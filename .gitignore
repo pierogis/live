@@ -1,0 +1,8 @@
+# generated
+__pycache__
+
+# venv
+venv
+
+# editor
+.vscode
