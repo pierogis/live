@@ -1,0 +1,20 @@
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="codeModel" v-cloak>
+        <p>{{ greeting }}</p>
+    </div>
+
+    <script src="{{ url_for('code.static', filename='index.js') }}"></script>
+</body>
+
+</html>
