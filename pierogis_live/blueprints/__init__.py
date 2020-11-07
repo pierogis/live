@@ -7,3 +7,6 @@ def register_blueprints(app: Flask):
 
     from .music import music
     app.register_blueprint(music)
+
+    from .art import art
+    app.register_blueprint(art)

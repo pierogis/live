@@ -1,0 +1,87 @@
+.banner {
+    height: 15vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-decoration: none;
+}
+
+.banner-text {
+    font-size: 3em;
+    font-weight: 600;
+    font-family: "Signika";
+    color: var(--secondary-color);
+    text-decoration: none;
+
+    text-shadow: 2px 2px var(--accent-color);
+}
+.banner-text:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.nav-bar {
+    height: 5vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--secondary-color);
+
+    box-shadow: 4px 4px var(--accent-color);
+
+    /* box-shadow: 0 0 3px 1px black; */
+}
+
+.nav-group {
+    width: 40%;
+    height: 150%;
+    
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 10px;
+    justify-items: center;
+    align-items: center;
+}
+
+.nav-page {
+    height: 100%;
+    width: 100%;
+    border-radius: 15%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--accent-color);
+
+    box-shadow: 4px 4px white;
+}
+
+.nav-page:hover {
+    filter: brightness(85%);
+}
+
+.nav-link {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 1.3em;
+    font-weight: 600;
+    font-family: "Signika";
+    color: white;
+    text-decoration: none;
+}
+.nav-link:hover {
+    color: white;
+    text-decoration: none;
+}

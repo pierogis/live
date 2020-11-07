@@ -1,18 +1,17 @@
 {% extends "app.html" %}
 
+{% block title %} pierogis.live {% endblock %}
+
 {% block head %}
-{% block title %}
-title
-{% endblock %}
-<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 {% endblock %}
 
-<body>
+{% block header %}
     {% include "header.html" %}
-    {% block content -%}
-    <div>
-        <p>I am not stealing your data</p>
-    </div>
-    {%- endblock content %}
+{% endblock %}
 
-</body>
+{% block content -%}
+<div>
+    <p>I am not stealing your data</p>
+</div>
+{%- endblock content %}

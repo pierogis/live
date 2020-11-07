@@ -1,0 +1,9 @@
+:root {
+    --main-bg-color: blanchedalmond;
+    --accent-color: rgb(165, 85, 85);
+    --secondary-color: cadetblue;
+  }
+
+body {
+    background-color: blanchedalmond;
+}
