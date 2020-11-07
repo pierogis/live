@@ -7,3 +7,6 @@ venv
 
 # editor
 .vscode
+
+# config
+.env
