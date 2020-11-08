@@ -1,6 +1,6 @@
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
-{% endblock %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+</head>
 
 <div class="banner">
     <a class="banner-text" href="{{ url_for('index') }}">
@@ -11,17 +11,16 @@
 <div class="nav-bar">
     <nav class="nav-group">
         <div class="nav-page">
-            <a class="nav-link" href="{{ url_for('code.index') }}">
-                /code
-            </a>
-        </div>
-        <div class="nav-page">
             <a class="nav-link" href="{{ url_for('index') }}">
 
                 /
             </a>
         </div>
-
+        <div class="nav-page">
+            <a class="nav-link" href="{{ url_for('code.index') }}">
+                /code
+            </a>
+        </div>
         <div class="nav-page">
             <a class="nav-link" href="{{ url_for('music.index') }}">
                 /music
