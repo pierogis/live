@@ -6,6 +6,7 @@ from flask import render_template
 from flask_cors import CORS
 
 from .blueprints import register_blueprints
+from .subdomains import register_subdomains
 
 
 def create_app():
@@ -18,8 +19,9 @@ def create_app():
     CORS(app, resources={r'/*': {'origins': '*'}})
 
     register_blueprints(app)
+    register_subdomains(app)
 
-    # print(app.url_map)
+    print(app.url_map)
 
     @app.route('/')
     def index():

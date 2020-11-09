@@ -9,3 +9,4 @@ code = Blueprint('code', __name__, url_prefix='/code',
 @code.route('', methods=['GET'])
 def index():
     return render_template('code/index.html', **{"greeting": "This is all my code!"})
+    
