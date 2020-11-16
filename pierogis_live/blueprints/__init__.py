@@ -10,3 +10,6 @@ def register_blueprints(app: Flask):
 
     from .art import art
     app.register_blueprint(art)
+
+    from .codenames import codenames
+    app.register_blueprint(codenames)
