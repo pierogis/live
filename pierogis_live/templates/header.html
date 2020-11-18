@@ -2,34 +2,36 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
 </head>
 
-<div class="banner">
-    <a class="banner-text" href="{{ url_for('index') }}">
-        Pierogis LIVE
-    </a>
+<div class="header">
+    <div class="banner">
+        <a class="banner-text" href="{{ url_for('index') }}">
+            Pierogis LIVE
+        </a>
+    </div>
+    <div class="nav-bar">
+        <nav class="nav-group">
+            <div class="nav-page">
+                <a class="nav-link" href="{{ url_for('index') }}">
+
+                    /
+                </a>
+            </div>
+            <div class="nav-page">
+                <a class="nav-link" href="{{ url_for('code.index') }}">
+                    /code
+                </a>
+            </div>
+            <div class="nav-page">
+                <a class="nav-link" href="{{ url_for('music.index') }}">
+                    /music
+                </a>
+            </div>
+            <div class="nav-page">
+                <a class="nav-link" href="{{ url_for('art.index') }}">
+                    /art
+                </a>
+            </div>
+        </nav>
+    </div>
 </div>
 
-<div class="nav-bar">
-    <nav class="nav-group">
-        <div class="nav-page">
-            <a class="nav-link" href="{{ url_for('index') }}">
-
-                /
-            </a>
-        </div>
-        <div class="nav-page">
-            <a class="nav-link" href="{{ url_for('code.index') }}">
-                /code
-            </a>
-        </div>
-        <div class="nav-page">
-            <a class="nav-link" href="{{ url_for('music.index') }}">
-                /music
-            </a>
-        </div>
-        <div class="nav-page">
-            <a class="nav-link" href="{{ url_for('art.index') }}">
-                /art
-            </a>
-        </div>
-    </nav>
-</div>

@@ -19,9 +19,9 @@ def create_app():
     CORS(app, resources={r'/*': {'origins': '*'}})
 
     register_blueprints(app)
-    register_subdomains(app)
+    # register_subdomains(app)
 
-    print(app.url_map)
+    # print(app.url_map)
 
     @app.route('/')
     def index():

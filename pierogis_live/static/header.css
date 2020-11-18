@@ -1,3 +1,7 @@
+.header {
+    padding-bottom: 50px;
+}
+
 .banner {
     height: 15vh;
 
@@ -31,6 +35,8 @@
     background-color: var(--secondary-color);
 
     box-shadow: 4px 4px var(--accent-color);
+
+    /*padding-bottom: 10px;*/
 
     /* box-shadow: 0 0 3px 1px black; */
 }

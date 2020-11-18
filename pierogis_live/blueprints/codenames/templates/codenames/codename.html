@@ -4,6 +4,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('codenames.static', filename='codenames.css') }}">
+<link rel="stylesheet" href="{{ url_for('codenames.static', filename='video.css') }}">
 {% endblock %}
 
 {% block header %}
@@ -11,5 +12,5 @@
 {% endblock %}
 
 {% block content -%}
-{% include "codenames/partials/music_video.html"}
+{% include "codenames/partials/video.html" %}
 {%- endblock content %}
