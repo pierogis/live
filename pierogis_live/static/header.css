@@ -1,9 +1,12 @@
 .header {
-    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 25px;
 }
 
 .banner {
-    height: 15vh;
+    height: 90px;
 
     display: flex;
     justify-content: center;
@@ -14,27 +17,50 @@
 
 .banner-text {
     font-size: 3em;
-    font-weight: 600;
-    font-family: "Signika";
+    font-family: "Titillium Web";
     color: var(--secondary-color);
+    letter-spacing: 9px;
+
     text-decoration: none;
 
-    text-shadow: 2px 2px var(--accent-color);
+    text-shadow: 3px 3px var(--accent-color);
+
+    margin-bottom: 5px;
 }
 .banner-text:hover {
     text-decoration: none;
 }
 
 .nav-bar {
-    height: 5vh;
+    height: 40px;
+    width: 95%;
+
+    align-self: center;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    background-color: var(--secondary-color);
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      var(--secondary-color) 4px,
+      var(--secondary-color) 7px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      var(--secondary-color),
+      var(--secondary-color) 8px,
+      var(--accent-color) 8px,
+      var(--accent-color) 9px
+    );
 
-    box-shadow: 4px 4px var(--accent-color);
+    box-shadow:
+        0px 0px 5px 1px rgba(0, 0, 0, 0.2),
+        4px 4px var(--accent-color),
+        5px 5px 10px 1px rgba(0, 0, 0, 0.5)
+    ;
 
     /*padding-bottom: 10px;*/
 
@@ -42,22 +68,22 @@
 }
 
 .nav-group {
-    width: 40%;
-    height: 150%;
+    width: 300px;
+    height: 170%;
     
     margin: 0 auto;
 
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: 10px;
+    grid-gap: 5px;
     justify-items: center;
     align-items: center;
 }
 
-.nav-page {
+.nav-tab {
     height: 100%;
     width: 100%;
-    border-radius: 15%;
+    border-radius: 50%;
 
     display: flex;
     justify-content: center;
@@ -65,7 +91,9 @@
 
     background-color: var(--accent-color);
 
-    box-shadow: 4px 4px white;
+    box-shadow:
+        0px 0px 5px 1px rgba(0, 0, 0, 0.4)
+    ;
 }
 
 .nav-page:hover {
@@ -80,10 +108,11 @@
     justify-content: center;
     align-items: center;
 
-    font-size: 1.3em;
-    font-weight: 600;
-    font-family: "Signika";
+    font-size: 1em;
+    font-family: "Titillium Web";
     color: white;
+    letter-spacing: 3px;
+
     text-decoration: none;
     text-shadow: 2px 2px var(--secondary-color);
 }

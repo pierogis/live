@@ -18,6 +18,6 @@ def index():
 
 @codenames.route('/<codename>', methods=['GET'])
 def codename(codename: str):
-    C
     video = Video('http://d3ds4cnxj62erj.cloudfront.net/oh~no!/ono.mp4')
+    video.name = "oh~no!"
     return render_template('codenames/codename.html', video=video)

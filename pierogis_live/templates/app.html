@@ -3,33 +3,35 @@
 
 <head>
 
-  <title>
-    {% block title %}pierogis live{% endblock %}
-  </title>
+    <title>
+        {% block title %}pierogis-live{% endblock %}
+    </title>
 
-  <!-- Google Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Signika">
-  
-  <!-- App styles -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Signika">
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@1,700&display=swap" rel="stylesheet">
 
-  {% block head %}{% endblock %}
+    <!-- App styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+
+    {% block head %}{% endblock %}
 
 </head>
 
 <body>
-  <header>{% block header %}{% endblock header %}</header>
+<div class="background">
+    <header>{% block header %}{% endblock header %}</header>
 
-  <section class="content">
-    {% for message in get_flashed_messages() %}
-    <div class="flash"><{{ message }}/div>
-    {% endfor %}
+    <section class="page">
+        {% for message in get_flashed_messages() %}
+        <div class="flash"><{{ message }}/div>
+            {% endfor %}
 
-    {% block content %}{% endblock %}
-  </section>
-
+            {% block page %}{% endblock %}
+    </section>
+</div>
 </body>
-
 
 
 </html>

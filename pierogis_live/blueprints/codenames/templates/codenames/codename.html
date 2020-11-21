@@ -4,13 +4,13 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('codenames.static', filename='codenames.css') }}">
-<link rel="stylesheet" href="{{ url_for('codenames.static', filename='video.css') }}">
+<link rel="stylesheet" href="{{ url_for('codenames.static', filename='content.css') }}">
 {% endblock %}
 
 {% block header %}
 {% include "header.html" %}
 {% endblock %}
 
-{% block content -%}
-{% include "codenames/partials/video.html" %}
-{%- endblock content %}
+{% block page -%}
+{% include "codenames/partials/content.html" %}
+{%- endblock page %}
