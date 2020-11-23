@@ -1,3 +1,3 @@
-# Pierogis Live
+# pierogis-live
 
 Portfoliated

@@ -1,11 +1,17 @@
 from setuptools import setup
+from setuptools import find_packages
 
 setup(
     name='pierogis-live',
-    packages=['pierogis_live'],
+    packages=find_packages('src'),
     include_package_data=True,
     install_requires=[
         'flask',
-        'ffmpeg'
+        'ffmpeg',
+        'python-dotenv',
+        'flask-cors',
+        'flask-sqlalchemy',
+        'flask-migrate',
+        'py-postgresql'
     ],
 )
