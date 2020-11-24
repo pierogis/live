@@ -43,9 +43,8 @@
 .content-title {
     margin: 0px;
     font-size: 1em;
-    font-family: "Titillium Web";
     color: white;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
 
     text-shadow: 2px 2px var(--secondary-color);
 }

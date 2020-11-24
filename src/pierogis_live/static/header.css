@@ -18,6 +18,9 @@
 .banner-text {
     font-size: 3em;
     font-family: "Titillium Web";
+    font-style: italic;
+    font-weight: 700;
+
     color: var(--secondary-color);
     letter-spacing: 9px;
 
@@ -43,8 +46,8 @@
 
     background-image: repeating-linear-gradient(
       45deg,
-      transparent,
-      transparent 2px,
+      var(--secondary-color-t) ,
+      var(--secondary-color-t) 0px,
       var(--secondary-color) 4px,
       var(--secondary-color) 7px
     ),
@@ -110,6 +113,9 @@
 
     font-size: 1em;
     font-family: "Titillium Web";
+    font-style: italic;
+    font-weight: 700;
+
     color: white;
     letter-spacing: 3px;
 

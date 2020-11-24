@@ -6,6 +6,9 @@ from flask import Flask
 def register_subdomains(app: Flask):
     register_apis(app)
 
+    from .app import app
+    app.register_blueprint(app)
+
 def register_apis(app: Flask):
     from .api.v0_1 import api as api_v0_1
 

@@ -2,6 +2,9 @@ from flask import Flask
 
 
 def register_blueprints(app: Flask):
+    from .base import base
+    app.register_blueprint(base)
+
     from .code import code
     app.register_blueprint(code)
 
@@ -11,5 +14,5 @@ def register_blueprints(app: Flask):
     from .art import art
     app.register_blueprint(art)
 
-    from .codenames import codenames
-    app.register_blueprint(codenames)
+    from .content import content
+    app.register_blueprint(content)

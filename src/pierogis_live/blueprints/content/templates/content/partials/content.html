@@ -1,13 +1,15 @@
 <div class="content">
+    {% if content.content_type == 'v' %}
     <div class="video-box">
         <video inline-template class="video" height="425" controls="true">
-            <source src="{{ video.path }}" type="video/mp4">
+            <source src="{{ content.url }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>
+    {% endif %}
     <div class="content-title-blob">
         <p class="content-title">
-            {{ video.name }}
+            {{ content.title }}
         </p>
     </div>
 </div>

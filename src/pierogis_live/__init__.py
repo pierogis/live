@@ -27,12 +27,9 @@ def create_app():
     register_blueprints(app)
     # register_subdomains(app)
 
-    # print(app.url_map)
+    from . import models
+    from . import routes
 
-    from pierogis_live import models
-
-    @app.route('/')
-    def index():
-        return render_template('index.html')
+    print(app.url_map)
 
     return app

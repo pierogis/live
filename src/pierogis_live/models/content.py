@@ -14,9 +14,9 @@ class Content(db.Model):
 
     codename = db.Column(db.String(4), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('content.id'))
-    subcontent = db.relationship('Content', backref='project', lazy='dynamic')
+    subcontent = db.relationship('Content', backref='project', remote_side=id)
 
-    content_type = db.Column(db.Enum(ContentType), index=True)
+    content_type = db.Column(db.Enum(ContentType), index=True, nullable=False)
     created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     palette = db.Column(db.Integer, db.ForeignKey('palette.id'), index=True)
@@ -30,3 +30,13 @@ class Content(db.Model):
 
     def __repr__(self):
         return "<Content {}-{}>".format(self.parent, self.codename)
+
+    @classmethod
+    def from_json(cls, json: dict, file):
+        # upload file to s3 to be served with cloudfront
+        # get cloudfront address back
+
+        url = "cdn.pierogis.live"
+
+        return cls(url=url, **json)
+

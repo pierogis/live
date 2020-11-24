@@ -3,4 +3,4 @@ from flask import request
 
 api = Blueprint('api_0.1', __name__)
 
-from . import image
+from . import routes

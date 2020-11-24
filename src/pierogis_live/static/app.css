@@ -1,7 +1,12 @@
 :root {
-    --main-bg-color: rgb(255, 235, 205);
-    --accent-color: rgb(165, 85, 85);
-    --secondary-color: rgb(95, 158, 160);
+    --primary-color: rgba(255, 235, 205, 1);
+    --accent-color: rgba(165, 85, 85, 1);
+    --secondary-color: rgba(95, 158, 160, 1);
+    --text-color: rgba(48, 79, 80, 1);
+
+    --primary-color-t: rgba(255, 235, 205, 0);
+    --accent-color-t: rgba(165, 85, 85, 0);
+    --secondary-color-t: rgba(95, 158, 160, 0);
 }
 
 body {
@@ -11,6 +16,13 @@ body {
     align-items: center;
 
     background-color: var(--accent-color);
+
+
+    font-family: "Open Sans";
+    font-weight: 600;
+    font-style: normal;
+
+    color: var(--text-color)
 }
 
 .background {
@@ -20,7 +32,7 @@ body {
     flex-direction: column;
 
     background-size: 40px 40px;
-    background-image: radial-gradient(circle, var(--main-bg-color) 1px, var(--main-bg-color) 2px);
+    background-image: radial-gradient(circle, var(--primary-color) 1px, var(--primary-color) 2px);
 
     box-shadow:
         5px 5px 0 var(--secondary-color),

@@ -1,0 +1,16 @@
+{% extends "app.html" %}
+
+{% block title %} codename {% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('content.static', filename='codename.css') }}">
+<link rel="stylesheet" href="{{ url_for('content.static', filename='content.css') }}">
+{% endblock %}
+
+{% block header %}
+{% include "header.html" %}
+{% endblock %}
+
+{% block page -%}
+{% include "content/partials/content.html" %}
+{%- endblock page %}

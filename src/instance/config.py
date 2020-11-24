@@ -7,6 +7,7 @@ load_dotenv(find_dotenv())
 
 CONTENT_HOME = os.getenv('CONTENT_HOME')
 FLASK_ENV = 'development'
+API_ADDRESS = os.getenv('API_ADDRESS')
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SEND_FILE_MAX_AGE_DEFAULT = 0
