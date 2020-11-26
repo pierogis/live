@@ -6,9 +6,10 @@
 }
 
 .banner {
-    height: 90px;
+    height: 140px;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 
@@ -71,14 +72,14 @@
 }
 
 .nav-group {
-    width: 300px;
+    width: 350px;
     height: 170%;
     
     margin: 0 auto;
 
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-gap: 5px;
+    grid-gap: 20px;
     justify-items: center;
     align-items: center;
 }
