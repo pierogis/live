@@ -1,6 +1,8 @@
 # generated
 __pycache__
 *.egg-info
+/dist/
+/build/
 
 # venv
 venv
@@ -8,5 +10,6 @@ venv
 # editor
 .vscode
 
-# config
+# env
 .env
+.flaskenv

@@ -1,0 +1,2 @@
+global-include *.css, *.js, *.html
+global-exclude *.pyc

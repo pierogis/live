@@ -1,0 +1,20 @@
+[Unit]
+Description = pierogis-live
+After = network.target
+
+[Service]
+PermissionsStartOnly = true
+PIDFile = /run/pierogis-live/pierogis-live.pid
+User = pierogis-live
+Group = pierogis-live
+WorkingDirectory = /opt/pierogis-live
+ExecStartPre = /bin/mkdir /run/pierogis-live
+ExecStartPre = /bin/chown -R pierogis-live:pierogis-live /run/pierogis-live
+ExecStart = /bin/env gunicorn 'pierogis-live:create_app()' -b 0.0.0.0:8000 --pid /run/pierogis-live/pierogis-live.pid
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+ExecStopPost = /bin/rm -rf /run/pierogis-live
+PrivateTmp = true
+
+[Install]
+WantedBy = multi-user.target

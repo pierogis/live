@@ -17,7 +17,7 @@ def create_app():
     """Create a flask app and configure it
     """
 
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
     app.config.from_pyfile('config.py')
 
     CORS(app, resources={r'/*': {'origins': '*'}})
@@ -30,6 +30,6 @@ def create_app():
     from . import models
     from . import routes
 
-    print(app.url_map)
+    # print(app.url_map)
 
     return app
