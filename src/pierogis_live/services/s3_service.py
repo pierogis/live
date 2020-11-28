@@ -3,30 +3,24 @@ from flask import Flask
 
 from pierogis_live.exceptions import FileSizeError
 
-import os
-import sys
-import threading
-
-from pierogis_live.models import Content
-
-
-def check_progress(complete, total):
-    print(complete / total)
-
 
 class S3Service:
 
-    def __init__(self, app: Flask=None):
+    def __init__(self, app: Flask=None, storage_client=boto3.client('s3')):
         if app is not None:
-            self.content_bucket = app.config.content_bucket
-        self.s3 = boto3.client('s3')
+            self.init_app(app)
+        self.storage_client = storage_client
 
     def init_app(self, app: Flask):
-        self.content_bucket = app.config.content_bucket
+        self.content_home = app.config.get('CONTENT_HOME')
 
-    def upload_content(self, file, path: str, content: Content):
+    def upload_content(self, file, path: str):
         max_size = 10 ** 6
-        if file.size >= max_size:
-            raise FileSizeError('File must be less than ' + max_size)
+        # if file.size >= max_size:
+        #     raise FileSizeError('File must be less than ' + max_size)
 
-        self.s3.upload_fileobj(file, self.content_bucket, path + content.id, cb=check_progress)
+        self.storage_client.upload_fileobj(file, self.content_home, 'content' + path)
+
+    # @staticmethod
+    # def check_progress(complete, total):
+    #     print(complete / total)

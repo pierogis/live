@@ -1,24 +1,25 @@
-from flask import request
-import boto3
+import json
+import uuid
 
+from flask import request
+
+from pierogis_live import s3
 from pierogis_live.models import Content
 from pierogis_live.models import Palette
-from pierogis_live.services import S3Service
 
 from . import api
 
 
 @api.route('/content', methods=['POST'])
 def post_content():
-    body = request.json
-    file = request.files['file']
+    form = request.form.to_dict()
+    body = json.loads(form['json'])
+    file = request.files.get('file')
 
-    content = Content.from_json(body, file)
+    content_id = uuid.uuid4()
+    content = Content(id=content_id, **body)
+    extension = file.filename.split('.')[-1]
+    content.file_name = str(content.id) + '.' + extension
+    s3.upload_content(file, content.file_path)
 
-    parent_id = content.parent_id
-    path = ''
-    while parent_id is not '':
-        path += parent_id + '/'
-
-    s3 = S3Service()
-    s3.upload_content(file, path, content)
+    return True
