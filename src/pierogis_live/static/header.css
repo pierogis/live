@@ -6,7 +6,7 @@
 }
 
 .banner {
-    height: 140px;
+    height: 125px;
 
     display: flex;
     flex-direction: column;
@@ -21,6 +21,9 @@
     font-family: "Titillium Web";
     font-style: italic;
     font-weight: 700;
+
+    padding-left: 20px;
+    padding-right: 20px;
 
     color: var(--secondary-color);
     letter-spacing: 9px;

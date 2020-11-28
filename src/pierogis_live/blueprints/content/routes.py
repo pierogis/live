@@ -12,7 +12,7 @@ def index():
 @content.route('/<content>', methods=['GET'])
 def content(content: str):
     content = Content(
-        url='http://d3ds4cnxj62erj.cloudfront.net/oh~no!/ono.mp4',
+        url='http://cdn.pierogis.live/oh~no!/oh~no_viz.mp4',
         content_type = 'v',
         title="oh~no!"
     )
