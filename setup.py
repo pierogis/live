@@ -14,6 +14,7 @@ setup(
         'flask-cors',
         'flask-sqlalchemy',
         'flask-migrate',
-        'py-postgresql'
+        'py-postgresql',
+        'requests'
     ],
 )

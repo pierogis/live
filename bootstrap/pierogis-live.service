@@ -1,20 +1,13 @@
 [Unit]
-Description = pierogis-live
-After = network.target
+Description=Gunicorn instance to serve pierogis-live
+After=network.target
 
 [Service]
-PermissionsStartOnly = true
-PIDFile = /run/pierogis-live/pierogis-live.pid
-User = pierogis-live
-Group = pierogis-live
-WorkingDirectory = /opt/pierogis-live
-ExecStartPre = /bin/mkdir /run/pierogis-live
-ExecStartPre = /bin/chown -R pierogis-live:pierogis-live /run/pierogis-live
-ExecStart = /bin/env gunicorn 'pierogis-live:create_app()' -b 0.0.0.0:8000 --pid /run/pierogis-live/pierogis-live.pid
-ExecReload = /bin/kill -s HUP $MAINPID
-ExecStop = /bin/kill -s TERM $MAINPID
-ExecStopPost = /bin/rm -rf /run/pierogis-live
-PrivateTmp = true
+User=pierogis-live
+Group=pierogis-live
+WorkingDirectory=/home/pierogis-live/pierogis-live
+Environment="PATH=/home/pierogis-live/pierogis-live/venv/bin"
+ExecStart=/home/pierogis-live/pierogis-live/venv/bin/gunicorn --workers 3 --bind unix:/home/pierogis-live/pierogis-live/pierogis-live.sock -m 007 'pierogis_live:create_app()'
 
 [Install]
-WantedBy = multi-user.target
+WantedBy=multi-user.target
