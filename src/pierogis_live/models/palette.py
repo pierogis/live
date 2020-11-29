@@ -10,3 +10,4 @@ class Palette(db.Model):
     primary = db.Column(db.String(6))
     secondary = db.Column(db.String(6))
     accent = db.Column(db.String(6))
+    text = db.Column(db.String(6))

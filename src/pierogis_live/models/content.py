@@ -19,15 +19,14 @@ class Content(db.Model):
     id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
 
     codename = db.Column(db.String(4), nullable=False)
-    project_id = db.Column(UUID(as_uuid=True), db.ForeignKey('content.id'))
-    subcontent = db.relationship('Content', backref=db.backref('project', remote_side=[id]))
+    project_id = db.Column(UUID(as_uuid=True), db.ForeignKey('project.id'), nullable=False)
+
+    created = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
+    uploaded = db.Column(db.DateTime, index=True)
 
     content_type = db.Column(db.Enum(FileType), index=True, nullable=False)
-    created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    uploaded = db.Column(db.Boolean, index=True, default=False)
-
+    extension = db.Column(db.String(10), nullable=False)
     title = db.Column(db.String(80))
-    file_name = db.Column(db.String(120))
 
     palette_id = db.Column(UUID(as_uuid=True), db.ForeignKey('palette.id'))
     palette = db.relationship('Palette')
@@ -39,31 +38,31 @@ class Content(db.Model):
     def __repr__(self):
         return "<Content {}-{}>".format(str(self.id), self.codename)
 
-    @property
-    def project(self):
-        return self.query(id=self.project_id).first()
+    # @property
+    # def project(self):
+    #     return self.query(id=self.project_id).first()
 
     @property
     def path(self):
         # get path of parent project and append own codename
-        project = self.project
-        if project is not None:
-            parent_path = self.project.path + '/'
-        else:
-            parent_path = '/'
+        return self.project.path + '/'
 
-        return parent_path + self.codename
+    @property
+    def file_name(self):
+        return self.codename + '.' + self.extension
 
     @property
     def file_path(self):
-        return "{}/{}".format(self.path, self.file_name)
+        return self.path + self.file_name
 
-    # @classmethod
-    # def from_json(cls, json: dict, file):
-    #     return cls(**json)
-    #
-    # def to_json(self):
-    #     # upload file to s3 to be served with cloudfront
-    #     # get cloudfront address back
-    #
-    #     return self.__dict__
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'codename': self.codename,
+            'project_id': self.project_id,
+            'created': self.created,
+            'content_type': str(self.content_type.name),
+            'extension': self.extension,
+            'title': self.title,
+            'palette_id': self.palette_id,
+        }

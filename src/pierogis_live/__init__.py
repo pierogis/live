@@ -12,7 +12,7 @@ from .blueprints import register_blueprints
 from .subdomains import register_subdomains
 
 db = SQLAlchemy()
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 s3 = S3Service()
 
 def create_app():
