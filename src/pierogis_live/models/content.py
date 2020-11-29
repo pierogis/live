@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import text
@@ -7,7 +8,7 @@ from sqlalchemy import text
 from pierogis_live import db
 
 
-class ContentType(Enum):
+class FileType(Enum):
     video = 'v'
     audio = 'a'
     image = 'i'
@@ -15,26 +16,28 @@ class ContentType(Enum):
 
 
 class Content(db.Model):
-    id = db.Column(UUID(as_uuid=True), primary_key=True)
+    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
 
     codename = db.Column(db.String(4), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('content.id'))
+    project_id = db.Column(UUID(as_uuid=True), db.ForeignKey('content.id'))
     subcontent = db.relationship('Content', backref=db.backref('project', remote_side=[id]))
 
-    content_type = db.Column(db.Enum(ContentType), index=True, nullable=False)
+    content_type = db.Column(db.Enum(FileType), index=True, nullable=False)
     created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-    palette = db.Column(db.Integer, db.ForeignKey('palette.id'), index=True)
+    uploaded = db.Column(db.Boolean, index=True, default=False)
 
     title = db.Column(db.String(80))
     file_name = db.Column(db.String(120))
+
+    palette_id = db.Column(UUID(as_uuid=True), db.ForeignKey('palette.id'))
+    palette = db.relationship('Palette')
 
     __table_args__ = (
         db.UniqueConstraint('codename', 'project_id'),
     )
 
     def __repr__(self):
-        return "<Content {}-{}>".format(self.id, self.codename)
+        return "<Content {}-{}>".format(str(self.id), self.codename)
 
     @property
     def project(self):

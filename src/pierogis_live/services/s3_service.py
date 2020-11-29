@@ -14,12 +14,12 @@ class S3Service:
     def init_app(self, app: Flask):
         self.content_home = app.config.get('CONTENT_HOME')
 
-    def upload_content(self, file, path: str):
+    def upload_content(self, file, path: str, callback=None):
         max_size = 10 ** 6
         # if file.size >= max_size:
         #     raise FileSizeError('File must be less than ' + max_size)
 
-        self.storage_client.upload_fileobj(file, self.content_home, 'content' + path)
+        self.storage_client.upload_fileobj(file, self.content_home, 'content' + path, Callback=callbackr)
 
     # @staticmethod
     # def check_progress(complete, total):

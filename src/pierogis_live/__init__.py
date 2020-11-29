@@ -19,10 +19,10 @@ def create_app():
     """Create a flask app and configure it
     """
 
-    app = Flask(__name__)
+    app = Flask(__name__, subdomain_matching=True)
     app.config.from_pyfile('config.py')
 
-    cors = CORS(app, resources={r'/*': {'origins': "http://localhost:port"}})
+    cors = CORS(app, resources={r'/*': {'origins': "http://*.{}".format(app.config['SERVER_NAME'])}})
     db.init_app(app)
     migrate.init_app(app, db)
     s3.init_app(app)

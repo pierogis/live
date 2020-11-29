@@ -202,6 +202,17 @@ optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
 [[package]]
+name = "pg8000"
+version = "1.16.6"
+description = "PostgreSQL interface library"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+scramp = "1.2.0"
+
+[[package]]
 name = "py-postgresql"
 version = "1.2.2"
 description = "PostgreSQL driver and tools library."
@@ -269,6 +280,14 @@ python-versions = "*"
 botocore = ">=1.12.36,<2.0a.0"
 
 [[package]]
+name = "scramp"
+version = "1.2.0"
+description = "An implementation of the SCRAM protocol."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "six"
 version = "1.15.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -324,7 +343,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "692cc8324c55c9d943b6023e971e26ca6cb46734c9f9cbef59437f7ee79faed0"
+content-hash = "0c3d56418e7d0515acb11dc0ecea65476ce134b78a7c6120da3691fa03214344"
 
 [metadata.files]
 alembic = [
@@ -429,6 +448,10 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1-cp38-cp38-win_amd64.whl", hash = "sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be"},
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
+pg8000 = [
+    {file = "pg8000-1.16.6-py3-none-any.whl", hash = "sha256:66fa16a402f38f8ba664206b4ba4040f24ea9641c4205b2b96a1ff3a613de3be"},
+    {file = "pg8000-1.16.6.tar.gz", hash = "sha256:8fc1e6a62ccb7c9830f1e7e9288e2d20eaf373cc8875b5c55b7d5d9b7717be91"},
+]
 py-postgresql = [
     {file = "py-postgresql-1.2.2.tar.gz", hash = "sha256:321a40123ee4a2afd07d26b96f466302308d709f71b4a71baa60468b0ed281d3"},
 ]
@@ -454,6 +477,10 @@ requests = [
 s3transfer = [
     {file = "s3transfer-0.3.3-py2.py3-none-any.whl", hash = "sha256:2482b4259524933a022d59da830f51bd746db62f047d6eb213f2f8855dcb8a13"},
     {file = "s3transfer-0.3.3.tar.gz", hash = "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"},
+]
+scramp = [
+    {file = "scramp-1.2.0-py3-none-any.whl", hash = "sha256:74815c25aad1fe0b5fb994e96c3de63e8695164358a80138352aaadfa4760350"},
+    {file = "scramp-1.2.0.tar.gz", hash = "sha256:d6865ed1d135ddb124a619d7cd3a5b505f69a7c92e248024dd7e48bc77752af5"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},

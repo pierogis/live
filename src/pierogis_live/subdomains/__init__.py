@@ -3,11 +3,13 @@
 
 from flask import Flask
 
+from .api import register_apis
+
 def register_subdomains(app: Flask):
     register_apis(app)
 
-def register_apis(app: Flask):
-    from .api.v0_1 import api as api_v0_1
+    from .admin import admin
+    app.register_blueprint(admin, subdomain='admin')
 
-    # app.register_blueprint(api_v0_1, url_prefix='/0.1', subdomain='api')
-    app.register_blueprint(api_v0_1, url_prefix='/0.1')
+
+
