@@ -11,14 +11,10 @@
 {% endblock %}
 
 {% block page -%}
-    <div class="project">
-        {% for content in project.contents %}
-            {% include "content/partials/content.html" %}
-        {% endfor %}
-        {% for project in project.projects %}
+    <div class="projects">
+        {% for project in projects %}
             {% include "content/partials/project.html" %}
+            <hr>
         {% endfor %}
-
-        {% include "content/partials/title-blob.html" %}
     </div>
 {%- endblock page %}

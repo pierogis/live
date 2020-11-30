@@ -1,15 +1,14 @@
 <div class="content">
-    {% if content.content_type == 'v' %}
-    <div class="video-box">
-        <video inline-template class="video" height="350" controls="true">
-            <source src="{{ content.url }}" type="video/mp4">
+    {% if content.media_type.name == 'video' %}
+    <div class="content-box">
+        <video inline-template class="video" height="200" controls="true">
+            <source src="{{ cdn + content.file_path }}" type="{{ content.media_type.name + '/' + content.extension }}">
             Your browser does not support the video tag.
         </video>
     </div>
-    {% endif %}
-    <div class="content-title-blob">
-        <p class="content-title">
-            {{ content.title }}
-        </p>
+    {% elif content.media_type.name == 'image' %}
+    <div class="content-box">
+        <img inline-template class="image" height="200" src="{{ cdn + content.file_path }}">
     </div>
+    {% endif %}
 </div>

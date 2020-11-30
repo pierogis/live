@@ -1,5 +1,11 @@
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+
+    <style>
+        .nav-group {
+            grid-template-columns: {{ ' '.join(['1fr'] * tabs|count) }};
+        }
+    </style>
 </head>
 
 <div class="header">
@@ -14,27 +20,15 @@
     </div>
     <div class="nav-bar">
         <nav class="nav-group">
-            <div class="nav-tab">
-                <a class="nav-link" href="{{ url_for('base.index') }}">
-
-                    /
-                </a>
-            </div>
-            <div class="nav-tab">
-                <a class="nav-link" href="{{ url_for('code.index') }}">
-                    /code
-                </a>
-            </div>
-            <div class="nav-tab">
-                <a class="nav-link" href="{{ url_for('music.index') }}">
-                    /music
-                </a>
-            </div>
-            <div class="nav-tab">
-                <a class="nav-link" href="{{ url_for('art.index') }}">
-                    /art
-                </a>
-            </div>
+            {% for tab in tabs %}
+            <a class="nav-tab" href="{{ tab.path }}">
+                <div>
+                    <span class="nav-link">
+                        {{ tab.name }}
+                    </span>
+                </div>
+            </a>
+            {% endfor %}
         </nav>
     </div>
 </div>

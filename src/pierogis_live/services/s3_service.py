@@ -19,7 +19,7 @@ class S3Service:
         # if file.size >= max_size:
         #     raise FileSizeError('File must be less than ' + max_size)
 
-        self.storage_client.upload_fileobj(file, self.content_home, 'content' + path, Callback=callback)
+        self.storage_client.upload_fileobj(file, self.content_home, 'content/' + path, Callback=callback)
 
     # @staticmethod
     # def check_progress(complete, total):

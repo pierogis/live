@@ -35,4 +35,9 @@ def create_app():
 
     # print(app.url_map)
 
+    from .models import Content, Project, Palette
+    @app.shell_context_processor
+    def make_shell_context():
+        return {'db': db, 'Content': Content, 'Project': Project, 'Palette': Palette}
+
     return app

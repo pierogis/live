@@ -3,6 +3,7 @@ import json
 import uuid
 
 from flask import request
+from flask import jsonify
 
 from pierogis_live import s3
 from pierogis_live import db
@@ -32,7 +33,7 @@ def post_content():
 
     file = request.files.get('file')
 
-    content = Content(content_type=file.content_type.split('/')[0], **body)
+    content = Content(media_type=file.content_type.split('/')[0], **body)
 
     # set title to file name if not in body
     if not content.title:
@@ -53,16 +54,39 @@ def post_content():
 
 @api.route('/projects', methods=['POST'])
 def post_project():
-    form = request.form.to_dict()
-    body = json.loads(form['json'])
+    body = request.json
 
     project = Project(**body)
 
     # set title to file name if not in body
     if not project.title:
-        project.title = 'ok'
+        project.title = project.codename
 
     db.session.add(project)
+    db.session.commit()
+
+    return project.to_dict()
+
+
+@api.route('/projects/<project_id>', methods=['GET'])
+def get_project(project_id: str):
+    project = Project.query.get(project_id)
+
+    return project.to_dict()
+
+@api.route('/projects', methods=['GET'])
+@api.route('/projects/', methods=['GET'])
+def get_projects():
+    projects = Project.query.all()
+
+    return jsonify([project.to_dict() for project in projects])
+
+@api.route('/projects/<project_id>', methods=['PATCH'])
+def patch_project(project_id: str):
+    body = request.json
+
+    project = Project.query.get(project_id)
+    project.update(**body)
     db.session.commit()
 
     return project.to_dict()

@@ -3,28 +3,28 @@ from enum import Enum
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import text
 
 from pierogis_live import db
 
+from .update_mixin import UpdateMixin
 
-class FileType(Enum):
-    video = 'v'
-    audio = 'a'
-    image = 'i'
-    text = 't'
+class MediaType(Enum):
+    video = 'video'
+    audio = 'audio'
+    image = 'image'
+    text = 'text'
 
 
-class Content(db.Model):
-    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+class Content(db.Model, UpdateMixin):
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     codename = db.Column(db.String(4), nullable=False)
     project_id = db.Column(UUID(as_uuid=True), db.ForeignKey('project.id'), nullable=False)
 
-    created = db.Column(db.DateTime, index=True, default=datetime.utcnow, nullable=False)
+    created = db.Column(db.DateTime, index=True, nullable=False, default=datetime.utcnow)
     uploaded = db.Column(db.DateTime, index=True)
 
-    content_type = db.Column(db.Enum(FileType), index=True, nullable=False)
+    media_type = db.Column(db.Enum(MediaType), index=True, nullable=False)
     extension = db.Column(db.String(10), nullable=False)
     title = db.Column(db.String(80))
 
@@ -61,8 +61,8 @@ class Content(db.Model):
             'codename': self.codename,
             'project_id': self.project_id,
             'created': self.created,
-            'content_type': str(self.content_type.name),
+            'media_type': str(self.media_type.name),
             'extension': self.extension,
             'title': self.title,
-            'palette_id': self.palette_id,
+            'palette_id': self.palette_id
         }

@@ -1,0 +1,9 @@
+<div class="project">
+    {% with content=project.main_content %}
+        {% if content %}
+            {% include "content/partials/content.html" %}
+        {% endif %}
+    {% endwith %}
+
+    {% include "content/partials/title-blob.html" %}
+</div>
