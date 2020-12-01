@@ -1,14 +1,12 @@
-<div class="content">
-    {% if content.media_type.name == 'video' %}
-    <div class="content-box">
-        <video inline-template class="video" height="200" controls="true">
-            <source src="{{ cdn + content.file_path }}" type="{{ content.media_type.name + '/' + content.extension }}">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-    {% elif content.media_type.name == 'image' %}
-    <div class="content-box">
-        <img inline-template class="image" height="200" src="{{ cdn + content.file_path }}">
-    </div>
-    {% endif %}
+<div class="content-box">
+    <a class="content-link" href="{{ project.path }}">
+        {% if content.media_type.name == 'video' %}
+            <video inline-template class="content" controls="true">
+                <source src="{{ cdn + content.file_path }}" type="{{ content.media_type.name + '/' + content.extension }}">
+                Your browser does not support the video tag.
+            </video>
+        {% elif content.media_type.name == 'image' %}
+            <img inline-template class="content" src="{{ cdn + content.file_path }}">
+        {% endif %}
+    </a>
 </div>

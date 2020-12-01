@@ -1,36 +1,28 @@
 .header {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding-bottom: 25px;
+    padding-left: 1%;
+    padding-right: 1%;
 }
 
 .banner {
-    height: 125px;
-
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
-    text-decoration: none;
 }
 
 .banner-text {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-family: "Titillium Web";
     font-style: italic;
     font-weight: 700;
 
-    padding-left: 20px;
-    padding-right: 20px;
-
     color: var(--secondary-color);
-    letter-spacing: 9px;
+    letter-spacing: .35rem;
 
     text-decoration: none;
 
-    text-shadow: 3px 3px var(--accent-color);
+    text-shadow: .15rem .15rem var(--accent-color);
 
     margin-bottom: 5px;
 }
@@ -39,8 +31,9 @@
 }
 
 .nav-bar {
-    height: 40px;
-    width: 95%;
+    width: 95vw;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 
     align-self: center;
 
@@ -71,37 +64,34 @@
 }
 
 .nav-group {
-    width: 350px;
-    height: 170%;
-    
-    margin: 0 auto;
-
     display: grid;
-    grid-gap: 20px;
-    justify-items: center;
-    align-items: center;
+    grid-gap: 5%;
+}
+
+.nav-link {
+    text-decoration: none;
 }
 
 .nav-tab {
     border-radius: 100px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 2px;
+    padding-bottom: .15rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
 
     background-color: var(--accent-color);
 
-    text-decoration: none;
+    text-align: center;
 }
 
-.nav-page:hover {
+.nav-tab:hover {
     filter: brightness(85%);
 }
 
-.nav-link {
+.nav-text {
     height: 100%;
     width: 100%;
 
-    font-size: 1em;
+    font-size: 1.2rem;
     font-family: "Titillium Web";
     font-style: italic;
     font-weight: 700;
@@ -109,6 +99,6 @@
     color: white;
     letter-spacing: 3px;
 }
-.nav-link:hover {
+.nav-text:hover {
     color: white;
 }

@@ -21,9 +21,9 @@
     <div class="nav-bar">
         <nav class="nav-group">
             {% for tab in tabs %}
-            <a class="nav-tab" href="{{ tab.path }}">
-                <div>
-                    <span class="nav-link">
+            <a class="nav-link" href="{{ tab.path }}">
+                <div class="nav-tab">
+                    <span class="nav-text">
                         {{ tab.name }}
                     </span>
                 </div>
