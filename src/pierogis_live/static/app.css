@@ -4,16 +4,22 @@
     --secondary-color: rgba(95, 158, 160, 1);
     --text-color: rgba(48, 79, 80, 1);
 
+    --primary-color-st: rgba(255, 235, 205, 0.5);
+    --accent-color-st: rgba(165, 85, 85, 0.5);
+    --secondary-color-st: rgba(95, 158, 160, 0.5);
+    --text-color-st: rgba(48, 79, 80, 0.5);
+
     --primary-color-t: rgba(255, 235, 205, 0);
     --accent-color-t: rgba(165, 85, 85, 0);
     --secondary-color-t: rgba(95, 158, 160, 0);
+    --text-color-t: rgba(48, 79, 80, 0);
 
     font-family: "Open Sans";
     font-weight: 600;
     font-style: normal;
     font-size: 20px;
 
-    color: var(--text-color)
+    color: var(--text-color);
 }
 
 @media screen and (max-width: 500px) {

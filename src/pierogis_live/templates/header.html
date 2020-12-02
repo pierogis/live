@@ -5,6 +5,7 @@
         .nav-group {
             grid-template-columns: {{ ' '.join(['1fr'] * tabs|count) }};
         }
+
     </style>
 </head>
 
@@ -13,16 +14,13 @@
         <a class="banner-text" href="{{ url_for('base.index') }}">
             pierogis-live
         </a>
-        <span>
-            a general chaos platform
-        </span>
-        <br>
+        <div class="byline" contenteditable="true">a general chaos platform</div>
     </div>
     <div class="nav-bar">
         <nav class="nav-group">
             {% for tab in tabs %}
             <a class="nav-link" href="{{ tab.path }}">
-                <div class="nav-tab">
+                <div class="nav-blob">
                     <span class="nav-text">
                         {{ tab.name }}
                     </span>
@@ -30,6 +28,9 @@
             </a>
             {% endfor %}
         </nav>
+    </div>
+    <div class="nav-buffer">
+
     </div>
 </div>
 
