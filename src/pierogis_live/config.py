@@ -1,15 +1,22 @@
 import os
 
-from dotenv import load_dotenv
-from dotenv import find_dotenv
-
-load_dotenv(find_dotenv())
-
-CONTENT_HOME = os.getenv('CONTENT_HOME')
+# flask
 FLASK_ENV = 'development'
-API_ADDRESS = os.getenv('API_ADDRESS')
+SEND_FILE_MAX_AGE_DEFAULT = 0
+SERVER_NAME = os.getenv('SERVER_NAME')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+# db
 SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SEND_FILE_MAX_AGE_DEFAULT = 0
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-SERVER_NAME = os.getenv('SERVER_NAME')
+
+# cdn
+CONTENT_HOME = os.getenv('CONTENT_HOME')
+BOOTSTRAP_HOME = os.getenv('BOOTSTRAP_HOME')
+DIST_HOME = os.getenv('DIST_HOME')
+
+# aws
+AWS_REGION = os.getenv('AWS_REGION')
+AWS_VPC_ID = os.getenv('AWS_VPC_ID')
+AWS_SUBNET_ID = os.getenv('AWS_SUBNET_ID')

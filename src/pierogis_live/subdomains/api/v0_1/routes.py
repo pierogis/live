@@ -5,7 +5,6 @@ import uuid
 from flask import request
 from flask import jsonify
 
-from pierogis_live import s3
 from pierogis_live import db
 from pierogis_live.models import Content
 from pierogis_live.models import Project

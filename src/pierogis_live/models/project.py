@@ -21,8 +21,8 @@ class Project(db.Model, UpdateMixin):
     created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     title = db.Column(db.String(80))
-    main_content_id = db.Column(UUID(as_uuid=True), db.ForeignKey('content.id'))
-    main_content = db.relationship('Content', foreign_keys=[main_content_id])
+    image_id = db.Column(UUID(as_uuid=True), db.ForeignKey('content.id'))
+    image = db.relationship('Content', foreign_keys=[image_id])
 
     palette_id = db.Column(UUID(as_uuid=True), db.ForeignKey('palette.id'))
     palette = db.relationship('Palette')

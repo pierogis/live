@@ -5,9 +5,9 @@ After=network.target
 [Service]
 User=pierogis-live
 Group=pierogis-live
-WorkingDirectory=/home/pierogis-live/pierogis-live
-Environment="PATH=/home/pierogis-live/pierogis-live/venv/bin"
-ExecStart=/home/pierogis-live/pierogis-live/venv/bin/gunicorn --workers 3 --bind unix:/home/pierogis-live/pierogis-live/pierogis-live.sock -m 007 'pierogis_live:create_app()'
+WorkingDirectory=/home/pierogis-live
+Environment="PATH=/home/pierogis-live/venv/bin"
+ExecStart=/home/pierogis-live/venv/bin/gunicorn -m 007 'pierogis_live:create_app()' -c /home/pierogis-live/conf/gunicorn.conf.py
 
 [Install]
 WantedBy=multi-user.target
