@@ -70,6 +70,6 @@ class Project(db.Model, UpdateMixin):
             'project_id': self.project_id,
             'created': self.created,
             'title': self.title,
-            'main_content_id': self.main_content_id,
+            'image_id': self.image_id,
             'palette_id': self.palette_id,
         }

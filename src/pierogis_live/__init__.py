@@ -36,6 +36,9 @@ def create_app():
 
     from . import routes
 
+    print("Config:")
+    print(app.config)
+
     # print(app.url_map)
 
     from .models import Content, Project, Palette

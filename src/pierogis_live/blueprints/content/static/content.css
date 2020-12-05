@@ -1,7 +1,6 @@
 .projects {
     display: grid;
     grid-template-columns: auto auto auto;
-    grid-column-gap: 5vw;
     grid-row-gap: 1vh;
 }
 
@@ -44,6 +43,7 @@
     max-width: var(--content-width);
 
     padding-top: 2vh;
+    padding-bottom: 2vh;
 }
 
 .content-link {
@@ -79,10 +79,10 @@
 @-webkit-keyframes initial-shadows-content {
     0% {
         -webkit-box-shadow:
-                0px 0px 5px 1px rgba(0, 0, 0, 0.6)
+                0px 0px 5px 0px rgba(0, 0, 0, 0.6)
             ;
             box-shadow:
-                0px 0px 5px 1px rgba(0, 0, 0, 0.6)
+                0px 0px 5px 0px rgba(0, 0, 0, 0.6)
             ;
     }
     100% {
@@ -110,10 +110,10 @@
   }
   100% {
     -webkit-box-shadow:
-                0px 0px 5px 1px rgba(0, 0, 0, 0.6)
+                0px 0px 5px 0px rgba(0, 0, 0, 0.6)
             ;
             box-shadow:
-                0px 0px 5px 1px rgba(0, 0, 0, 0.6)
+                0px 0px 5px 0px rgba(0, 0, 0, 0.6)
             ;
   }
 }
