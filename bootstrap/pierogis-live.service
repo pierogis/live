@@ -7,6 +7,7 @@ User=pierogis-live
 Group=pierogis-live
 WorkingDirectory=/home/pierogis-live
 Environment="PATH=/home/pierogis-live/venv/bin"
+EnvironmentFile=/home/pierogis-live/.env
 ExecStart=/home/pierogis-live/venv/bin/gunicorn -m 007 'pierogis_live:create_app()' -c /home/pierogis-live/conf/gunicorn.conf.py
 
 [Install]

@@ -11,14 +11,32 @@
 {% endblock %}
 
 {% block page -%}
-    <div class="project">
-        {% for content in project.contents %}
-            {% include "content/partials/content.html" %}
-        {% endfor %}
-        {% for project in project.projects %}
-            {% include "content/partials/project.html" %}
-        {% endfor %}
-
-        {% include "content/partials/title-blob.html" %}
+<div class="codename">
+    <div class="projects">
+        {% if projects|length > 0 %}
+            {% with title="subprojects" %}
+            {% with path=path %}
+                {% include "content/partials/title-blob.html" %}
+            {% endwith %}
+            {% endwith %}
+            {% for project in projects %}
+                {% include "content/partials/project.html" %}
+            {% endfor %}
+        {% endif %}
     </div>
+    {% if contents|length > 0 %}
+        {% with title="content" %}
+        {% with path=path %}
+            {% include "content/partials/title-blob.html" %}
+        {% endwith %}
+        {% endwith %}
+        <div class="content-wheel content">
+            {% for content in contents %}
+                {% include "content/partials/content.html" %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% include "content/partials/title-blob.html" %}
+</div>
 {%- endblock page %}

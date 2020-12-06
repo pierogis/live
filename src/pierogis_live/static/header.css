@@ -32,6 +32,9 @@
     transition: .5s;
 
     transition-timing-function: ease-out;
+
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .banner-text:hover {
@@ -129,6 +132,8 @@
 
 .nav-link {
     text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .nav-blob {
@@ -147,17 +152,31 @@
             ;
 
     text-align: center;
-    transition: .5s;
+    transition: .2s;
 }
 
 .nav-blob:hover {
     -webkit-box-shadow:
-                0px 0px 3px 0px rgba(0, 0, 0, 0.5)
+                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
             ;
             box-shadow:
-                0px 0px 3px 0px rgba(0, 0, 0, 0.5)
+                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
             ;
     filter: brightness(90%);
+}
+
+.nav-link:focus {
+    outline: none;
+}
+
+.nav-link:focus .nav-blob {
+    -webkit-box-shadow:
+            2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+        ;
+        box-shadow:
+            2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+        ;
+    filter: brightness(120%);
 }
 
 .nav-text {
@@ -172,10 +191,12 @@
     color: white;
     letter-spacing: .3em;
 
-    text-shadow: .15rem .15rem 2px var(--text-color-st);
+    text-shadow: .1rem .1rem 2px var(--text-color-st);
+
+    transition: .5s;
 }
 .nav-text:hover {
-    color: white;
+    text-shadow: .1rem .1rem 0px var(--text-color);
 }
 
 .nav-buffer {

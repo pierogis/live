@@ -18,7 +18,6 @@ setup(
         'flask-cors',
         'flask-sqlalchemy',
         'flask-migrate',
-        'psycopg2',
         'requests'
     ],
     entry_points={

@@ -17,12 +17,13 @@ sudo useradd pierogis-live
 sudo passwd -f -u pierogis-live
 
 # set env var from ssm parameter store
-echo export VERSION=$(aws ssm get-parameter --name 'version' --query 'Parameter.Value') >> /etc/profile
-echo export CONTENT_HOME=$(aws ssm get-parameter --name 'content-home' --query 'Parameter.Value') >> /etc/profile
-echo export BOOTSTRAP_HOME=$(aws ssm get-parameter --name 'bootstrap-home' --query 'Parameter.Value') >> /etc/profile
-echo export DIST_HOME=$(aws ssm get-parameter --name 'dist-home' --query 'Parameter.Value') >> /etc/profile
-echo export DATABASE_URL=$(aws ssm get-parameter --name 'database-url' --query 'Parameter.Value') >> /etc/profile
-source /etc/profile
+export VERSION=$(aws ssm get-parameter --name 'version' --query 'Parameter.Value' | xargs)
+sudo echo VERSION=$VERSION >> /home/pierogis-live/.env
+sudo echo CONTENT_HOME=$(aws ssm get-parameter --name 'content-home' --query 'Parameter.Value' | xargs) >> /home/pierogis-live/.env
+sudo echo BOOTSTRAP_HOME=$(aws ssm get-parameter --name 'bootstrap-home' --query 'Parameter.Value' | xargs) >> /home/pierogis-live/.env
+sudo echo DIST_HOME=$(aws ssm get-parameter --name 'dist-home' --query 'Parameter.Value' | xargs) >> /home/pierogis-live/.env
+sudo echo DATABASE_URL=$(aws ssm get-parameter --name 'database-url' --query 'Parameter.Value' | xargs) >> /home/pierogis-live/.env
+sudo echo CDN_URL=$(aws ssm get-parameter --name 'cdn-url' --query 'Parameter.Value' | xargs) >> /home/pierogis-live/.env
 
 # copy server install script
 sudo aws s3 cp s3://pierogis.live/dist/pierogis-live-$VERSION.tar.gz /home/pierogis-live/pierogis-live.tar.gz
@@ -31,6 +32,7 @@ sudo aws s3 cp s3://pierogis.live/dist/pierogis-live-$VERSION.tar.gz /home/piero
 sudo python3 -m venv /home/pierogis-live/venv
 sudo /home/pierogis-live/venv/bin/pip install gunicorn
 sudo /home/pierogis-live/venv/bin/pip install /home/pierogis-live/pierogis-live.tar.gz
+sudo /home/pierogis-live/venv/bin/pip install psycopg2
 
 # configure gunicorn
 sudo aws s3 cp s3://pierogis.live/bootstrap/gunicorn.conf.py /home/pierogis-live/conf/gunicorn.conf.py

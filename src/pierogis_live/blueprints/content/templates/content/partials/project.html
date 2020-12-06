@@ -1,9 +1,21 @@
 <div class="project">
-    {% with content=project.image %}
-        {% if content %}
-            {% include "content/partials/content.html" %}
-        {% endif %}
+    <div class="content-wheel content">
+        {% for subproject in project.subprojects %}
+            {% with content=subproject.image %}
+                {% if content %}
+                    {% include "content/partials/content.html" %}
+                {% endif %}
+            {% endwith %}
+        {% endfor %}
+        {% for content in project.contents %}
+            {% if content %}
+                {% include "content/partials/content.html" %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% with title=project.title %}
+    {% with path=project.path %}
+        {% include "content/partials/title-blob.html" %}
     {% endwith %}
-
-    {% include "content/partials/title-blob.html" %}
+    {% endwith %}
 </div>

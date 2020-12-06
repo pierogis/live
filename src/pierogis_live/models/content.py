@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from enum import Enum
 import uuid
@@ -45,7 +46,7 @@ class Content(db.Model, UpdateMixin):
     @property
     def path(self):
         # get path of parent project and append own codename
-        return self.project.path + '/'
+        return self.project.path
 
     @property
     def file_name(self):
@@ -53,7 +54,8 @@ class Content(db.Model, UpdateMixin):
 
     @property
     def file_path(self):
-        return self.path + self.file_name
+        print(self.path, self.file_name)
+        return os.path.join(self.path, self.file_name)
 
     def to_dict(self):
         return {

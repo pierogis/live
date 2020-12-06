@@ -8,12 +8,13 @@ import boto3
 @click.option('--content-home')
 @click.option('--bootstrap-home')
 @click.option('--dist_home')
-@click.option('--aws-subnet-id')
+@click.option('--cdn-url')
 @click.option('--database-url')
 @click.option('--aws-region')
+@click.option('--aws-subnet-id')
 @click.option('--count', default=1)
 @flask.cli.with_appcontext
-def launch(version, content_home, bootstrap_home, dist_home, database_url, aws_region, aws_subnet_id, count):
+def launch(version, content_home, bootstrap_home, dist_home, cdn_url, database_url, aws_region, aws_subnet_id, count):
     if bootstrap_home is None:
         bootstrap_home = flask.current_app.config['BOOTSTRAP_HOME']
 
@@ -22,6 +23,9 @@ def launch(version, content_home, bootstrap_home, dist_home, database_url, aws_r
 
     if dist_home is None:
         dist_home = flask.current_app.config['DIST_HOME']
+
+    if cdn_url is None:
+        cdn_url = flask.current_app.config['CDN_URL']
 
     if database_url is None:
         database_url = flask.current_app.config['SQLALCHEMY_DATABASE_URI']
@@ -39,6 +43,7 @@ def launch(version, content_home, bootstrap_home, dist_home, database_url, aws_r
     ssm.put_parameter(Name='content-home', Value=content_home, Type='String', Overwrite=True)
     ssm.put_parameter(Name='bootstrap-home', Value=bootstrap_home, Type='String', Overwrite=True)
     ssm.put_parameter(Name='dist-home', Value=dist_home, Type='String', Overwrite=True)
+    ssm.put_parameter(Name='cdn-url', Value=cdn_url, Type='String', Overwrite=True)
     ssm.put_parameter(Name='database-url', Value=database_url, Type='String', Overwrite=True)
     ssm.put_parameter(Name='version', Value=version, Type='String', Overwrite=True)
     ssm.put_parameter(Name='subnet_id', Value=aws_subnet_id, Type='String', Overwrite=True)

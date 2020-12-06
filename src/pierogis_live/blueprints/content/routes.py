@@ -1,3 +1,5 @@
+import os
+
 from flask import current_app
 from flask import render_template
 
@@ -23,8 +25,11 @@ def codename_project(path: str = None):
     return render_template(
         'content/codename.html',
         cdn='https://cdn.pierogis.live/',
-        project=project,
-        tabs=tabs
+        contents=project.contents,
+        projects=project.subprojects,
+        tabs=tabs,
+        path=project.path,
+        title=project.title
     )
 
 
@@ -33,8 +38,11 @@ def projects_base():
     projects = Project.query.filter_by(project_id=None).all()
 
     tabs = [Tab('/', 'home'), Tab('/c', 'content')]
-    return render_template('content/projects.html',
-                           cdn='https://cdn.' + current_app.config['CONTENT_HOME'] + '/',
+    return render_template('content/codename.html',
+                           cdn=current_app.config['CDN_URL'],
+                           content=None,
                            projects=projects,
-                           tabs=tabs
+                           tabs=tabs,
+                           path='/c',
+                           title='content'
                            )

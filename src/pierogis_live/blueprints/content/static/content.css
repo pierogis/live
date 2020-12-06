@@ -1,46 +1,7 @@
-.projects {
-    display: grid;
-    grid-template-columns: auto auto auto;
-    grid-row-gap: 1vh;
-}
-
-@-webkit-keyframes adjust-grid-project {
-  0% {
-
-  }
-  100% {
-
-  }
-}
-
-@media screen and (max-width: 1050px) {
-    .projects {
-        -webkit-animation: adjust-grid-project 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	            animation: adjust-grid-project 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-
-	    grid-template-columns: auto auto;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .projects {
-        grid-template-columns: auto;
-    }
-}
-
-.project {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    --content-width: 240px;
-    width: var(--content-width);
-}
-
 .content-box {
     height: auto;
-    max-width: var(--content-width);
+    max-height: var(--project-height);
+    width: 100%;
 
     padding-top: 2vh;
     padding-bottom: 2vh;
@@ -50,30 +11,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: var(--content-width);
+    margin: auto;
+
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+
+    scroll-snap-align: center;
 }
 
 .content {
     outline: none;
 
     height: auto;
-    width: 100%;
+    max-width: var(--content-width);
 
+    background-color: var(--secondary-color);
     border: solid;
-    border-width: 10px;
+    border-width: calc(var(--content-width)/24);
     border-color: var(--accent-color);
 
     -webkit-animation: initial-shadows-content 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 	        animation: initial-shadows-content 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
-@media screen and (max-width: 500px) {
-  .content {
-    border-width: .5rem;
-    width: 48vw;
-  }
-  .project {
-    width: 48vw;
-  }
+.content:hover {
+    -webkit-animation: shadow-drop-content 0.2s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+	        animation: shadow-drop-content 0.2s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 @-webkit-keyframes initial-shadows-content {
@@ -118,13 +82,24 @@
   }
 }
 
-.content:hover {
-    -webkit-animation: shadow-drop-content 0.2s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: shadow-drop-content 0.2s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-}
-
 .title-link {
     text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.title-link:focus {
+    outline: none;
+}
+
+.title-link:focus .title-blob {
+    -webkit-box-shadow:
+                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+            ;
+            box-shadow:
+                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+            ;
+    filter: brightness(120%);
 }
 
 .title-blob {
@@ -158,6 +133,10 @@
     filter: brightness(90%);
 }
 
+.title-blob:focus {
+
+}
+
 .title {
     margin: 0px;
 
@@ -168,5 +147,77 @@
     font-style: italic;
     letter-spacing: .1em;
 
-    text-shadow: .15rem .15rem 2px var(--text-color-st);
+    text-shadow: .1rem .1rem 2px var(--text-color-st);
+}
+
+.title:hover {
+    text-shadow: .1rem .1rem 0px var(--text-color);
+}
+
+.codename {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.projects {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.project {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-wheel {
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    max-width: none;
+    width: 75vw;
+    background: linear-gradient(
+          rgba(0, 0, 0, 0.2),
+          rgba(0, 0, 0, 0.2)
+        );
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns:calc((100% - (var(--n) - 1)*var(--g))/var(--n));
+    --n: 4;
+    --g: 0px;
+
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior: contain;
+
+    align-items: center;
+    justify-items: center;
+}
+
+.content-wheel::-webkit-scrollbar {
+  display: none;
+}
+
+@media screen and (max-width: 1500px) {
+    .content-wheel {
+        --n: 3;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+    .content-wheel {
+        --n: 2;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .content-wheel {
+        --n: 1;
+    }
 }
