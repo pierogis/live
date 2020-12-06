@@ -8,8 +8,9 @@ setup(
     author_email='moore.kyle39@gmail.com',
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    version='0.1.0',
+    version='0.1.1',
     include_package_data=True,
+    setup_requires=['libsass >= 0.6.0'],
     install_requires=[
         'setuptools'
         'flask',
@@ -24,5 +25,9 @@ setup(
         'console_scripts': [
             'pierogis-live=pierogis_live:cli',
         ]
+    },
+    sass_manifests={
+        'pierogis_live': ('static/sass', 'static/css', '/static/css'),
+        'pierogis_live.blueprints.content': ('static/sass', 'static/css', '/c/static/css')
     }
 )

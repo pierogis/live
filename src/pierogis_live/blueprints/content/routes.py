@@ -15,21 +15,27 @@ def codename_project(path: str = None):
     """
     codenames = path.split('/')
 
+    # dict with codename as key and path as value
+    breadcrumbs = {}
+
     project_id = None
     for codename in codenames:
         project = Project.query.filter_by(codename=codename, project_id=project_id).first()
+        breadcrumbs['codename'] = project.path
         project_id = project.project_id
 
-    tabs = [Tab('/c', 'content')]
-    tabs.extend([Tab(codename) for codename in project.path.lower().split('/')])
+    # tabs = [Tab('/c', 'content')]
+    # tabs.extend([Tab(codename) for codename in project.path.lower().split('/')])
+
+
     return render_template(
         'content/codename.html',
-        cdn='https://cdn.pierogis.live/',
+        cdn=current_app.config['CDN_URL'],
         contents=project.contents,
         projects=project.subprojects,
-        tabs=tabs,
         path=project.path,
-        title=project.title
+        title=project.title,
+        breadcrumbs=breadcrumbs
     )
 
 
@@ -38,11 +44,13 @@ def projects_base():
     projects = Project.query.filter_by(project_id=None).all()
 
     tabs = [Tab('/', 'home'), Tab('/c', 'content')]
+    breadcrumbs = {'content': '/'}
     return render_template('content/codename.html',
                            cdn=current_app.config['CDN_URL'],
                            content=None,
                            projects=projects,
                            tabs=tabs,
                            path='/c',
-                           title='content'
+                           title='content',
+                           breadcrumbs=breadcrumbs
                            )
