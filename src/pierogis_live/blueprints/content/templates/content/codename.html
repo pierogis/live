@@ -3,7 +3,7 @@
 {% block title %} codename {% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('content.static', filename='css/codename.scss.css') }}">
+<link rel="stylesheet" href="{{ url_for('content.static', filename='css/codename.css') }}">
 {% endblock %}
 
 {% block header %}
@@ -12,13 +12,13 @@
 
 {% block page -%}
 <div class="codename">
-    {% include "content/partials/breadcrumbs.html" %}
+    {% include "partials/breadcrumbs.html" %}
     {% with alternate=True %}
     <div class="projects">
         {% if projects|length > 0 %}
             {% with title="projects" %}
             {% with path=None %}
-                {% include "content/partials/link-blob.html" %}
+                {% include "partials/blob.html" %}
             {% endwith %}
             {% endwith %}
             {% for project in projects %}
@@ -29,7 +29,7 @@
     {% if contents|length > 0 %}
         {% with title="content" %}
         {% with path=None %}
-            {% include "content/partials/link-blob.html" %}
+            {% include "partials/blob.html" %}
         {% endwith %}
         {% endwith %}
         <div class="content-wheel content">
@@ -40,6 +40,6 @@
     {% endif %}
     {% endwith %}
 
-    {% include "content/partials/link-blob.html" %}
+    {% include "partials/blob.html" %}
 </div>
 {%- endblock page %}
