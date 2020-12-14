@@ -1,0 +1,27 @@
+.dubious {
+    all: unset;
+    padding: .4em;
+
+    background-color: var(--primary-color);
+
+    border: solid;
+    border-width: .2em;
+    border-color: var(--secondary-color-t);
+
+    margin-bottom: 10px;
+    transition: .4s;
+
+    text-decoration: none;
+}
+
+.visible, .dubious:focus {
+    outline: none;
+
+    background-color: rgba(255, 255, 255, .3);
+
+    border-color: var(--secondary-color);
+
+    box-shadow:
+        0px 0px 5px 1px rgba(0, 0, 0, 0.2)
+    ;
+}

@@ -1,6 +1,7 @@
 # generated
 __pycache__
 *.egg-info
+*.egg
 /dist/
 /build/
 

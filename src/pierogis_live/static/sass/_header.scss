@@ -1,3 +1,5 @@
+@use '_dubious';
+
 .header {
     display: flex;
     flex-direction: column;
@@ -41,31 +43,6 @@
     text-decoration: none;
 
     text-shadow: .15rem .15rem 2px var(--text-color);
-}
-
-.byline {
-    padding: .4em;
-
-    border: solid;
-    border-width: .2em;
-    border-color: var(--secondary-color-t);
-
-    margin-bottom: 10px;
-    transition: .4s;
-
-    text-decoration: none;
-}
-
-.byline:focus {
-    outline: none;
-
-    background-color: rgba(255, 255, 255, .3);
-
-    border-color: var(--secondary-color);
-
-    box-shadow:
-        0px 0px 5px 1px rgba(0, 0, 0, 0.2)
-    ;
 }
 
 .nav-bar {

@@ -1,0 +1,25 @@
+.pierogi-cage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: auto;
+    width: 100%;
+}
+
+.pierogi {
+    outline: none;
+
+    height: auto;
+    max-width: var(--content-width);
+}
+
+.pierogi-monologue-frame {
+    display: block;
+    border: none;
+}
+
+.pierogi-monologue {
+    text-align: center;
+}

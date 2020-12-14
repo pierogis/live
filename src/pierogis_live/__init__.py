@@ -9,48 +9,56 @@ from flask.cli import FlaskGroup
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 
 from .services import StorageService
 from .blueprints import register_blueprints
 from .subdomains import register_subdomains
-from .commands import register_commands
 
 db = SQLAlchemy()
 migrate = Migrate(compare_type=True)
 storage = StorageService()
+jwt = JWTManager()
+
 
 def create_app():
     """Create a flask app and configure it
     """
 
     app = Flask(__name__, subdomain_matching=True)
+    # TODO: Fix this config to use the given stage
     app.config.from_pyfile('config.py')
 
     cors = CORS(app, resources={r'/*': {'origins': "http://*.{}".format(app.config['SERVER_NAME'])}})
     db.init_app(app)
     migrate.init_app(app, db)
     storage.init_app(app)
+    jwt.init_app(app)
 
     register_blueprints(app)
     register_subdomains(app)
 
     from . import routes
 
-    print("Config:")
-    print(app.config)
+    # print("Config:")
+    # print(app.config)
 
-    # print(app.url_map)
+    print(app.url_map)
 
-    from .models import Content, Project, Palette
+    from .models import Content, Project, Palette, Trivia
+
     @app.shell_context_processor
     def make_shell_context():
-        return {'db': db, 'Content': Content, 'Project': Project, 'Palette': Palette}
+        return {'db': db, 'Content': Content, 'Project': Project, 'Palette': Palette, 'Trivia': Trivia}
 
     return app
 
-cli = FlaskGroup(create_app=create_app)
 
-register_commands(cli)
+# cli = FlaskGroup(create_app=create_app)
+#
+# register_commands(cli)
 
 if __name__ == '__main__':
-    cli()
+    app = create_app()
+    app.run()
+    # cli()

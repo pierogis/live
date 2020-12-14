@@ -9,7 +9,7 @@ from pierogis_live.models import Project
 from pierogis_live.common import Tab
 
 
-@content.route('/<path>', methods=['GET'])
+@content.route('/<path:path>', methods=['GET'])
 def codename_project(path: str = None):
     """Render a template for all of the content under the given path
     """

@@ -14,10 +14,12 @@ Flask-SQLAlchemy = "^2.4.4"
 Flask-Migrate = "^2.5.3"
 boto3 = "^1.16.24"
 requests = "^2.25.0"
+Flask-JWT-Extended = "^3.25.0"
 
 [tool.poetry.dev-dependencies]
 Flask = "^1.1.2"
 python-dotenv = "^0.15.0"
+fabric = "^2.5.0"
 
 [tool.poetry.scripts]
 pierogis-live = "pierogis_live:cli"

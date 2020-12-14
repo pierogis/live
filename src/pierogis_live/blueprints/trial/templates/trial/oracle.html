@@ -1,0 +1,27 @@
+{% extends "app.html" %}
+
+{% block title %} dungeon {% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('trial.static', filename='css/oracle.css') }}">
+{% endblock %}
+
+{% block page %}
+<div class="audience">
+    {% include 'trial/partials/pierogi.html' %}
+
+
+    <div class="blob">
+        <span class="blob-text">
+            questions
+        </span>
+    </div>
+
+    <form method="post">
+        {% for question in questions %}
+            {% include 'trial/partials/question.html' %}
+        {% endfor %}
+    <input type="submit">
+    </form>
+</div>
+{% endblock page %}
