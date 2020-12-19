@@ -21,13 +21,13 @@ storage = StorageService()
 jwt = JWTManager()
 
 
-def create_app():
+def create_app(stage='Base'):
     """Create a flask app and configure it
     """
 
     app = Flask(__name__, subdomain_matching=True)
     # TODO: Fix this config to use the given stage
-    app.config.from_pyfile('config.py')
+    app.config.from_object('pierogis_live.config.' + stage)
 
     cors = CORS(app, resources={r'/*': {'origins': "http://*.{}".format(app.config['SERVER_NAME'])}})
     db.init_app(app)
@@ -54,11 +54,6 @@ def create_app():
     return app
 
 
-# cli = FlaskGroup(create_app=create_app)
-#
-# register_commands(cli)
-
 if __name__ == '__main__':
     app = create_app()
     app.run()
-    # cli()

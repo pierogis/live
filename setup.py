@@ -19,7 +19,8 @@ setup(
         'flask-cors',
         'flask-sqlalchemy',
         'flask-migrate',
-        'requests'
+        'requests',
+        'pierogis'
     ],
     entry_points={
         'console_scripts': [

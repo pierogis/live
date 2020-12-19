@@ -1,6 +1,6 @@
 import os
 
-class BaseConfig:
+class Base:
     # flask
     SEND_FILE_MAX_AGE_DEFAULT = 0
     SERVER_NAME = os.getenv('SERVER_NAME')
@@ -29,20 +29,20 @@ class BaseConfig:
     AWS_VPC_ID = os.getenv('AWS_VPC_ID')
     AWS_SUBNET_ID = os.getenv('AWS_SUBNET_ID')
 
-class LocalConfig(BaseConfig):
+class Local(Base):
     SECRET_KEY = os.getenv('LOCAL_SECRET_KEY')
     FLASK_ENV = 'development'
 
     # db
     SQLALCHEMY_DATABASE_URI = os.getenv('LOCAL_DATABASE_URL')
 
-class DevConfig(BaseConfig):
+class Dev(Base):
     SECRET_KEY = os.getenv('DEV_SECRET_KEY')
 
     # db
     SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL')
 
-class ProdConfig(BaseConfig):
+class Prod(Base):
     SECRET_KEY = os.getenv('PROD_SECRET_KEY')
 
     # db
