@@ -4,6 +4,7 @@ import subprocess
 import boto3
 import flask
 from fabric import Connection, task, SerialGroup
+from pierogis_live import __version__
 import dotenv
 
 # the servers where the commands are executed
@@ -19,10 +20,9 @@ def build(context):
 
 
 @task(optional=['aws_region', 'aws_subnet_id', 'count'])
-def launch(context, stage, aws_region=None, aws_subnet_id=None, count=None):
+def launch(context, stage, aws_region=None, aws_subnet_id=None, count=1):
     aws_region = aws_region or os.getenv('AWS_REGION')
     aws_subnet_id = aws_subnet_id or os.getenv('AWS_SUBNET_ID')
-    count = count or 1
 
     res = boto3.resource('ec2', aws_region)
     client = boto3.client('ec2', aws_region)
@@ -112,7 +112,7 @@ def deploy(context, stage, version, content_home=None, bootstrap_home=None, dist
     # figure out the package name and version
     # dist = subprocess.run('python setup.py --fullname', capture_output=True).strip()
 
-    filename = '{}-{}.tar.gz'.format('pierogis-live', version)
+    filename = '{}-{}.tar.gz'.format('pierogis-live', __version__)
 
     bootstrap_dir = os.getenv('BOOTSTRAP_DIR')
 

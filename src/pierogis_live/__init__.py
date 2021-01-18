@@ -15,6 +15,8 @@ from .services import StorageService
 from .blueprints import register_blueprints
 from .subdomains import register_subdomains
 
+__version__ = '0.1.1'
+
 db = SQLAlchemy()
 migrate = Migrate(compare_type=True)
 storage = StorageService()

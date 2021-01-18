@@ -15,7 +15,6 @@ Flask-Migrate = "^2.5.3"
 boto3 = "^1.16.24"
 requests = "^2.25.0"
 Flask-JWT-Extended = "^3.25.0"
-pierogis = { path = "../pierogis/" }
 
 [tool.poetry.dev-dependencies]
 Flask = "^1.1.2"
