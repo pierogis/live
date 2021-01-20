@@ -39,7 +39,7 @@ jobs:
       - name: compile sass
         run: |
           curl https://github.com/sass/dart-sass/archive/1.32.4.tar.gz -o sass.tar.gz
-          export PATH="$PATH:~/dev/src/pierogis/sass.tar.gz"
+          export PATH="$PATH:./sass.tar.gz"
           source compile_sass.sh
 
       - name: build
