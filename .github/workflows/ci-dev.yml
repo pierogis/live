@@ -1,0 +1,68 @@
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: deploy develop
+
+on:
+  push:
+    branches:
+      - develop
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-east-1
+  JWT_TOKEN_LOCATION: 'headers cookies'
+  DIST_HOME: 'pierogis-dev/dist/'
+  DIST_DIR: ${{ github.sha }}
+  SERVER_NAME: 'pierogis.dev'
+  DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
+  STAGE: 'dev'
+
+jobs:
+  deploy-develop-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: install dependencies
+        run: |
+          pip install fabric
+          pip install Flask-Migrate
+
+      - name: compile sass
+        working-directory: './src/pierogis_live'
+        run: |
+          curl https://github.com/sass/dart-sass/archive/1.32.4.tar.gz -o sass.tar.gz
+          export PATH="$PATH:~/dev/src/pierogis/sass.tar.gz"
+          source compile_sass.sh
+
+      - name: build
+        run: |
+          fab build
+
+      - name: upload to aws
+        shell: bash
+        run: |
+          pip install -U awscli
+          python -m awscli s3 sync --exact-timestamps ./dist "s3://$DIST_HOME/$DIST_DIR"
+
+      - name: launch and bootstrap instances
+        run: |
+          fab launch --stage=dev --count=1
+          fab bootstrap --stage=$STAGE
+
+      - name: deploy
+        run: |
+          pip install Flask-Migrate dotenv-python
+          fab deploy --stage=$STAGE
+
+      - name: start
+        run: |
+          fabric start --stage=$STAGE

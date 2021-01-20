@@ -1,5 +1,6 @@
 """Function to create an app instance
 """
+import os
 
 import click
 
@@ -15,7 +16,7 @@ from .services import StorageService
 from .blueprints import register_blueprints
 from .subdomains import register_subdomains
 
-__version__ = '0.1.1'
+__version__ = '0.1.0'
 
 db = SQLAlchemy()
 migrate = Migrate(compare_type=True)
@@ -23,7 +24,7 @@ storage = StorageService()
 jwt = JWTManager()
 
 
-def create_app(stage='Base'):
+def create_app(stage=os.getenv('STAGE', 'local')):
     """Create a flask app and configure it
     """
 
@@ -45,7 +46,7 @@ def create_app(stage='Base'):
     # print("Config:")
     # print(app.config)
 
-    print(app.url_map)
+    # print(app.url_map)
 
     from .models import Content, Project, Palette, Trivia
 

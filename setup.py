@@ -4,6 +4,7 @@ from setuptools import find_packages
 setup(
     name='pierogis-live',
     author='Kyle Moore',
+    url='pierogis.live',
     version='',
     author_email='moore.kyle39@gmail.com',
     packages=find_packages('src'),

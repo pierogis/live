@@ -25,4 +25,4 @@ from . import content
 from . import projects
 from . import trivia
 from . import claims
-from . import pierogis
+# from . import pierogis

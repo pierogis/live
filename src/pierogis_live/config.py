@@ -1,6 +1,7 @@
 import os
 
-class Base:
+
+class base:
     # flask
     SEND_FILE_MAX_AGE_DEFAULT = 0
     SERVER_NAME = os.getenv('SERVER_NAME')
@@ -12,7 +13,6 @@ class Base:
     JWT_CSRF_CHECK_FORM = True
 
     # db
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAX_CONTENT_LENGTH = 24 * 1024 * 1024 * 1024
 
@@ -29,21 +29,19 @@ class Base:
     AWS_VPC_ID = os.getenv('AWS_VPC_ID')
     AWS_SUBNET_ID = os.getenv('AWS_SUBNET_ID')
 
-class Local(Base):
-    SECRET_KEY = os.getenv('LOCAL_SECRET_KEY')
+
+class local(base):
     FLASK_ENV = 'development'
-
     # db
-    SQLALCHEMY_DATABASE_URI = os.getenv('LOCAL_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.path.join(os.getenv('DATABASE_SERVER_URL'), "pierogis-live")
 
-class Dev(Base):
-    SECRET_KEY = os.getenv('DEV_SECRET_KEY')
 
+class dev(base):
     # db
-    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.path.join(os.getenv('DATABASE_SERVER_URL'), 'dev')
 
-class Prod(Base):
-    SECRET_KEY = os.getenv('PROD_SECRET_KEY')
 
+class live(base):
+    FLASK_ENV = 'production'
     # db
-    SQLALCHEMY_DATABASE_URI = os.getenv('PROD_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.path.join(os.getenv('DATABASE_SERVER_URL'), 'live')

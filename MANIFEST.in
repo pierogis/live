@@ -1,3 +1,8 @@
 global-include *.js
 global-include *.html
-global-exclude *.pyc
+global-include *.css
+global-include *.jpg
+global-include *.png
+recursive-include migrations *
+global-exclude *.py[cod]
+global-exclude __pycache__

@@ -1,14 +1,12 @@
 import os
-import subprocess
 
 import boto3
-import flask
-from fabric import Connection, task, SerialGroup
-from pierogis_live import __version__
 import dotenv
-
+from fabric import Connection, task, SerialGroup
 # the servers where the commands are executed
 from setuptools import sandbox
+
+from pierogis_live import __version__
 
 dotenv.load_dotenv()
 
@@ -53,6 +51,15 @@ def launch(context, stage, aws_region=None, aws_subnet_id=None, count=1):
                                  InstanceId=instance.instance_id)
 
 
+def get_connect_kwargs():
+    aws_key_file = os.getenv('AWS_KEY_FILE')
+    connect_kwargs = {}
+    if aws_key_file is not None:
+        connect_kwargs['key_filename'] = os.environ['AWS_KEY_FILE']
+
+    return connect_kwargs
+
+
 @task(optional=['aws_region'])
 def bootstrap(context, stage, aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
@@ -61,7 +68,9 @@ def bootstrap(context, stage, aws_region=None):
     allocated_addresses = get_stage_addresses(client, stage, allocated=True)
     ips = [address.get('PublicIp') for address in allocated_addresses]
 
-    group = SerialGroup(*ips, user='ec2-user')
+    connect_kwargs = get_connect_kwargs()
+
+    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=connect_kwargs)
 
     # install nginx
     group.run("sudo amazon-linux-extras install -y nginx1")
@@ -73,33 +82,36 @@ def bootstrap(context, stage, aws_region=None):
     group.run("sudo useradd pierogis-live")
     group.run("sudo passwd -f -u pierogis-live")
 
+    print("installing python dependencies")
     # create the python environment for the deployment
     group.run("sudo python3 -m venv /home/pierogis-live/venv")
     group.run("sudo /home/pierogis-live/venv/bin/pip install gunicorn")
     group.run("sudo /home/pierogis-live/venv/bin/pip install psycopg2")
 
+    print("making gunicorn log fiiles")
     # create gunicorn log files
     group.run("sudo mkdir /home/pierogis-live/log")
     group.run("sudo mkdir /home/pierogis-live/conf")
     group.run("sudo touch /home/pierogis-live/log/gunicorn.access.log")
     group.run("sudo touch /home/pierogis-live/log/gunicorn.error.log")
 
+    print("giving nginx access to pierogis-live home")
     # make pierogis-live owner of their home folder
     group.run("sudo chown -R pierogis-live:pierogis-live /home/pierogis-live")
 
     # and give nginx service access to pierogis-live home folder
-    group.run("sudo chmod 710 /home/pierogis-live/")
+    group.run("sudo chmod 733 /home/pierogis-live/")
     group.run("sudo usermod -a -G pierogis-live nginx")
 
+    print("creating dirs for nginx and gunicorn service configs")
     # create dir for nginx and system d config
-    group.run('sudo mkdir /usr/local/nginx')
     group.run('sudo mkdir /usr/local/lib/systemd')
     group.run('sudo mkdir /usr/local/lib/systemd/system')
 
 
-@task(optional=['content_home', 'bootstrap_home', 'dist_home', 'cdn_url', 'database_url', 'aws_region'])
-def deploy(context, stage, version, content_home=None, bootstrap_home=None, dist_home=None, cdn_url=None,
-           database_url=None,
+@task(optional=['content_home', 'cdn_url', 'database_server_url', 'aws_region'])
+def deploy(context, stage, content_home=None, cdn_url=None,
+           database_server_url=None,
            aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
 
@@ -107,59 +119,87 @@ def deploy(context, stage, version, content_home=None, bootstrap_home=None, dist
     allocated_addresses = get_stage_addresses(client, stage, allocated=True)
     ips = [address.get('PublicIp') for address in allocated_addresses]
 
-    group = SerialGroup(*ips, user='ec2-user')
+    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs())
 
     # figure out the package name and version
     # dist = subprocess.run('python setup.py --fullname', capture_output=True).strip()
 
     filename = '{}-{}.tar.gz'.format('pierogis-live', __version__)
 
-    bootstrap_dir = os.getenv('BOOTSTRAP_DIR')
+    print("Copying gunicorn and nginx conf")
 
     for connection in group:
         # copy service configs
-        connection.put(bootstrap_dir + 'pierogis-live.conf', '/tmp/pierogis-live.conf')
-        connection.put(bootstrap_dir + 'pierogis-live.service', '/tmp/pierogis-live.service')
+        connection.put('bootstrap/pierogis-live-nginx.conf', '/tmp/pierogis-live-nginx.conf')
+        connection.put('bootstrap/pierogis-live.service', '/tmp/pierogis-live.service')
 
         # copy gunicorn config
-        connection.put(bootstrap_dir + 'gunicorn.conf.py', '/tmp/gunicorn.conf.py')
+        connection.put('bootstrap/gunicorn.conf.py', '/tmp/gunicorn.conf.py')
 
         # upload the package to the temporary folder on the server
         connection.put('dist/%s' % filename, '/tmp/%s' % filename)
 
-    group.run("sudo mv /tmp/pierogis-live.conf /usr/local/nginx/pierogis-live.conf")
+    group.run("sudo mv /tmp/pierogis-live-nginx.conf /etc/nginx/conf.d/pierogis-live-nginx.conf")
     group.run("sudo mv /tmp/pierogis-live.service /usr/local/lib/systemd/system/pierogis-live.service")
     group.run("sudo mv /tmp/gunicorn.conf.py /home/pierogis-live/conf/gunicorn.conf.py")
 
     # add env var to .env
-    SERVER_NAME = 'pierogis.live'
-    CONTENT_HOME = content_home or os.getenv('CONTENT_HOME')
-    BOOTSTRAP_HOME = bootstrap_home or os.getenv('BOOTSTRAP_HOME')
-    # DIST_HOME = dist_home or os.getenv('DIST_HOME')
+    server_name = os.environ['SERVER_NAME']
+    content_home = content_home or os.environ['CONTENT_HOME']
 
-    if database_url:
-        DATABASE_URL = database_url
-    elif stage == 'dev':
-        DATABASE_URL = os.getenv('DEV_DATABASE_URL')
-    elif stage == 'prod':
-        DATABASE_URL = os.getenv('PROD_DATABASE_URL')
-    elif stage == 'test':
-        DATABASE_URL = os.getenv('TEST_DATABASE_URL')
+    if database_server_url is None:
+        database_server_url = os.environ['DATABASE_SERVER_URL']
 
-    CDN_URL = cdn_url or os.getenv('CDN_URL')
+    if cdn_url is None:
+        cdn_url = os.environ['CDN_URL']
 
-    group.run('echo SERVER_NAME={} | sudo tee -a /home/pierogis-live/.env'.format(SERVER_NAME))
-    group.run('echo CONTENT_HOME={} | sudo tee -a /home/pierogis-live/.env'.format(CONTENT_HOME))
-    group.run('echo BOOTSTRAP_HOME={} | sudo tee -a /home/pierogis-live/.env'.format(BOOTSTRAP_HOME))
-    # run('echo DIST_HOME={} | sudo tee -a /home/pierogis-live/.env'.format(DIST_HOME))
-    group.run('echo DATABASE_URL={} | sudo tee -a /home/pierogis-live/.env'.format(DATABASE_URL))
-    group.run('echo DATABASE_URL={} | sudo tee -a /home/pierogis-live/.env'.format(CDN_URL))
+    jwt_token_location = os.environ['JWT_TOKEN_LOCATION']
+    secret_key = os.environ['SECRET_KEY']
+
+    print("Adding env var to .env:")
+
+    group.run('echo SERVER_NAME={} | sudo tee -a /home/pierogis-live/.env'.format(server_name))
+    group.run('echo SECRET_KEY={} | sudo tee -a /home/pierogis-live/.env'.format(secret_key))
+    group.run('echo CONTENT_HOME={} | sudo tee -a /home/pierogis-live/.env'.format(content_home))
+    group.run('echo DATABASE_SERVER_URL={} | sudo tee -a /home/pierogis-live/.env'.format(database_server_url))
+    group.run('echo CDN_URL={} | sudo tee -a /home/pierogis-live/.env'.format(cdn_url))
+    group.run('echo JWT_TOKEN_LOCATION={} | sudo tee -a /home/pierogis-live/.env'.format(jwt_token_location))
+    group.run('echo STAGE={} | sudo tee -a /home/pierogis-live/.env'.format(stage))
+
+    group.run('echo FLASK_APP={} | sudo tee -a /home/pierogis-live/.flaskenv'.format('pierogis_live'))
 
     # install the package in the application's virtualenv with pip
     group.run('sudo /home/pierogis-live/venv/bin/pip install /tmp/%s' % filename)
 
     # remove the uploaded package
     group.run('rm -r /tmp/%s' % filename)
+    group.run("sudo chmod 733 /home/pierogis-live/")
+
+    connection = group[0]
+
+    print("Checking for migrations")
+
+    # make directories for migrations files
+    connection.run("sudo rm -rf /tmp/migrations")
+    connection.run('sudo mkdir -m 777 /tmp/migrations')
+    connection.run('sudo mkdir -m 777 /tmp/migrations/versions')
+
+    # get migration files and put them all in the ec2 instance
+    version_files = os.listdir('migrations/versions')
+
+    for filename in version_files:
+        if filename == '__pycache__':
+            continue
+        connection.put('migrations/versions/' + filename, '/tmp/migrations/versions/' + filename)
+
+    connection.put('migrations/alembic.ini', '/tmp/migrations/alembic.ini')
+    connection.put('migrations/env.py', '/tmp/migrations/env.py')
+
+    connection.run("sudo rm -rf /home/pierogis-live/migrations")
+    connection.run("sudo mv /tmp/migrations /home/pierogis-live")
+    connection.run("cd /home/pierogis-live && venv/bin/flask db upgrade")
+
+    print("Starting server and nginx")
 
     # restart services
     group.run("sudo systemctl enable pierogis-live")
@@ -172,8 +212,7 @@ def get_stage_addresses(client, stage: str, allocated=False):
     # find the elastic ip for the desired stage
     elastic_ip_filters = [
         {'Name': 'domain', 'Values': ['vpc']},
-        {'Name': 'tag-key', 'Values': ['pierogis-live']},
-        {'Name': 'tag:stage', 'Values': [stage]}
+        {'Name': 'tag-key', 'Values': ['pierogis-' + stage]},
     ]
     if allocated:
         elastic_ip_filters.append({'Name': 'instance-id', 'Values': ['*']})

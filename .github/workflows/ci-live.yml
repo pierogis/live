@@ -1,7 +1,7 @@
 # This workflow will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: upload pierogis-live
+name: deploy release
 
 on:
   push:
@@ -11,11 +11,18 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_VPC_ID: vpc-0499f07d75deb3d4e
+  AWS_SUBNET_ID: subnet-016c385fd35de887a
   AWS_DEFAULT_REGION: us-east-1
+  DIST_HOME: ${{ environment.DIST_HOME }}
   DIST_DIR: ${{ github.sha }}
+  SERVER_NAME: 'pierogis.live'
 
 jobs:
-  sdist-build:
+  environment: dev
+  deploy-develop-build:
+    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
 
     steps:
@@ -39,10 +46,10 @@ jobs:
         shell: bash
         run: |
           pip install -U awscli
-          python -m awscli s3 sync --exact-timestamps ./dist "s3://pierogis.live/dist/$DIST_DIR"
+          python -m awscli s3 sync --exact-timestamps ./dist "s3://$DIST_HOME/$DIST_DIR"
 
       - name: deploy
         run: |
-          fab launch
-          fab bootstrap
-          fab deploy
+          fab launch --stage=live --count=1
+                    fab bootstrap --stage=live
+                    fab deploy --stage=live
