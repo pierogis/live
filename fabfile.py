@@ -11,66 +11,76 @@ from pierogis_live import __version__
 dotenv.load_dotenv()
 
 
+def get_stage_addresses(client, stage: str, allocated=False):
+    """
+    get the elastic ip addresses that are tagged with stage
+    """
+    # find the elastic ip for the desired stage
+    elastic_ip_filters = [
+        {'Name': 'domain', 'Values': ['vpc']},
+        {'Name': 'tag-key', 'Values': ['pierogis-' + stage]},
+    ]
+    if allocated:
+        elastic_ip_filters.append({'Name': 'instance-id', 'Values': ['*']})
+
+    return client.describe_addresses(Filters=elastic_ip_filters)['Addresses']
+
+def get_connect_kwargs(key):
+    """
+    get a dict from the key filename
+    """
+    return {
+        'key_filename': key,
+        'timeout': 30
+    }
+
 @task
 def build(context):
     # build the package
     sandbox.run_setup('setup.py', ['clean', 'sdist'])
 
 
-@task(optional=['aws_region', 'aws_subnet_id', 'count'])
-def launch(context, stage, aws_region=None, aws_subnet_id=None, count=1):
+@task(optional=['aws_region'])
+def launch(context, stage, aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
-    aws_subnet_id = aws_subnet_id or os.getenv('AWS_SUBNET_ID')
 
-    res = boto3.resource('ec2', aws_region)
-    client = boto3.client('ec2', aws_region)
+    ec2_res = boto3.resource('ec2', aws_region)
+    ec2_client = boto3.client('ec2', aws_region)
 
-    allocated_addresses = get_stage_addresses(client, stage, allocated=True)
-    if len(allocated_addresses) != 0:
-        client.terminate_instances(InstanceIds=[address.get('InstanceId') for address in allocated_addresses])
+    allocated_elastic_ips = get_stage_addresses(ec2_client, stage, allocated=True)
+    if len(allocated_elastic_ips) != 0:
+        ec2_client.terminate_instances(InstanceIds=[address.get('InstanceId') for address in allocated_elastic_ips])
 
-    instances = res.create_instances(
-        MaxCount=count,
+    elastic_ips = get_stage_addresses(ec2_client, stage, allocated=False)
+    elastic_ip_count = len(elastic_ips)
+
+    # create an instance for as many elastic ips as are tagged with this stage
+    instances = ec2_res.create_instances(
+        MaxCount=elastic_ip_count,
         LaunchTemplate={
             'LaunchTemplateName': 'pierogis-live',
-            'Version': '8',
+            'Version': '16',
         },
-        MinCount=count,
-        SubnetId=aws_subnet_id
+        MinCount=elastic_ip_count
     )
 
-    addresses = get_stage_addresses(client, stage, allocated=False)
-
-    for i in range(count):
-        instance = instances[i]
-        address = addresses[i]
-
+    for elastic_ip in elastic_ips:
+        instance = instances.pop()
         instance.wait_until_running()
+        ec2_client.associate_address(AllocationId=elastic_ip['AllocationId'],
+                                     InstanceId=instance.instance_id)
 
-        client.associate_address(AllocationId=address['AllocationId'],
-                                 InstanceId=instance.instance_id)
-
-
-def get_connect_kwargs():
-    aws_key_file = os.getenv('AWS_KEY_FILE')
-    connect_kwargs = {}
-    if aws_key_file is not None:
-        connect_kwargs['key_filename'] = os.environ['AWS_KEY_FILE']
-
-    return connect_kwargs
 
 
 @task(optional=['aws_region'])
-def bootstrap(context, stage, aws_region=None):
+def bootstrap(context, stage, key, aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
     client = boto3.client('ec2', aws_region)
 
-    allocated_addresses = get_stage_addresses(client, stage, allocated=True)
-    ips = [address.get('PublicIp') for address in allocated_addresses]
+    allocated_elastic_ips = get_stage_addresses(client, stage, allocated=True)
+    ips = [address.get('PublicIp') for address in allocated_elastic_ips]
 
-    connect_kwargs = get_connect_kwargs()
-
-    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=connect_kwargs)
+    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
 
     # install nginx
     group.run("sudo amazon-linux-extras install -y nginx1")
@@ -82,20 +92,20 @@ def bootstrap(context, stage, aws_region=None):
     group.run("sudo useradd pierogis-live")
     group.run("sudo passwd -f -u pierogis-live")
 
-    print("installing python dependencies")
+    print("~~installing python dependencies~~")
     # create the python environment for the deployment
     group.run("sudo python3 -m venv /home/pierogis-live/venv")
     group.run("sudo /home/pierogis-live/venv/bin/pip install gunicorn")
     group.run("sudo /home/pierogis-live/venv/bin/pip install psycopg2")
 
-    print("making gunicorn log fiiles")
+    print("~~making gunicorn log files~~")
     # create gunicorn log files
     group.run("sudo mkdir /home/pierogis-live/log")
     group.run("sudo mkdir /home/pierogis-live/conf")
     group.run("sudo touch /home/pierogis-live/log/gunicorn.access.log")
     group.run("sudo touch /home/pierogis-live/log/gunicorn.error.log")
 
-    print("giving nginx access to pierogis-live home")
+    print("~~giving nginx access to pierogis-live home~~")
     # make pierogis-live owner of their home folder
     group.run("sudo chown -R pierogis-live:pierogis-live /home/pierogis-live")
 
@@ -103,14 +113,14 @@ def bootstrap(context, stage, aws_region=None):
     group.run("sudo chmod 733 /home/pierogis-live/")
     group.run("sudo usermod -a -G pierogis-live nginx")
 
-    print("creating dirs for nginx and gunicorn service configs")
+    print("~~creating dirs for nginx and gunicorn service configs~~")
     # create dir for nginx and system d config
     group.run('sudo mkdir /usr/local/lib/systemd')
     group.run('sudo mkdir /usr/local/lib/systemd/system')
 
 
 @task(optional=['content_home', 'cdn_url', 'database_server_url', 'aws_region'])
-def deploy(context, stage, content_home=None, cdn_url=None,
+def deploy(context, stage, key, content_home=None, cdn_url=None,
            database_server_url=None,
            aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
@@ -119,14 +129,14 @@ def deploy(context, stage, content_home=None, cdn_url=None,
     allocated_addresses = get_stage_addresses(client, stage, allocated=True)
     ips = [address.get('PublicIp') for address in allocated_addresses]
 
-    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs())
+    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
 
     # figure out the package name and version
     # dist = subprocess.run('python setup.py --fullname', capture_output=True).strip()
 
     filename = '{}-{}.tar.gz'.format('pierogis-live', __version__)
 
-    print("Copying gunicorn and nginx conf")
+    print("~~copying gunicorn and nginx conf~~")
 
     for connection in group:
         # copy service configs
@@ -156,7 +166,7 @@ def deploy(context, stage, content_home=None, cdn_url=None,
     jwt_token_location = os.environ['JWT_TOKEN_LOCATION']
     secret_key = os.environ['SECRET_KEY']
 
-    print("Adding env var to .env:")
+    print("~~adding env var to .env~~")
 
     group.run('echo SERVER_NAME={} | sudo tee -a /home/pierogis-live/.env'.format(server_name))
     group.run('echo SECRET_KEY={} | sudo tee -a /home/pierogis-live/.env'.format(secret_key))
@@ -177,7 +187,7 @@ def deploy(context, stage, content_home=None, cdn_url=None,
 
     connection = group[0]
 
-    print("Checking for migrations")
+    print("~~checking for migrations~~")
 
     # make directories for migrations files
     connection.run("sudo rm -rf /tmp/migrations")
@@ -199,22 +209,10 @@ def deploy(context, stage, content_home=None, cdn_url=None,
     connection.run("sudo mv /tmp/migrations /home/pierogis-live")
     connection.run("cd /home/pierogis-live && venv/bin/flask db upgrade")
 
-    print("Starting server and nginx")
+    print("~~starting server and nginx~~")
 
     # restart services
     group.run("sudo systemctl enable pierogis-live")
     group.run("sudo systemctl restart pierogis-live")
     group.run("sudo systemctl enable nginx")
     group.run("sudo systemctl restart nginx")
-
-
-def get_stage_addresses(client, stage: str, allocated=False):
-    # find the elastic ip for the desired stage
-    elastic_ip_filters = [
-        {'Name': 'domain', 'Values': ['vpc']},
-        {'Name': 'tag-key', 'Values': ['pierogis-' + stage]},
-    ]
-    if allocated:
-        elastic_ip_filters.append({'Name': 'instance-id', 'Values': ['*']})
-
-    return client.describe_addresses(Filters=elastic_ip_filters)['Addresses']

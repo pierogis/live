@@ -19,6 +19,7 @@ env:
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
   STAGE: 'dev'
 
+
 jobs:
   deploy-develop-build:
     runs-on: ubuntu-latest
@@ -38,7 +39,7 @@ jobs:
 
       - name: compile sass
         run: |
-          mkdir sass
+          mkdir ~/sass
           curl https://github.com/sass/dart-sass/archive/1.32.4.tar.gz -o ~/sass/sass.tar.gz
           export PATH="$PATH:~/sass"
           source compile_sass.sh
@@ -55,8 +56,9 @@ jobs:
 
       - name: launch and bootstrap instances
         run: |
-          fab launch --stage=dev --count=1
-          fab bootstrap --stage=$STAGE
+          fab launch --stage=$STAGE
+          echo ${{ secrets.AWS_KEY }} >> ~/.ssh/pierogis-live.pem
+          fab bootstrap --stage=$STAGE --key=~/.ssh/pierogis-live.pem
 
       - name: deploy
         run: |
