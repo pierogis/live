@@ -35,9 +35,8 @@ jobs:
       - name: install dependencies
         shell: bash
         run: |
-          pip install fabric
+          pip install fabric python-dotenv Flask-Migrate
           pip install -r requirements.txt
-          pip install Flask-Migrate
 
       - name: compile sass
         shell: bash
@@ -73,5 +72,4 @@ jobs:
       - name: deploy to instances
         shell: bash
         run: |
-          pip install Flask-Migrate dotenv-python
           fab deploy --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
