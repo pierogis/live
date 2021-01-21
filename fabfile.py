@@ -1,4 +1,5 @@
 import os
+import time
 
 import boto3
 import dotenv
@@ -73,6 +74,8 @@ def launch(context, stage, aws_region=None):
         instance.wait_until_running()
         ec2_client.associate_address(AllocationId=elastic_ip['AllocationId'],
                                      InstanceId=instance.instance_id)
+
+    time.sleep(10)
 
 
 @task(optional=['aws_region'])
