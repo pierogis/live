@@ -33,18 +33,21 @@ jobs:
           python-version: 3.8
 
       - name: install dependencies
+        shell: bash
         run: |
           pip install fabric
           pip install -r requirements.txt
           pip install Flask-Migrate
 
       - name: compile sass
+        shell: bash
         run: |
           wget https://github.com/sass/dart-sass/releases/download/1.32.5/dart-sass-1.32.5-linux-x64.tar.gz
           tar -xvzf dart-sass-1.32.5-linux-x64.tar.gz
           source compile_sass.sh
 
-      - name: build
+      - name: build package
+        shell: bash
         run: |
           fab build
 
@@ -55,16 +58,21 @@ jobs:
           python -m awscli s3 sync --exact-timestamps ./dist "s3://$DIST_HOME/$DIST_DIR"
 
       - name: launch and bootstrap instances
+        shell: bash
         run: |
           fab launch --stage=$STAGE
-          echo ${{ secrets.AWS_KEY }} >> ~/.ssh/pierogis-live.pem
+          echo "$SSH_KEY" >> ~/.ssh/pierogis-live.pem
           fab bootstrap --stage=$STAGE --key=~/.ssh/pierogis-live.pem
+        env:
+          SSH_KEY: ${{secrets.AWS_KEY}}
 
-      - name: deploy
+      - name: deploy to instances
+        shell: bash
         run: |
           pip install Flask-Migrate dotenv-python
           fab deploy --stage=$STAGE
 
-      - name: start
+      - name: start servers
+        shell: bash
         run: |
           fabric start --stage=$STAGE
