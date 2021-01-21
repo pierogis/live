@@ -58,15 +58,13 @@ jobs:
 
       - name: launch instances
         shell: bash
-        run: fab launch --stage=$STAGE && sleep 10
+        run: fab launch --stage=$STAGE && sleep 30
 
       - name: bootstrap instances
         shell: bash
         run: |
           mkdir "$GITHUB_WORKSPACE/.ssh"
           echo "$SSH_KEY" > $GITHUB_WORKSPACE/.ssh/pierogis-live.pem
-          chmod 600 "$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
-          chmod 600 "$GITHUB_WORKSPACE/.ssh"
           fab bootstrap --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
