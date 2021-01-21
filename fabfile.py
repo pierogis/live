@@ -8,6 +8,11 @@ from setuptools import sandbox
 
 dotenv.load_dotenv()
 
+LAUNCH_TEMPLATE = {
+    'LaunchTemplateName': 'pierogis-live',
+    'Version': '17',
+}
+
 
 def get_stage_addresses(client, stage: str, allocated=False):
     """
@@ -23,6 +28,7 @@ def get_stage_addresses(client, stage: str, allocated=False):
 
     return client.describe_addresses(Filters=elastic_ip_filters)['Addresses']
 
+
 def get_connect_kwargs(key):
     """
     get a dict from the key filename
@@ -31,6 +37,7 @@ def get_connect_kwargs(key):
         'key_filename': key,
         'timeout': 30
     }
+
 
 @task
 def build(context):
@@ -55,10 +62,7 @@ def launch(context, stage, aws_region=None):
     # create an instance for as many elastic ips as are tagged with this stage
     instances = ec2_res.create_instances(
         MaxCount=elastic_ip_count,
-        LaunchTemplate={
-            'LaunchTemplateName': 'pierogis-live',
-            'Version': '16',
-        },
+        LaunchTemplate=LAUNCH_TEMPLATE,
         MinCount=elastic_ip_count
     )
 
@@ -67,7 +71,6 @@ def launch(context, stage, aws_region=None):
         instance.wait_until_running()
         ec2_client.associate_address(AllocationId=elastic_ip['AllocationId'],
                                      InstanceId=instance.instance_id)
-
 
 
 @task(optional=['aws_region'])
