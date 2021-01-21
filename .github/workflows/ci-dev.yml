@@ -65,8 +65,8 @@ jobs:
         run: |
           mkdir "$GITHUB_WORKSPACE/.ssh"
           echo "$SSH_KEY" > $GITHUB_WORKSPACE/.ssh/pierogis-live.pem
-          chmod 600 "$GITHUB_WORKSPACE/.ssh"
           chmod 600 "$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
+          chmod 600 "$GITHUB_WORKSPACE/.ssh"
           fab bootstrap --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
