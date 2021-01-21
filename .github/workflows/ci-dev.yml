@@ -14,6 +14,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   JWT_TOKEN_LOCATION: 'headers cookies'
   DIST_HOME: 'pierogis-dev/dist/'
+  CONTENT_HOME: 'pierogis-live/content/'
   DIST_DIR: ${{ github.sha }}
   SERVER_NAME: 'pierogis.dev'
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
