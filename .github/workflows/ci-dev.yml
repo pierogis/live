@@ -58,7 +58,7 @@ jobs:
 
       - name: launch instances
         shell: bash
-        run: fab launch --stage=$STAGE
+        run: fab launch --stage=$STAGE && sleep 10
 
       - name: bootstrap instances
         shell: bash
