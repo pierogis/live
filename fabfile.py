@@ -6,8 +6,6 @@ from fabric import Connection, task, SerialGroup
 # the servers where the commands are executed
 from setuptools import sandbox
 
-from pierogis_live import __version__
-
 dotenv.load_dotenv()
 
 
@@ -133,6 +131,8 @@ def deploy(context, stage, key, content_home=None, cdn_url=None,
 
     # figure out the package name and version
     # dist = subprocess.run('python setup.py --fullname', capture_output=True).strip()
+
+    from pierogis_live import __version__
 
     filename = '{}-{}.tar.gz'.format('pierogis-live', __version__)
 
