@@ -57,10 +57,13 @@ jobs:
           pip install -U awscli
           python -m awscli s3 sync --exact-timestamps ./dist "s3://$DIST_HOME/$DIST_DIR"
 
-      - name: launch and bootstrap instances
+      - name: launch instances
+        shell: bash
+        run: fab launch --stage=$STAGE
+
+      - name: bootstrap instances
         shell: bash
         run: |
-          fab launch --stage=$STAGE
           echo "$SSH_KEY" > ~/pierogis-live.pem
           fab bootstrap --stage=$STAGE --key=~/pierogis-live.pem
         env:

@@ -35,7 +35,7 @@ def get_connect_kwargs(key):
     """
     return {
         'key_filename': [key],
-        'timeout': 30
+        'timeout': 60
     }
 
 
