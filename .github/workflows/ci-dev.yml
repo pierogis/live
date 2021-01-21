@@ -66,10 +66,19 @@ jobs:
           mkdir "$GITHUB_WORKSPACE/.ssh"
           echo "$SSH_KEY" > $GITHUB_WORKSPACE/.ssh/pierogis-live.pem
           fab bootstrap --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
+
+          mkdir "$GITHUB_WORKSPACE/.ssh"
+          touch "$GITHUB_WORKSPACE/.ssh/known_hosts"
+          echo "$SSH_KEY" > "$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
+
+          chmod 700 "$GITHUB_WORKSPACE/.ssh"
+          chmod 600 "$GITHUB_WORKSPACE/.ssh/known_hosts"
+          chmod 600 "$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
+          fab bootstrap --stage=$STAGE --key="$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
 
       - name: deploy to instances
         shell: bash
         run: |
-          fab deploy --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
+          fab deploy --stage=$STAGE --key="$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
