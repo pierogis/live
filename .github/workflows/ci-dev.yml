@@ -72,4 +72,5 @@ jobs:
       - name: deploy to instances
         shell: bash
         run: |
+          pip install .
           fab deploy --stage=$STAGE --key="$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
