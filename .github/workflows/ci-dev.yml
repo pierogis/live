@@ -11,15 +11,18 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DIST_DIR: ${{ github.sha }}
   AWS_DEFAULT_REGION: us-east-1
+  STAGE: 'dev'
+
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
   JWT_TOKEN_LOCATION: 'headers cookies'
   DIST_HOME: 'pierogis-dev/dist/'
   CONTENT_HOME: 'pierogis-live/content/'
   CDN_URL: 'https://cdn.pierogis.live/'
-  DIST_DIR: ${{ github.sha }}
   SERVER_NAME: 'pierogis.dev'
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
-  STAGE: 'dev'
+
 
 
 jobs:
