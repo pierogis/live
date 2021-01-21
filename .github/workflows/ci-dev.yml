@@ -64,8 +64,12 @@ jobs:
       - name: bootstrap instances
         shell: bash
         run: |
-          echo "$SSH_KEY" > ~/pierogis-live.pem
-          fab bootstrap --stage=$STAGE --key=~/pierogis-live.pem
+          mkdir "$HOME/.ssh"
+          echo "$SSH_KEY" > "$HOME/.ssh/pierogis-live.pem"
+          chmod 700 "$HOME/.ssh"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/pierogis-live.pem"
+          fab bootstrap --stage=$STAGE --key="$HOME/.ssh/pierogis-live.pem"
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
 
