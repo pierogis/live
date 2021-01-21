@@ -15,6 +15,7 @@ env:
   JWT_TOKEN_LOCATION: 'headers cookies'
   DIST_HOME: 'pierogis-dev/dist/'
   CONTENT_HOME: 'pierogis-live/content/'
+  CDN_URL: 'https://cdn.pierogis.live/'
   DIST_DIR: ${{ github.sha }}
   SERVER_NAME: 'pierogis.dev'
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
