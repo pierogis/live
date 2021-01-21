@@ -64,14 +64,9 @@ jobs:
       - name: bootstrap instances
         shell: bash
         run: |
-          mkdir "$HOME/.ssh"
-          touch "$HOME/.ssh/known_hosts"
-          echo "$SSH_KEY" > "$HOME/.ssh/pierogis-live.pem"
-
-          chmod 700 "$HOME/.ssh"
-          chmod 600 "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/pierogis-live.pem"
-          fab bootstrap --stage=$STAGE --key="$HOME/.ssh/pierogis-live.pem"
+          mkdir "$GITHUB_WORKSPACE/.ssh"
+          echo "$SSH_KEY" > $GITHUB_WORKSPACE/.ssh/pierogis-live.pem
+          fab bootstrap --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
 
@@ -79,9 +74,4 @@ jobs:
         shell: bash
         run: |
           pip install Flask-Migrate dotenv-python
-          fab deploy --stage=$STAGE
-
-      - name: start servers
-        shell: bash
-        run: |
-          fabric start --stage=$STAGE
+          fab deploy --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
