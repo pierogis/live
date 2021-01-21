@@ -4,6 +4,8 @@ import boto3
 import dotenv
 from fabric import Connection, task, SerialGroup
 # the servers where the commands are executed
+from fabric.exceptions import GroupException
+from paramiko.ssh_exception import NoValidConnectionsError
 from setuptools import sandbox
 
 dotenv.load_dotenv()
@@ -81,43 +83,48 @@ def bootstrap(context, stage, key, aws_region=None):
     allocated_elastic_ips = get_stage_addresses(client, stage, allocated=True)
     ips = [address.get('PublicIp') for address in allocated_elastic_ips]
 
-    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
+    group = SerialGroup(*ips, user='ec2-user')
 
-    # install nginx
-    group.run("sudo amazon-linux-extras install -y nginx1")
+    try:
+        # install nginx
+        group.run("sudo amazon-linux-extras install -y nginx1")
 
-    # install python3
-    group.run("sudo yum install -y python3 python3-devel gcc postgresql-devel")
+        # install python3
+        group.run("sudo yum install -y python3 python3-devel gcc postgresql-devel")
 
-    # add service executing user
-    group.run("sudo useradd pierogis-live")
-    group.run("sudo passwd -f -u pierogis-live")
+        # add service executing user
+        group.run("sudo useradd pierogis-live")
+        group.run("sudo passwd -f -u pierogis-live")
 
-    print("~~installing python dependencies~~")
-    # create the python environment for the deployment
-    group.run("sudo python3 -m venv /home/pierogis-live/venv")
-    group.run("sudo /home/pierogis-live/venv/bin/pip install gunicorn")
-    group.run("sudo /home/pierogis-live/venv/bin/pip install psycopg2")
+        print("~~installing python dependencies~~")
+        # create the python environment for the deployment
+        group.run("sudo python3 -m venv /home/pierogis-live/venv")
+        group.run("sudo /home/pierogis-live/venv/bin/pip install gunicorn")
+        group.run("sudo /home/pierogis-live/venv/bin/pip install psycopg2")
 
-    print("~~making gunicorn log files~~")
-    # create gunicorn log files
-    group.run("sudo mkdir /home/pierogis-live/log")
-    group.run("sudo mkdir /home/pierogis-live/conf")
-    group.run("sudo touch /home/pierogis-live/log/gunicorn.access.log")
-    group.run("sudo touch /home/pierogis-live/log/gunicorn.error.log")
+        print("~~making gunicorn log files~~")
+        # create gunicorn log files
+        group.run("sudo mkdir /home/pierogis-live/log")
+        group.run("sudo mkdir /home/pierogis-live/conf")
+        group.run("sudo touch /home/pierogis-live/log/gunicorn.access.log")
+        group.run("sudo touch /home/pierogis-live/log/gunicorn.error.log")
 
-    print("~~giving nginx access to pierogis-live home~~")
-    # make pierogis-live owner of their home folder
-    group.run("sudo chown -R pierogis-live:pierogis-live /home/pierogis-live")
+        print("~~giving nginx access to pierogis-live home~~")
+        # make pierogis-live owner of their home folder
+        group.run("sudo chown -R pierogis-live:pierogis-live /home/pierogis-live")
 
-    # and give nginx service access to pierogis-live home folder
-    group.run("sudo chmod 733 /home/pierogis-live/")
-    group.run("sudo usermod -a -G pierogis-live nginx")
+        # and give nginx service access to pierogis-live home folder
+        group.run("sudo chmod 733 /home/pierogis-live/")
+        group.run("sudo usermod -a -G pierogis-live nginx")
 
-    print("~~creating dirs for nginx and gunicorn service configs~~")
-    # create dir for nginx and system d config
-    group.run('sudo mkdir /usr/local/lib/systemd')
-    group.run('sudo mkdir /usr/local/lib/systemd/system')
+        print("~~creating dirs for nginx and gunicorn service configs~~")
+        # create dir for nginx and system d config
+        group.run('sudo mkdir /usr/local/lib/systemd')
+        group.run('sudo mkdir /usr/local/lib/systemd/system')
+    except GroupException as err:
+        for connection, error in err.result.failed.items():
+            print(error.errors)
+        raise Exception("still failed though!")
 
 
 @task(optional=['content_home', 'cdn_url', 'database_server_url', 'aws_region'])
