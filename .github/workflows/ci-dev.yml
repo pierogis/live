@@ -65,7 +65,9 @@ jobs:
         shell: bash
         run: |
           mkdir "$HOME/.ssh"
+          touch "$HOME/.ssh/known_hosts"
           echo "$SSH_KEY" > "$HOME/.ssh/pierogis-live.pem"
+
           chmod 700 "$HOME/.ssh"
           chmod 600 "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/pierogis-live.pem"
