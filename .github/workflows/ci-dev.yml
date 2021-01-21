@@ -40,8 +40,9 @@ jobs:
       - name: compile sass
         run: |
           mkdir ~/sass
-          curl https://github.com/sass/dart-sass/archive/1.32.4.tar.gz -o ~/sass/sass.tar.gz
-          export PATH="$PATH:~/sass" && source compile_sass.sh
+          wget https://github.com/sass/dart-sass/releases/download/1.32.5/dart-sass-1.32.5-linux-x64.tar.gz
+          tar -xvzf dart-sass-1.32.5-linux-x64.tar.gz
+          export PATH="$PATH:~/dart-sass" && source compile_sass.sh
 
       - name: build
         run: |
