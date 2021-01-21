@@ -61,8 +61,8 @@ jobs:
         shell: bash
         run: |
           fab launch --stage=$STAGE
-          echo "$SSH_KEY" > ~/.ssh/pierogis-live.pem
-          fab bootstrap --stage=$STAGE --key=~/.ssh/pierogis-live.pem
+          echo "$SSH_KEY" > ~/pierogis-live.pem
+          fab bootstrap --stage=$STAGE --key=~/pierogis-live.pem
         env:
           SSH_KEY: ${{secrets.AWS_KEY}}
 
