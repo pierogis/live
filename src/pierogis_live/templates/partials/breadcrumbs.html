@@ -1,5 +1,10 @@
 <div class="breadcrumbs">
-    {% for name, link in breadcrumbs.items() %}
+    {% for text, path in breadcrumbs.items() %}
         {% include "partials/blob.html" %}
+        {% with text = '/' %}
+        {% with path = none %}
+            {% include "partials/blob.html" %}
+        {% endwith %}
+        {% endwith %}
     {% endfor %}
 </div>

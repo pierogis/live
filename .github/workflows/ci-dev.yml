@@ -23,8 +23,6 @@ env:
   SERVER_NAME: 'pierogis.dev'
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
 
-
-
 jobs:
   deploy-develop-build:
     runs-on: ubuntu-latest

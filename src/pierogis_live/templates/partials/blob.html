@@ -1,0 +1,11 @@
+{% if path is not none %}
+<a class="blob-link" href="{{ path }}">
+{% else %}
+<a class="blob-link">
+{% endif %}
+    <div class="blob">
+        <span class="blob-text">
+            {{ text }}
+        </span>
+    </div>
+</a>

@@ -113,34 +113,34 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.nav-blob {
-    border-radius: 100px;
-    padding-bottom: .15rem;
-    padding-left: .5rem;
-    padding-right: .5rem;
-
-    background-color: var(--accent-color);
-
-    -webkit-box-shadow:
-                0px 0px 3px 0px rgba(0, 0, 0, 0.2)
-            ;
-            box-shadow:
-                0px 0px 3px 0px rgba(0, 0, 0, 0.2)
-            ;
-
-    text-align: center;
-    transition: .2s;
-}
-
-.nav-blob:hover {
-    -webkit-box-shadow:
-                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
-            ;
-            box-shadow:
-                2px 2px 3px 0px rgba(0, 0, 0, 0.5)
-            ;
-    filter: brightness(90%);
-}
+// .blob {
+//     border-radius: 100px;
+//     padding-bottom: .15rem;
+//     padding-left: .5rem;
+//     padding-right: .5rem;
+//
+//     background-color: var(--accent-color);
+//
+//     -webkit-box-shadow:
+//                 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+//             ;
+//             box-shadow:
+//                 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+//             ;
+//
+//     text-align: center;
+//     transition: .2s;
+// }
+//
+// .blob:hover {
+//     -webkit-box-shadow:
+//                 2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+//             ;
+//             box-shadow:
+//                 2px 2px 3px 0px rgba(0, 0, 0, 0.5)
+//             ;
+//     filter: brightness(90%);
+// }
 
 .nav-link:focus {
     outline: none;

@@ -1,3 +1,14 @@
-.breadcrumbs blob {
-    background-color: var(--secondary-color);
+.breadcrumbs {
+    display: flex;
+    align-items: center;
 }
+
+.breadcrumbs .blob {
+    background-color: var(--secondary-color);
+    box-shadow: none;
+
+}
+.breadcrumbs .blob-text {
+    font-size: .8rem;
+}
+

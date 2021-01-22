@@ -16,7 +16,7 @@
     {% with alternate=True %}
     <div class="projects">
         {% if projects|length > 0 %}
-            {% with title="projects" %}
+            {% with text="projects" %}
             {% with path=None %}
                 {% include "partials/blob.html" %}
             {% endwith %}
@@ -27,7 +27,7 @@
         {% endif %}
     </div>
     {% if contents|length > 0 %}
-        {% with title="content" %}
+        {% with text="content" %}
         {% with path=None %}
             {% include "partials/blob.html" %}
         {% endwith %}
