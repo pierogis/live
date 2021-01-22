@@ -33,7 +33,7 @@ class base:
 class local(base):
     FLASK_ENV = 'development'
     # db
-    SQLALCHEMY_DATABASE_URI = os.path.join(os.getenv('DATABASE_SERVER_URL'), "pierogis-live")
+    SQLALCHEMY_DATABASE_URI = os.path.join(os.getenv('DATABASE_SERVER_URL'), "local")
 
 
 class dev(base):

@@ -2,11 +2,7 @@
 """
 import os
 
-import click
-
 from flask import Flask
-from flask import render_template
-from flask.cli import FlaskGroup
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -16,7 +12,7 @@ from .services import StorageService
 from .blueprints import register_blueprints
 from .subdomains import register_subdomains
 
-__version__ = '0.1.0'
+__version__ = '0.1.0-dev0'
 
 db = SQLAlchemy()
 migrate = Migrate(compare_type=True)
@@ -29,7 +25,6 @@ def create_app(stage=os.getenv('STAGE', 'local')):
     """
 
     app = Flask(__name__, subdomain_matching=True)
-    # TODO: Fix this config to use the given stage
     app.config.from_object('pierogis_live.config.' + stage)
 
     cors = CORS(app, resources={r'/*': {'origins': "http://*.{}".format(app.config['SERVER_NAME'])}})

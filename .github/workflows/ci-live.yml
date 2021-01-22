@@ -11,13 +11,17 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-east-1
-  JWT_TOKEN_LOCATION: 'headers cookies'
-  DIST_HOME: 'pierogis-live/dist/'
   DIST_DIR: ${{ github.sha }}
+  AWS_DEFAULT_REGION: us-east-1
+  STAGE: 'live'
+
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  JWT_TOKEN_LOCATION: 'headers cookies'
+  DIST_HOME: 'pierogis-dev/dist/'
+  CONTENT_HOME: 'pierogis-live/content/'
+  CDN_URL: 'https://cdn.pierogis.live/'
   SERVER_NAME: 'pierogis.live'
   DATABASE_SERVER_URL: ${{ secrets.DATABASE_SERVER_URL }}
-  STAGE: 'live'
 
 jobs:
   deploy-develop-build:
@@ -32,18 +36,20 @@ jobs:
           python-version: 3.8
 
       - name: install dependencies
+        shell: bash
         run: |
-          pip install fabric
-          pip install Flask-Migrate
+          pip install fabric python-dotenv Flask-Migrate
+          pip install -r requirements.txt
 
       - name: compile sass
-        working-directory: './src/pierogis_live'
+        shell: bash
         run: |
-          curl https://github.com/sass/dart-sass/archive/1.32.4.tar.gz -o sass.tar.gz
-          export PATH="$PATH:~/dev/src/pierogis/sass.tar.gz"
+          wget https://github.com/sass/dart-sass/releases/download/1.32.5/dart-sass-1.32.5-linux-x64.tar.gz
+          tar -xvzf dart-sass-1.32.5-linux-x64.tar.gz
           source compile_sass.sh
 
-      - name: build
+      - name: build package
+        shell: bash
         run: |
           fab build
 
@@ -53,16 +59,21 @@ jobs:
           pip install -U awscli
           python -m awscli s3 sync --exact-timestamps ./dist "s3://$DIST_HOME/$DIST_DIR"
 
-      - name: launch and bootstrap instances
-        run: |
-          fab launch --stage=dev --count=1
-          fab bootstrap --stage=$STAGE
+      - name: launch instances
+        shell: bash
+        run: fab launch --stage=$STAGE && sleep 30
 
-      - name: deploy
+      - name: bootstrap instances
+        shell: bash
         run: |
-          pip install Flask-Migrate dotenv-python
-          fab deploy --stage=$STAGE
+          mkdir "$GITHUB_WORKSPACE/.ssh"
+          echo "$SSH_KEY" > $GITHUB_WORKSPACE/.ssh/pierogis-live.pem
+          fab bootstrap --stage=$STAGE --key=$GITHUB_WORKSPACE/.ssh/pierogis-live.pem
+        env:
+          SSH_KEY: ${{secrets.AWS_KEY}}
 
-      - name: start
+      - name: deploy to instances
+        shell: bash
         run: |
-          fabric start --stage=$STAGE
+          pip install .
+          fab deploy --stage=$STAGE --key="$GITHUB_WORKSPACE/.ssh/pierogis-live.pem"
