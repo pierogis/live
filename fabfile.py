@@ -75,15 +75,19 @@ def launch(context, stage, aws_region=None):
                                      InstanceId=instance.instance_id)
 
 
-@task(optional=['aws_region'])
-def bootstrap(context, stage, key, aws_region=None):
-    aws_region = aws_region or os.getenv('AWS_REGION')
+def get_allocated_group(aws_region, stage, key):
     client = boto3.client('ec2', aws_region)
 
     allocated_elastic_ips = get_stage_addresses(client, stage, allocated=True)
     ips = [address.get('PublicIp') for address in allocated_elastic_ips]
 
-    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
+    return SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
+
+
+@task(optional=['aws_region'])
+def bootstrap(context, stage, key, aws_region=None):
+    aws_region = aws_region or os.getenv('AWS_REGION')
+    group = get_allocated_group(aws_region, stage, key)
 
     # install nginx
     group.run("sudo amazon-linux-extras install -y nginx1")
@@ -121,18 +125,30 @@ def bootstrap(context, stage, key, aws_region=None):
     group.run('sudo mkdir /usr/local/lib/systemd')
     group.run('sudo mkdir /usr/local/lib/systemd/system')
 
+    # add certificate
+    group.run('python3 -m pip install --user certbot certbot-dns-cloudflare')
+    group.run('mkdir certbot && mkdir certbot/config && mkdir certbot/work && mkdir certbot/logs')
+
+    for connection in group:
+        # copy service configs
+        connection.put('bootstrap/certbot.sh', 'certbot/certbot.sh')
+
+    # certbot uses dns to validate, certbot-dns-cloudflare plugin allows using a cloudflare api token
+    cloudflare_token = os.environ['CLOUDFLARE_TOKEN']
+    group.run('echo dns_cloudflare_api_token = {} | tee -a certbot/cloudflare.ini'.format(cloudflare_token))
+    group.run('chmod 600 certbot/cloudflare.ini')
+    group.run('chmod 733 certbot/certbot.sh')
+
+    group.run('cd certbot && ./certbot.sh')
+    group.run('sudo rm -rf certbot')
+
 
 @task(optional=['content_home', 'cdn_url', 'database_server_url', 'aws_region'])
 def deploy(context, stage, key, content_home=None, cdn_url=None,
            database_server_url=None,
            aws_region=None):
     aws_region = aws_region or os.getenv('AWS_REGION')
-
-    client = boto3.client('ec2', aws_region)
-    allocated_addresses = get_stage_addresses(client, stage, allocated=True)
-    ips = [address.get('PublicIp') for address in allocated_addresses]
-
-    group = SerialGroup(*ips, user='ec2-user', connect_kwargs=get_connect_kwargs(key))
+    group = get_allocated_group(aws_region, stage, key)
 
     # figure out the package name and version
     # dist = subprocess.run('python setup.py --fullname', capture_output=True).strip()
@@ -190,9 +206,22 @@ def deploy(context, stage, key, content_home=None, cdn_url=None,
     group.run('rm -r /tmp/%s' % filename)
     group.run("sudo chmod 733 /home/pierogis-live/")
 
-    connection = group[0]
+    print("~~starting server and nginx~~")
+
+    # restart services
+    group.run("sudo systemctl enable pierogis-live")
+    group.run("sudo systemctl restart pierogis-live")
+    group.run("sudo systemctl enable nginx")
+    group.run("sudo systemctl restart nginx")
+
+
+def migrate(context, stage, key, aws_region=None):
+    aws_region = aws_region or os.getenv('AWS_REGION')
+    group = get_allocated_group(aws_region, stage, key)
 
     print("~~checking for migrations~~")
+
+    connection = group[0]
 
     # make directories for migrations files
     connection.run("sudo rm -rf /tmp/migrations")
@@ -213,11 +242,3 @@ def deploy(context, stage, key, content_home=None, cdn_url=None,
     connection.run("sudo rm -rf /home/pierogis-live/migrations")
     connection.run("sudo mv /tmp/migrations /home/pierogis-live")
     connection.run("cd /home/pierogis-live && venv/bin/flask db upgrade")
-
-    print("~~starting server and nginx~~")
-
-    # restart services
-    group.run("sudo systemctl enable pierogis-live")
-    group.run("sudo systemctl restart pierogis-live")
-    group.run("sudo systemctl enable nginx")
-    group.run("sudo systemctl restart nginx")
