@@ -1,4 +1,4 @@
 from flask import Blueprint
 from flask import request
 
-app = Blueprint('chef', __name__, subdomain='chef')
+kitchen = Blueprint('kitchen', __name__)

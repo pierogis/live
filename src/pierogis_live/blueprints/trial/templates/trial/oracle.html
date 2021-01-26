@@ -10,7 +10,6 @@
 <div class="audience">
     {% include 'trial/partials/pierogi.html' %}
 
-
     <div class="blob">
         <span class="blob-text">
             questions
@@ -19,9 +18,14 @@
 
     <form method="post">
         {% for question in questions %}
-            {% include 'trial/partials/question.html' %}
+        {% include 'trial/partials/question.html' %}
         {% endfor %}
-    <input type="submit">
+        <input type="submit">
     </form>
+
+    <a href="https://twitter.com/messages/compose?recipient_id=123&ref_src=twsrc%5Etfw" class="twitter-dm-button"
+       data-text="i would like to make a reservation uwu" data-dnt="true" data-screen-name="pierogis_waiter"
+       data-show-count="false">Message @pierogis_waiter</a>
+<!--    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>-->
 </div>
 {% endblock page %}

@@ -131,7 +131,7 @@ def bootstrap(context, stage, key, aws_region=None):
 
     for connection in group:
         # copy service configs
-        connection.put('bootstrap/certbot.sh', 'certbot/certbot.sh')
+        connection.put('bootstrap/certbot-{}.sh'.format(stage), 'certbot/certbot.sh')
 
     # certbot uses dns to validate, certbot-dns-cloudflare plugin allows using a cloudflare api token
     cloudflare_token = os.environ['CLOUDFLARE_TOKEN']
@@ -206,6 +206,10 @@ def deploy(context, stage, key, content_home=None, cdn_url=None,
     group.run('rm -r /tmp/%s' % filename)
     group.run("sudo chmod 733 /home/pierogis-live/")
 
+    # perform an alembic db migration from one instance
+    print("~~checking for migrations~~")
+    migrate(group[0])
+
     print("~~starting server and nginx~~")
 
     # restart services
@@ -215,14 +219,7 @@ def deploy(context, stage, key, content_home=None, cdn_url=None,
     group.run("sudo systemctl restart nginx")
 
 
-def migrate(context, stage, key, aws_region=None):
-    aws_region = aws_region or os.getenv('AWS_REGION')
-    group = get_allocated_group(aws_region, stage, key)
-
-    print("~~checking for migrations~~")
-
-    connection = group[0]
-
+def migrate(connection):
     # make directories for migrations files
     connection.run("sudo rm -rf /tmp/migrations")
     connection.run('sudo mkdir -m 777 /tmp/migrations')

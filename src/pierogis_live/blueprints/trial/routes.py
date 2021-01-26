@@ -31,8 +31,10 @@ def input_claim():
         claim = session.get('claim')
 
     csrf_token = (get_raw_jwt() or {}).get("csrf")
-    return render_template('trial/claim.html', claim=claim, pierogi_url=url_for('trial.static', filename='pierogi_master.png'),
-                           csrf_token=csrf_token)
+    return render_template(
+        'trial/claim.html', claim=claim, csrf_token=csrf_token,
+        pierogi_url=url_for('trial.static', filename='pierogi_master.png'),
+    )
 
 
 # post a claim form input
@@ -57,7 +59,8 @@ def review_claim():
 def ask_question():
     questions = Trivia.query.order_by(func.random()).limit(2).all()
 
-    return render_template('trial/oracle.html', path=None, questions=questions, pierogi_url='static/pierogi_master.png')
+    return render_template('trial/oracle.html', path=None, questions=questions,
+                           pierogi_url='static/pierogi_master.png')
 
 
 @trial.route('/oracle', methods=['POST'])
