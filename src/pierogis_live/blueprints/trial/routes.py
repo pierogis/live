@@ -20,6 +20,7 @@ def index():
 
 
 # route for filling out a claim (banner subtitle)
+# the chicken was raw!
 @trial.route('/claim', methods=['GET'])
 @jwt_optional
 def input_claim():
@@ -53,47 +54,6 @@ def review_claim():
     requests.post(url_for('atlas.post_claim'), json={'claim': claim}, headers={'Authentication': access_token})
 
     return redirect(url_for('trial.index'), 302)
-
-
-@trial.route('/oracle', methods=['GET'])
-def ask_question():
-    questions = Trivia.query.order_by(func.random()).limit(2).all()
-
-    return render_template('trial/oracle.html', path=None, questions=questions,
-                           pierogi_url='static/pierogi_master.png')
-
-
-@trial.route('/oracle', methods=['POST'])
-@jwt_optional
-def review_answer():
-    # get redirect destination from url params
-    destination = session.get('destination')
-
-    # loop through the question-answer pairs posted with the request
-    correct = 0
-    questions = 0
-    for question_id, response_answer in request.form.items():
-        question = Trivia.query.filter_by(id=question_id).first()
-        if question.answer == response_answer:
-            correct += 1
-        questions += 1
-
-    if destination:
-        resp = make_response(redirect(url_for(destination), 302))
-    else:
-        resp = render_template('trial/success.html')
-
-    identity = get_current_user()
-    identity = {
-        'correct': correct,
-        'questions': questions
-    }
-
-    # attach jwt access token to cookies of response
-    access_token = create_access_token(identity=identity)
-    set_access_cookies(resp, access_token)
-
-    return resp
 
 
 @trial.route('/dungeon')

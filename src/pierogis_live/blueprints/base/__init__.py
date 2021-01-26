@@ -12,4 +12,4 @@ base = Blueprint('base', __name__,
 
 @base.route('/')
 def index():
-    return render_template('index.html', tabs=[Tab('/', 'home'), Tab('c', 'content')])
+    return render_template('index.html', tabs=[Tab('home'), Tab('content'), Tab('kitchen')])

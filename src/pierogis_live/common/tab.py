@@ -1,7 +1,7 @@
-class Tab:
-    def __init__(self, path: str, name: str = None):
-        if not name:
-            name = path
+from flask import url_for
 
-        self.path = path
+
+class Tab:
+    def __init__(self, name: str = None):
+        self.path = url_for(name + ".index")
         self.name = name
