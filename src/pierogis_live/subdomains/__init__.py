@@ -4,7 +4,7 @@
 from flask import Flask
 
 def register_subdomains(app: Flask):
-    from api import api
+    from .api import api
     app.register_blueprint(api, subdomain='api')
 
     # from .admin import admin
