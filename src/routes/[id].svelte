@@ -10,9 +10,9 @@
 	export let errors;
 </script>
 
-<PlateCard {plate} />
+<div class="card-wrapper"><PlateCard {plate} /></div>
 
-<form method="post">
+<!-- <form method="post">
 	<input name="title" />
 
 	{#if errors?.title}
@@ -20,4 +20,11 @@
 	{/if}
 
 	<button type="submit">Create review</button>
-</form>
+</form> -->
+<style>
+	.card-wrapper {
+		margin: 20px;
+		display: flex;
+		justify-content: center;
+	}
+</style>

@@ -20,8 +20,8 @@
 
 <style>
 	.card {
-		height: 30vh;
-		margin: 20px;
+		height: 200px;
+		max-width: 200px;
 
 		display: flex;
 		flex-direction: column;
@@ -29,6 +29,10 @@
 		align-content: center;
 
 		text-align: center;
-		border: 1px solid black;
+
+		background-color: (--primary-color);
+
+		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
+			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 	}
 </style>
