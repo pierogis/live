@@ -1,7 +1,9 @@
 <script lang="ts">
-	import type { Plate, Scores } from '$lib/plates';
+	import type { Plate } from '$lib/plates';
 
 	export let plate: Plate;
+
+	export let stateOnly: boolean = false;
 
 	function parseScore(score: number) {
 		const fullScores = Math.floor(score);
@@ -12,7 +14,7 @@
 </script>
 
 <div class="card">
-	<a href={'/' + plate.id}>
+	<a href={'/' + (stateOnly ? 'states/' + plate.state : plate.id)}>
 		<img
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.state} license plate for ${plate.startYear}-${plate.endYear}`}
@@ -20,26 +22,29 @@
 		/>
 	</a>
 	<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
-	<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
-	<div class="scores">
-		<p aria-describedby="starsSummary">{parseScore(plate.scores.overall)}</p>
-		<div role="tooltip" id="starsSummary">
-			{#each Object.entries(plate.scores) as [name, score]}
-				{#if name != 'overall'}
-					<p>{name[0]}: {parseScore(score)}</p>
-				{/if}
-			{/each}
-			<p class="overall">
-				o: {parseScore(plate.scores.overall)}
-			</p>
+	{#if !stateOnly}
+		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
+		<div class="scores">
+			<span aria-describedby="starsSummary">{parseScore(plate.scores.overall)}</span>
+			<div role="tooltip" id="starsSummary">
+				{#each Object.entries(plate.scores) as [name, score]}
+					{#if name != 'overall'}
+						<p>{name[0]}: {parseScore(score)}</p>
+					{/if}
+				{/each}
+				<p class="overall">
+					{parseScore(plate.scores.overall)}
+				</p>
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>
 
 <style>
 	.card {
-		height: 200px;
+		max-height: 200px;
 		max-width: 200px;
+		padding: 8px;
 
 		display: flex;
 		flex-direction: column;
@@ -71,7 +76,7 @@
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 
 		width: 100px;
-		bottom: 90%;
+		bottom: 0%;
 		left: 50%;
 		margin-left: -50px; /* Use half of the width (120/2 = 60), to center the tooltip */
 		text-align: center;
