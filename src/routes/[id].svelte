@@ -1,8 +1,10 @@
 <script lang="ts">
 	import PlateCard from '$lib/PlateCard.svelte';
+	import Plates from '$lib/Plates.svelte';
 	import type { Plate } from '$lib/plates';
 
 	export let plate: Plate;
+	console.log(plate);
 
 	// ...plus props from `post` when the page is rendered
 	// in response to a POST request, for example after
@@ -10,7 +12,7 @@
 	export let errors;
 </script>
 
-<div class="card-wrapper"><PlateCard {plate} /></div>
+<Plates grid={false}><PlateCard {plate} /></Plates>
 
 <!-- <form method="post">
 	<input name="title" />
@@ -21,10 +23,3 @@
 
 	<button type="submit">Create review</button>
 </form> -->
-<style>
-	.card-wrapper {
-		margin: 20px;
-		display: flex;
-		justify-content: center;
-	}
-</style>

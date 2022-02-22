@@ -1,5 +1,5 @@
 <header class="header">
-	<a href="/"> <h3 class="title">Karl's Plate Emporium</h3></a>
+	<a href="/" class="title-link"> <h3 class="title">Karl's Plate Emporium</h3></a>
 </header>
 
 <slot />
@@ -41,7 +41,7 @@
 
 		--content-width: 240px;
 
-		font-family: 'Open Sans';
+		font-family: monospace;
 		font-weight: 600;
 		font-style: normal;
 		font-size: 20px;
@@ -57,15 +57,23 @@
 		position: sticky;
 		top: 0;
 
-		padding: 20px;
-		box-shadow: 4px 4px 0px 0px var(--accent-color), 0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		padding: 32px;
 
-		background-color: var(--primary-color);
+		background-color: transparent;
 
 		text-align: center;
 	}
 
+	.title-link {
+		text-decoration: none;
+	}
+
 	.title {
 		display: inline;
+		background-color: var(--primary-color);
+		color: var(--text-color);
+		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
+			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		padding: 4px;
 	}
 </style>
