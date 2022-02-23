@@ -72,6 +72,7 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
+
 		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 		padding: 4px;

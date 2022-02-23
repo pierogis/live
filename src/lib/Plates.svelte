@@ -8,7 +8,8 @@
 
 <style>
 	.plates {
-		margin: 20px;
+		margin: 16px;
+		padding-top: 12px;
 
 		display: flex;
 		justify-content: center;

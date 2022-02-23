@@ -16,21 +16,23 @@
 </script>
 
 <div class="card">
+	{#if showState}
+		<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
+	{/if}
 	<a href={'/' + (!showYears ? 'states/' + plate.state : plate.id)}>
 		<img
+			class="image"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.state} license plate for ${plate.startYear}-${plate.endYear}`}
 			width="90%"
 		/>
 	</a>
-	{#if showState}
-		<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
-	{/if}
 	{#if showYears}
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
 
 	{#if showScores}
+		<div style="height: 4px;" />
 		<div class="scores">
 			<span aria-describedby="starsSummary">{parseScore(plate.scores.overall)}</span>
 			<div role="tooltip" id="starsSummary">
@@ -66,10 +68,27 @@
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 	}
 
+	/* @media only screen and (min-width: 400px) {
+		.card {
+		max-height: 200px;
+		max-width: 200px;
+		}
+	} */
+	@media only screen and (min-width: 600px) {
+		.card {
+			max-height: 300px;
+			max-width: 300px;
+		}
+	}
+
+	.image {
+		padding: 4px;
+	}
+
 	.scores {
-		font-size: 1em;
 		position: relative;
 		display: inline-block;
+		font-size: 1em;
 		font-family: monospace;
 	}
 
@@ -79,13 +98,15 @@
 		z-index: 1;
 		background-color: var(--primary-color);
 
-		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
+		border-radius: 5%;
+
+		box-shadow: 4px 4px 0 var(--accent-color), -4px -4px 0 var(--secondary-color),
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 
-		width: 100px;
+		width: 112px;
 		top: 0%;
 		left: 50%;
-		margin-left: -50px; /* Use half of the width (120/2 = 60), to center the tooltip */
+		margin-left: -56px;
 		text-align: center;
 		font-family: monospace;
 	}
@@ -107,6 +128,6 @@
 	}
 
 	.overall {
-		border-bottom: 2px dashed var(--text-color);
+		border-bottom: 2px solid var(--text-color);
 	}
 </style>

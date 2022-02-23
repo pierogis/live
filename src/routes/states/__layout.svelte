@@ -3,7 +3,8 @@
 
 <style>
 	.states-header {
-		padding: 4px;
+		padding: 8px;
+		padding-top: 24px;
 
 		background-color: transparent;
 
