@@ -1,14 +1,14 @@
 <script lang="ts">
-	import PlateCard from '$lib/PlateCard.svelte';
-	import type { Plate } from '$lib/plates';
+	import type { Plate } from '$lib/models';
 
-	import Plates from '$lib/Plates.svelte';
+	import Plates from '$lib/components/Plates.svelte';
+	import PlateCard from '$lib/components/PlateCard.svelte';
 
 	export let states: { [key: string]: Plate };
 </script>
 
 <Plates grid={true}>
 	{#each Object.entries(states) as [state, plate]}
-		<PlateCard {plate} showScores={false} showYears={false} />
+		<PlateCard {plate} showState={true} showYears={false} showScores={false} />
 	{/each}
 </Plates>

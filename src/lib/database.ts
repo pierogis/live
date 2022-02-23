@@ -1,4 +1,4 @@
-import type { Plate } from './plates';
+import type { Plate } from './models';
 
 import { defineDb, star } from '@ff00ff/mammoth';
 import { pool } from './pool';
@@ -19,37 +19,85 @@ const plates: Plate[] = [
 		state: 'OH',
 		startYear: 2012,
 		endYear: 2015,
-		scores: { overall: 4.5, identifiability: 5 }
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
 	},
 	{
 		id: 5,
 		state: 'OH',
 		startYear: 2011,
 		endYear: 2017,
-		scores: { overall: 4.5, identifiability: 3 }
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
 	},
 	{
 		id: 1,
 		state: 'NY',
 		startYear: 2012,
 		endYear: 2015,
-		scores: { overall: 3.2, identifiability: 5 }
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
 	},
 	{
 		id: 2,
 		state: 'NV',
 		startYear: 2012,
 		endYear: 2015,
-		scores: { overall: 4, identifiability: 5 }
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
 	},
 	{
 		id: 3,
 		state: 'NH',
 		startYear: 2012,
 		endYear: 2015,
-		scores: { overall: 2, identifiability: 5 }
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
 	},
-	{ id: 4, state: 'NJ', startYear: 2012, endYear: 2015, scores: { overall: 4, identifiability: 5 } }
+	{
+		id: 4,
+		state: 'NJ',
+		startYear: 2012,
+		endYear: 2015,
+		scores: {
+			overall: { description: 'asd', score: 4.5 },
+			identifiability: { description: 'asd', score: 5 },
+			colors: { description: 'asd', score: 4.5 },
+			symbols: { description: 'asd', score: 5 },
+			typeface: { description: 'asd', score: 4.5 },
+			clarity: { description: 'asd', score: 5 }
+		}
+	}
 ];
 
 export function createPlate(request) {}

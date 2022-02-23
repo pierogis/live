@@ -1,5 +1,5 @@
 import * as db from '$lib/database';
-import type { Plate } from '$lib/plates';
+import type { Plate } from '$lib/models';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {

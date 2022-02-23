@@ -1,7 +1,7 @@
 <script lang="ts">
-	import PlateCard from '$lib/PlateCard.svelte';
-	import Plates from '$lib/Plates.svelte';
-	import type { Plate } from '$lib/plates';
+	import PlateCard from '$lib/components/PlateCard.svelte';
+	import Plates from '$lib/components/Plates.svelte';
+	import type { Plate } from '$lib/models';
 
 	export let plates: Plate[];
 </script>

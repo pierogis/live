@@ -12,8 +12,10 @@ export interface Score {
 }
 
 export interface Scores {
-	// overall: Score;
-	// identifiability: Score;
-	overall: number;
-	identifiability: number;
+	overall: Score;
+	identifiability: Score;
+	colors: Score;
+	symbols: Score;
+	typeface: Score;
+	clarity: Score;
 }
