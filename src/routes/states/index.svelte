@@ -9,6 +9,6 @@
 
 <Plates grid={true}>
 	{#each Object.entries(states) as [state, plate]}
-		<PlateCard {plate} stateOnly={true} />
+		<PlateCard {plate} showScores={false} showYears={false} />
 	{/each}
 </Plates>

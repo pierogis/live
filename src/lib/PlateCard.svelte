@@ -3,7 +3,9 @@
 
 	export let plate: Plate;
 
-	export let stateOnly: boolean = false;
+	export let showState: boolean = true;
+	export let showYears: boolean = true;
+	export let showScores: boolean = true;
 
 	function parseScore(score: number) {
 		const fullScores = Math.floor(score);
@@ -14,16 +16,21 @@
 </script>
 
 <div class="card">
-	<a href={'/' + (stateOnly ? 'states/' + plate.state : plate.id)}>
+	<a href={'/' + (!showYears ? 'states/' + plate.state : plate.id)}>
 		<img
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.state} license plate for ${plate.startYear}-${plate.endYear}`}
 			width="90%"
 		/>
 	</a>
-	<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
-	{#if !stateOnly}
+	{#if showState}
+		<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
+	{/if}
+	{#if showYears}
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
+	{/if}
+
+	{#if showScores}
 		<div class="scores">
 			<span aria-describedby="starsSummary">{parseScore(plate.scores.overall)}</span>
 			<div role="tooltip" id="starsSummary">

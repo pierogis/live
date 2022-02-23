@@ -2,28 +2,33 @@
 	import PlateCard from '$lib/PlateCard.svelte';
 	import Plates from '$lib/Plates.svelte';
 	import type { Plate } from '$lib/plates';
-	import { each } from 'svelte/internal';
 
 	export let plates: Plate[];
-
-	// ...plus props from `post` when the page is rendered
-	// in response to a POST request, for example after
-	// submitting the form below
-	export let errors;
 </script>
 
-<Plates grid={true}>
-	{#each plates as plate}
-		<PlateCard {plate} />
-	{/each}
-</Plates>
+<div class="state">
+	<div class="state-description">Ah, the sunshine state</div>
 
-<!-- <form method="post">
-	<input name="title" />
+	<div class="state-plates">
+		<Plates grid={true}>
+			{#each plates as plate}
+				<PlateCard {plate} showState={false} />
+			{/each}
+		</Plates>
+	</div>
+</div>
 
-	{#if errors?.title}
-		<p class="error">{errors.title}</p>
-	{/if}
-
-	<button type="submit">Create review</button>
-</form> -->
+<style>
+	.state {
+		display: flex;
+		flex-direction: row;
+	}
+	.state-description {
+		flex: 1;
+		padding: 16px;
+	}
+	.state-plates {
+		flex: 3;
+		border-left: 10px solid var(--accent-color);
+	}
+</style>

@@ -1,4 +1,4 @@
-<header class="states-header"><a class="states-link" href="/states">States</a></header>
+<header class="states-header"><a class="states-link" href="/states">states</a></header>
 <slot />
 
 <style>
