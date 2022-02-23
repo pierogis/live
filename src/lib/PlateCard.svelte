@@ -34,14 +34,14 @@
 		<div class="scores">
 			<span aria-describedby="starsSummary">{parseScore(plate.scores.overall)}</span>
 			<div role="tooltip" id="starsSummary">
+				<p class="overall">
+					{parseScore(plate.scores.overall)}
+				</p>
 				{#each Object.entries(plate.scores) as [name, score]}
 					{#if name != 'overall'}
 						<p>{name[0]}: {parseScore(score)}</p>
 					{/if}
 				{/each}
-				<p class="overall">
-					{parseScore(plate.scores.overall)}
-				</p>
 			</div>
 		</div>
 	{/if}
@@ -83,7 +83,7 @@
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 
 		width: 100px;
-		bottom: 0%;
+		top: 0%;
 		left: 50%;
 		margin-left: -50px; /* Use half of the width (120/2 = 60), to center the tooltip */
 		text-align: center;
@@ -107,6 +107,6 @@
 	}
 
 	.overall {
-		border-top: 2px dashed var(--text-color);
+		border-bottom: 2px dashed var(--text-color);
 	}
 </style>

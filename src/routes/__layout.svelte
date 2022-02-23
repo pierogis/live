@@ -57,7 +57,7 @@
 		position: sticky;
 		top: 0;
 
-		padding: 32px;
+		padding-top: 32px;
 
 		background-color: transparent;
 
