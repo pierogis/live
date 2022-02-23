@@ -8,7 +8,7 @@
 	// ...plus props from `post` when the page is rendered
 	// in response to a POST request, for example after
 	// submitting the form below
-	export let errors;
+	// export let errors;
 </script>
 
 <Plates grid={false}><PlateCard {plate} /></Plates>

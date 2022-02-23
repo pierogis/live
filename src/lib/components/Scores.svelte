@@ -1,13 +1,9 @@
 <script lang="ts">
 	import type { Scores } from '../models';
 
+	import ScoreDisplay from './ScoreDisplay.svelte';
+
 	export let scores: Scores;
-	function parseScore(score: number) {
-		const fullScores = Math.floor(score);
-		const halfScores = Math.round((score - fullScores) / 0.5) % 2;
-		const emptyScores = 5 - (fullScores + halfScores);
-		return '★'.repeat(fullScores) + '½'.repeat(halfScores) + '☆'.repeat(emptyScores);
-	}
 
 	const emojis = {
 		identifiability: '👁️',
@@ -20,14 +16,14 @@
 
 <div style="height: 4px;" />
 <div class="scores">
-	<span aria-describedby="starsSummary">{parseScore(scores.overall.score)}</span>
+	<span aria-describedby="starsSummary"><ScoreDisplay score={scores.overall} /></span>
 	<div role="tooltip" id="starsSummary">
-		<p class="overall">
-			{parseScore(scores.overall.score)}
-		</p>
+		<ScoreDisplay score={scores.overall} />
+		<div class="overall-seperator" />
 		{#each Object.entries(scores) as [name, category]}
 			{#if name != 'overall'}
-				<p>{emojis[name]}: {parseScore(category.score)}</p>
+				<span>{emojis[name]}: <ScoreDisplay score={category} /></span>
+				<br />
 			{/if}
 		{/each}
 	</div>
@@ -46,8 +42,6 @@
 		position: absolute;
 		z-index: 1;
 		background-color: var(--primary-color);
-
-		border-radius: 5%;
 
 		box-shadow: 4px 4px 0 var(--accent-color), -4px -4px 0 var(--secondary-color),
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
@@ -71,7 +65,7 @@
 			visibility: visible;
 		}
 	}
-	.overall {
+	.overall-seperator {
 		border-bottom: 2px solid var(--text-color);
 	}
 </style>

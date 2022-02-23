@@ -7,7 +7,7 @@ export interface Plate {
 }
 
 export interface Score {
-	score: number;
+	value: number;
 	description: string;
 }
 
