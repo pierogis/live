@@ -2,7 +2,7 @@ import * as db from '$lib/database';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const plates = await db.list();
+	const plates = await db.listPlates();
 
 	return {
 		body: { plates }

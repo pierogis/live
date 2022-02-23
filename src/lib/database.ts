@@ -1,5 +1,18 @@
 import type { Plate } from './plates';
 
+import { defineDb, star } from '@ff00ff/mammoth';
+import { pool } from './pool';
+import { state, plate } from './tables';
+
+export const db = defineDb({ state, plate }, async (query, parameters) => {
+	const result = await pool.query(query, parameters);
+
+	return {
+		affectedCount: result.rowCount,
+		rows: result.rows
+	};
+});
+
 const plates: Plate[] = [
 	{
 		id: 0,
@@ -39,10 +52,16 @@ const plates: Plate[] = [
 	{ id: 4, state: 'NJ', startYear: 2012, endYear: 2015, scores: { overall: 4, identifiability: 5 } }
 ];
 
-export function create(request) {}
+export function createPlate(request) {}
 
-export async function list() {
+export async function listPlates() {
+	// const plates = await db.select(star()).from(db.plate);
+
 	return plates;
+}
+
+export async function listStates() {
+	return await db.select(star()).from(db.state);
 }
 
 export async function get(params: { id?: number; state?: string }) {

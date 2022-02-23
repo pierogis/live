@@ -6,7 +6,14 @@ export interface Plate {
 	scores: Scores;
 }
 
+export interface Score {
+	score: number;
+	description: string;
+}
+
 export interface Scores {
+	// overall: Score;
+	// identifiability: Score;
 	overall: number;
 	identifiability: number;
 }

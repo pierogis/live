@@ -3,7 +3,7 @@ import type { Plate } from '$lib/plates';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const plates = await db.list();
+	const plates = await db.listPlates();
 
 	let statesPlate: { [state: string]: Plate } = {};
 	for (const plate of plates) {
