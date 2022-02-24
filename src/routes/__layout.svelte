@@ -1,6 +1,12 @@
 <header class="header">
-	<a href="/" class="title-link"> <h3 class="title">Karl's Plate Emporium</h3></a>
+	<div>
+		<a href="/" class="title-link"> <h3 class="title">Karl's Plate Emporium</h3></a>
+	</div>
 </header>
+
+<nav class="nav">
+	<a href="/states" class="states-link">states</a>
+</nav>
 
 <slot />
 
@@ -73,6 +79,26 @@
 		background-color: var(--primary-color);
 		color: var(--text-color);
 
+		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
+			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		padding: 4px;
+	}
+
+	.nav {
+		padding: 8px;
+		padding-top: 24px;
+		padding-bottom: 24px;
+
+		background-color: transparent;
+
+		text-align: center;
+	}
+
+	.states-link {
+		text-decoration: none;
+		display: inline;
+		background-color: var(--primary-color);
+		color: var(--text-color);
 		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
 			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
 		padding: 4px;
