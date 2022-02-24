@@ -21,7 +21,7 @@
 
 		justify-items: center;
 	}
-	@media only screen and (min-width: 400px) {
+	@media only screen and (min-width: 500px) {
 		.grid {
 			grid-template-columns: repeat(2, 1fr);
 		}

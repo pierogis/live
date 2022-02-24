@@ -30,8 +30,8 @@
 
 <style>
 	.card {
-		max-height: 200px;
-		max-width: 200px;
+		max-height: 90vw;
+		max-width: 90vw;
 		padding: 8px;
 
 		display: flex;
@@ -53,10 +53,10 @@
 		max-width: 200px;
 		}
 	} */
-	@media only screen and (min-width: 600px) {
+	@media only screen and (min-width: 700px) {
 		.card {
-			max-height: 300px;
-			max-width: 300px;
+			max-height: 384px;
+			max-width: 384px;
 		}
 	}
 
