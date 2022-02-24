@@ -61,10 +61,10 @@
 	}
 
 	.scoresheet {
-		width: 80%;
+		width: 192px;
 		top: 0%;
 		left: 50%;
-		margin-left: -40%;
+		margin-left: -96px;
 
 		background-color: var(--primary-color);
 		box-shadow: 4px 4px 0 var(--accent-color), -4px -4px 0 var(--secondary-color),

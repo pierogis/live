@@ -26,6 +26,7 @@
 	.state-description {
 		flex: 1;
 		padding: 16px;
+		font-size: 0.8em;
 	}
 	.state-plates {
 		flex: 3;

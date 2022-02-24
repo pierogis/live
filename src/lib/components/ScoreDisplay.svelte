@@ -7,7 +7,7 @@
 
 	export let score: Score;
 
-	enum ScoreStatus {
+	enum PointStatus {
 		full = '●',
 		half = '◐',
 		empty = '○'
@@ -17,15 +17,15 @@
 	$: halfScores = Math.round((score.value - fullScores) / 0.5) % 2;
 	$: emptyScores = 5 - (fullScores + halfScores);
 
-	let scoreStatuses: ScoreStatus[];
-	$: scoreStatuses = Array(fullScores)
-		.fill(ScoreStatus.full)
-		.concat(Array(halfScores).fill(ScoreStatus.half))
-		.concat(Array(emptyScores).fill(ScoreStatus.empty));
+	let pointStatuses: PointStatus[];
+	$: pointStatuses = Array(fullScores)
+		.fill(PointStatus.full)
+		.concat(Array(halfScores).fill(PointStatus.half))
+		.concat(Array(emptyScores).fill(PointStatus.empty));
 
 	function changeScoreAction(
 		element: HTMLElement,
-		params: { scoreStatus: ScoreStatus; i: number }
+		params: { pointStatus: PointStatus; i: number }
 	) {
 		function handlePointerDown(event) {
 			if (Math.ceil(score.value) == params.i + 1) {
@@ -44,7 +44,7 @@
 		element.addEventListener('pointerdown', handlePointerDown);
 
 		return {
-			update(newParams: { scoreStatus: ScoreStatus; i: number }) {
+			update(newParams: { pointStatus: PointStatus; i: number }) {
 				params = newParams;
 			},
 			destroy() {
@@ -55,8 +55,8 @@
 </script>
 
 <div class="scores-container">
-	{#each scoreStatuses as scoreStatus, i (i)}
-		<span class="score" use:changeScoreAction={{ scoreStatus, i }}>{scoreStatus} </span>
+	{#each pointStatuses as pointStatus, i (i)}
+		<span class="score" use:changeScoreAction={{ pointStatus, i }}>{pointStatus} </span>
 	{/each}
 </div>
 
@@ -65,9 +65,6 @@
 		cursor: pointer;
 		-webkit-user-select: none;
 		user-select: none;
-
-		font-size: 1.1em;
-		padding: 4px;
 	}
 
 	.scores-container {
@@ -75,5 +72,6 @@
 		justify-content: center;
 		align-items: center;
 		flex: 2;
+		gap: 12px;
 	}
 </style>
