@@ -19,7 +19,7 @@ export async function listPlates(): Promise<Plate[]> {
 
 	const plates: Plate[] = await Promise.all(
 		partialPlates.map(async (partialPlate) => {
-			let scoresheets = await db
+			const scoresheets = await db
 				.withSchema('emporium')
 				.table<Scoresheet>('scoresheets')
 				.select()
@@ -27,7 +27,7 @@ export async function listPlates(): Promise<Plate[]> {
 					plateId: partialPlate.id
 				});
 
-			let images = await db.withSchema('emporium').table<Image>('images').select().where({
+			const images = await db.withSchema('emporium').table<Image>('images').select().where({
 				plateId: partialPlate.id
 			});
 
@@ -43,7 +43,7 @@ export async function listJurisdictions(): Promise<Jurisdiction[]> {
 }
 
 export async function get(params: { id?: number; jurisdiction?: string }): Promise<Plate> {
-	let keys = Object.keys(params);
+	const keys = Object.keys(params);
 	return plates.find((plate) => {
 		return keys.every((key) => {
 			return plate[key] == params[key];
@@ -52,7 +52,7 @@ export async function get(params: { id?: number; jurisdiction?: string }): Promi
 }
 
 export async function getAll(params: { id?: number; jurisdiction?: string }): Promise<Plate[]> {
-	let keys = Object.keys(params);
+	const keys = Object.keys(params);
 	return plates.filter((plate) => {
 		return keys.every((key) => {
 			return plate[key] == params[key];

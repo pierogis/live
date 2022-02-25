@@ -5,7 +5,7 @@ import type { Plate } from '$lib/models';
 export async function get() {
 	const plates = await db.listPlates();
 
-	let jurisdictionsPlate: { [jurisdiction: string]: Plate } = {};
+	const jurisdictionsPlate: { [jurisdiction: string]: Plate } = {};
 	for (const plate of plates) {
 		if (!(plate.jurisdiction in jurisdictionsPlate)) {
 			jurisdictionsPlate[plate.jurisdiction] = await db.get({ jurisdiction: plate.jurisdiction });

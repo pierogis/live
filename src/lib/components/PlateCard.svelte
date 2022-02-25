@@ -4,8 +4,8 @@
 
 	export let plate: Plate;
 
-	export let showJurisdiction: boolean = true;
-	export let showYears: boolean = true;
+	export let showJurisdiction = true;
+	export let showYears = true;
 	export let showScores: boolean = plate.scoresheets.length > 1;
 </script>
 
