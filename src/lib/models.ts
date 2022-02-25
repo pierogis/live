@@ -3,7 +3,8 @@ export interface Plate {
 	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	scoresheet: Scoresheet;
+	scoresheets: Scoresheet[];
+	images: Image[];
 }
 
 export interface Score {
@@ -12,12 +13,20 @@ export interface Score {
 }
 
 export interface Scoresheet {
+	id: number;
+	plateId: number;
 	overall: Score;
 	identifiability: Score;
 	colors: Score;
 	symbols: Score;
 	typeface: Score;
 	clarity: Score;
+}
+
+export interface Image {
+	id: number;
+	plateId: number;
+	url: string;
 }
 
 export class Jurisdiction {

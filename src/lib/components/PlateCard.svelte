@@ -6,7 +6,7 @@
 
 	export let showJurisdiction: boolean = true;
 	export let showYears: boolean = true;
-	export let showScores: boolean = true;
+	export let showScores: boolean = plate.scoresheets.length > 1;
 </script>
 
 <div class="card">
@@ -25,7 +25,7 @@
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
 
-	{#if showScores}<Scores scores={plate.scores} />{/if}
+	{#if showScores}<Scores scoresheets={plate.scoresheets} />{/if}
 </div>
 
 <style>

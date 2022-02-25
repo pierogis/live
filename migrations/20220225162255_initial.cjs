@@ -16,9 +16,9 @@ exports.up = async function (knex) {
 			.references('abbreviation')
 			.inTable(schema + '.jurisdictions');
 
-		table.string('startYear').notNullable();
+		table.integer('startYear').notNullable();
 
-		table.string('endYear').notNullable();
+		table.integer('endYear').notNullable();
 	});
 
 	await knex.schema.withSchema(schema).createTable('scoresheets', function (table) {
@@ -53,6 +53,7 @@ exports.up = async function (knex) {
 
 exports.down = async function (knex) {
 	await knex.schema.withSchema('emporium').dropTable('scoresheets');
+	await knex.schema.withSchema('emporium').dropTable('images');
 	await knex.schema.withSchema('emporium').dropTable('plates');
 	await knex.schema.withSchema('emporium').dropTable('jurisdictions');
 

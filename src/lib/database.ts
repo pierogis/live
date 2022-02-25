@@ -1,23 +1,45 @@
-import type { Jurisdiction, Plate } from './models';
+import type { Jurisdiction, Plate, Image, Scoresheet } from './models';
 
 import { knex } from 'knex';
+import { add_styles } from 'svelte/internal';
 
 const db = knex({
 	client: 'pg',
-	connection: process.env.PG_CONNECTION_STRING,
+	connection: process.env.DATABASE_URL,
 	searchPath: ['knex', 'public']
 });
 
 export function createPlate(request) {}
 
 export async function listPlates(): Promise<Plate[]> {
-	let plates = await db.withSchema('emporium').table<Plate>('plate').select();
+	const partialPlates = await db
+		.withSchema('emporium')
+		.table<Omit<Plate, 'scoresheets' | 'images'>>('plates')
+		.select();
+
+	const plates: Plate[] = await Promise.all(
+		partialPlates.map(async (partialPlate) => {
+			let scoresheets = await db
+				.withSchema('emporium')
+				.table<Scoresheet>('scoresheets')
+				.select()
+				.where({
+					plateId: partialPlate.id
+				});
+
+			let images = await db.withSchema('emporium').table<Image>('images').select().where({
+				plateId: partialPlate.id
+			});
+
+			return { ...partialPlate, scoresheets, images };
+		})
+	);
 
 	return plates;
 }
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
-	return await db.select().table('jurisdiction');
+	return await db.table('jurisdiction').select();
 }
 
 export async function get(params: { id?: number; jurisdiction?: string }): Promise<Plate> {

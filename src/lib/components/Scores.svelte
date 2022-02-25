@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Scores } from '../models';
+	import type { Scoresheet } from '$lib/models';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
-	export let scores: Scores;
+	export let scoresheets: Scoresheet[];
 
 	const categories = {
 		identifiability: { emoji: '👁️' },
@@ -12,17 +12,19 @@
 		typeface: { emoji: '🔤' },
 		clarity: { emoji: '👓' }
 	};
+
+	let scoresheet = scoresheets[0];
 </script>
 
 <div style="height: 4px;" />
 <div class="scores">
 	<span aria-describedby="starsSummary">
-		<ScoreDisplay score={scores.overall} />
+		<ScoreDisplay score={scoresheet.overall} />
 	</span>
 	<div role="tooltip" class="scoresheet" id="starsSummary">
-		<ScoreDisplay bind:score={scores.overall} />
+		<ScoreDisplay bind:score={scoresheet.overall} />
 		<div class="overall-seperator" />
-		{#each Object.entries(scores) as [name, category]}
+		{#each Object.entries(scoresheet) as [name, category]}
 			{#if name != 'overall'}
 				<div class="category">
 					<span class="emoji" title={name}>{categories[name].emoji} </span>

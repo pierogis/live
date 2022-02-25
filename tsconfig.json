@@ -1,9 +1,11 @@
 {
 	"compilerOptions": {
 		"moduleResolution": "node",
-		"module": "commonjs",
+		"module": "es2020",
 		"lib": ["es2020", "DOM"],
 		"target": "es2020",
+		"importsNotUsedAsValues": "error",
+		"preserveValueImports": true,
 		"isolatedModules": true,
 		"resolveJsonModule": true,
 		"sourceMap": true,
