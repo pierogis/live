@@ -6,29 +6,29 @@
 	export let plates: Plate[];
 </script>
 
-<div class="state">
-	<div class="state-description">Ah, the sunshine state</div>
+<div class="jurisdiction">
+	<div class="jurisdiction-description">Ah, the sunshine jurisdiction</div>
 
-	<div class="state-plates">
+	<div class="jurisdiction-plates">
 		<Plates grid={true}>
 			{#each plates as plate}
-				<PlateCard {plate} showState={false} />
+				<PlateCard {plate} showJurisdiction={false} />
 			{/each}
 		</Plates>
 	</div>
 </div>
 
 <style>
-	.state {
+	.jurisdiction {
 		display: flex;
 		flex-direction: row;
 	}
-	.state-description {
+	.jurisdiction-description {
 		flex: 1;
 		padding: 16px;
 		font-size: 0.8em;
 	}
-	.state-plates {
+	.jurisdiction-plates {
 		flex: 3;
 		border-left: 10px solid var(--accent-color);
 	}

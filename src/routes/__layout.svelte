@@ -5,7 +5,7 @@
 </header>
 
 <nav class="nav">
-	<a href="/states" class="states-link">states</a>
+	<a href="/jurisdictions" class="jurisdictions-link">jurisdictions</a>
 </nav>
 
 <slot />
@@ -94,7 +94,7 @@
 		text-align: center;
 	}
 
-	.states-link {
+	.jurisdictions-link {
 		text-decoration: none;
 		display: inline;
 		background-color: var(--primary-color);

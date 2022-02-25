@@ -1,9 +1,9 @@
 export interface Plate {
 	id: number;
-	state: string;
+	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	scores: Scores;
+	scoresheet: Scoresheet;
 }
 
 export interface Score {
@@ -11,11 +11,16 @@ export interface Score {
 	description: string;
 }
 
-export interface Scores {
+export interface Scoresheet {
 	overall: Score;
 	identifiability: Score;
 	colors: Score;
 	symbols: Score;
 	typeface: Score;
 	clarity: Score;
+}
+
+export class Jurisdiction {
+	abbreviation: string;
+	name: string;
 }

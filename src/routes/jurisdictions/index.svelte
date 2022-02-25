@@ -4,11 +4,11 @@
 	import Plates from '$lib/components/Plates.svelte';
 	import PlateCard from '$lib/components/PlateCard.svelte';
 
-	export let states: { [key: string]: Plate };
+	export let jurisdictions: { [key: string]: Plate };
 </script>
 
 <Plates grid={true}>
-	{#each Object.entries(states) as [state, plate]}
-		<PlateCard {plate} showState={true} showYears={false} showScores={false} />
+	{#each Object.entries(jurisdictions) as [jurisdiction, plate]}
+		<PlateCard {plate} showJurisdiction={true} showYears={false} showScores={false} />
 	{/each}
 </Plates>

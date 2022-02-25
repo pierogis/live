@@ -4,20 +4,20 @@
 
 	export let plate: Plate;
 
-	export let showState: boolean = true;
+	export let showJurisdiction: boolean = true;
 	export let showYears: boolean = true;
 	export let showScores: boolean = true;
 </script>
 
 <div class="card">
-	{#if showState}
-		<a class="link" href={'/states/' + plate.state}>{plate.state}</a>
+	{#if showJurisdiction}
+		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
 	{/if}
-	<a href={'/' + (!showYears ? 'states/' + plate.state : plate.id)}>
+	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : plate.id)}>
 		<img
 			class="image"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
-			alt={`${plate.state} license plate for ${plate.startYear}-${plate.endYear}`}
+			alt={`${plate.jurisdiction} license plate for ${plate.startYear}-${plate.endYear}`}
 			width="90%"
 		/>
 	</a>

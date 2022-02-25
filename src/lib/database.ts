@@ -1,85 +1,27 @@
-import type { Plate } from './models';
+import type { Jurisdiction, Plate } from './models';
 
-import { defineDb, star } from '@ff00ff/mammoth';
-import { pool } from './pool';
-import { state, plate } from './tables';
+import { knex } from 'knex';
 
-export const db = defineDb({ state, plate }, async (query, parameters) => {
-	const result = await pool.query(query, parameters);
-
-	return {
-		affectedCount: result.rowCount,
-		rows: result.rows
-	};
+const db = knex({
+	client: 'pg',
+	connection: process.env.PG_CONNECTION_STRING,
+	searchPath: ['knex', 'public']
 });
-
-const scores = {
-	overall: { description: 'asd', value: 4.5 },
-	identifiability: { description: 'asd', value: 5 },
-	colors: { description: 'asd', value: 4.5 },
-	symbols: { description: 'asd', value: 5 },
-	typeface: { description: 'asd', value: 4.5 },
-	clarity: { description: 'asd', value: 5 }
-};
-
-const plates: Plate[] = [
-	{
-		id: 0,
-		state: 'OH',
-		startYear: 2012,
-		endYear: 2015,
-		scores: scores
-	},
-	{
-		id: 5,
-		state: 'OH',
-		startYear: 2011,
-		endYear: 2017,
-		scores: scores
-	},
-	{
-		id: 1,
-		state: 'NY',
-		startYear: 2012,
-		endYear: 2015,
-		scores: scores
-	},
-	{
-		id: 2,
-		state: 'NV',
-		startYear: 2012,
-		endYear: 2015,
-		scores: scores
-	},
-	{
-		id: 3,
-		state: 'NH',
-		startYear: 2012,
-		endYear: 2015,
-		scores: scores
-	},
-	{
-		id: 4,
-		state: 'NJ',
-		startYear: 2012,
-		endYear: 2015,
-		scores: scores
-	}
-];
 
 export function createPlate(request) {}
 
-export async function listPlates() {
-	// const plates = await db.select(star()).from(db.plate);
+export async function listPlates(): Promise<Plate[]> {
+	console.log(db.client.database());
+	let plates = await db.withSchema('emporium').table('plate').select();
 
 	return plates;
 }
 
-export async function listStates() {
-	return await db.select(star()).from(db.state);
+export async function listJurisdictions(): Promise<Jurisdiction[]> {
+	return await db.select().table('jurisdiction');
 }
 
-export async function get(params: { id?: number; state?: string }) {
+export async function get(params: { id?: number; jurisdiction?: string }): Promise<Plate> {
 	let keys = Object.keys(params);
 	return plates.find((plate) => {
 		return keys.every((key) => {
@@ -88,7 +30,7 @@ export async function get(params: { id?: number; state?: string }) {
 	});
 }
 
-export async function getAll(params: { id?: number; state?: string }) {
+export async function getAll(params: { id?: number; jurisdiction?: string }): Promise<Plate[]> {
 	let keys = Object.keys(params);
 	return plates.filter((plate) => {
 		return keys.every((key) => {
