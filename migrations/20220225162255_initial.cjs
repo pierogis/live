@@ -1,8 +1,6 @@
-import { Knex } from 'knex';
-
 const schema = 'emporium';
 
-export async function up(knex: Knex): Promise<void> {
+exports.up = async function (knex) {
 	await knex.schema.createSchema(schema);
 	await knex.schema.withSchema(schema).createTable('jurisdictions', function (table) {
 		table.string('abbreviation', 2).primary();
@@ -39,12 +37,24 @@ export async function up(knex: Knex): Promise<void> {
 		table.integer('typeface').checkBetween([0, 10]);
 		table.integer('clarity').checkBetween([0, 10]);
 	});
-}
 
-export async function down(knex: Knex): Promise<void> {
-	await knex.schema.withSchema('emporium').dropTable('jurisdictions');
-	await knex.schema.withSchema('emporium').dropTable('plates');
+	await knex.schema.withSchema(schema).createTable('images', function (table) {
+		table.increments();
+
+		table.integer('plateId').notNullable();
+		table
+			.foreign('plateId')
+			.references('id')
+			.inTable(schema + '.plates');
+
+		table.string('url');
+	});
+};
+
+exports.down = async function (knex) {
 	await knex.schema.withSchema('emporium').dropTable('scoresheets');
+	await knex.schema.withSchema('emporium').dropTable('plates');
+	await knex.schema.withSchema('emporium').dropTable('jurisdictions');
 
 	await knex.schema.dropSchema(schema);
-}
+};

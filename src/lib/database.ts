@@ -11,8 +11,7 @@ const db = knex({
 export function createPlate(request) {}
 
 export async function listPlates(): Promise<Plate[]> {
-	console.log(db.client.database());
-	let plates = await db.withSchema('emporium').table('plate').select();
+	let plates = await db.withSchema('emporium').table<Plate>('plate').select();
 
 	return plates;
 }
