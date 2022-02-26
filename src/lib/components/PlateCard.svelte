@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Plate } from '$lib/models';
+	import type { Plate } from '$lib/database/plate';
 	import Scores from './Scores.svelte';
 
 	export let plate: Plate;

@@ -1,14 +1,14 @@
-import * as db from '$lib/database';
-import type { Plate } from '$lib/models';
+import { type Plate, listPlates, getPlates } from '$lib/database/plate';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const plates = await db.listPlates();
+	const plates = await listPlates();
 
 	const jurisdictionsPlate: { [jurisdiction: string]: Plate } = {};
 	for (const plate of plates) {
 		if (!(plate.jurisdiction in jurisdictionsPlate)) {
-			jurisdictionsPlate[plate.jurisdiction] = await db.get({ jurisdiction: plate.jurisdiction });
+			let jdPlates = await getPlates({ jurisdiction: plate.jurisdiction }, 1);
+			jurisdictionsPlate[plate.jurisdiction] = jdPlates[0];
 		}
 	}
 

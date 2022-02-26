@@ -4,7 +4,7 @@
 module.exports = {
 	development: {
 		client: 'postgresql',
-		connection: process.env.DATABASE_URL || { database: 'plates' },
+		connection: process.env.DATABASE_URL,
 		migrations: {
 			extension: 'cjs'
 		}
@@ -12,7 +12,7 @@ module.exports = {
 
 	production: {
 		client: 'postgresql',
-		connection: process.env.DATABASE_URL || { database: 'plates' },
+		connection: process.env.DATABASE_URL,
 		migrations: {
 			extension: 'cjs'
 		}

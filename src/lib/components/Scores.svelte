@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Scoresheet } from '$lib/models';
+	import type { Scoresheet } from '$lib/database/scoresheet';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 

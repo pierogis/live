@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import Plates from '$lib/components/Plates.svelte';
-	import type { Plate } from '$lib/models';
+	import PlatesGrid from '$lib/components/PlatesGrid.svelte';
+	import type { Plate } from '$lib/database/plate';
 
 	export let plate: Plate;
 
@@ -11,7 +11,7 @@
 	// export let errors;
 </script>
 
-<Plates grid={false}><PlateCard {plate} /></Plates>
+<PlatesGrid grid={false}><PlateCard {plate} /></PlatesGrid>
 
 <!-- <form method="post">
 	<input name="title" />

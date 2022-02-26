@@ -1,8 +1,8 @@
-import * as db from '$lib/database';
+import { listPlates } from '$lib/database/plate';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const plates = await db.listPlates();
+	const plates = await listPlates();
 
 	return {
 		body: { plates }

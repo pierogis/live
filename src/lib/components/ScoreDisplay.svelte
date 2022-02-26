@@ -1,9 +1,5 @@
 <script lang="ts">
-	import type { Score } from '$lib/models';
-
-	// export let fullScoreSymbol = '★';
-	// export let halfScoreSymbol = '½';
-	// export let emptyScoreSymbol = '☆';
+	import type { Score } from '$lib/database/scoresheet';
 
 	export let score: Score;
 

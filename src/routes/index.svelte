@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { Plate } from '$lib/models';
+	import type { Plate } from '$lib/database/plate';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import Plates from '$lib/components/Plates.svelte';
+	import PlatesGrid from '$lib/components/PlatesGrid.svelte';
 
 	export let plates: Plate[];
 </script>
 
-<Plates grid={true}>
+<PlatesGrid grid={true}>
 	{#each plates as plate}
 		<PlateCard {plate} />
 	{/each}
-</Plates>
+</PlatesGrid>

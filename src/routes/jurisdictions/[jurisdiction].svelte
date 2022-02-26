@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import Plates from '$lib/components/Plates.svelte';
-	import type { Plate } from '$lib/models';
+	import PlatesGrid from '$lib/components/PlatesGrid.svelte';
+	import type { Plate } from '$lib/database/plate';
 
 	export let plates: Plate[];
 </script>
@@ -10,11 +10,11 @@
 	<div class="jurisdiction-description">Ah, the sunshine jurisdiction</div>
 
 	<div class="jurisdiction-plates">
-		<Plates grid={true}>
+		<PlatesGrid grid={true}>
 			{#each plates as plate}
 				<PlateCard {plate} showJurisdiction={false} />
 			{/each}
-		</Plates>
+		</PlatesGrid>
 	</div>
 </div>
 
