@@ -4,15 +4,7 @@
 module.exports = {
 	development: {
 		client: 'postgresql',
-		connection: process.env.DATABASE_URL,
-		migrations: {
-			extension: 'cjs'
-		}
-	},
-
-	production: {
-		client: 'postgresql',
-		connection: process.env.DATABASE_URL,
+		connection: require('dotenv').config({ path: '.env' }).parsed.VITE_DATABASE_URL,
 		migrations: {
 			extension: 'cjs'
 		}

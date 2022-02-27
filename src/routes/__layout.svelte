@@ -32,12 +32,12 @@
 	:root {
 		--primary-color: rgba(255, 235, 205, 1);
 		--accent-color: rgba(165, 85, 85, 1);
-		--secondary-color: rgba(95, 158, 160, 1);
-		--text-color: rgba(48, 79, 80, 1);
+		--secondary-color: rgb(59, 98, 99);
+		--text-color: rgb(58, 96, 106);
 
 		--primary-color-st: rgba(255, 235, 205, 0.5);
 		--accent-color-st: rgba(165, 85, 85, 0.5);
-		--secondary-color-st: rgba(95, 158, 160, 0.5);
+		--secondary-color-st: rgba(75, 123, 125, 0.5);
 		--text-color-st: rgba(48, 79, 80, 0.5);
 
 		--primary-color-t: rgba(255, 235, 205, 0);
@@ -47,7 +47,7 @@
 
 		--content-width: 240px;
 
-		font-family: monospace;
+		font-family: 'Courier', monospace;
 		font-weight: 600;
 		font-style: normal;
 		font-size: 20px;
@@ -76,11 +76,17 @@
 
 	.title {
 		display: inline;
-		background-color: var(--primary-color);
 		color: var(--text-color);
 
-		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
-			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
+			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
+
+		border-top: outset 5px var(--secondary-color);
+		border-left: outset 5px var(--secondary-color);
+		border-bottom: inset 5px var(--accent-color);
+		border-right: inset 5px var(--accent-color);
+		border-radius: 5%;
+
 		padding: 4px;
 	}
 
@@ -99,8 +105,15 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
-		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
-			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
+			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
+
+		border-top: outset 5px var(--secondary-color);
+		border-left: outset 5px var(--secondary-color);
+		border-bottom: inset 5px var(--accent-color);
+		border-right: inset 5px var(--accent-color);
+		border-radius: 5%;
+
 		padding: 4px;
 	}
 </style>

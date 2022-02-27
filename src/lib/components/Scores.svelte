@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { Scoresheet } from '$lib/database/scoresheet';
+	import type { Review } from '$lib/database/review';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
-	export let scoresheets: Scoresheet[];
+	export let plateId: number;
+	export let reviews: Review[];
 
 	const categories = {
 		identifiability: { emoji: '👁️' },
@@ -13,23 +14,52 @@
 		clarity: { emoji: '👓' }
 	};
 
-	let scoresheet = scoresheets[0];
+	// if editorial review, use that
+	// if no editorial, show averages
+
+	let editorial = reviews[0];
+
+	const score = { id: null, reviewId: null, value: 0, description: '' };
+	let provisionalReview: Review = {
+		id: null,
+		plateId: plateId,
+		scores: {
+			overall: score,
+			identifiability: score,
+			colors: score,
+			symbols: score,
+			typeface: score,
+			clarity: score
+		}
+	};
+
+	// $: review = editorial
+	// 	? editorial
+	// 	: reviews.reduce((previous, review) => {
+	// 			previous.overall.value = review.overall.value / reviews.length;
+	// 			previous.identifiability.value = review.identifiability / reviews.length;
+	// 			previous.colors.value = review.colors.value / reviews.length;
+	// 			previous.symbols.value = review.symbols.value / reviews.length;
+	// 			previous.typeface.value = review.typeface.value / reviews.length;
+	// 			previous.clarity.value = review.clarity.value / reviews.length;
+	// 			return previous;
+	// 	  });
 </script>
 
 <div style="height: 4px;" />
 <div class="scores">
 	<span aria-describedby="starsSummary">
-		<ScoreDisplay score={scoresheet.overall} />
+		<ScoreDisplay score={editorial.scores.overall} />
 	</span>
-	<div role="tooltip" class="scoresheet" id="starsSummary">
-		<ScoreDisplay bind:score={scoresheet.overall} />
+	<div role="tooltip" class="review" id="starsSummary">
+		<ScoreDisplay bind:score={editorial.scores.overall} />
 		<div class="overall-seperator" />
-		{#each Object.entries(scoresheet) as [name, category]}
+		{#each Object.entries(editorial) as [name, category]}
 			{#if name != 'overall'}
 				<div class="category">
 					<span class="emoji" title={name}>{categories[name].emoji} </span>
 					<ScoreDisplay score={category} />
-					<div style="flex: 1;" />
+					<div class="graph" />
 					<br />
 				</div>
 			{/if}
@@ -62,7 +92,7 @@
 		user-select: none;
 	}
 
-	.scoresheet {
+	.review {
 		width: 192px;
 		top: 0%;
 		left: 50%;
@@ -70,7 +100,7 @@
 
 		background-color: var(--primary-color);
 		box-shadow: 4px 4px 0 var(--accent-color), -4px -4px 0 var(--secondary-color),
-			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+			0px 0px 16px 4px rgba(0, 0, 0, 0.5);
 	}
 
 	@media (hover: hover) and (pointer: fine) {
@@ -90,6 +120,9 @@
 	}
 	.emoji {
 		cursor: help;
+		flex: 1;
+	}
+	.graph {
 		flex: 1;
 	}
 </style>

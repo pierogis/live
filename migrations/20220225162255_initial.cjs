@@ -21,23 +21,6 @@ exports.up = async function (knex) {
 		table.integer('endYear').notNullable();
 	});
 
-	await knex.schema.withSchema(schema).createTable('scoresheets', function (table) {
-		table.increments();
-
-		table.integer('plateId').notNullable();
-		table
-			.foreign('plateId')
-			.references('id')
-			.inTable(schema + '.plates');
-
-		table.integer('overall').checkBetween([0, 10]);
-		table.integer('identifiability').checkBetween([0, 10]);
-		table.integer('colors').checkBetween([0, 10]);
-		table.integer('symbols').checkBetween([0, 10]);
-		table.integer('typeface').checkBetween([0, 10]);
-		table.integer('clarity').checkBetween([0, 10]);
-	});
-
 	await knex.schema.withSchema(schema).createTable('images', function (table) {
 		table.increments();
 
@@ -49,10 +32,38 @@ exports.up = async function (knex) {
 
 		table.string('url');
 	});
+
+	await knex.schema.withSchema(schema).createTable('scores', function (table) {
+		table.integer('plateId').notNullable();
+		table
+			.foreign('plateId')
+			.references('id')
+			.inTable(schema + '.plates');
+
+		table.integer('userId').notNullable();
+		table
+			.foreign('userId')
+			.references('id')
+			.inTable(schema + '.users');
+
+		table.enum('category', [
+			'overall',
+			'identifiability',
+			'colors',
+			'symbols',
+			'typeface',
+			'clarity'
+		]);
+
+		table.primary(['plateId', 'userId', 'category']);
+
+		table.integer('value').checkBetween([0, 10]);
+		table.string('explanation');
+	});
 };
 
 exports.down = async function (knex) {
-	await knex.schema.withSchema('emporium').dropTable('scoresheets');
+	await knex.schema.withSchema('emporium').dropTable('scores');
 	await knex.schema.withSchema('emporium').dropTable('images');
 	await knex.schema.withSchema('emporium').dropTable('plates');
 	await knex.schema.withSchema('emporium').dropTable('jurisdictions');

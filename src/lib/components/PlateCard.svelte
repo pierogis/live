@@ -6,7 +6,7 @@
 
 	export let showJurisdiction = true;
 	export let showYears = true;
-	export let showScores: boolean = plate.scoresheets.length > 1;
+	export let showScores = true;
 </script>
 
 <div class="card">
@@ -25,7 +25,7 @@
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
 
-	{#if showScores}<Scores scoresheets={plate.scoresheets} />{/if}
+	{#if showScores}<Scores plateId={plate.id} reviews={plate.reviews} />{/if}
 </div>
 
 <style>
@@ -43,8 +43,14 @@
 
 		background-color: var(--primary-color);
 
-		box-shadow: 5px 5px 0 var(--accent-color), -5px -5px 0 var(--secondary-color),
-			0px 0px 10px 2px rgba(0, 0, 0, 0.4);
+		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
+			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
+
+		border-top: outset 5px var(--secondary-color);
+		border-left: outset 5px var(--secondary-color);
+		border-bottom: inset 5px var(--accent-color);
+		border-right: inset 5px var(--accent-color);
+		border-radius: 5%;
 	}
 
 	/* @media only screen and (min-width: 400px) {
@@ -61,7 +67,13 @@
 	}
 
 	.image {
-		padding: 4px;
+		border-top: solid 4px rgba(100, 100, 100, 0.8);
+		border-left: solid 4px rgba(100, 100, 100, 0.8);
+		border-bottom: solid 4px rgba(150, 150, 150, 0.8);
+		border-right: solid 4px rgba(150, 150, 150, 0.8);
+		border-radius: 8%;
+
+		margin: 4px;
 	}
 
 	.link {

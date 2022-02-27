@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Score } from '$lib/database/scoresheet';
+	import type { Score } from '$lib/database/review';
 
 	export let score: Score;
 

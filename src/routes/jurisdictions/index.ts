@@ -7,7 +7,7 @@ export async function get() {
 	const jurisdictionsPlate: { [jurisdiction: string]: Plate } = {};
 	for (const plate of plates) {
 		if (!(plate.jurisdiction in jurisdictionsPlate)) {
-			let jdPlates = await getPlates({ jurisdiction: plate.jurisdiction }, 1);
+			const jdPlates = await getPlates({ jurisdiction: plate.jurisdiction }, 1);
 			jurisdictionsPlate[plate.jurisdiction] = jdPlates[0];
 		}
 	}

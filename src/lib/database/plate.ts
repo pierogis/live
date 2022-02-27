@@ -1,6 +1,6 @@
 import { db } from './client';
 
-import type { Scoresheet } from './scoresheet';
+import type { Category, Score } from './review';
 import type { Image } from './image';
 
 export interface Plate {
@@ -8,35 +8,38 @@ export interface Plate {
 	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	scoresheets: Scoresheet[];
+	scores: { [userId: string]: { [category in Category]: Score } };
 	images: Image[];
 }
 
 export function create(request) {}
 
-async function completePlate(partialPlate: Omit<Plate, 'scoresheets' | 'images'>) {
-	const scoresheets = await db
+async function completePlate(partialPlate: Omit<Plate, 'scores' | 'images'>) {
+	const scores = await db
 		.withSchema('emporium')
-		.table<Scoresheet>('scoresheets')
+		.table<Score>('scores')
 		.select()
 		.where({
 			plateId: partialPlate.id
-		});
+		})
+		.groupBy('userId');
+
+	// need to turn this grouping into an object
 
 	const images = await db.withSchema('emporium').table<Image>('images').select().where({
 		plateId: partialPlate.id
 	});
 
-	return { ...partialPlate, scoresheets, images };
+	return { ...partialPlate, scores, images };
 }
 
 export async function listPlates(): Promise<Plate[]> {
 	const partialPlates = await db
 		.withSchema('emporium')
-		.table<Omit<Plate, 'scoresheets' | 'images'>>('plates')
+		.table<Omit<Plate, 'reviews' | 'images'>>('plates')
 		.select();
 
-	const plates: Plate[] = await Promise.all(partialPlates.map(completePlate));
+	const plates = await Promise.all(partialPlates.map(completePlate));
 
 	return plates;
 }
@@ -44,11 +47,11 @@ export async function listPlates(): Promise<Plate[]> {
 export async function getPlates(
 	params: { id?: number; jurisdiction?: string },
 	count: number = null,
-	skip: number = 0
+	skip = 0
 ): Promise<Plate[]> {
 	const partialPlatesQuery = db
 		.withSchema('emporium')
-		.table<Omit<Plate, 'scoresheets' | 'images'>>('plates')
+		.table<Omit<Plate, 'reviews' | 'images'>>('plates')
 		.select()
 		.where(params)
 		.offset(skip);
