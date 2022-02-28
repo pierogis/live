@@ -6,5 +6,5 @@ export class Jurisdiction {
 }
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
-	return await db.table('jurisdiction').select();
+	return await db.withSchema('emporium').table<Jurisdiction>('jurisdictions').select();
 }

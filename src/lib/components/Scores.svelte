@@ -1,10 +1,19 @@
 <script lang="ts">
-	import type { Review } from '$lib/database/review';
+	import type { Score } from '$lib/database/review';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
 	export let plateId: number;
-	export let reviews: Review[];
+	export let reviews: {
+		[userId: string]: {
+			overall: Score;
+			identifiability: Score;
+			colors: Score;
+			symbols: Score;
+			typeface: Score;
+			clarity: Score;
+		};
+	};
 
 	const categories = {
 		identifiability: { emoji: '👁️' },
@@ -20,8 +29,7 @@
 	let editorial = reviews[0];
 
 	const score = { id: null, reviewId: null, value: 0, description: '' };
-	let provisionalReview: Review = {
-		id: null,
+	let provisionalReview = {
 		plateId: plateId,
 		scores: {
 			overall: score,
@@ -49,10 +57,10 @@
 <div style="height: 4px;" />
 <div class="scores">
 	<span aria-describedby="starsSummary">
-		<ScoreDisplay score={editorial.scores.overall} />
+		<ScoreDisplay score={editorial.overall} />
 	</span>
 	<div role="tooltip" class="review" id="starsSummary">
-		<ScoreDisplay bind:score={editorial.scores.overall} />
+		<ScoreDisplay bind:score={editorial.overall} />
 		<div class="overall-seperator" />
 		{#each Object.entries(editorial) as [name, category]}
 			{#if name != 'overall'}

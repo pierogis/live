@@ -2,13 +2,13 @@
 	import type { Plate } from '$lib/database/plate';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import PlatesGrid from '$lib/components/PlatesGrid.svelte';
+	import CardsGrid from '$lib/components/CardsGrid.svelte';
 
 	export let plates: Plate[];
 </script>
 
-<PlatesGrid grid={true}>
+<CardsGrid>
 	{#each plates as plate}
 		<PlateCard {plate} />
 	{/each}
-</PlatesGrid>
+</CardsGrid>

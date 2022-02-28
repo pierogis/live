@@ -8,7 +8,11 @@ export interface Plate {
 	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	scores: { [userId: string]: { [category in Category]: Score } };
+	reviews: {
+		[userId: string]: {
+			[category in Category]: Score;
+		};
+	};
 	images: Image[];
 }
 

@@ -8,7 +8,7 @@
 	<a href="/jurisdictions" class="jurisdictions-link">jurisdictions</a>
 </nav>
 
-<slot />
+<div class="plates"><slot /></div>
 
 <style global>
 	* {
@@ -115,5 +115,13 @@
 		border-radius: 5%;
 
 		padding: 4px;
+	}
+
+	.plates {
+		margin: 16px;
+		padding-top: 12px;
+
+		display: flex;
+		justify-content: center;
 	}
 </style>

@@ -21,6 +21,10 @@ exports.up = async function (knex) {
 		table.integer('endYear').notNullable();
 	});
 
+	await knex.schema.withSchema(schema).createTable('users', function (table) {
+		table.increments();
+	});
+
 	await knex.schema.withSchema(schema).createTable('images', function (table) {
 		table.increments();
 
@@ -65,6 +69,7 @@ exports.up = async function (knex) {
 exports.down = async function (knex) {
 	await knex.schema.withSchema('emporium').dropTable('scores');
 	await knex.schema.withSchema('emporium').dropTable('images');
+	await knex.schema.withSchema('emporium').dropTable('users');
 	await knex.schema.withSchema('emporium').dropTable('plates');
 	await knex.schema.withSchema('emporium').dropTable('jurisdictions');
 
