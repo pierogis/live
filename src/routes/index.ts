@@ -1,11 +1,13 @@
+import { listJurisdictions } from '$lib/database/jurisdiction';
 import { listPlates } from '$lib/database/plate';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
 	const plates = await listPlates();
+	const jurisdictions = await listJurisdictions();
 
 	return {
-		body: { plates }
+		body: { plates, jurisdictions }
 	};
 }
 

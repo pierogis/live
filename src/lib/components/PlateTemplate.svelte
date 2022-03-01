@@ -1,12 +1,13 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import DropZone from '$lib/components/DropZone.svelte';
 	import type { Jurisdiction } from '$lib/database/jurisdiction';
 
 	export let jurisdictions: Jurisdiction[];
 </script>
 
-<Card>
-	<span>
+<form action="">
+	<Card>
 		<input class="jurisdiction" list="jurisdictions" />
 
 		<datalist id="jurisdictions">
@@ -14,13 +15,15 @@
 				<option value={jurisdiction.abbreviation} />
 			{/each}
 		</datalist>
-	</span>
 
-	<span><input class="image" type="file" /><img id="blah" src="#" alt="plate image" /></span>
+		<div class="image">
+			<DropZone />
+		</div>
 
-	<span><input class="year" />-<input class="year" /></span>
-	<!-- <Scores plateId={plate.id} reviews={plate.reviews} /> -->
-</Card>
+		<span><input class="year" />-<input class="year" /></span>
+		<!-- <Scores plateId={plate.id} scores={plate.scores} /> -->
+	</Card>
+</form>
 
 <style>
 	input {

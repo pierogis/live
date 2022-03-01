@@ -26,7 +26,7 @@
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
 
-	{#if showScores}<Scores plateId={plate.id} reviews={plate.reviews} />{/if}
+	{#if showScores}<Scores plateId={plate.id} scores={plate.scores} />{/if}
 </Card>
 
 <style>

@@ -1,19 +1,10 @@
 <script lang="ts">
-	import type { Score } from '$lib/database/review';
+	import type { Score, Review } from '$lib/database/review';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
 	export let plateId: number;
-	export let reviews: {
-		[userId: string]: {
-			overall: Score;
-			identifiability: Score;
-			colors: Score;
-			symbols: Score;
-			typeface: Score;
-			clarity: Score;
-		};
-	};
+	export let scores: Score[];
 
 	const categories = {
 		identifiability: { emoji: '👁️' },
@@ -26,20 +17,20 @@
 	// if editorial review, use that
 	// if no editorial, show averages
 
-	let editorial = reviews[0];
+	let reviews: {
+		[userId: string]: Review;
+	} = {};
+
+	let editorial: Review = scores
+		.filter((score) => score.userId == 0)
+		.reduce((previous, score) => {
+			previous[score.category] = score;
+
+			return previous;
+		}, {});
 
 	const score = { id: null, reviewId: null, value: 0, description: '' };
-	let provisionalReview = {
-		plateId: plateId,
-		scores: {
-			overall: score,
-			identifiability: score,
-			colors: score,
-			symbols: score,
-			typeface: score,
-			clarity: score
-		}
-	};
+	let provisionalReview: Review = {};
 
 	// $: review = editorial
 	// 	? editorial

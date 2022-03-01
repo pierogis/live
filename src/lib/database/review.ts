@@ -9,8 +9,12 @@ export enum Category {
 
 export interface Score {
 	plateId: number;
-	username: string;
+	userId: number;
 	category: Category;
 	value: number;
 	description: string;
 }
+
+export type Review = {
+	[category in Category]?: Score;
+};

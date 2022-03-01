@@ -8,27 +8,16 @@ export interface Plate {
 	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	reviews: {
-		[userId: string]: {
-			[category in Category]: Score;
-		};
-	};
+	scores: Score[];
 	images: Image[];
 }
 
 export function create(request) {}
 
-async function completePlate(partialPlate: Omit<Plate, 'scores' | 'images'>) {
-	const scores = await db
-		.withSchema('emporium')
-		.table<Score>('scores')
-		.select()
-		.where({
-			plateId: partialPlate.id
-		})
-		.groupBy('userId');
-
-	// need to turn this grouping into an object
+async function completePlate(partialPlate: Omit<Plate, 'reviews' | 'images'>): Promise<Plate> {
+	const scores = await db.withSchema('emporium').table<Score>('scores').select().where({
+		plateId: partialPlate.id
+	});
 
 	const images = await db.withSchema('emporium').table<Image>('images').select().where({
 		plateId: partialPlate.id

@@ -75,6 +75,8 @@
 	}
 
 	.title {
+		padding: 4px;
+
 		display: inline;
 		color: var(--text-color);
 
@@ -87,7 +89,7 @@
 		border-right: inset 5px var(--accent-color);
 		border-radius: 5%;
 
-		padding: 4px;
+		background-color: var(--primary-color);
 	}
 
 	.nav {
@@ -115,6 +117,8 @@
 		border-radius: 5%;
 
 		padding: 4px;
+
+		background-color: var(--primary-color);
 	}
 
 	.plates {

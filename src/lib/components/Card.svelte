@@ -10,10 +10,7 @@
 
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		align-content: center;
-
-		text-align: center;
+		align-items: center;
 
 		background-color: var(--primary-color);
 
