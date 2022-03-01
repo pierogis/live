@@ -22,6 +22,7 @@
 
 		<span><input class="year" />-<input class="year" /></span>
 		<!-- <Scores plateId={plate.id} scores={plate.scores} /> -->
+		<button type="submit" method="post">✅</button>
 	</Card>
 </form>
 
@@ -43,9 +44,5 @@
 	}
 	.year {
 		width: 3em;
-	}
-
-	.image {
-		margin: 4px;
 	}
 </style>

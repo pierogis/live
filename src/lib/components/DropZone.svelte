@@ -24,8 +24,6 @@
 			}
 		};
 	}
-
-	let thumbnailIndex = 0;
 	let thumbnailSrc = '#';
 
 	function changeThumbnail(event) {
@@ -41,6 +39,11 @@
 </script>
 
 <div class="zone" use:dropAction>
+	{#if inputElement && inputElement.files.length >= 0}
+		<!-- <span class="prompt">plate image</span>
+	{:else} -->
+		<img class="thumbnail" src={thumbnailSrc} alt="plate" />
+	{/if}
 	<input
 		bind:this={inputElement}
 		type="file"
@@ -48,11 +51,6 @@
 		accept="image/*"
 		on:change={changeThumbnail}
 	/>
-	{#if inputElement && inputElement.files.length == 0}
-		<span class="prompt">plate image</span>
-	{:else}
-		<img class="thumbnail" src={thumbnailSrc} alt="plate" />
-	{/if}
 </div>
 
 <style>
@@ -73,14 +71,25 @@
 		border-radius: 8%;
 
 		margin: 4px;
+
+		position: relative;
 	}
 
-	input {
-		display: none;
+	input[type='file'] {
+		position: absolute;
+		top: 0;
+		left: 0;
+
+		height: 100%;
+		width: 100%;
+		opacity: 0;
 	}
 
 	.thumbnail {
-		max-height: 200px;
-		max-width: 90%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
 	}
 </style>

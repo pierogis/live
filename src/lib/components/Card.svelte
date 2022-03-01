@@ -23,6 +23,10 @@
 		border-right: inset 5px var(--accent-color);
 		border-radius: 5%;
 	}
+
+	:global .card > * {
+		margin: 4px;
+	}
 	/* @media only screen and (min-width: 400px) {
 		.card {
 		max-height: 200px;
