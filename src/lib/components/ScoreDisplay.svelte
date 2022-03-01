@@ -9,9 +9,9 @@
 		empty = '○'
 	}
 
-	$: fullScores = Math.floor(score.value);
-	$: halfScores = Math.round((score.value - fullScores) / 0.5) % 2;
-	$: emptyScores = 5 - (fullScores + halfScores);
+	let fullScores = Math.floor(score.value);
+	let halfScores = Math.round((score.value - fullScores) / 0.5) % 2;
+	let emptyScores = 5 - (fullScores + halfScores);
 
 	let pointStatuses: PointStatus[];
 	$: pointStatuses = Array(fullScores)

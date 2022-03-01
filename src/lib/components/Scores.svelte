@@ -3,7 +3,6 @@
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
-	export let plateId: number;
 	export let scores: Score[];
 
 	const categories = {
@@ -21,13 +20,16 @@
 		[userId: string]: Review;
 	} = {};
 
-	let editorial: Review = scores
+	let editorial: Review;
+	$: editorial = scores
 		.filter((score) => score.userId == 0)
 		.reduce((previous, score) => {
 			previous[score.category] = score;
 
 			return previous;
 		}, {});
+
+	console.log(scores);
 
 	const score = { id: null, reviewId: null, value: 0, description: '' };
 	let provisionalReview: Review = {};
@@ -45,25 +47,26 @@
 	// 	  });
 </script>
 
-<div style="height: 4px;" />
 <div class="scores">
-	<span aria-describedby="starsSummary">
-		<ScoreDisplay score={editorial.overall} />
-	</span>
-	<div role="tooltip" class="review" id="starsSummary">
-		<ScoreDisplay bind:score={editorial.overall} />
-		<div class="overall-seperator" />
-		{#each Object.entries(editorial) as [name, category]}
-			{#if name != 'overall'}
-				<div class="category">
-					<span class="emoji" title={name}>{categories[name].emoji} </span>
-					<ScoreDisplay score={category} />
-					<div class="graph" />
-					<br />
-				</div>
-			{/if}
-		{/each}
-	</div>
+	{#if editorial.overall}
+		<span aria-describedby="starsSummary">
+			<ScoreDisplay score={editorial.overall} />
+		</span>
+		<div role="tooltip" class="review" id="starsSummary">
+			<ScoreDisplay bind:score={editorial.overall} />
+			<div class="overall-seperator" />
+			{#each Object.entries(editorial) as [name, category]}
+				{#if name != 'overall'}
+					<div class="category">
+						<span class="emoji" title={name}>{categories[name].emoji} </span>
+						<ScoreDisplay score={category} />
+						<div class="graph" />
+						<br />
+					</div>
+				{/if}
+			{/each}
+		</div>
+	{:else}{/if}
 </div>
 
 <style>

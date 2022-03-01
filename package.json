@@ -16,6 +16,7 @@
 		"@sveltejs/kit": "^1.0.0-next.285",
 		"@typescript-eslint/eslint-plugin": "^5.10.1",
 		"@typescript-eslint/parser": "^5.10.1",
+		"dotenv": "^16.0.0",
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^3.2.1",
@@ -26,8 +27,7 @@
 		"svelte-preprocess": "^4.10.1",
 		"ts-node": "^10.5.0",
 		"tslib": "^2.3.1",
-		"typescript": "~4.5.4",
-		"dotenv": "^16.0.0"
+		"typescript": "~4.5.4"
 	},
 	"type": "module",
 	"dependencies": {

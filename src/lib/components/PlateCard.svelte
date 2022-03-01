@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	import type { Plate } from '$lib/database/plate';
+	import type { Score } from '$lib/database/review';
+
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
 
@@ -8,13 +12,27 @@
 	export let showJurisdiction = true;
 	export let showYears = true;
 	export let showScores = true;
+
+	let scores: Score[] = [];
+
+	async function get(): Promise<void> {
+		const response = await fetch(`/${plate.id}/scores`);
+		const data = await response.json();
+		scores = data.scores;
+	}
+	onMount(async () => {
+		await get();
+	});
 </script>
 
 <Card>
 	{#if showJurisdiction}
 		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
 	{/if}
-	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : plate.id)}>
+	<a
+		class="image-link"
+		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : plate.id)}
+	>
 		<img
 			class="image"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
@@ -26,7 +44,7 @@
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
 
-	{#if showScores}<Scores plateId={plate.id} scores={plate.scores} />{/if}
+	{#if showScores}<Scores {scores} />{/if}
 </Card>
 
 <style>
@@ -38,6 +56,11 @@
 		border-radius: 8%;
 
 		margin: 4px;
+	}
+
+	.image-link {
+		display: flex;
+		justify-content: center;
 	}
 
 	.link {

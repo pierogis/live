@@ -1,40 +1,16 @@
 import { db } from './client';
 
-import type { Category, Score } from './review';
-import type { Image } from './image';
-
 export interface Plate {
 	id: number;
 	jurisdiction: string;
 	startYear: number;
 	endYear: number;
-	scores: Score[];
-	images: Image[];
 }
 
 export function create(request) {}
 
-async function completePlate(partialPlate: Omit<Plate, 'reviews' | 'images'>): Promise<Plate> {
-	const scores = await db.withSchema('emporium').table<Score>('scores').select().where({
-		plateId: partialPlate.id
-	});
-
-	const images = await db.withSchema('emporium').table<Image>('images').select().where({
-		plateId: partialPlate.id
-	});
-
-	return { ...partialPlate, scores, images };
-}
-
 export async function listPlates(): Promise<Plate[]> {
-	const partialPlates = await db
-		.withSchema('emporium')
-		.table<Omit<Plate, 'reviews' | 'images'>>('plates')
-		.select();
-
-	const plates = await Promise.all(partialPlates.map(completePlate));
-
-	return plates;
+	return await db.withSchema('emporium').table<Plate>('plates').select();
 }
 
 export async function getPlates(
@@ -42,20 +18,16 @@ export async function getPlates(
 	count: number = null,
 	skip = 0
 ): Promise<Plate[]> {
-	const partialPlatesQuery = db
+	const platesQuery = db
 		.withSchema('emporium')
-		.table<Omit<Plate, 'reviews' | 'images'>>('plates')
+		.table<Plate>('plates')
 		.select()
 		.where(params)
 		.offset(skip);
 
 	if (count != null) {
-		partialPlatesQuery.limit(count);
+		platesQuery.limit(count);
 	}
 
-	const partialPlates = await partialPlatesQuery;
-
-	const plates: Plate[] = await Promise.all(partialPlates.map(completePlate));
-
-	return plates;
+	return await platesQuery;
 }
