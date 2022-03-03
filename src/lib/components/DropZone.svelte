@@ -39,11 +39,6 @@
 </script>
 
 <div class="zone" use:dropAction>
-	{#if inputElement && inputElement.files.length >= 0}
-		<!-- <span class="prompt">plate image</span>
-	{:else} -->
-		<img class="thumbnail" src={thumbnailSrc} alt="plate" />
-	{/if}
 	<input
 		bind:this={inputElement}
 		type="file"
@@ -51,16 +46,14 @@
 		accept="image/*"
 		on:change={changeThumbnail}
 	/>
+	<img src={thumbnailSrc} alt="plate" />
 </div>
 
 <style>
 	.zone {
-		max-width: 200px;
-		max-height: 200px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
+		display: grid;
+		grid-template-columns: 1fr;
+
 		cursor: pointer;
 		background-color: rgba(100, 100, 100, 0.2);
 
@@ -69,27 +62,18 @@
 		border-bottom: dashed 4px rgba(150, 150, 150, 0.8);
 		border-right: dashed 4px rgba(150, 150, 150, 0.8);
 		border-radius: 8%;
+	}
 
-		margin: 4px;
-
-		position: relative;
+	.zone > * {
+		height: 100%;
+		width: 100%;
+		grid-row-start: 1;
+		grid-column-start: 1;
 	}
 
 	input[type='file'] {
-		position: absolute;
-		top: 0;
-		left: 0;
-
-		height: 100%;
-		width: 100%;
+		max-height: 100%;
+		max-width: 100%;
 		opacity: 0;
-	}
-
-	.thumbnail {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		width: 100%;
 	}
 </style>

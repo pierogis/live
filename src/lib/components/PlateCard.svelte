@@ -56,6 +56,7 @@
 		border-radius: 8%;
 
 		margin: 4px;
+		height: 256px;
 	}
 
 	.image-link {

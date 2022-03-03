@@ -29,7 +29,7 @@
 <style>
 	input {
 		font-family: 'Courier', monospace;
-		width: 100px;
+		width: 128px;
 		border-top: outset 5px var(--secondary-color);
 		border-left: outset 5px var(--secondary-color);
 		border-bottom: inset 5px var(--accent-color);
@@ -44,5 +44,13 @@
 	}
 	.year {
 		width: 3em;
+	}
+
+	.image {
+		max-width: 100%;
+		max-height: 256px;
+
+		display: flex;
+		justify-content: center;
 	}
 </style>
