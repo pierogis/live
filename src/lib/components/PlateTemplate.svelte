@@ -47,8 +47,7 @@
 	}
 
 	.image {
-		max-width: 100%;
-		max-height: 256px;
+		max-height: 196px;
 
 		display: flex;
 		justify-content: center;

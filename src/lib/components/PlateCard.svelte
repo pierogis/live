@@ -3,6 +3,7 @@
 
 	import type { Plate } from '$lib/database/plate';
 	import type { Score } from '$lib/database/review';
+	import type { Image } from '$lib/database/image';
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
@@ -14,14 +15,22 @@
 	export let showScores = true;
 
 	let scores: Score[] = [];
+	let images: Image[] = [];
 
-	async function get(): Promise<void> {
+	async function getScores(): Promise<void> {
 		const response = await fetch(`/${plate.id}/scores`);
 		const data = await response.json();
 		scores = data.scores;
 	}
+
+	async function getImages(): Promise<void> {
+		const response = await fetch(`/${plate.id}/images`);
+		const data = await response.json();
+		images = data.images;
+	}
 	onMount(async () => {
-		await get();
+		await getScores();
+		await getImages();
 	});
 </script>
 
@@ -29,6 +38,7 @@
 	{#if showJurisdiction}
 		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
 	{/if}
+
 	<a
 		class="image-link"
 		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : plate.id)}
@@ -37,9 +47,9 @@
 			class="image"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.jurisdiction} license plate for ${plate.startYear}-${plate.endYear}`}
-			width="90%"
 		/>
 	</a>
+
 	{#if showYears}
 		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
 	{/if}
@@ -54,9 +64,6 @@
 		border-bottom: solid 4px rgba(150, 150, 150, 0.8);
 		border-right: solid 4px rgba(150, 150, 150, 0.8);
 		border-radius: 8%;
-
-		margin: 4px;
-		height: 256px;
 	}
 
 	.image-link {

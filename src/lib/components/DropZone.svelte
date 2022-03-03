@@ -46,34 +46,43 @@
 		accept="image/*"
 		on:change={changeThumbnail}
 	/>
-	<img src={thumbnailSrc} alt="plate" />
+	<img class="image" src={thumbnailSrc} alt="plate" />
 </div>
 
 <style>
 	.zone {
 		display: grid;
 		grid-template-columns: 1fr;
+		grid-template-rows: 192px;
 
 		cursor: pointer;
-		background-color: rgba(100, 100, 100, 0.2);
 
 		border-top: dashed 4px rgba(100, 100, 100, 0.8);
 		border-left: dashed 4px rgba(100, 100, 100, 0.8);
 		border-bottom: dashed 4px rgba(150, 150, 150, 0.8);
 		border-right: dashed 4px rgba(150, 150, 150, 0.8);
 		border-radius: 8%;
+		background-color: rgba(100, 100, 100, 0.2);
 	}
 
 	.zone > * {
 		height: 100%;
 		width: 100%;
+
 		grid-row-start: 1;
 		grid-column-start: 1;
+		justify-self: center;
+		align-self: center;
+	}
+
+	.image {
+		max-height: 90%;
+		max-width: 90%;
+		width: auto;
+		height: auto;
 	}
 
 	input[type='file'] {
-		max-height: 100%;
-		max-width: 100%;
 		opacity: 0;
 	}
 </style>
