@@ -50,7 +50,7 @@
 	</a>
 
 	{#if showYears}
-		<a class="link" href={'/' + plate.id}>{`${plate.startYear}-${plate.endYear}`}</a>
+		<a class="link" href={'/' + plate.id}>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a>
 	{/if}
 
 	{#if showScores}<Scores {scores} />{/if}

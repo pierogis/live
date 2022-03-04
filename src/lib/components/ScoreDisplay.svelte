@@ -68,6 +68,7 @@
 
 <style>
 	.score {
+		padding-bottom: 2px;
 		cursor: pointer;
 		-webkit-user-select: none;
 		user-select: none;

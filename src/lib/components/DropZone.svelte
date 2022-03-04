@@ -42,11 +42,11 @@
 	<input
 		bind:this={inputElement}
 		type="file"
-		name="plates"
+		name="images"
 		accept="image/*"
 		on:change={changeThumbnail}
 	/>
-	<img class="image" src={thumbnailSrc} alt="plate" />
+	<img class="image" src={thumbnailSrc} alt="upload" />
 </div>
 
 <style>

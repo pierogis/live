@@ -6,7 +6,8 @@
 	.grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 40px;
+		gap: 64px;
+		margin: 32px;
 
 		justify-items: center;
 	}

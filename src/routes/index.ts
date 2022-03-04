@@ -1,6 +1,7 @@
-import { listPlates } from '$lib/database/plates';
+import type { Plate } from '$lib/database/models';
+import { listPlates, createPlate } from '$lib/database/plates';
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
+/** @type {import('./index').RequestHandler} */
 export async function get() {
 	const plates = await listPlates();
 
@@ -9,22 +10,28 @@ export async function get() {
 	};
 }
 
-// export async function post({ request }) {
-// 	const [errors, item] = await db.create(request);
+/** @type {import('./index').RequestHandler} */
+export async function post({ request }: { request: Request }) {
+	let formData = await request.formData();
 
-// 	if (errors) {
-// 		// return validation errors
-// 		return {
-// 			status: 400,
-// 			body: { errors }
-// 		};
-// 	}
+	let data = {};
+	formData.forEach((v, k) => {
+		data[k] = v.valueOf();
+	});
 
-// 	// redirect to the newly created item
-// 	return {
-// 		status: 303,
-// 		headers: {
-// 			location: `/items/${item.id}`
-// 		}
-// 	};
-// }
+	const plate: Omit<Plate, 'id'> = {
+		jurisdiction: data['jurisdiction'],
+		startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
+		endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+	};
+
+	const id = await createPlate(plate);
+
+	// redirect to the newly created plate
+	return {
+		status: 303,
+		headers: {
+			location: `/${id}`
+		}
+	};
+}

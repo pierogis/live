@@ -88,10 +88,10 @@
 </script>
 
 <div class="scores">
-	<span aria-describedby="starsSummary">
+	<div aria-describedby="score-summary" class="inner">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
-	</span>
-	<div role="tooltip" class="review" id="starsSummary">
+	</div>
+	<div role="tooltip" class="review" id="score-summary">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 		<div class="overall-seperator" />
 		{#each Object.entries(categories) as [name, meta]}
@@ -144,12 +144,27 @@
 		border-left: outset 5px var(--secondary-color);
 		border-bottom: inset 5px var(--accent-color);
 		border-right: inset 5px var(--accent-color);
-		margin: -5px;
+
+		/* differential with inner's border, see [0]*/
+		margin: -1px;
 
 		/* half of width plus 5px offset for border to center */
 		margin-left: -101px;
 
 		border-radius: 5%;
+	}
+
+	.inner {
+		padding-bottom: 2px;
+		padding-right: 8px;
+		padding-left: 8px;
+
+		/* [0] */
+		border-top: dotted 4px rgba(100, 100, 100, 0.8);
+		border-left: dotted 4px rgba(100, 100, 100, 0.8);
+		border-bottom: dotted 4px rgba(150, 150, 150, 0.8);
+		border-right: dotted 4px rgba(150, 150, 150, 0.8);
+		border-radius: 16%;
 	}
 
 	@media (hover: hover) and (pointer: fine) {
@@ -165,7 +180,9 @@
 		}
 	}
 	.overall-seperator {
-		border-bottom: 2px solid var(--text-color);
+		height: 2px;
+		border-bottom: 4px double var(--text-color-st);
+		margin-bottom: 2px;
 	}
 	.emoji {
 		cursor: help;

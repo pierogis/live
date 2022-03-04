@@ -16,9 +16,8 @@ exports.up = async function (knex) {
 			.references('abbreviation')
 			.inTable(schema + '.jurisdictions');
 
-		table.integer('startYear').notNullable();
-
-		table.integer('endYear').notNullable();
+		table.integer('startYear');
+		table.integer('endYear');
 	});
 
 	await knex.schema.withSchema(schema).createTable('users', function (table) {

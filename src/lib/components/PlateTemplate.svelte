@@ -1,34 +1,46 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import DropZone from '$lib/components/DropZone.svelte';
-	import type { Jurisdiction } from '$lib/database/models';
+	import type { Jurisdiction, Plate } from '$lib/database/models';
 	import Scores from './Scores.svelte';
 
 	export let jurisdictions: Jurisdiction[];
+	export let plate: Plate = null;
 </script>
 
-<form action="">
-	<Card>
-		<input class="jurisdiction" list="jurisdictions" />
+<Card>
+	<input
+		type="text"
+		class="jurisdiction"
+		list="jurisdictions"
+		name="jurisdiction"
+		value={plate ? plate.jurisdiction : ''}
+	/>
 
-		<datalist id="jurisdictions">
-			{#each jurisdictions as jurisdiction}
-				<option value={jurisdiction.abbreviation} />
-			{/each}
-		</datalist>
+	<datalist id="jurisdictions">
+		{#each jurisdictions as jurisdiction}
+			<option value={jurisdiction.abbreviation} />
+		{/each}
+	</datalist>
 
-		<div class="image">
-			<DropZone />
-		</div>
+	<div class="image-input">
+		<DropZone />
+	</div>
 
-		<span><input class="year" />-<input class="year" /></span>
-		<Scores scores={[]} />
-		<button type="submit" method="post">✅</button>
-	</Card>
-</form>
+	<span>
+		<input type="text" class="year" name="startYear" value={plate ? plate.startYear : ''} />-<input
+			type="text"
+			class="year"
+			name="endYear"
+			value={plate ? plate.endYear : ''}
+		/>
+	</span>
+	<Scores scores={[]} />
+	<input type="submit" method="post" value="✅" />
+</Card>
 
 <style>
-	input {
+	input[type='text'] {
 		font-family: 'Courier', monospace;
 		width: 128px;
 		border-top: outset 5px var(--secondary-color);
@@ -40,14 +52,13 @@
 		background-color: whitesmoke;
 	}
 
-	.jurisdiction {
+	input[type='text'].jurisdiction {
 		width: 2em;
 	}
-	.year {
+	input[type='text'].year {
 		width: 3em;
 	}
-
-	.image {
+	.image-input {
 		max-height: 196px;
 
 		display: flex;

@@ -1,6 +1,25 @@
 import { db } from './client';
+import type { Plate } from './models';
 
-export function create(request) {}
+export async function updatePlate(plate: Plate): Promise<Plate> {
+	const { id, ...partial } = plate;
+	const result = await db
+		.withSchema('emporium')
+		.table<Plate>('plates')
+		.update(partial)
+		.where({ id })
+		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
+	return { id, ...result[0] };
+}
+
+export async function createPlate(plate: Omit<Plate, 'id'>): Promise<Plate> {
+	const result = await db
+		.withSchema('emporium')
+		.table<Plate>('plates')
+		.insert(plate)
+		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
+	return result[0];
+}
 
 export async function listPlates(): Promise<Plate[]> {
 	return await db.withSchema('emporium').table<Plate>('plates').select();

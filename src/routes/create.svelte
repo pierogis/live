@@ -6,4 +6,6 @@
 	export let jurisdictions: Jurisdiction[];
 </script>
 
-<PlateTemplate {jurisdictions} />
+<form action="/" method="post">
+	<PlateTemplate {jurisdictions} />
+</form>
