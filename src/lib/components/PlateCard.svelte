@@ -8,6 +8,7 @@
 
 	export let plate: Plate;
 
+	export let showAdmin = false;
 	export let showJurisdiction = true;
 	export let showYears = true;
 	export let showScores = true;
@@ -34,6 +35,14 @@
 </script>
 
 <Card>
+	{#if showAdmin}
+		<form class="admin left" action="/{plate.id}/edit">
+			<input type="submit" value="✎" />
+		</form>
+		<form class="admin right" action="/{plate.id}?_method=DELETE" method="post">
+			<input type="submit" value="❌" />
+		</form>
+	{/if}
 	{#if showJurisdiction}
 		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
 	{/if}
@@ -57,6 +66,16 @@
 </Card>
 
 <style>
+	.admin {
+		position: absolute;
+		display: flex;
+	}
+	.admin.left {
+		left: 8px;
+	}
+	.admin.right {
+		right: 8px;
+	}
 	.image {
 		border-top: solid 4px rgba(100, 100, 100, 0.8);
 		border-left: solid 4px rgba(100, 100, 100, 0.8);

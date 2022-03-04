@@ -1,13 +1,16 @@
 import type { Plate } from '$lib/database/models';
-import { getPlates, updatePlate } from '$lib/database/plates';
+import { getPlates, updatePlate, deletePlate } from '$lib/database/plates';
 
 /** @type {import('./[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	const parsedParams = { ...params, id: parseInt(params.id) };
 	const plates = await getPlates(parsedParams, 1);
 
+	// this should be based on the user id
+	const showAdmin = true;
+
 	return {
-		body: { plate: plates[0] }
+		body: { plate: plates[0], showAdmin }
 	};
 }
 
@@ -34,6 +37,19 @@ export async function put({ request, params }: { request: Request; params: { id:
 		status: 303,
 		headers: {
 			location: `/${plate.id}`
+		}
+	};
+}
+
+/** @type {import('./[id]').RequestHandler} */
+export async function del({ params }: { params: { id: string } }) {
+	await deletePlate(parseInt(params.id));
+
+	// redirect to the newly created plate
+	return {
+		status: 303,
+		headers: {
+			location: `/`
 		}
 	};
 }

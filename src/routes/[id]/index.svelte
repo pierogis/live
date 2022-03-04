@@ -3,6 +3,7 @@
 	import type { Plate } from '$lib/database/models';
 
 	export let plate: Plate;
+	export let showAdmin: boolean;
 
 	// ...plus props from `post` when the page is rendered
 	// in response to a POST request, for example after
@@ -10,7 +11,7 @@
 	// export let errors;
 </script>
 
-<PlateCard {plate} />
+<PlateCard {plate} {showAdmin} />
 
 <!-- <form method="post">
 	<input name="title" />

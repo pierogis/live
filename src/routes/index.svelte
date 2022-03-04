@@ -5,10 +5,11 @@
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 
 	export let plates: Plate[];
+	export let showAdmin: boolean;
 </script>
 
 <CardsGrid>
 	{#each plates as plate}
-		<PlateCard {plate} />
+		<PlateCard {plate} {showAdmin} />
 	{/each}
 </CardsGrid>
