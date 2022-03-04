@@ -1,19 +1,20 @@
-import { listPlates, getPlates } from '$lib/database/plates';
+import { getPlates } from '$lib/database/plates';
+import { listJurisdictions } from '$lib/database/jurisdictions';
 import type { Plate } from '$lib/database/models';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const plates = await listPlates();
+	const jurisdictions = await listJurisdictions();
 
 	const jurisdictionsPlate: { [jurisdiction: string]: Plate } = {};
-	for (const plate of plates) {
-		if (!(plate.jurisdiction in jurisdictionsPlate)) {
-			const jdPlates = await getPlates({ jurisdiction: plate.jurisdiction }, 1);
-			jurisdictionsPlate[plate.jurisdiction] = jdPlates[0];
+	for (const jurisdiction of jurisdictions) {
+		const jdPlates = await getPlates({ jurisdiction: jurisdiction.abbreviation }, 1);
+		if (jdPlates.length > 0) {
+			jurisdictionsPlate[jurisdiction.abbreviation] = jdPlates[0];
 		}
 	}
 
 	return {
-		body: { jurisdictions: jurisdictionsPlate }
+		body: { jurisdictionsPlate }
 	};
 }
