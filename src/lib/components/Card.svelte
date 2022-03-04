@@ -25,7 +25,7 @@
 	}
 
 	:global(.card > *) {
-		margin: 4px;
+		margin: 8px;
 	}
 	/* @media only screen and (min-width: 400px) {
 		.card {

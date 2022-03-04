@@ -12,26 +12,26 @@ export async function get() {
 
 /** @type {import('./index').RequestHandler} */
 export async function post({ request }: { request: Request }) {
-	let formData = await request.formData();
+	const formData = await request.formData();
 
 	let data = {};
 	formData.forEach((v, k) => {
 		data[k] = v.valueOf();
 	});
 
-	const plate: Omit<Plate, 'id'> = {
+	const partial: Omit<Plate, 'id'> = {
 		jurisdiction: data['jurisdiction'],
 		startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
 		endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
 	};
 
-	const id = await createPlate(plate);
+	const plate = await createPlate(partial);
 
 	// redirect to the newly created plate
 	return {
 		status: 303,
 		headers: {
-			location: `/${id}`
+			location: `/${plate.id}`
 		}
 	};
 }

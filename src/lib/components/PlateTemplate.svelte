@@ -51,6 +51,9 @@
 
 		background-color: whitesmoke;
 	}
+	input[type='submit'] {
+		cursor: pointer;
+	}
 
 	input[type='text'].jurisdiction {
 		width: 2em;
