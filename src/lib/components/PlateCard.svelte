@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	import type { Plate } from '$lib/database/plate';
-	import type { Score } from '$lib/database/review';
-	import type { Image } from '$lib/database/image';
+	import type { Plate, Score, Image } from '$lib/database/models';
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';

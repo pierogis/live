@@ -1,12 +1,5 @@
 import { db } from './client';
 
-export interface Plate {
-	id: number;
-	jurisdiction: string;
-	startYear: number;
-	endYear: number;
-}
-
 export function create(request) {}
 
 export async function listPlates(): Promise<Plate[]> {

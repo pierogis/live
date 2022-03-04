@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Score, type Review, Category } from '$lib/database/review';
+	import type { Score, Review } from '$lib/database/models';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
@@ -27,28 +27,45 @@
 
 	const userId = 0;
 
-	const score: Score = {
-		plateId: null,
-		userId: userId,
-		category: Category.overall,
+	const partialScore = {
 		value: null,
 		description: null
 	};
-	let userReview: Review = {
-		overall: score,
-		identifiability: score,
-		colors: score,
-		symbols: score,
-		typeface: score,
-		clarity: score,
-		...scores
-			.filter((score) => score.userId == userId)
-			.reduce((previous, score) => {
+	let userReview = scores
+		.filter((score) => score.userId == userId)
+		.reduce(
+			(previous, score) => {
 				previous[score.category] = score;
 
 				return previous;
-			}, {})
-	};
+			},
+			{
+				overall: {
+					value: null,
+					description: null
+				},
+				identifiability: {
+					value: null,
+					description: null
+				},
+				colors: {
+					value: null,
+					description: null
+				},
+				symbols: {
+					value: null,
+					description: null
+				},
+				typeface: {
+					value: null,
+					description: null
+				},
+				clarity: {
+					value: null,
+					description: null
+				}
+			}
+		);
 
 	let reviews: {
 		[userId: string]: Review;
@@ -117,11 +134,22 @@
 		width: 192px;
 		top: 0%;
 		left: 50%;
-		margin-left: -96px;
 
 		background-color: var(--primary-color);
-		box-shadow: 4px 4px 0 var(--accent-color), -4px -4px 0 var(--secondary-color),
-			0px 0px 16px 4px rgba(0, 0, 0, 0.5);
+
+		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
+			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
+
+		border-top: outset 5px var(--secondary-color);
+		border-left: outset 5px var(--secondary-color);
+		border-bottom: inset 5px var(--accent-color);
+		border-right: inset 5px var(--accent-color);
+		margin: -5px;
+
+		/* half of width plus 5px offset for border to center */
+		margin-left: -101px;
+
+		border-radius: 5%;
 	}
 
 	@media (hover: hover) and (pointer: fine) {

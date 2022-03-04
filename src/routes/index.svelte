@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Plate } from '$lib/database/plate';
+	import type { Plate } from '$lib/database/models';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';

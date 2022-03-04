@@ -1,4 +1,4 @@
-import { getScores } from '$lib/database/review';
+import { getScores } from '$lib/database/scores';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {

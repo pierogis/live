@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import DropZone from '$lib/components/DropZone.svelte';
-	import type { Jurisdiction } from '$lib/database/jurisdiction';
+	import type { Jurisdiction } from '$lib/database/models';
 	import Scores from './Scores.svelte';
 
 	export let jurisdictions: Jurisdiction[];

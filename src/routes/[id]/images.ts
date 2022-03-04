@@ -1,4 +1,4 @@
-import { getImages } from '$lib/database/image';
+import { getImages } from '$lib/database/images';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {

@@ -1,11 +1,13 @@
 <script lang="ts">
-	import type { Score } from '$lib/database/review';
+	import type { Score } from '$lib/database/models';
 
 	export let editorialScore: Score;
-	export let userScore: Pick<Score, 'category' | 'value' | 'description'>;
+	export let userScore: Pick<Score, 'value' | 'description'>;
 	let placeholderScore = { value: 0, description: '' };
 
 	$: user = userScore.value != null;
+
+	$: placeholder = !user && editorialScore == null;
 
 	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
 
@@ -58,7 +60,9 @@
 
 <div class="scores-container">
 	{#each pointStatuses as pointStatus, i (i)}
-		<span class="score" class:user use:changeScoreAction={{ pointStatus, i }}>{pointStatus} </span>
+		<span class="score" class:user class:placeholder use:changeScoreAction={{ pointStatus, i }}
+			>{pointStatus}
+		</span>
 	{/each}
 </div>
 
@@ -70,7 +74,11 @@
 	}
 
 	.user {
-		color: green;
+		color: var(--accent-color);
+	}
+
+	.placeholder {
+		color: grey;
 	}
 
 	.scores-container {

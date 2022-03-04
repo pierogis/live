@@ -1,4 +1,5 @@
-import { type Plate, listPlates, getPlates } from '$lib/database/plate';
+import { listPlates, getPlates } from '$lib/database/plates';
+import type { Plate } from '$lib/database/models';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {

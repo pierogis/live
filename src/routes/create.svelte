@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Jurisdiction } from '$lib/database/jurisdiction';
+	import type { Jurisdiction } from '$lib/database/models';
 
 	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
 

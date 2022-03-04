@@ -24,7 +24,7 @@
 		border-radius: 5%;
 	}
 
-	:global .card > * {
+	:global(.card > *) {
 		margin: 4px;
 	}
 	/* @media only screen and (min-width: 400px) {
