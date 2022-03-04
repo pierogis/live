@@ -2,6 +2,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import DropZone from '$lib/components/DropZone.svelte';
 	import type { Jurisdiction } from '$lib/database/jurisdiction';
+	import Scores from './Scores.svelte';
 
 	export let jurisdictions: Jurisdiction[];
 </script>
@@ -21,7 +22,7 @@
 		</div>
 
 		<span><input class="year" />-<input class="year" /></span>
-		<!-- <Scores plateId={plate.id} scores={plate.scores} /> -->
+		<Scores scores={[]} />
 		<button type="submit" method="post">✅</button>
 	</Card>
 </form>

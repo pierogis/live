@@ -1,7 +1,13 @@
 <script lang="ts">
 	import type { Score } from '$lib/database/review';
 
-	export let score: Score;
+	export let editorialScore: Score;
+	export let userScore: Pick<Score, 'category' | 'value' | 'description'>;
+	let placeholderScore = { value: 0, description: '' };
+
+	$: user = userScore.value != null;
+
+	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
 
 	enum PointStatus {
 		full = '●',
@@ -9,9 +15,9 @@
 		empty = '○'
 	}
 
-	let fullScores = Math.floor(score.value);
-	let halfScores = Math.round((score.value - fullScores) / 0.5) % 2;
-	let emptyScores = 5 - (fullScores + halfScores);
+	$: fullScores = Math.floor(displayScore.value);
+	$: halfScores = Math.round((displayScore.value - fullScores) / 0.5) % 2;
+	$: emptyScores = 5 - (fullScores + halfScores);
 
 	let pointStatuses: PointStatus[];
 	$: pointStatuses = Array(fullScores)
@@ -24,16 +30,16 @@
 		params: { pointStatus: PointStatus; i: number }
 	) {
 		function handlePointerDown(event) {
-			if (Math.ceil(score.value) == params.i + 1) {
-				if (score.value == params.i + 1) {
-					score.value = params.i + 0.5;
-				} else if (score.value == params.i + 0.5) {
-					score.value = params.i;
+			if (Math.ceil(userScore.value) == params.i + 1) {
+				if (userScore.value == params.i + 1) {
+					userScore.value = params.i + 0.5;
+				} else if (userScore.value == params.i + 0.5) {
+					userScore.value = params.i;
 				} else {
-					score.value = params.i + 1;
+					userScore.value = params.i + 1;
 				}
 			} else {
-				score.value = params.i + 1;
+				userScore.value = params.i + 1;
 			}
 		}
 
@@ -52,7 +58,7 @@
 
 <div class="scores-container">
 	{#each pointStatuses as pointStatus, i (i)}
-		<span class="score" use:changeScoreAction={{ pointStatus, i }}>{pointStatus} </span>
+		<span class="score" class:user use:changeScoreAction={{ pointStatus, i }}>{pointStatus} </span>
 	{/each}
 </div>
 
@@ -61,6 +67,10 @@
 		cursor: pointer;
 		-webkit-user-select: none;
 		user-select: none;
+	}
+
+	.user {
+		color: green;
 	}
 
 	.scores-container {

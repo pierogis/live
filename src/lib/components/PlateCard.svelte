@@ -28,6 +28,7 @@
 		const data = await response.json();
 		images = data.images;
 	}
+
 	onMount(async () => {
 		await getScores();
 		await getImages();

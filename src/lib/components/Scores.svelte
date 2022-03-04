@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Score, Review } from '$lib/database/review';
+	import { type Score, type Review, Category } from '$lib/database/review';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
@@ -16,10 +16,6 @@
 	// if editorial review, use that
 	// if no editorial, show averages
 
-	let reviews: {
-		[userId: string]: Review;
-	} = {};
-
 	let editorial: Review;
 	$: editorial = scores
 		.filter((score) => score.userId == 0)
@@ -29,10 +25,34 @@
 			return previous;
 		}, {});
 
-	console.log(scores);
+	const userId = 0;
 
-	const score = { id: null, reviewId: null, value: 0, description: '' };
-	let provisionalReview: Review = {};
+	const score: Score = {
+		plateId: null,
+		userId: userId,
+		category: Category.overall,
+		value: null,
+		description: null
+	};
+	let userReview: Review = {
+		overall: score,
+		identifiability: score,
+		colors: score,
+		symbols: score,
+		typeface: score,
+		clarity: score,
+		...scores
+			.filter((score) => score.userId == userId)
+			.reduce((previous, score) => {
+				previous[score.category] = score;
+
+				return previous;
+			}, {})
+	};
+
+	let reviews: {
+		[userId: string]: Review;
+	} = {};
 
 	// $: review = editorial
 	// 	? editorial
@@ -45,28 +65,27 @@
 	// 			previous.clarity.value = review.clarity.value / reviews.length;
 	// 			return previous;
 	// 	  });
+
+	// if no user score for this category, show editorial
+	// if user score, font color should be differents
 </script>
 
 <div class="scores">
-	{#if editorial.overall}
-		<span aria-describedby="starsSummary">
-			<ScoreDisplay score={editorial.overall} />
-		</span>
-		<div role="tooltip" class="review" id="starsSummary">
-			<ScoreDisplay bind:score={editorial.overall} />
-			<div class="overall-seperator" />
-			{#each Object.entries(editorial) as [name, category]}
-				{#if name != 'overall'}
-					<div class="category">
-						<span class="emoji" title={name}>{categories[name].emoji} </span>
-						<ScoreDisplay score={category} />
-						<div class="graph" />
-						<br />
-					</div>
-				{/if}
-			{/each}
-		</div>
-	{:else}{/if}
+	<span aria-describedby="starsSummary">
+		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
+	</span>
+	<div role="tooltip" class="review" id="starsSummary">
+		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
+		<div class="overall-seperator" />
+		{#each Object.entries(categories) as [name, meta]}
+			<div class="category">
+				<span class="emoji" title={name}>{meta.emoji} </span>
+				<ScoreDisplay editorialScore={editorial[name]} bind:userScore={userReview[name]} />
+				<div class="graph" />
+				<br />
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style>
