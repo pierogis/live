@@ -36,3 +36,8 @@ export interface Image {
 	plateId: number;
 	url: string;
 }
+
+export interface User {
+	id: number;
+	name: string;
+}

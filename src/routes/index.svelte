@@ -1,11 +1,13 @@
 <script lang="ts">
+	import { session } from '$app/stores';
 	import type { Plate } from '$lib/database/models';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 
 	export let plates: Plate[];
-	export let showAdmin: boolean;
+
+	let showAdmin = $session.user.id == 0;
 </script>
 
 <CardsGrid>

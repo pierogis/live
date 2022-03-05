@@ -44,6 +44,10 @@ export async function getPlates(
 	return await platesQuery;
 }
 
+export async function getPlate(params: { id?: number; jurisdiction?: string }): Promise<Plate> {
+	return await getPlates(params, 1)[0];
+}
+
 export async function deletePlate(id: number): Promise<Plate[]> {
 	return await db.withSchema('emporium').table<Plate>('plates').where({ id }).del();
 }

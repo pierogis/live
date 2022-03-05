@@ -5,11 +5,8 @@ import { listPlates, createPlate } from '$lib/database/plates';
 export async function get() {
 	const plates = await listPlates();
 
-	// this should be based on the user id
-	const showAdmin = true;
-
 	return {
-		body: { plates, showAdmin }
+		body: { plates }
 	};
 }
 
