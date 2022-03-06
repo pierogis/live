@@ -3,7 +3,6 @@
 	import type { Plate } from '$lib/database/models';
 
 	export let plate: Plate;
-	export let showAdmin: boolean;
 
 	// ...plus props from `post` when the page is rendered
 	// in response to a POST request, for example after
@@ -15,7 +14,7 @@
 	<title>{'plate ' + plate.id}</title>
 </svelte:head>
 
-<PlateCard {plate} {showAdmin} />
+<PlateCard {plate} />
 
 <!-- <form method="post">
 	<input name="title" />

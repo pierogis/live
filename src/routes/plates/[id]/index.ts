@@ -7,11 +7,8 @@ export async function get({ params }: { params: { id: string } }) {
 		const parsedParams = { ...params, id: parseInt(params.id) };
 		const plate = await getPlate(parsedParams);
 
-		// this should be based on the user id
-		const showAdmin = true;
-
 		return {
-			body: { plate: plate, showAdmin }
+			body: { plate: plate }
 		};
 	} catch (error) {
 		console.error(error);

@@ -9,5 +9,6 @@ export const variables = {
 	encryptionSecret: process.env.ENCRYPTION_SECRET,
 	emailUser: process.env.EMAIL_USER,
 	emailPass: process.env.EMAIL_PASS,
-	devPassword: process.env.DEV_PASSWORD
+	devPassword: process.env.DEV_PASSWORD,
+	adminId: parseInt(process.env.ADMIN_ID)
 };

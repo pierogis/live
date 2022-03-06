@@ -5,20 +5,49 @@
 	import Card from '$lib/components/Card.svelte';
 
 	export let user: User;
+	const originalUser: User = user;
 
 	$: isUser = $session.user ? $session.user.id == user.id : false;
+	$: isAdmin = $session.user ? $session.user.id == 1 : false;
 </script>
 
 <svelte:head>
-	<title>{'user: ' + user.id}</title>
+	<title>{'user: ' + user.name}</title>
 </svelte:head>
 
-<Card>
-	<span>{user.name}</span>
-	{#if isUser}
-		<span>{user.email}</span>
-	{/if}
-</Card>
+{#if !isUser}
+	<Card>
+		{#if isAdmin}
+			<span>#{user.id}</span>
+		{/if}
+		<span>{user.name}</span>
+	</Card>
+{/if}
+
+{#if isUser}
+	<form action="/{user.id}?_method=PUT" method="post">
+		<Card>
+			{#if isAdmin}
+				<span>#{user.id}</span>
+			{/if}
+			<input
+				class="border shadow"
+				type="text"
+				name="name"
+				bind:value={user.name}
+				placeholder={originalUser.name}
+			/>
+			<input
+				class="border shadow"
+				type="text"
+				name="email"
+				bind:value={user.email}
+				placeholder={originalUser.email}
+			/>
+			<button class="border shadow" type="submit">update</button>
+		</Card>
+	</form>
+{/if}
 
 {#if isUser}
 	<form action="/logout" method="post">
@@ -27,6 +56,13 @@
 {/if}
 
 <style>
+	form {
+		display: flex;
+		flex-direction: column;
+	}
+	input[type='text'] {
+		padding: 0.1rem 0.2rem;
+	}
 	.logout {
 		position: absolute;
 

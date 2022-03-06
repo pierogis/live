@@ -6,11 +6,8 @@ export async function get({ params }: { params: { id: string } }) {
 	try {
 		const user = await getUser({ id: parseInt(params.id) });
 
-		// this should be based on the user id
-		const showAdmin = true;
-
 		return {
-			body: { user: user, showAdmin }
+			body: { user: user }
 		};
 	} catch (error) {
 		console.error(error);

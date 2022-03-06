@@ -74,7 +74,7 @@
 	}
 	input[type='submit'],
 	button {
-		padding: 12px;
+		padding: 8px;
 		background-color: var(--primary-color);
 		font-weight: bold;
 

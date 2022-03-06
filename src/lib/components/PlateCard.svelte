@@ -5,10 +5,12 @@
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
+	import { session } from '$app/stores';
+	import { variables } from '$lib/env';
 
 	export let plate: Plate;
 
-	export let showAdmin = false;
+	export let isAdmin = $session.user ? $session.user.id == variables.adminId : false;
 	export let showJurisdiction = true;
 	export let showYears = true;
 	export let showScores = true;
@@ -35,7 +37,7 @@
 </script>
 
 <Card>
-	{#if showAdmin}
+	{#if isAdmin}
 		<form class="admin left" action="/{plate.id}/edit">
 			<input type="submit" value="✎" />
 		</form>

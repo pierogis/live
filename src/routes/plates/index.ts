@@ -5,10 +5,9 @@ import { listPlates, createPlate } from '$lib/database/plates';
 export async function get(event) {
 	try {
 		const plates = await listPlates();
-		const showAdmin = event.locals.userId == 0;
 
 		return {
-			body: { plates, showAdmin }
+			body: { plates }
 		};
 	} catch (error) {
 		console.error(error);
