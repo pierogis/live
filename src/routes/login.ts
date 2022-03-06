@@ -33,7 +33,7 @@ export async function post({ request }: { request: Request }) {
 			passwords[email] = generatedPassword;
 
 			return {
-				status: 201,
+				status: 200,
 				body: {
 					message: `Generated password emailed to ${email}`
 				}
@@ -49,9 +49,10 @@ export async function post({ request }: { request: Request }) {
 					const cookie = await createSessionCookie(user);
 
 					return {
-						status: 200,
+						status: 303,
 						headers: {
-							'set-cookie': cookie
+							'set-cookie': cookie,
+							location: '/plates'
 						},
 						body: {
 							message: 'Signed in'

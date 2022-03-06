@@ -23,7 +23,7 @@ export async function createSessionCookie(data: any): Promise<string> {
 	});
 }
 
-export async function deleteSessionCookie(): Promise<string> {
+export function deleteSessionCookie(): Promise<string> {
 	return serialize(variables.sessionName, '', {
 		expires: new Date(0),
 		httpOnly: true,

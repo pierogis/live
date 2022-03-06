@@ -63,14 +63,4 @@
 		display: flex;
 		justify-content: center;
 	}
-	input[type='submit'],
-	button {
-		font-family: monospace;
-		padding: 12px;
-		background-color: var(--primary-color);
-		color: var(--text-color);
-		font-weight: bold;
-
-		cursor: pointer;
-	}
 </style>

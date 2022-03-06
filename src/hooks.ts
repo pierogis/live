@@ -17,7 +17,7 @@ export async function handle({ event, resolve }) {
 		if (cookies[variables.sessionName]) {
 			// set cookie expires now
 			const cookie = deleteSessionCookie();
-			response['set-cookie'] = cookie;
+			response.headers.set('set-cookie', cookie);
 		}
 
 		return response;

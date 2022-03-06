@@ -24,8 +24,15 @@
 		padding: 0;
 		border: 0;
 		outline: 0;
-		font-size: 100%;
+
 		vertical-align: baseline;
+
+		font-family: 'Courier', monospace;
+		font-weight: 600;
+		font-style: normal;
+		font-size: 20px;
+		color: var(--text-color);
+
 		background: transparent;
 	}
 
@@ -54,11 +61,6 @@
 		--text-color-t: rgba(48, 79, 80, 0);
 
 		--content-width: 240px;
-
-		font-family: 'Courier', monospace;
-		font-weight: 600;
-		font-style: normal;
-		font-size: 20px;
 	}
 
 	body {
@@ -68,11 +70,14 @@
 	}
 
 	input[type='text'] {
-		font-family: 'Courier', monospace;
-
 		background-color: whitesmoke;
 	}
-	input[type='submit'] {
+	input[type='submit'],
+	button {
+		padding: 12px;
+		background-color: var(--primary-color);
+		font-weight: bold;
+
 		cursor: pointer;
 	}
 

@@ -4,8 +4,7 @@ import { getUser, updateUser, deleteUser } from '$lib/database/users';
 /** @type {import('./users/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
-		const parsedParams = { ...params, id: parseInt(params.id) };
-		const user = await getUser(parsedParams);
+		const user = await getUser({ id: parseInt(params.id) });
 
 		// this should be based on the user id
 		const showAdmin = true;

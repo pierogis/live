@@ -25,7 +25,7 @@ export async function getUser(params: {
 	name?: string;
 	email?: string;
 }): Promise<User> {
-	return await getUsers(params, 1)[0];
+	return (await getUsers(params, 1))[0];
 }
 
 export async function createUser(user: Omit<User, 'id'>): Promise<User> {

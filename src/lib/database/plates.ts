@@ -25,7 +25,7 @@ export async function getPlates(
 }
 
 export async function getPlate(params: { id?: number; jurisdiction?: string }): Promise<Plate> {
-	return await getPlates(params, 1)[0];
+	return (await getPlates(params, 1))[0];
 }
 
 export async function createPlate(plate: Omit<Plate, 'id'>): Promise<Plate> {

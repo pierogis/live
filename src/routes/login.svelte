@@ -37,9 +37,9 @@
 					bind:value={password}
 				/>
 			</div>
-			<button class="submit border shadow" type="submit"
-				>{password != '' ? 'login' : 'generate'}</button
-			>
+			<button class="submit border shadow" type="submit">
+				{password != '' ? 'login' : 'generate'}
+			</button>
 		</form>
 	</div>
 </Card>
