@@ -1,11 +1,11 @@
 <header class="header">
 	<div>
-		<a href="/" class="title-link"> <h3 class="title">Karl's Plate Emporium</h3></a>
+		<a href="/" class="title-link"> <h3 class="title border">Karl's Plate Emporium</h3></a>
 	</div>
 </header>
 
 <nav class="nav">
-	<a href="/jurisdictions" class="jurisdictions-link">jurisdictions</a>
+	<a href="/jurisdictions" class="jurisdictions-link border">jurisdictions</a>
 </nav>
 
 <div class="content"><slot /></div>
@@ -62,11 +62,6 @@
 	input[type='text'] {
 		font-family: 'Courier', monospace;
 		width: 128px;
-		border-top: outset 5px var(--secondary-color);
-		border-left: outset 5px var(--secondary-color);
-		border-bottom: inset 5px var(--accent-color);
-		border-right: inset 5px var(--accent-color);
-		border-radius: 5%;
 
 		background-color: whitesmoke;
 	}
@@ -95,6 +90,10 @@
 		display: inline;
 		color: var(--text-color);
 
+		background-color: var(--primary-color);
+	}
+
+	.border {
 		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
 			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
 
@@ -103,8 +102,6 @@
 		border-bottom: inset 5px var(--accent-color);
 		border-right: inset 5px var(--accent-color);
 		border-radius: 5%;
-
-		background-color: var(--primary-color);
 	}
 
 	.nav {
@@ -122,14 +119,6 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
-		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
-			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
-
-		border-top: outset 5px var(--secondary-color);
-		border-left: outset 5px var(--secondary-color);
-		border-bottom: inset 5px var(--accent-color);
-		border-right: inset 5px var(--accent-color);
-		border-radius: 5%;
 
 		padding: 4px;
 

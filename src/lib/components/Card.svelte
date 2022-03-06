@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card border">
 	<slot />
 </div>
 
@@ -14,15 +14,6 @@
 		position: relative;
 
 		background-color: var(--primary-color);
-
-		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
-			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
-
-		border-top: outset 5px var(--secondary-color);
-		border-left: outset 5px var(--secondary-color);
-		border-bottom: inset 5px var(--accent-color);
-		border-right: inset 5px var(--accent-color);
-		border-radius: 5%;
 	}
 
 	:global(.card > *) {

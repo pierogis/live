@@ -1,5 +1,6 @@
 <script lang="ts">
 	let email = '';
+	let password = '';
 </script>
 
 <svelte:head>
@@ -9,10 +10,10 @@
 <div class="login">
 	<form action="/login" method="post">
 		<label for="email">email</label>
-		<input id="email" type="text" name="email" bind:value={email} />
-		<div class="btn-container">
-			<button type="submit">Login</button>
-		</div>
+		<input class="border" id="email" type="text" name="email" bind:value={email} />
+		<label for="password">password</label>
+		<input class="border" id="password" type="text" name="password" bind:value={password} />
+		<button class="border" type="submit">{password != '' ? 'login' : 'generate'}</button>
 	</form>
 </div>
 
@@ -26,6 +27,10 @@
 		width: 28rem;
 		margin: auto;
 		font-size: 1.5rem;
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 	label {
 		display: block;
@@ -40,10 +45,9 @@
 		height: 2.5rem;
 	}
 	button {
-		width: 100%;
+		width: 50%;
 		background-color: var(--accent-color);
 		color: white;
-		border: none;
 		height: 2.5rem;
 		font-weight: bold;
 		transition: background-color 0.2s ease-in-out;

@@ -22,6 +22,8 @@ exports.up = async function (knex) {
 
 	await knex.schema.withSchema(schema).createTable('users', function (table) {
 		table.increments();
+		table.string('email').notNullable();
+		table.string('name').notNullable();
 	});
 
 	await knex.schema.withSchema(schema).createTable('images', function (table) {

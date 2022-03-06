@@ -39,5 +39,6 @@ export interface Image {
 
 export interface User {
 	id: number;
+	email: string;
 	name: string;
 }
