@@ -11,9 +11,10 @@
 <Card>
 	<input
 		type="text"
-		class="jurisdiction"
+		class="jurisdiction border shadow"
 		list="jurisdictions"
 		name="jurisdiction"
+		maxlength="2"
 		value={plate ? plate.jurisdiction : ''}
 	/>
 
@@ -28,18 +29,28 @@
 	</div>
 
 	<span>
-		<input type="text" class="year" name="startYear" value={plate ? plate.startYear : ''} />-<input
+		<input
 			type="text"
-			class="year"
+			class="year border shadow"
+			name="startYear"
+			value={plate ? plate.startYear : ''}
+			maxlength="4"
+		/>-<input
+			type="text"
+			class="year border shadow"
 			name="endYear"
 			value={plate ? plate.endYear : ''}
+			maxlength="4"
 		/>
 	</span>
 	<Scores scores={[]} />
-	<input type="submit" method="post" value="✅" />
+	<input class="border shadow" type="submit" method="post" value="submit" />
 </Card>
 
 <style>
+	input[type='text'] {
+		padding: 0.1rem 0.2rem;
+	}
 	input[type='text'].jurisdiction {
 		width: 2em;
 	}
@@ -51,5 +62,15 @@
 
 		display: flex;
 		justify-content: center;
+	}
+	input[type='submit'],
+	button {
+		font-family: monospace;
+		padding: 12px;
+		background-color: var(--primary-color);
+		color: var(--text-color);
+		font-weight: bold;
+
+		cursor: pointer;
 	}
 </style>

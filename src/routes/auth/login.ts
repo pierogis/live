@@ -3,7 +3,6 @@ import { createSessionCookie } from '$lib/session';
 /** @type {import('./auth/login').RequestHandler} */
 export async function post({ request }: { request: Request }) {
 	try {
-		console.log(request.headers);
 		const didToken = request.headers['authorization'];
 
 		let user = {};

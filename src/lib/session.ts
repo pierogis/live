@@ -23,7 +23,7 @@ export async function createSessionCookie(data: any): Promise<string> {
 	});
 }
 
-export async function getSession<T>(cookie: string): Promise<T> {
+export async function getUserSession<T>(cookie: string): Promise<T> {
 	return await decrypt(cookie);
 }
 

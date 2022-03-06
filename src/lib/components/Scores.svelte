@@ -91,7 +91,7 @@
 	<div aria-describedby="score-summary" class="inner">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 	</div>
-	<div role="tooltip" class="review border" id="score-summary">
+	<div role="tooltip" class="review border shadow" id="score-summary">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 		<div class="overall-seperator" />
 		{#each Object.entries(categories) as [name, meta]}
@@ -136,9 +136,6 @@
 		left: 50%;
 
 		background-color: var(--primary-color);
-
-		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
-			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
 
 		/* differential with inner's border, see [0]*/
 		margin: -1px;

@@ -38,7 +38,7 @@
 	}
 </script>
 
-<div class="zone" use:dropAction>
+<div class="zone shadow" use:dropAction>
 	<input
 		bind:this={inputElement}
 		type="file"
@@ -62,6 +62,7 @@
 		border-bottom: dashed 4px rgba(150, 150, 150, 0.8);
 		border-right: dashed 4px rgba(150, 150, 150, 0.8);
 		border-radius: 8%;
+
 		background-color: rgba(100, 100, 100, 0.2);
 	}
 

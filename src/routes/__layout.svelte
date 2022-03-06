@@ -1,11 +1,19 @@
+<script lang="ts">
+	import { session } from '$app/stores';
+	import type { User } from '$lib/database/models';
+
+	let user: User = $session.user;
+</script>
+
 <header class="header">
 	<div>
-		<a href="/" class="title-link"> <h3 class="title border">Karl's Plate Emporium</h3></a>
+		<a href="/" class="title-link"> <h3 class="title border shadow">Karl's Plate Emporium</h3></a>
 	</div>
 </header>
 
 <nav class="nav">
-	<a href="/jurisdictions" class="jurisdictions-link border">jurisdictions</a>
+	<a href="/jurisdictions" class="jurisdictions-link border shadow">jurisdictions</a>
+	<a href="/account" class="account-link border shadow">{user ? user.name : 'login'}</a>
 </nav>
 
 <div class="content"><slot /></div>
@@ -61,7 +69,6 @@
 
 	input[type='text'] {
 		font-family: 'Courier', monospace;
-		width: 128px;
 
 		background-color: whitesmoke;
 	}
@@ -91,17 +98,20 @@
 		color: var(--text-color);
 
 		background-color: var(--primary-color);
+		z-index: 10;
 	}
 
 	.border {
-		box-shadow: inset 0px 0px 4px 2px rgba(165, 165, 165, 0.393),
-			0px 0px 4px 2px rgba(165, 165, 165, 0.393);
-
 		border-top: outset 5px var(--secondary-color);
 		border-left: outset 5px var(--secondary-color);
 		border-bottom: inset 5px var(--accent-color);
 		border-right: inset 5px var(--accent-color);
 		border-radius: 5%;
+	}
+
+	.shadow {
+		box-shadow: inset 2px 2px 0px rgba(150, 150, 150, 0.4),
+			inset -2px -2px 0px rgba(150, 150, 150, 0.4);
 	}
 
 	.nav {
@@ -128,5 +138,22 @@
 	.content {
 		display: flex;
 		justify-content: center;
+	}
+
+	.account-link {
+		position: absolute;
+		right: 32px;
+		top: 32px;
+
+		grid-row: 2;
+
+		text-decoration: none;
+		display: inline;
+		background-color: var(--primary-color);
+		color: var(--text-color);
+
+		padding: 4px;
+
+		background-color: var(--primary-color);
 	}
 </style>

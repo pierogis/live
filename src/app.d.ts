@@ -2,6 +2,7 @@
 
 interface User {
 	id: number;
+	email: string;
 	name: string;
 }
 
@@ -14,7 +15,9 @@ declare namespace App {
 
 	interface Platform {}
 
-	interface Session {}
+	interface Session {
+		user: User;
+	}
 
 	interface Stuff {}
 }

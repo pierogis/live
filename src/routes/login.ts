@@ -1,7 +1,22 @@
 import { dev } from '$app/env';
+
+import { variables } from '$lib/env';
 import { createUser, getUser } from '$lib/database/users';
-import { sendEmail } from '$lib/words';
+import { generatePhrase, generateEmailAddress, generateName } from '$lib/words';
 import { createSessionCookie } from '$lib/session';
+import { sendEmail } from '$lib/auth';
+
+/** @type {import('./login').RequestHandler} */
+export async function get() {
+	const samplePhrase = generatePhrase();
+	const sampleEmail = generateEmailAddress();
+	return {
+		body: {
+			samplePhrase,
+			sampleEmail
+		}
+	};
+}
 
 let passwords = {};
 /** @type {import('./login').RequestHandler} */
@@ -9,11 +24,11 @@ export async function post({ request }: { request: Request }) {
 	try {
 		const formData = await request.formData();
 
-		const email = dev ? 'kyle@pierogis.live' : formData.get('email').toString();
+		const email = formData.get('email').toString();
 		const password = formData.get('password').toString();
 
 		if (password == '') {
-			const generatedPassword = dev ? 'kitty' : await sendEmail(email);
+			const generatedPassword = dev ? variables.devPassword : await sendEmail(email);
 
 			passwords[email] = generatedPassword;
 
@@ -28,7 +43,7 @@ export async function post({ request }: { request: Request }) {
 				if (passwords[email] == password) {
 					let user = await getUser({ email });
 					if (!user) {
-						user = await createUser({ email });
+						user = await createUser({ email, name: generateName() });
 					}
 
 					const cookie = await createSessionCookie(user);

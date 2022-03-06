@@ -13,12 +13,11 @@ export async function updateUser(user: User): Promise<User> {
 	return { id, ...result[0] };
 }
 
-export async function createUser(user: Omit<User, 'id' | 'name'>): Promise<User> {
-	const partial: { email: string; name: string } = { ...user, name: generateName() };
+export async function createUser(user: Omit<User, 'id'>): Promise<User> {
 	const result = await db
 		.withSchema('emporium')
 		.table<User>('users')
-		.insert(partial)
+		.insert(user)
 		.returning(['id', 'email', 'name']);
 	return result[0];
 }

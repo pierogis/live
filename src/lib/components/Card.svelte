@@ -1,11 +1,11 @@
-<div class="card border">
+<div class="card border shadow">
 	<slot />
 </div>
 
 <style>
 	.card {
-		max-height: 90vw;
-		max-width: 90vw;
+		max-height: 80vw;
+		max-width: 80vw;
 		padding: 8px;
 
 		display: flex;
@@ -25,10 +25,10 @@
 		max-width: 200px;
 		}
 	} */
-	@media only screen and (min-width: 700px) {
+	@media only screen and (min-width: 640) {
 		.card {
-			max-height: 384px;
-			max-width: 384px;
+			max-height: 512px;
+			max-width: 512px;
 		}
 	}
 </style>

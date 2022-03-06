@@ -16,7 +16,7 @@
 			grid-template-columns: repeat(2, 1fr);
 		}
 	}
-	@media only screen and (min-width: 700px) {
+	@media only screen and (min-width: 640px) {
 		.grid {
 			grid-template-columns: repeat(3, 1fr);
 		}

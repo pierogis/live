@@ -7,8 +7,6 @@ export async function get(event) {
 		const plates = await listPlates();
 		const showAdmin = event.locals.userId == 0;
 
-		console.log(event.locals);
-
 		return {
 			body: { plates, showAdmin }
 		};
