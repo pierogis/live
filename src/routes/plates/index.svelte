@@ -9,6 +9,10 @@
 	export let showAdmin;
 </script>
 
+<svelte:head>
+	<title>plates</title>
+</svelte:head>
+
 <CardsGrid>
 	{#each plates as plate}
 		<PlateCard {plate} {showAdmin} />

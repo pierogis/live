@@ -24,6 +24,8 @@ exports.up = async function (knex) {
 		table.increments();
 		table.string('email').notNullable();
 		table.string('name').notNullable();
+
+		table.check('lower(??) = ??', ['name', 'name']);
 	});
 
 	await knex.schema.withSchema(schema).createTable('images', function (table) {

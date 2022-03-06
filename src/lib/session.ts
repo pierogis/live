@@ -23,6 +23,16 @@ export async function createSessionCookie(data: any): Promise<string> {
 	});
 }
 
+export async function deleteSessionCookie(): Promise<string> {
+	return serialize(variables.sessionName, '', {
+		expires: new Date(0),
+		httpOnly: true,
+		secure: process.env['NODE_ENV'] === 'production',
+		path: '/',
+		sameSite: 'lax'
+	});
+}
+
 export async function getUserSession<T>(cookie: string): Promise<T> {
 	return await decrypt(cookie);
 }

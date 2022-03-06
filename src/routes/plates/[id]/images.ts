@@ -1,6 +1,6 @@
 import { getImages } from '$lib/database/images';
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
+/** @type {import('./plates/[id]/images').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
 		const parsedParams = { plateId: parseInt(params.id) };

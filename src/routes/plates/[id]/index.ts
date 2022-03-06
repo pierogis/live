@@ -1,17 +1,17 @@
 import type { Plate } from '$lib/database/models';
-import { getPlates, updatePlate, deletePlate } from '$lib/database/plates';
+import { getPlate, updatePlate, deletePlate } from '$lib/database/plates';
 
-/** @type {import('./[id]').RequestHandler} */
+/** @type {import('./plates/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
 		const parsedParams = { ...params, id: parseInt(params.id) };
-		const plates = await getPlates(parsedParams, 1);
+		const plate = await getPlate(parsedParams);
 
 		// this should be based on the user id
 		const showAdmin = true;
 
 		return {
-			body: { plate: plates[0], showAdmin }
+			body: { plate: plate, showAdmin }
 		};
 	} catch (error) {
 		console.error(error);

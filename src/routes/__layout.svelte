@@ -129,12 +129,4 @@
 		color: var(--text-color);
 		padding: 4px;
 	}
-
-	.account {
-		position: absolute;
-		right: 32px;
-		top: 32px;
-
-		grid-row: 2;
-	}
 </style>

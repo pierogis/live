@@ -11,6 +11,10 @@
 	// export let errors;
 </script>
 
+<svelte:head>
+	<title>{'plate ' + plate.id}</title>
+</svelte:head>
+
 <PlateCard {plate} {showAdmin} />
 
 <!-- <form method="post">

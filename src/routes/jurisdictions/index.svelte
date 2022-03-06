@@ -7,6 +7,10 @@
 	export let jurisdictionsPlate: { [key: string]: Plate };
 </script>
 
+<svelte:head>
+	<title>jurisdictions</title>
+</svelte:head>
+
 <CardsGrid>
 	{#each Object.entries(jurisdictionsPlate) as [jurisdiction, plate]}
 		<PlateCard {plate} showJurisdiction={true} showYears={false} showScores={false} />

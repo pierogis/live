@@ -1,4 +1,3 @@
-import { generateName } from '$lib/words';
 import { db } from './client';
 import type { User } from './models';
 
@@ -14,6 +13,7 @@ export async function updateUser(user: User): Promise<User> {
 }
 
 export async function createUser(user: Omit<User, 'id'>): Promise<User> {
+	user.name = user.name.toLowerCase();
 	const result = await db
 		.withSchema('emporium')
 		.table<User>('users')
