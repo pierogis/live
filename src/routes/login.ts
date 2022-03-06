@@ -49,7 +49,7 @@ export async function post({ request }: { request: Request }) {
 					const cookie = await createSessionCookie(user);
 
 					return {
-						status: 201,
+						status: 200,
 						headers: {
 							'set-cookie': cookie
 						},
@@ -59,7 +59,7 @@ export async function post({ request }: { request: Request }) {
 					};
 				} else {
 					return {
-						status: 201,
+						status: 401,
 						body: {
 							message: 'Wrong password'
 						}
@@ -67,7 +67,7 @@ export async function post({ request }: { request: Request }) {
 				}
 			} else {
 				return {
-					status: 201,
+					status: 401,
 					body: {
 						message: 'Wrong email'
 					}

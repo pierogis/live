@@ -1,17 +1,17 @@
-import type { Plate } from '$lib/database/models';
-import { getPlate, updatePlate, deletePlate } from '$lib/database/plates';
+import type { User } from '$lib/database/models';
+import { getUser, updateUser, deleteUser } from '$lib/database/users';
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./users/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
 		const parsedParams = { ...params, id: parseInt(params.id) };
-		const plate = await getPlate(parsedParams);
+		const user = await getUser(parsedParams);
 
 		// this should be based on the user id
 		const showAdmin = true;
 
 		return {
-			body: { plate: plate, showAdmin }
+			body: { user: user, showAdmin }
 		};
 	} catch (error) {
 		console.error(error);
@@ -26,7 +26,7 @@ export async function get({ params }: { params: { id: string } }) {
 	}
 }
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./users/[id]').RequestHandler} */
 export async function put({ request, params }: { request: Request; params: { id: string } }) {
 	try {
 		const formData = await request.formData();
@@ -36,20 +36,18 @@ export async function put({ request, params }: { request: Request; params: { id:
 			data[k] = v.valueOf();
 		});
 
-		let plate: Plate = {
+		let user: Partial<User> & Pick<User, 'id'> = {
 			id: parseInt(params.id),
-			jurisdiction: data['jurisdiction'],
-			startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
-			endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+			...data
 		};
 
-		plate = await updatePlate(plate);
+		user = await updateUser(user);
 
-		// redirect to the newly created plate
+		// redirect to the newly created user
 		return {
 			status: 303,
 			headers: {
-				location: `/${plate.id}`
+				location: `/${user.id}`
 			}
 		};
 	} catch (error) {
@@ -65,12 +63,12 @@ export async function put({ request, params }: { request: Request; params: { id:
 	}
 }
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./users/[id]').RequestHandler} */
 export async function del({ params }: { params: { id: string } }) {
 	try {
-		await deletePlate(parseInt(params.id));
+		await deleteUser(parseInt(params.id));
 
-		// redirect to the newly created plate
+		// redirect to the newly created user
 		return {
 			status: 303,
 			headers: {
