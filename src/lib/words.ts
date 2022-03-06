@@ -35,5 +35,5 @@ export function generateName(): string {
 	names = names || readJson('static/words/names.json');
 	alphabet = alphabet || readJson('static/words/alphabet.json');
 
-	return `${selectRandom(names)} ${selectRandom(alphabet).toUpperCase()}.`;
+	return `${selectRandom(names)} ${selectRandom(alphabet)}.`;
 }

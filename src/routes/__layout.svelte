@@ -7,13 +7,13 @@
 
 <header class="header">
 	<div>
-		<a href="/" class="title-link"> <h3 class="title border shadow">Karl's Plate Emporium</h3></a>
+		<a href="/"> <h3 class="title nav-box border shadow">karl's plate emporium</h3></a>
 	</div>
 </header>
 
 <nav class="nav">
-	<a href="/jurisdictions" class="jurisdictions-link border shadow">jurisdictions</a>
-	<a href="/account" class="account-link border shadow">{user ? user.name : 'login'}</a>
+	<a href="/jurisdictions" class="nav-box border shadow">jurisdictions</a>
+	<a href="/account" class="nav-box account border shadow">{user ? user.name : 'login'}</a>
 </nav>
 
 <div class="content"><slot /></div>
@@ -87,17 +87,11 @@
 		text-align: center;
 	}
 
-	.title-link {
+	a {
 		text-decoration: none;
 	}
 
 	.title {
-		padding: 4px;
-
-		display: inline;
-		color: var(--text-color);
-
-		background-color: var(--primary-color);
 		z-index: 10;
 	}
 
@@ -124,36 +118,23 @@
 		text-align: center;
 	}
 
-	.jurisdictions-link {
-		text-decoration: none;
-		display: inline;
-		background-color: var(--primary-color);
-		color: var(--text-color);
-
-		padding: 4px;
-
-		background-color: var(--primary-color);
-	}
-
 	.content {
 		display: flex;
 		justify-content: center;
 	}
 
-	.account-link {
+	.nav-box {
+		display: inline;
+		background-color: var(--primary-color);
+		color: var(--text-color);
+		padding: 4px;
+	}
+
+	.account {
 		position: absolute;
 		right: 32px;
 		top: 32px;
 
 		grid-row: 2;
-
-		text-decoration: none;
-		display: inline;
-		background-color: var(--primary-color);
-		color: var(--text-color);
-
-		padding: 4px;
-
-		background-color: var(--primary-color);
 	}
 </style>
