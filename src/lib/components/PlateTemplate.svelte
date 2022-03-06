@@ -40,21 +40,6 @@
 </Card>
 
 <style>
-	input[type='text'] {
-		font-family: 'Courier', monospace;
-		width: 128px;
-		border-top: outset 5px var(--secondary-color);
-		border-left: outset 5px var(--secondary-color);
-		border-bottom: inset 5px var(--accent-color);
-		border-right: inset 5px var(--accent-color);
-		border-radius: 5%;
-
-		background-color: whitesmoke;
-	}
-	input[type='submit'] {
-		cursor: pointer;
-	}
-
 	input[type='text'].jurisdiction {
 		width: 2em;
 	}

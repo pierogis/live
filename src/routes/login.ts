@@ -1,23 +1,28 @@
-import { createSession } from '$lib/database/users';
 import { serialize } from 'cookie';
 
-/** @type {import('./[login]').RequestHandler} */
-export async function post() {
-	const uuid = createSession({ id: 0, name: 'karl' });
+/** @type {import('./login').RequestHandler} */
+export async function post({ request }: { request: Request }) {
+	try {
+		const formData = await request.formData();
+		const email = formData.get('email').toString();
 
-	return {
-		status: 201,
-		headers: {
-			'Set-Cookie': serialize('session_id', uuid, {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: process.env.NODE_ENV === 'production',
-				maxAge: 60 * 60 * 24 * 7 // one week
-			})
-		},
-		body: {
-			message: 'Successfully signed in'
-		}
-	};
+		// send email
+
+		return {
+			status: 201,
+			body: {
+				message: 'Successfully signed in'
+			}
+		};
+	} catch (error) {
+		console.error(error);
+		return {
+			status: 500,
+			body: {
+				error: {
+					message: 'Internal Server Error'
+				}
+			}
+		};
+	}
 }

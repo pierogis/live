@@ -1,16 +1,20 @@
-import type { User } from './lib/database/models';
 /// <reference types="@sveltejs/kit" />
+
+interface User {
+	id: number;
+	name: string;
+}
 
 // See https://kit.svelte.dev/docs/typescript
 // for information about these interfaces
 declare namespace App {
-	interface Locals {}
+	interface Locals {
+		user: User;
+	}
 
 	interface Platform {}
 
-	interface Session {
-		user: User;
-	}
+	interface Session {}
 
 	interface Stuff {}
 }

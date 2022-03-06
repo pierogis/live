@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { session } from '$app/stores';
 	import type { Plate } from '$lib/database/models';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
@@ -7,7 +6,7 @@
 
 	export let plates: Plate[];
 
-	let showAdmin = $session.user.id == 0;
+	export let showAdmin;
 </script>
 
 <CardsGrid>

@@ -2,11 +2,23 @@ import { listJurisdictions } from '$lib/database/jurisdictions';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {
-	const jurisdictions = await listJurisdictions();
+	try {
+		const jurisdictions = await listJurisdictions();
 
-	return {
-		body: { jurisdictions }
-	};
+		return {
+			body: { jurisdictions }
+		};
+	} catch (error) {
+		console.error(error);
+		return {
+			status: 500,
+			body: {
+				error: {
+					message: 'Internal Server Error'
+				}
+			}
+		};
+	}
 }
 
 // export default async function get({params}) {

@@ -59,6 +59,21 @@
 		background-image: radial-gradient(circle, var(--primary-color) 1px, var(--primary-color) 2px);
 	}
 
+	input[type='text'] {
+		font-family: 'Courier', monospace;
+		width: 128px;
+		border-top: outset 5px var(--secondary-color);
+		border-left: outset 5px var(--secondary-color);
+		border-bottom: inset 5px var(--accent-color);
+		border-right: inset 5px var(--accent-color);
+		border-radius: 5%;
+
+		background-color: whitesmoke;
+	}
+	input[type='submit'] {
+		cursor: pointer;
+	}
+
 	.header {
 		position: sticky;
 		top: 0;
