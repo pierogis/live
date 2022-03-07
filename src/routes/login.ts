@@ -29,7 +29,7 @@ export async function post({ request }: { request: Request }) {
 
 		const passphraseEntry = formData.get('passphrase');
 
-		if (!passphraseEntry) {
+		if (passphraseEntry == null) {
 			const email = emailEntry.toString();
 
 			if (emailEntry) {
@@ -40,6 +40,7 @@ export async function post({ request }: { request: Request }) {
 				return {
 					status: 200,
 					body: {
+						good: true,
 						message: `Generated passphrase emailed to ${email}`
 					}
 				};
@@ -47,6 +48,7 @@ export async function post({ request }: { request: Request }) {
 				return {
 					status: 400,
 					body: {
+						good: false,
 						message: 'Email required'
 					}
 				};
@@ -78,6 +80,7 @@ export async function post({ request }: { request: Request }) {
 					return {
 						status: 401,
 						body: {
+							good: false,
 							message: 'Wrong passphrase'
 						}
 					};
@@ -86,6 +89,7 @@ export async function post({ request }: { request: Request }) {
 				return {
 					status: 401,
 					body: {
+						good: false,
 						message: 'Wrong email'
 					}
 				};

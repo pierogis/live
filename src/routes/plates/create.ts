@@ -1,13 +1,26 @@
+import { dev } from '$app/env';
 import { listJurisdictions } from '$lib/database/jurisdictions';
+import { variables } from '$lib/env';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
-export async function get() {
+export async function get(event) {
 	try {
-		const jurisdictions = await listJurisdictions();
+		if (dev || event.locals.userId == variables.adminId) {
+			const jurisdictions = await listJurisdictions();
 
-		return {
-			body: { jurisdictions }
-		};
+			return {
+				body: { jurisdictions }
+			};
+		} else {
+			return {
+				status: 403,
+				body: {
+					error: {
+						message: 'Admin only'
+					}
+				}
+			};
+		}
 	} catch (error) {
 		console.error(error);
 		return {

@@ -1,10 +1,18 @@
 import { parse } from 'cookie';
-import { variables } from '$lib/env';
+
+import { variables, setupEnv } from '$lib/env';
+import { db, setupClient } from '$lib/database/client';
 import { deleteSessionCookie, getUserSession } from '$lib/session';
+import { setup, setupWords } from '$lib/words';
+
 import { getUser } from '$lib/database/users';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
+	if (!variables) setupEnv();
+	if (!db) setupClient();
+	if (!setup) setupWords();
+
 	const cookies = parse(event.request.headers.get('cookie') || '');
 
 	try {

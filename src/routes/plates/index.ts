@@ -7,6 +7,7 @@ export async function get(event) {
 		const plates = await listPlates();
 
 		return {
+			status: 200,
 			body: { plates }
 		};
 	} catch (error) {

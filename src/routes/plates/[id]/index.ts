@@ -7,8 +7,15 @@ export async function get({ params }: { params: { id: string } }) {
 		const parsedParams = { ...params, id: parseInt(params.id) };
 		const plate = await getPlate(parsedParams);
 
+		if (plate) {
+			return {
+				status: 200,
+				body: { plate: plate }
+			};
+		}
+
 		return {
-			body: { plate: plate }
+			status: 404
 		};
 	} catch (error) {
 		console.error(error);

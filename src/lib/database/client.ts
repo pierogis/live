@@ -1,9 +1,12 @@
-import { knex } from 'knex';
+import { type Knex, knex } from 'knex';
 
 import { variables } from '$lib/env';
 
-export const db = knex({
-	client: 'pg',
-	connection: variables.databaseUrl,
-	searchPath: ['knex', 'public']
-});
+export let db: Knex;
+export function setupClient() {
+	db = knex({
+		client: 'pg',
+		connection: variables.databaseUrl,
+		searchPath: ['knex', 'public']
+	});
+}

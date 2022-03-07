@@ -45,14 +45,16 @@
 				bind:value={user.email}
 				placeholder={originalUser.email}
 			/>
-			<button class="border shadow" type="submit">update</button>
-		</Card>
-	</form>
-{/if}
+			<div class="buttons">
+				<button class="border shadow" type="submit">update</button>
 
-{#if isUser}
-	<form action="/logout" method="post">
-		<button class="logout border shadow" type="submit">logout</button>
+				{#if isUser}
+					<form action="/logout" method="post">
+						<button class="logout border shadow" type="submit">logout</button>
+					</form>
+				{/if}
+			</div>
+		</Card>
 	</form>
 {/if}
 
@@ -67,10 +69,11 @@
 	input.email {
 		width: 16rem;
 	}
+	.buttons {
+		display: flex;
+		gap: 1rem;
+	}
 	.logout {
-		position: absolute;
-
-		right: 32px;
 		background-color: var(--accent-color);
 		color: var(--primary-color);
 	}

@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 
 	let email = $page.url.searchParams.get('email') || '';
 	$: generated = $page.url.searchParams.get('generated') != null;
@@ -10,11 +11,16 @@
 
 	export let sampleEmail: string;
 	export let samplePhrase: string;
+
+	export let good: boolean = null;
+	export let message: string = null;
 </script>
 
 <svelte:head>
 	<title>login</title>
 </svelte:head>
+
+{#if message}<Alert {message} {good} />{/if}
 
 <Card>
 	<form action="/login?email={email}&generated" method="post">
@@ -31,7 +37,7 @@
 		</div>
 		{#if generated}
 			<div class="input-container">
-				<label for="passphrase">generated passphrase</label>
+				<label for="passphrase">temporary passphrase</label>
 				<input
 					class="input border shadow"
 					id="passphrase"
@@ -71,7 +77,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 12px;
+		gap: 0.5rem;
 	}
 	label {
 		display: block;

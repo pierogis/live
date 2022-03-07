@@ -87,6 +87,6 @@
 		justify-content: center;
 		align-items: center;
 		flex: 2;
-		gap: 12px;
+		gap: 0.5rem;
 	}
 </style>
