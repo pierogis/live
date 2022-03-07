@@ -4,8 +4,8 @@
 
 <style>
 	.card {
-		max-height: 80vw;
-		max-width: 80vw;
+		max-width: 50vw;
+		max-height: 60rem;
 		padding: 8px;
 
 		display: flex;
@@ -19,16 +19,9 @@
 	:global(.card > *) {
 		margin: 8px;
 	}
-	/* @media only screen and (min-width: 400px) {
+	@media only screen and (max-width: 448px) {
 		.card {
-		max-height: 200px;
-		max-width: 200px;
-		}
-	} */
-	@media only screen and (min-width: 640) {
-		.card {
-			max-height: 512px;
-			max-width: 512px;
+			max-width: 80vw;
 		}
 	}
 </style>

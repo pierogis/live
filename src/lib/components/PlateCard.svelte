@@ -37,10 +37,10 @@
 
 <Card>
 	{#if isAdmin}
-		<form class="admin left" action="/{plate.id}/edit">
+		<form class="admin left" action="/plates/{plate.id}/edit">
 			<input type="submit" value="✎" />
 		</form>
-		<form class="admin right" action="/{plate.id}?_method=DELETE" method="post">
+		<form class="admin right" action="/plates/{plate.id}?_method=DELETE" method="post">
 			<input type="submit" value="❌" />
 		</form>
 	{/if}
@@ -50,17 +50,19 @@
 
 	<a
 		class="image-link"
-		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : plate.id)}
+		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}
 	>
 		<img
 			class="image"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
-			alt={`${plate.jurisdiction} license plate for ${plate.startYear}-${plate.endYear}`}
+			alt={`${plate.startYear || ''}-${plate.endYear || ''} ${plate.jurisdiction} license plate`}
 		/>
 	</a>
 
 	{#if showYears}
-		<a class="link" href={'/' + plate.id}>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a>
+		<a class="link" href={'/plates/' + plate.id}
+			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
+		>
 	{/if}
 
 	{#if showScores}<Scores {scores} />{/if}
@@ -78,6 +80,7 @@
 		right: 8px;
 	}
 	.image {
+		width: 90%;
 		border-top: solid 4px rgba(100, 100, 100, 0.8);
 		border-left: solid 4px rgba(100, 100, 100, 0.8);
 		border-bottom: solid 4px rgba(150, 150, 150, 0.8);

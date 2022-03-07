@@ -7,6 +7,8 @@
 	export let user: User;
 	const originalUser: User = user;
 
+	$: user.name = user.name.toUpperCase();
+
 	$: isUser = $session.user ? $session.user.id == user.id : false;
 	$: isAdmin = $session.user ? $session.user.id == 1 : false;
 </script>
@@ -69,6 +71,7 @@
 	}
 	input.email {
 		width: 16rem;
+		max-width: 90%;
 	}
 	.buttons {
 		display: flex;

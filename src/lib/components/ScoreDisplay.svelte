@@ -69,6 +69,9 @@
 <style>
 	.score {
 		padding-bottom: 2px;
+
+		font-size: 1.2rem;
+
 		cursor: pointer;
 		-webkit-user-select: none;
 		user-select: none;

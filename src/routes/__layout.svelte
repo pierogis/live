@@ -5,6 +5,10 @@
 	let user: User = $session.user;
 </script>
 
+<svelte:head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</svelte:head>
+
 <header class="header">
 	<div>
 		<a href="/"> <h3 class="title nav-box border shadow">karl's plate emporium</h3></a>
@@ -21,31 +25,6 @@
 <div class="content"><slot /></div>
 
 <style global>
-	* {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		outline: 0;
-
-		vertical-align: baseline;
-
-		font-family: 'Courier', monospace;
-		font-weight: 600;
-		font-style: normal;
-		font-size: 20px;
-		color: var(--text-color);
-
-		background: transparent;
-	}
-
-	h2 {
-		font-size: 1.5em;
-	}
-
-	h3 {
-		font-size: 1.17em;
-	}
-
 	:root {
 		--primary-color: rgba(255, 235, 205, 1);
 		--accent-color: rgba(165, 85, 85, 1);
@@ -63,6 +42,27 @@
 		--text-color-t: rgba(48, 79, 80, 0);
 
 		--content-width: 240px;
+	}
+	* {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		outline: 0;
+
+		vertical-align: baseline;
+
+		font-family: 'Courier', monospace;
+		font-weight: 600;
+		font-style: normal;
+		font-size: 20px;
+		color: var(--text-color);
+
+		background: transparent;
+	}
+	@media only screen and (max-width: 400px) {
+		* {
+			font-size: 5vw;
+		}
 	}
 
 	body {
@@ -131,7 +131,16 @@
 
 		background-color: transparent;
 
+		display: flex;
+		gap: 16px;
+		justify-content: center;
+
 		text-align: center;
+	}
+	@media only screen and (max-width: 320px) {
+		.nav {
+			flex-direction: column;
+		}
 	}
 
 	.content {

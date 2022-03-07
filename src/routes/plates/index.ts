@@ -45,7 +45,7 @@ export async function post({ request }: { request: Request }) {
 		return {
 			status: 303,
 			headers: {
-				location: `/${plate.id}`
+				location: `/plates/${plate.id}`
 			}
 		};
 	} catch (error) {
