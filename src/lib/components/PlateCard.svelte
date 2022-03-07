@@ -18,13 +18,13 @@
 	let images: Image[] = [];
 
 	async function getScores(): Promise<void> {
-		const response = await fetch(`/${plate.id}/scores`);
+		const response = await fetch(`/plates/${plate.id}/scores`);
 		const data = await response.json();
 		scores = data.scores;
 	}
 
 	async function getImages(): Promise<void> {
-		const response = await fetch(`/${plate.id}/images`);
+		const response = await fetch(`/plates/${plate.id}/images`);
 		const data = await response.json();
 		images = data.images;
 	}

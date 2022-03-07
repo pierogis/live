@@ -1,13 +1,20 @@
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
-	import type { Plate } from '$lib/database/models';
+	import type { Jurisdiction, Plate } from '$lib/database/models';
 
+	export let jurisdiction: Jurisdiction;
 	export let plates: Plate[];
 </script>
 
+<svelte:head>
+	<title>{jurisdiction.name}</title>
+</svelte:head>
+
 <div class="jurisdiction">
-	<div class="jurisdiction-description">Ah, the sunshine jurisdiction</div>
+	<div class="jurisdiction-description">Ah, the sunshine jurisdiction.</div>
+
+	<div class="divider" />
 
 	<div class="jurisdiction-plates">
 		<CardsGrid>
@@ -25,11 +32,16 @@
 	}
 	.jurisdiction-description {
 		flex: 1;
-		padding: 16px;
-		font-size: 0.8em;
+		padding: 32px;
+		font-family: 'Lora';
+		font-weight: normal;
 	}
 	.jurisdiction-plates {
 		flex: 3;
-		border-left: 10px solid var(--accent-color);
+	}
+	.divider {
+		width: 8px;
+		background-color: var(--accent-color);
+		border-radius: 4px;
 	}
 </style>

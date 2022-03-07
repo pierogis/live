@@ -11,17 +11,17 @@
 </script>
 
 <svelte:head>
-	<title>{'plate ' + plate.id}</title>
+	<title>{'plate: ' + plate.id}</title>
 </svelte:head>
 
 <PlateCard {plate} />
 
-<!-- <form method="post">
-	<input name="title" />
+<div class="description">This is a description of the license plate of which we are speaking.</div>
 
-	{#if errors?.title}
-		<p class="error">{errors.title}</p>
-	{/if}
-
-	<button type="submit">Create review</button>
-</form> -->
+<style>
+	.description {
+		font-family: 'Lora';
+		font-weight: normal;
+		font-size: 0.8rem;
+	}
+</style>
