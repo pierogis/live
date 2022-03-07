@@ -28,13 +28,13 @@ export async function getUser(params: {
 	return (await getUsers(params, 1))[0];
 }
 
-export async function createUser(user: Omit<User, 'id'>): Promise<User> {
+export async function createUser(user: Omit<User, 'id' | 'isAdmin'>): Promise<User> {
 	user.name = user.name.toUpperCase();
 	const result = await db
 		.withSchema(platesSchema)
 		.table<User>('users')
 		.insert(user)
-		.returning(['id', 'email', 'name']);
+		.returning(['id', 'email', 'name', 'isAdmin']);
 	return result[0];
 }
 
@@ -45,7 +45,7 @@ export async function updateUser(user: Partial<User> & Pick<User, 'id'>): Promis
 		.table<User>('users')
 		.update(partial)
 		.where({ id })
-		.returning(['id', 'name', 'email']);
+		.returning(['id', 'name', 'email', 'isAdmin']);
 	return { id, ...result[0] };
 }
 

@@ -1,11 +1,10 @@
 import { dev } from '$app/env';
 import { listJurisdictions } from '$lib/database/jurisdictions';
-import { variables } from '$lib/env';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get(event) {
 	try {
-		if (dev || event.locals.userId == variables.adminId) {
+		if (dev || event.locals.user.isAdmin) {
 			const jurisdictions = await listJurisdictions();
 
 			return {

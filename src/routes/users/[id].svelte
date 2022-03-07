@@ -37,6 +37,7 @@
 				bind:value={user.name}
 				placeholder={originalUser.name}
 				maxlength="7"
+				autocomplete="off"
 			/>
 			<input
 				class="email border shadow"

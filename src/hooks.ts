@@ -15,27 +15,33 @@ export async function handle({ event, resolve }) {
 
 	const cookies = parse(event.request.headers.get('cookie') || '');
 
-	try {
-		event.locals =
-			(await getUserSession<App.Locals>(cookies[variables.sessionName])) || event.locals;
+	let response;
 
-		const response = await resolve(event);
-		return response;
+	try {
+		let { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
+
+		if (userId) {
+			event.locals.user = await getUser({ id: userId });
+		}
+
+		response = await resolve(event);
+
+		if (!event.locals.user) {
+			const cookie = deleteSessionCookie();
+			response.headers.set('set-cookie', cookie);
+		}
 	} catch {
-		const response = await resolve(event);
+		response = await resolve(event);
 		if (cookies[variables.sessionName]) {
 			// set cookie expires now
 			const cookie = deleteSessionCookie();
 			response.headers.set('set-cookie', cookie);
 		}
-
-		return response;
 	}
+	return response;
 }
 
 /** @type {import('@sveltejs/kit').GetSession} */
-export async function getSession(event): Promise<App.Session> {
-	let user = event.locals.userId ? await getUser({ id: event.locals.userId }) : null;
-
-	return { user };
+export function getSession(event): App.Session {
+	return { user: event.locals.user };
 }

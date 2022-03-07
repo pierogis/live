@@ -24,6 +24,7 @@ exports.up = async function (knex) {
 		table.increments();
 		table.string('email').notNullable();
 		table.string('name').notNullable(7);
+		table.boolean('isAdmin').notNullable().default(false);
 
 		table.check('upper(??) = ??', ['name', 'name']);
 	});
