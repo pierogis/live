@@ -75,7 +75,6 @@
 	}
 	label {
 		display: block;
-		font-weight: bold;
 		margin-bottom: 0.25rem;
 	}
 	.input-container {
@@ -89,10 +88,8 @@
 	}
 	button {
 		font-family: monospace;
-		padding: 8px;
 		background-color: var(--primary-color);
 		color: var(--text-color);
-		font-weight: bold;
 
 		cursor: pointer;
 	}

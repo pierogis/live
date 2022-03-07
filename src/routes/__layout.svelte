@@ -75,15 +75,21 @@
 	input[type='email'],
 	input[type='password'] {
 		background-color: whitesmoke;
-		padding: 0.2rem 0.2rem;
 	}
 	input[type='submit'],
 	button {
-		padding: 8px;
 		background-color: var(--primary-color);
-		font-weight: bold;
-
 		cursor: pointer;
+	}
+
+	input[type='text'],
+	input[type='email'],
+	input[type='password'],
+	input[type='submit'],
+	button,
+	.nav-box {
+		font-weight: bold;
+		padding: 0.2rem 0.4rem;
 	}
 
 	.header {
@@ -119,9 +125,9 @@
 	}
 
 	.nav {
-		padding: 8px;
-		padding-top: 24px;
-		padding-bottom: 24px;
+		padding: 1rem;
+		padding-top: 1.5rem;
+		padding-bottom: 1rem;
 
 		background-color: transparent;
 
@@ -137,6 +143,5 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
-		padding: 4px;
 	}
 </style>
