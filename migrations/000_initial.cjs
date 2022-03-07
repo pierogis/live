@@ -1,4 +1,4 @@
-const schema = 'emporium';
+const schema = 'plates';
 
 exports.up = async function (knex) {
 	await knex.schema.createSchema(schema);
@@ -70,11 +70,11 @@ exports.up = async function (knex) {
 };
 
 exports.down = async function (knex) {
-	await knex.schema.withSchema('emporium').dropTable('scores');
-	await knex.schema.withSchema('emporium').dropTable('images');
-	await knex.schema.withSchema('emporium').dropTable('users');
-	await knex.schema.withSchema('emporium').dropTable('plates');
-	await knex.schema.withSchema('emporium').dropTable('jurisdictions');
+	await knex.schema.withSchema(schema).dropTable('scores');
+	await knex.schema.withSchema(schema).dropTable('images');
+	await knex.schema.withSchema(schema).dropTable('users');
+	await knex.schema.withSchema(schema).dropTable('plates');
+	await knex.schema.withSchema(schema).dropTable('jurisdictions');
 
 	await knex.schema.dropSchema(schema);
 };

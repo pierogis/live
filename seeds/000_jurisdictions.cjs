@@ -57,7 +57,8 @@ const jurisdictions = [
 	{ abbreviation: 'wy', name: 'wyoming' }
 ];
 
+const schema = 'plates';
 exports.seed = async function (knex) {
-	await knex.withSchema('emporium').table('jurisdictions').del();
-	await knex.withSchema('emporium').table('jurisdictions').insert(jurisdictions);
+	await knex.withSchema(schema).table('jurisdictions').del();
+	await knex.withSchema(schema).table('jurisdictions').insert(jurisdictions);
 };

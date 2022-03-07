@@ -1,4 +1,4 @@
-import { db } from './client';
+import { db, platesSchema } from './client';
 
 import type { Category, Score } from './models';
 
@@ -8,7 +8,7 @@ export async function getScores(
 	skip = 0
 ): Promise<Score[]> {
 	const scoresQuery = db
-		.withSchema('emporium')
+		.withSchema(platesSchema)
 		.table<Score>('scores')
 		.select()
 		.where(params)

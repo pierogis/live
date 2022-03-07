@@ -1,4 +1,4 @@
-import { db } from './client';
+import { db, platesSchema } from './client';
 import type { User } from './models';
 
 export async function getUsers(
@@ -7,7 +7,7 @@ export async function getUsers(
 	skip = 0
 ): Promise<User[]> {
 	const usersQuery = db
-		.withSchema('emporium')
+		.withSchema(platesSchema)
 		.table<User>('users')
 		.select()
 		.where(params)
@@ -31,7 +31,7 @@ export async function getUser(params: {
 export async function createUser(user: Omit<User, 'id'>): Promise<User> {
 	user.name = user.name.toUpperCase();
 	const result = await db
-		.withSchema('emporium')
+		.withSchema(platesSchema)
 		.table<User>('users')
 		.insert(user)
 		.returning(['id', 'email', 'name']);
@@ -41,7 +41,7 @@ export async function createUser(user: Omit<User, 'id'>): Promise<User> {
 export async function updateUser(user: Partial<User> & Pick<User, 'id'>): Promise<User> {
 	const { id, ...partial } = user;
 	const result = await db
-		.withSchema('emporium')
+		.withSchema(platesSchema)
 		.table<User>('users')
 		.update(partial)
 		.where({ id })
@@ -50,5 +50,5 @@ export async function updateUser(user: Partial<User> & Pick<User, 'id'>): Promis
 }
 
 export async function deleteUser(id: number): Promise<void> {
-	return await db.withSchema('emporium').table<User>('users').where({ id }).del();
+	return await db.withSchema(platesSchema).table<User>('users').where({ id }).del();
 }
