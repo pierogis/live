@@ -24,21 +24,22 @@
 	</Card>
 {/if}
 
-{#if isUser}
-	<form action="/{user.id}?_method=PUT" method="post">
+{#if isUser || isAdmin}
+	<form action="/users/{user.id}?_method=PUT" method="post">
 		<Card>
 			{#if isAdmin}
 				<span>#{user.id}</span>
 			{/if}
 			<input
-				class="border shadow"
+				class="name border shadow"
 				type="text"
 				name="name"
 				bind:value={user.name}
 				placeholder={originalUser.name}
+				maxlength="7"
 			/>
 			<input
-				class="border shadow"
+				class="email border shadow"
 				type="text"
 				name="email"
 				bind:value={user.email}
@@ -60,8 +61,11 @@
 		display: flex;
 		flex-direction: column;
 	}
-	input[type='text'] {
-		padding: 0.1rem 0.2rem;
+	input.name {
+		width: 4.25rem;
+	}
+	input.email {
+		width: 16rem;
 	}
 	.logout {
 		position: absolute;

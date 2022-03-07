@@ -13,7 +13,7 @@ function readJson(path: string): string[] {
 	return JSON.parse(json);
 }
 
-function selectRandom(options: string[]): string {
+function selectRandom<T>(options: T[]): T {
 	return options[Math.floor(options.length * Math.random())];
 }
 
@@ -31,9 +31,21 @@ export function generatePhrase(): string {
 	return `${selectRandom(adverbs)}-${selectRandom(adjectives)}-${selectRandom(nouns)}`;
 }
 
-export function generateName(): string {
-	names = names || readJson('static/words/names.json');
+export function generateSerial(): string {
 	alphabet = alphabet || readJson('static/words/alphabet.json');
+	// except I, O, Q
 
-	return `${selectRandom(names)} ${selectRandom(alphabet)}.`;
+	const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+	const serial = [
+		selectRandom(alphabet),
+		selectRandom(alphabet),
+		selectRandom(alphabet),
+		selectRandom(digits),
+		selectRandom(digits),
+		selectRandom(digits),
+		selectRandom(digits)
+	];
+
+	return serial.join('');
 }

@@ -1,14 +1,15 @@
 import { parse } from 'cookie';
 import { variables } from '$lib/env';
 import { deleteSessionCookie, getUserSession } from '$lib/session';
+import { getUser } from '$lib/database/users';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const cookies = parse(event.request.headers.get('cookie') || '');
 
 	try {
-		const user = await getUserSession<User>(cookies[variables.sessionName]);
-		event.locals.user = user;
+		event.locals =
+			(await getUserSession<App.Locals>(cookies[variables.sessionName])) || event.locals;
 
 		const response = await resolve(event);
 		return response;
@@ -25,6 +26,8 @@ export async function handle({ event, resolve }) {
 }
 
 /** @type {import('@sveltejs/kit').GetSession} */
-export function getSession(event) {
-	return { user: event.locals.user };
+export async function getSession(event): Promise<App.Session> {
+	let user = event.locals.userId ? await getUser({ id: event.locals.userId }) : null;
+
+	return { user };
 }

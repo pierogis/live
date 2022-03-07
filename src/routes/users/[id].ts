@@ -43,7 +43,7 @@ export async function put({ request, params }: { request: Request; params: { id:
 		return {
 			status: 303,
 			headers: {
-				location: `/${user.id}`
+				location: `/users/${user.id}`
 			}
 		};
 	} catch (error) {

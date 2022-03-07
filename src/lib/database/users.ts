@@ -29,7 +29,7 @@ export async function getUser(params: {
 }
 
 export async function createUser(user: Omit<User, 'id'>): Promise<User> {
-	user.name = user.name.toLowerCase();
+	user.name = user.name.toUpperCase();
 	const result = await db
 		.withSchema('emporium')
 		.table<User>('users')

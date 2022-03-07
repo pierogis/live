@@ -1,8 +1,8 @@
 /** @type {import('./account').RequestHandler} */
 export async function get(event) {
 	let redirect = '/login';
-	if (event.locals.user) {
-		redirect = `/users/${event.locals.user.id}`;
+	if (event.locals.userId) {
+		redirect = `/users/${event.locals.userId}`;
 	}
 	return {
 		status: 302,

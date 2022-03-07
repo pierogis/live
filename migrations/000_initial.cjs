@@ -23,9 +23,9 @@ exports.up = async function (knex) {
 	await knex.schema.withSchema(schema).createTable('users', function (table) {
 		table.increments();
 		table.string('email').notNullable();
-		table.string('name').notNullable();
+		table.string('name').notNullable(7);
 
-		table.check('lower(??) = ??', ['name', 'name']);
+		table.check('upper(??) = ??', ['name', 'name']);
 	});
 
 	await knex.schema.withSchema(schema).createTable('images', function (table) {

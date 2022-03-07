@@ -10,7 +10,7 @@ async function decrypt<T>(data: string): Promise<T> {
 	return data && Iron.unseal(data, variables.encryptionSecret, Iron.defaults);
 }
 
-export async function createSessionCookie(data: any): Promise<string> {
+export async function createSessionCookie(data: App.Locals): Promise<string> {
 	const session = await encrypt(data);
 
 	return serialize(variables.sessionName, session, {

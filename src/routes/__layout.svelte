@@ -13,7 +13,9 @@
 
 <nav class="nav">
 	<a href="/jurisdictions" class="nav-box border shadow">jurisdictions</a>
-	<a href="/account" class="nav-box account border shadow">{user ? user.name : 'login'}</a>
+	<a href="/account" class="nav-box account border shadow"
+		>{user && user.name ? user.name : 'login'}</a
+	>
 </nav>
 
 <div class="content"><slot /></div>
@@ -69,8 +71,11 @@
 		background-image: radial-gradient(circle, var(--primary-color) 1px, var(--primary-color) 2px);
 	}
 
-	input[type='text'] {
+	input[type='text'],
+	input[type='email'],
+	input[type='password'] {
 		background-color: whitesmoke;
+		padding: 0.2rem 0.2rem;
 	}
 	input[type='submit'],
 	button {

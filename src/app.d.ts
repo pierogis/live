@@ -10,7 +10,7 @@ interface User {
 // for information about these interfaces
 declare namespace App {
 	interface Locals {
-		user?: User;
+		userId?: number;
 	}
 
 	interface Platform {}
