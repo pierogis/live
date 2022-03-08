@@ -52,14 +52,17 @@
 				<button class="border inset shadow" type="submit">update</button>
 
 				{#if isUser}
-					<form action="/logout" method="post">
-						<button class="logout border inset shadow" type="submit">logout</button>
-					</form>
+					<!-- svelte-ignore a11y-accesskey -->
+					<button class="logout border inset shadow" type="submit" form="logout" accesskey="l"
+						>logout</button
+					>
 				{/if}
 			</div>
 		</Card>
 	</form>
 {/if}
+
+<form id="logout" action="/logout" method="post" />
 
 <style>
 	form {

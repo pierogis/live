@@ -7,14 +7,27 @@ import { createSessionCookie } from '$lib/session';
 import { sendEmail } from '$lib/auth';
 
 /** @type {import('./login').RequestHandler} */
-export async function get({ params }) {
+export async function get({ request }) {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
+
+	const query = request.url.split('?', 2)[1];
+
+	let email = '';
+	let generated = false;
+
+	if (query) {
+		const searchParams = new URLSearchParams(query);
+		email = searchParams.get('email') || '';
+		generated = searchParams.get('generated') == 'true';
+	}
 
 	return {
 		body: {
 			samplePhrase,
-			sampleEmail
+			sampleEmail,
+			email,
+			generated
 		}
 	};
 }
@@ -26,8 +39,9 @@ export async function post({ request }: { request: Request }) {
 		const formData = await request.formData();
 
 		const emailEntry = formData.get('email');
-
 		const passphraseEntry = formData.get('passphrase');
+
+		console.log(emailEntry, passphraseEntry);
 
 		if (passphraseEntry == null) {
 			const email = emailEntry.toString();
@@ -40,6 +54,8 @@ export async function post({ request }: { request: Request }) {
 				return {
 					status: 200,
 					body: {
+						email: email,
+						generated: true,
 						good: true,
 						message: `Generated passphrase emailed to ${email}`
 					}
