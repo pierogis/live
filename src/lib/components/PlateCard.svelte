@@ -53,7 +53,7 @@
 		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}
 	>
 		<img
-			class="image"
+			class="image shadow"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.startYear || ''}-${plate.endYear || ''} ${plate.jurisdiction} license plate`}
 		/>
@@ -81,11 +81,11 @@
 	}
 	.image {
 		width: 90%;
-		border-top: solid 4px rgba(100, 100, 100, 0.8);
-		border-left: solid 4px rgba(100, 100, 100, 0.8);
-		border-bottom: solid 4px rgba(150, 150, 150, 0.8);
-		border-right: solid 4px rgba(150, 150, 150, 0.8);
-		border-radius: 8%;
+		border-top: solid 4px var(--text-color);
+		border-left: solid 4px var(--text-color);
+		border-bottom: solid 4px var(--text-color);
+		border-right: solid 4px var(--text-color);
+		border-radius: 12px;
 	}
 
 	.image-link {

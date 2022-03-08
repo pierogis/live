@@ -36,15 +36,15 @@
 		--secondary-color: rgb(140, 205, 225);
 		--text-color: rgb(58, 96, 106);
 
-		--primary-color-st: rgba(255, 235, 205, 0.5);
-		--accent-color-st: rgba(165, 85, 85, 0.5);
-		--secondary-color-st: rgba(75, 123, 125, 0.5);
-		--text-color-st: rgba(48, 79, 80, 0.5);
+		--primary-color-st: rgba(255, 240, 220, 0.2);
+		--accent-color-st: rgba(225, 140, 150, 0.2);
+		--secondary-color-st: rgba(140, 205, 225, 0.2);
+		--text-color-st: rgba(58, 96, 106, 0.2);
 
-		--primary-color-t: rgba(255, 235, 205, 0);
-		--accent-color-t: rgba(165, 85, 85, 0);
-		--secondary-color-t: rgba(95, 158, 160, 0);
-		--text-color-t: rgba(48, 79, 80, 0);
+		--primary-color-t: rgba(255, 240, 220, 0);
+		--accent-color-t: rgba(225, 140, 150, 0);
+		--secondary-color-t: rgba(140, 205, 225, 0);
+		--text-color-t: rgba(58, 96, 106, 0);
 
 		--content-width: 240px;
 	}
@@ -117,16 +117,15 @@
 	}
 
 	.border {
-		border-top: solid 5px var(--secondary-color);
-		border-left: solid 5px var(--secondary-color);
-		border-bottom: solid 5px var(--accent-color);
-		border-right: solid 5px var(--accent-color);
-		border-radius: 5%;
+		border-top: solid 8px var(--secondary-color);
+		border-left: solid 8px var(--secondary-color);
+		border-bottom: solid 8px var(--accent-color);
+		border-right: solid 8px var(--accent-color);
+		border-radius: 12px;
 	}
 
 	.shadow {
-		box-shadow: inset 2px 2px 0px rgba(150, 150, 150, 0.4),
-			inset -2px -2px 0px rgba(150, 150, 150, 0.4);
+		box-shadow: inset 2px 2px 0px var(--text-color-st), inset -2px -2px 0px var(--text-color-st);
 	}
 
 	.nav {

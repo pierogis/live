@@ -57,11 +57,11 @@
 
 		cursor: pointer;
 
-		border-top: dashed 4px rgba(100, 100, 100, 0.8);
-		border-left: dashed 4px rgba(100, 100, 100, 0.8);
-		border-bottom: dashed 4px rgba(150, 150, 150, 0.8);
-		border-right: dashed 4px rgba(150, 150, 150, 0.8);
-		border-radius: 8%;
+		border-top: dashed 4px var(--text-color);
+		border-left: dashed 4px var(--text-color);
+		border-bottom: dashed 4px var(--text-color);
+		border-right: dashed 4px var(--text-color);
+		border-radius: 12px;
 
 		background-color: rgba(100, 100, 100, 0.2);
 	}

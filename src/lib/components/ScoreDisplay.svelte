@@ -82,7 +82,7 @@
 	}
 
 	.placeholder {
-		color: grey;
+		color: var(--text-color-st);
 	}
 
 	.scores-container {

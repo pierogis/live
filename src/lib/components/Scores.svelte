@@ -138,10 +138,10 @@
 		background-color: var(--primary-color);
 
 		/* differential with inner's border, see [0]*/
-		margin: -1px;
+		margin: -4px;
 
 		/* half of width plus 5px offset for border to center */
-		margin-left: -101px;
+		margin-left: -104px;
 	}
 
 	.inner {
@@ -150,11 +150,11 @@
 		padding-left: 8px;
 
 		/* [0] */
-		border-top: dotted 4px rgba(100, 100, 100, 0.8);
-		border-left: dotted 4px rgba(100, 100, 100, 0.8);
-		border-bottom: dotted 4px rgba(150, 150, 150, 0.8);
-		border-right: dotted 4px rgba(150, 150, 150, 0.8);
-		border-radius: 16%;
+		border-top: dotted 4px var(--text-color-st);
+		border-left: dotted 4px var(--text-color-st);
+		border-bottom: dotted 4px var(--text-color-st);
+		border-right: dotted 4px var(--text-color-st);
+		border-radius: 16px;
 	}
 
 	@media (hover: hover) and (pointer: fine) {
