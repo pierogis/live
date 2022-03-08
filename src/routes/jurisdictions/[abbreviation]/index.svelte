@@ -5,6 +5,10 @@
 
 	export let jurisdiction: Jurisdiction;
 	export let plates: Plate[];
+
+	const mediumColumns = 2;
+	const largeColumns = 2;
+	const maximumColumns = 3;
 </script>
 
 <svelte:head>
@@ -17,7 +21,7 @@
 	<div class="divider" />
 
 	<div class="jurisdiction-plates">
-		<CardsGrid>
+		<CardsGrid {mediumColumns} {largeColumns} {maximumColumns}>
 			{#each plates as plate}
 				<PlateCard {plate} showJurisdiction={false} />
 			{/each}

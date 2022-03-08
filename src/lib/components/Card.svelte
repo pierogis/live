@@ -4,7 +4,6 @@
 
 <style>
 	.card {
-		max-width: 50vw;
 		max-height: 60rem;
 		padding: 0.4rem;
 
