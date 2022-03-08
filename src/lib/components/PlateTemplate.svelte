@@ -11,7 +11,7 @@
 <Card>
 	<input
 		type="text"
-		class="jurisdiction border shadow"
+		class="jurisdiction border inset shadow"
 		list="jurisdictions"
 		name="jurisdiction"
 		maxlength="2"
@@ -31,20 +31,20 @@
 	<span>
 		<input
 			type="text"
-			class="year border shadow"
+			class="year border inset shadow"
 			name="startYear"
 			value={plate ? plate.startYear : ''}
 			maxlength="4"
 		/>-<input
 			type="text"
-			class="year border shadow"
+			class="year border inset shadow"
 			name="endYear"
 			value={plate ? plate.endYear : ''}
 			maxlength="4"
 		/>
 	</span>
 	<Scores scores={[]} />
-	<input class="border shadow" type="submit" method="post" value="submit" />
+	<input class="border inset shadow" type="submit" method="post" value="submit" />
 </Card>
 
 <style>

@@ -3,7 +3,7 @@
 	export let good: boolean;
 </script>
 
-<div class="alert border shadow" class:good>{message}</div>
+<div class="alert border inset shadow" class:good>{message}</div>
 
 <style>
 	@keyframes fadeout {

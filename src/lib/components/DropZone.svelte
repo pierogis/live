@@ -38,7 +38,7 @@
 	}
 </script>
 
-<div class="zone shadow" use:dropAction>
+<div class="zone inset shadow" use:dropAction>
 	<input
 		bind:this={inputElement}
 		type="file"

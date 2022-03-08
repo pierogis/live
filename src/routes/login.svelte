@@ -27,7 +27,7 @@
 		<div class="input-container">
 			<label for="email">email</label>
 			<input
-				class="input border shadow"
+				class="input border inset shadow"
 				id="email"
 				type="email"
 				name="email"
@@ -39,7 +39,7 @@
 			<div class="input-container">
 				<label for="passphrase">temporary passphrase</label>
 				<input
-					class="input border shadow"
+					class="input border inset shadow"
 					id="passphrase"
 					type="text"
 					name="passphrase"
@@ -49,7 +49,7 @@
 			</div>
 			<button
 				type="button"
-				class="border shadow"
+				class="border inset shadow"
 				on:click|preventDefault={() => {
 					goto(`/login?email=${email}`);
 				}}
@@ -59,7 +59,7 @@
 		{:else}
 			<button
 				type="button"
-				class=" border shadow"
+				class=" border inset shadow"
 				on:click|preventDefault={() => {
 					goto(`/login?email=${email}&generated`);
 				}}
@@ -68,7 +68,7 @@
 			</button>
 		{/if}
 
-		<button class="border shadow" type="submit">{generated ? 'login' : 'generate'}</button>
+		<button class="border inset shadow" type="submit">{generated ? 'login' : 'generate'}</button>
 	</form>
 </Card>
 

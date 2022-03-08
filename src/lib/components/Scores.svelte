@@ -91,7 +91,7 @@
 	<div aria-describedby="score-summary" class="inner">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 	</div>
-	<div role="tooltip" class="review border shadow" id="score-summary">
+	<div role="tooltip" class="review border inset shadow" id="score-summary">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 		<div class="overall-seperator" />
 		{#each Object.entries(categories) as [name, meta]}

@@ -53,7 +53,7 @@
 		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}
 	>
 		<img
-			class="image shadow"
+			class="image inset shadow"
 			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 			alt={`${plate.startYear || ''}-${plate.endYear || ''} ${plate.jurisdiction} license plate`}
 		/>

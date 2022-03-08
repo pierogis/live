@@ -16,13 +16,13 @@
 
 <header class="header">
 	<div>
-		<a href="/"> <h3 class="title nav-box border shadow">karl's plate emporium</h3></a>
+		<a href="/"> <h3 class="title nav-box border inset shadow">karl's plate emporium</h3></a>
 	</div>
 </header>
 
 <nav class="nav">
-	<a href="/jurisdictions" class="nav-box border shadow">jurisdictions</a>
-	<a href="/account" class="nav-box account border shadow"
+	<a href="/jurisdictions" class="nav-box border inset shadow">jurisdictions</a>
+	<a href="/account" class="nav-box account border inset shadow"
 		>{user && user.name ? user.name : 'login'}</a
 	>
 </nav>
@@ -124,8 +124,17 @@
 		border-radius: 12px;
 	}
 
-	.shadow {
+	.inset {
 		box-shadow: inset 2px 2px 0px var(--text-color-st), inset -2px -2px 0px var(--text-color-st);
+	}
+
+	.shadow {
+		box-shadow: 0px 0px 4px 0px var(--text-color-st);
+	}
+
+	.inset.shadow {
+		box-shadow: inset 2px 2px 0px var(--text-color-st), inset -2px -2px 0px var(--text-color-st),
+			0px 0px 8px 0px var(--text-color-st);
 	}
 
 	.nav {

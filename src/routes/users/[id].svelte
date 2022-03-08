@@ -33,7 +33,7 @@
 				<span>#{user.id}</span>
 			{/if}
 			<input
-				class="name border shadow"
+				class="name border inset shadow"
 				type="text"
 				name="name"
 				bind:value={user.name}
@@ -42,18 +42,18 @@
 				autocomplete="off"
 			/>
 			<input
-				class="email border shadow"
+				class="email border inset shadow"
 				type="text"
 				name="email"
 				bind:value={user.email}
 				placeholder={originalUser.email}
 			/>
 			<div class="buttons">
-				<button class="border shadow" type="submit">update</button>
+				<button class="border inset shadow" type="submit">update</button>
 
 				{#if isUser}
 					<form action="/logout" method="post">
-						<button class="logout border shadow" type="submit">logout</button>
+						<button class="logout border inset shadow" type="submit">logout</button>
 					</form>
 				{/if}
 			</div>

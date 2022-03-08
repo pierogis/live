@@ -1,4 +1,4 @@
-<div class="card border shadow">
+<div class="card border inset shadow">
 	<slot />
 </div>
 
