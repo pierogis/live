@@ -21,9 +21,9 @@
 </header>
 
 <nav class="nav">
-	<a href="/jurisdictions" class="nav-box border inset shadow">jurisdictions</a>
-	<a href="/account" class="nav-box account border inset shadow"
-		>{user && user.name ? user.name : 'login'}</a
+	<a href="/jurisdictions"><h3 class="nav-box border inset shadow">jurisdictions</h3></a>
+	<a href="/account"
+		><h3 class="nav-box border inset shadow">{user && user.name ? user.name : 'login'}</h3></a
 	>
 </nav>
 
@@ -101,7 +101,7 @@
 		position: sticky;
 		top: 0;
 
-		padding-top: 32px;
+		padding-top: 1.6rem;
 
 		background-color: transparent;
 
@@ -117,43 +117,39 @@
 	}
 
 	.border {
-		border-top: solid 8px var(--secondary-color);
-		border-left: solid 8px var(--secondary-color);
-		border-bottom: solid 8px var(--accent-color);
-		border-right: solid 8px var(--accent-color);
-		border-radius: 12px;
+		border-top: solid 0.4rem var(--secondary-color);
+		border-left: solid 0.4rem var(--secondary-color);
+		border-bottom: solid 0.4rem var(--accent-color);
+		border-right: solid 0.4rem var(--accent-color);
+		border-radius: 0.6rem;
 	}
 
 	.inset {
-		box-shadow: inset 2px 2px 0px var(--text-color-st), inset -2px -2px 0px var(--text-color-st);
+		box-shadow: inset 0.1rem 0.1rem 0px var(--text-color-st),
+			inset -0.1rem -0.1rem 0px var(--text-color-st);
 	}
 
 	.shadow {
-		box-shadow: 0px 0px 4px 0px var(--text-color-st);
+		box-shadow: 0px 0px 0.2rem 0px var(--text-color-st);
 	}
 
 	.inset.shadow {
-		box-shadow: inset 2px 2px 0px var(--text-color-st), inset -2px -2px 0px var(--text-color-st),
-			0px 0px 8px 0px var(--text-color-st);
+		box-shadow: inset 0.1rem 0.1rem 0px var(--text-color-st),
+			inset -0.1rem -0.1rem 0px var(--text-color-st), 0px 0px 0.4rem 0px var(--text-color-st);
 	}
 
 	.nav {
-		padding: 1rem;
-		padding-top: 1.5rem;
+		padding: 2rem;
+		padding-top: 2rem;
 		padding-bottom: 1rem;
 
 		background-color: transparent;
 
 		display: flex;
-		gap: 16px;
+		gap: 1rem;
 		justify-content: center;
 
 		text-align: center;
-	}
-	@media only screen and (max-width: 320px) {
-		.nav {
-			flex-direction: column;
-		}
 	}
 
 	.content {

@@ -74,18 +74,18 @@
 		display: flex;
 	}
 	.admin.left {
-		left: 8px;
+		left: 0.4rem;
 	}
 	.admin.right {
-		right: 8px;
+		right: 0.4rem;
 	}
 	.image {
 		width: 90%;
-		border-top: solid 4px var(--text-color);
-		border-left: solid 4px var(--text-color);
-		border-bottom: solid 4px var(--text-color);
-		border-right: solid 4px var(--text-color);
-		border-radius: 12px;
+		border-top: solid 0.2rem var(--text-color);
+		border-left: solid 0.2rem var(--text-color);
+		border-bottom: solid 0.2rem var(--text-color);
+		border-right: solid 0.2rem var(--text-color);
+		border-radius: 0.6rem;
 	}
 
 	.image-link {

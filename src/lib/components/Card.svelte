@@ -6,7 +6,7 @@
 	.card {
 		max-width: 50vw;
 		max-height: 60rem;
-		padding: 8px;
+		padding: 0.4rem;
 
 		display: flex;
 		flex-direction: column;
@@ -17,7 +17,7 @@
 	}
 
 	:global(.card > *) {
-		margin: 8px;
+		margin: 0.4rem;
 	}
 	@media only screen and (max-width: 448px) {
 		.card {
