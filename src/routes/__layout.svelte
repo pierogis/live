@@ -31,9 +31,9 @@
 
 <style global>
 	:root {
-		--primary-color: rgba(255, 235, 205, 1);
-		--accent-color: rgba(165, 85, 85, 1);
-		--secondary-color: rgb(59, 98, 99);
+		--primary-color: rgba(255, 240, 220, 1);
+		--accent-color: rgba(225, 140, 150, 1);
+		--secondary-color: rgb(140, 205, 225);
 		--text-color: rgb(58, 96, 106);
 
 		--primary-color-st: rgba(255, 235, 205, 0.5);
@@ -117,10 +117,10 @@
 	}
 
 	.border {
-		border-top: outset 5px var(--secondary-color);
-		border-left: outset 5px var(--secondary-color);
-		border-bottom: inset 5px var(--accent-color);
-		border-right: inset 5px var(--accent-color);
+		border-top: solid 5px var(--secondary-color);
+		border-left: solid 5px var(--secondary-color);
+		border-bottom: solid 5px var(--accent-color);
+		border-right: solid 5px var(--accent-color);
 		border-radius: 5%;
 	}
 
