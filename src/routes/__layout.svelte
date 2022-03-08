@@ -141,7 +141,7 @@
 	.nav {
 		padding: 2rem;
 		padding-top: 2rem;
-		padding-bottom: 1rem;
+		padding-bottom: 2rem;
 
 		background-color: transparent;
 
@@ -155,6 +155,9 @@
 	.content {
 		display: flex;
 		justify-content: center;
+
+		padding: 1.6rem;
+		padding-top: 0;
 	}
 
 	.nav-box {

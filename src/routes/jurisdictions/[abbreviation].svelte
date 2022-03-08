@@ -27,21 +27,34 @@
 
 <style>
 	.jurisdiction {
+		width: 100%;
 		display: flex;
 		flex-direction: row;
 	}
 	.jurisdiction-description {
 		flex: 1;
-		padding: 32px;
+		padding: 0.4rem;
 		font-family: 'Lora';
 		font-weight: normal;
 	}
 	.jurisdiction-plates {
 		flex: 3;
+		padding: 1.2rem;
 	}
 	.divider {
-		width: 8px;
+		width: 0.4rem;
+		height: 100%;
 		background-color: var(--accent-color);
-		border-radius: 4px;
+		border-radius: 0.2rem;
+	}
+	@media only screen and (max-width: 640px) {
+		.jurisdiction {
+			flex-direction: column;
+			align-items: center;
+		}
+		.divider {
+			height: 0.4rem;
+			width: 100%;
+		}
 	}
 </style>

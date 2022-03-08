@@ -66,7 +66,7 @@
 				formmethod="get"
 				class="border inset shadow"
 				on:click|preventDefault={() => {
-					goto(`/login?email=${email}&generated`);
+					goto(`/login?email=${email}&generated=true`);
 				}}
 				accesskey="g"
 			>
