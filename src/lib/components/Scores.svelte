@@ -91,12 +91,19 @@
 	<div aria-describedby="score-summary" class="inner">
 		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
 	</div>
+
 	<div role="tooltip" class="review border inset shadow" id="score-summary">
-		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
+		<div class="category">
+			<span class="emoji" title="overall">🌡️</span>
+			<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
+			<div class="graph" />
+		</div>
+
 		<div class="overall-seperator" />
+
 		{#each Object.entries(categories) as [name, meta]}
 			<div class="category">
-				<span class="emoji" title={name}>{meta.emoji} </span>
+				<span class="emoji" title={name}>{meta.emoji}</span>
 				<ScoreDisplay editorialScore={editorial[name]} bind:userScore={userReview[name]} />
 				<div class="graph" />
 				<br />
@@ -131,30 +138,31 @@
 	}
 
 	.review {
-		width: 192px;
+		padding: 0.2rem;
+		width: 10rem;
 		top: 0%;
 		left: 50%;
 
 		background-color: var(--primary-color);
 
 		/* differential with inner's border, see [0]*/
-		margin: -4px;
+		margin: -0.4rem;
 
 		/* half of width plus 5px offset for border to center */
-		margin-left: -104px;
+		margin-left: -5.6rem;
 	}
 
 	.inner {
-		padding-bottom: 2px;
-		padding-right: 8px;
-		padding-left: 8px;
+		padding-bottom: 0.1rem;
+		padding-right: 0.4rem;
+		padding-left: 0.4rem;
 
 		/* [0] */
-		border-top: dotted 4px var(--text-color-st);
-		border-left: dotted 4px var(--text-color-st);
-		border-bottom: dotted 4px var(--text-color-st);
-		border-right: dotted 4px var(--text-color-st);
-		border-radius: 16px;
+		border-top: dotted 0.2rem var(--text-color-st);
+		border-left: dotted 0.2rem var(--text-color-st);
+		border-bottom: dotted 0.2rem var(--text-color-st);
+		border-right: dotted 0.2rem var(--text-color-st);
+		border-radius: 0.8rem;
 	}
 
 	@media (hover: hover) and (pointer: fine) {

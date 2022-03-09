@@ -15,29 +15,32 @@ export async function handle({ event, resolve }) {
 
 	const cookies = parse(event.request.headers.get('cookie') || '');
 
-	let response;
+	let deleteCookie = false;
 
-	try {
-		let { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
+	if (variables.sessionName in cookies) {
+		try {
+			let { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
 
-		if (userId) {
-			event.locals.user = await getUser({ id: userId });
-		}
+			if (userId) {
+				const user = await getUser({ id: userId });
 
-		response = await resolve(event);
-
-		if (!event.locals.user) {
-			const cookie = deleteSessionCookie();
-			response.headers.set('set-cookie', cookie);
-		}
-	} catch {
-		response = await resolve(event);
-		if (cookies[variables.sessionName]) {
-			// set cookie expires now
-			const cookie = deleteSessionCookie();
-			response.headers.set('set-cookie', cookie);
+				if (!user) {
+					throw 'Cookie user not in database';
+				}
+				event.locals.user = user;
+			}
+		} catch {
+			deleteCookie = true;
 		}
 	}
+
+	let response = await resolve(event);
+
+	if (deleteCookie) {
+		const cookie = deleteSessionCookie();
+		response.headers.set('set-cookie', cookie);
+	}
+
 	return response;
 }
 

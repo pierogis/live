@@ -6,8 +6,8 @@ export class Jurisdiction {
 export interface Plate {
 	id: number;
 	jurisdiction: string;
-	startYear?: number;
-	endYear?: number;
+	startYear: number;
+	endYear: number;
 }
 
 export enum Category {
@@ -24,7 +24,7 @@ export interface Score {
 	userId: number;
 	category: Category;
 	value: number;
-	description?: string;
+	description: string;
 }
 
 export type Review = {
