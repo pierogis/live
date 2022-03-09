@@ -23,7 +23,7 @@
 <nav class="nav">
 	<a href="/jurisdictions"><h3 class="nav-box border inset shadow">jurisdictions</h3></a>
 	<a href="/account"
-		><h3 class="nav-box border inset shadow">{user && user.name ? user.name : 'login'}</h3></a
+		><h3 class="nav-box border inset shadow">{user && user.serial ? user.serial : 'login'}</h3></a
 	>
 </nav>
 

@@ -27,14 +27,13 @@ export async function put({ request, params }: { request: Request; params: { id:
 	try {
 		const formData = await request.formData();
 
-		let data = {};
-		formData.forEach((v, k) => {
-			data[k] = v.valueOf();
-		});
+		const emailEntry = formData.get('email');
+		const serialEntry = formData.get('serial');
 
-		let user: Partial<User> & Pick<User, 'id'> = {
+		let user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'> = {
 			id: parseInt(params.id),
-			...data
+			...(emailEntry && { email: emailEntry.toString() }),
+			...(serialEntry && { serial: serialEntry.toString() })
 		};
 
 		user = await updateUser(user);

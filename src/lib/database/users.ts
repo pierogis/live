@@ -2,16 +2,11 @@ import { db, platesSchema } from './client';
 import type { User } from './models';
 
 export async function getUsers(
-	params: { id?: number; name?: string; email?: string },
+	params: { id?: number; serial?: string; email?: string },
 	count: number = null,
 	skip = 0
 ): Promise<User[]> {
-	const usersQuery = db
-		.withSchema(platesSchema)
-		.table<User>('users')
-		.select()
-		.where(params)
-		.offset(skip);
+	const usersQuery = db.withSchema(platesSchema).table('users').select().where(params).offset(skip);
 
 	if (count != null) {
 		usersQuery.limit(count);
@@ -22,19 +17,19 @@ export async function getUsers(
 
 export async function getUser(params: {
 	id?: number;
-	name?: string;
+	serial?: string;
 	email?: string;
 }): Promise<User> {
 	return (await getUsers(params, 1))[0];
 }
 
 export async function createUser(user: Omit<User, 'id' | 'isAdmin'>): Promise<User> {
-	user.name = user.name.toUpperCase();
+	user.serial = user.serial.toUpperCase();
 	const result = await db
 		.withSchema(platesSchema)
-		.table<User>('users')
+		.table('users')
 		.insert(user)
-		.returning(['id', 'email', 'name', 'isAdmin']);
+		.returning(['id', 'email', 'serial', 'isAdmin']);
 	return result[0];
 }
 
@@ -42,13 +37,13 @@ export async function updateUser(user: Partial<User> & Pick<User, 'id'>): Promis
 	const { id, ...partial } = user;
 	const result = await db
 		.withSchema(platesSchema)
-		.table<User>('users')
+		.table('users')
 		.update(partial)
 		.where({ id })
-		.returning(['id', 'name', 'email', 'isAdmin']);
+		.returning(['id', 'serial', 'email', 'isAdmin']);
 	return { id, ...result[0] };
 }
 
 export async function deleteUser(id: number): Promise<void> {
-	return await db.withSchema(platesSchema).table<User>('users').where({ id }).del();
+	return await db.withSchema(platesSchema).table('users').where({ id }).del();
 }

@@ -2,7 +2,7 @@ import { db, platesSchema } from './client';
 import type { Plate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {
-	return await db.withSchema(platesSchema).table<Plate>('plates').select();
+	return await db.withSchema(platesSchema).table('plates').select();
 }
 
 export async function getPlates(
@@ -12,7 +12,7 @@ export async function getPlates(
 ): Promise<Plate[]> {
 	const platesQuery = db
 		.withSchema(platesSchema)
-		.table<Plate>('plates')
+		.table('plates')
 		.select()
 		.where(params)
 		.offset(skip);
@@ -31,7 +31,7 @@ export async function getPlate(params: { id?: number; jurisdiction?: string }): 
 export async function createPlate(plate: Omit<Plate, 'id'>): Promise<Plate> {
 	const result = await db
 		.withSchema(platesSchema)
-		.table<Plate>('plates')
+		.table('plates')
 		.insert(plate)
 		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
 	return result[0];
@@ -41,7 +41,7 @@ export async function updatePlate(plate: Plate): Promise<Plate> {
 	const { id, ...partial } = plate;
 	const result = await db
 		.withSchema(platesSchema)
-		.table<Plate>('plates')
+		.table('plates')
 		.update(partial)
 		.where({ id })
 		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
@@ -49,5 +49,5 @@ export async function updatePlate(plate: Plate): Promise<Plate> {
 }
 
 export async function deletePlate(id: number): Promise<void> {
-	return await db.withSchema(platesSchema).table<Plate>('plates').where({ id }).del();
+	return await db.withSchema(platesSchema).table('plates').where({ id }).del();
 }

@@ -23,10 +23,10 @@ exports.up = async function (knex) {
 	await knex.schema.withSchema(schema).createTable('users', function (table) {
 		table.increments();
 		table.string('email').notNullable();
-		table.string('name').notNullable(7);
+		table.string('serial').notNullable(7);
 		table.boolean('isAdmin').notNullable().default(false);
 
-		table.check('upper(??) = ??', ['name', 'name']);
+		table.check('upper(??) = ??', ['serial', 'serial']);
 	});
 
 	await knex.schema.withSchema(schema).createTable('images', function (table) {

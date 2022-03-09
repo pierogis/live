@@ -2,8 +2,11 @@ import { db, platesSchema } from './client';
 import type { Jurisdiction } from './models';
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
-	return await db.withSchema(platesSchema).table<Jurisdiction>('jurisdictions').select();
+	return await db.withSchema(platesSchema).table('jurisdictions').select();
 }
+// export async function listJurisdictions(): Promise<Jurisdiction[]> {
+// 	return await list('jurisdictions');
+// }
 
 export async function getJurisdictions(
 	params: { abbreviation?: string },
@@ -12,7 +15,7 @@ export async function getJurisdictions(
 ): Promise<Jurisdiction[]> {
 	const jurisdictionsQuery = db
 		.withSchema(platesSchema)
-		.table<Jurisdiction>('jurisdictions')
+		.table('jurisdictions')
 		.select()
 		.where(params)
 		.offset(skip);

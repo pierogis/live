@@ -9,7 +9,7 @@ export async function getScores(
 ): Promise<Score[]> {
 	const scoresQuery = db
 		.withSchema(platesSchema)
-		.table<Score>('scores')
+		.table('scores')
 		.select()
 		.where(params)
 		.offset(skip);

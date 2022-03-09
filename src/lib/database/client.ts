@@ -1,4 +1,5 @@
-import { type Knex, knex } from 'knex';
+import knex from 'knex';
+import type { Knex } from 'knex';
 
 import { variables } from '$lib/env';
 

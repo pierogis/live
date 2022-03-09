@@ -7,14 +7,14 @@
 	export let user: User;
 	const originalUser: User = user;
 
-	$: user.name = user.name.toUpperCase();
+	$: user.serial = user.serial.toUpperCase();
 
 	$: isUser = $session.user ? $session.user.id == user.id : false;
 	$: isAdmin = $session.user ? $session.user.id == 1 : false;
 </script>
 
 <svelte:head>
-	<title>{'user: ' + user.name}</title>
+	<title>{'user: ' + user.serial}</title>
 </svelte:head>
 
 {#if !isUser}
@@ -22,7 +22,7 @@
 		{#if isAdmin}
 			<span>#{user.id}</span>
 		{/if}
-		<span>{user.name}</span>
+		<span>{user.serial}</span>
 	</Card>
 {/if}
 
@@ -33,11 +33,11 @@
 				<span>#{user.id}</span>
 			{/if}
 			<input
-				class="name border inset shadow"
+				class="serial border inset shadow"
 				type="text"
-				name="name"
-				bind:value={user.name}
-				placeholder={originalUser.name}
+				name="serial"
+				bind:value={user.serial}
+				placeholder={originalUser.serial}
 				maxlength="7"
 				autocomplete="off"
 			/>
@@ -69,7 +69,7 @@
 		display: flex;
 		flex-direction: column;
 	}
-	input.name {
+	input.serial {
 		width: 4.25rem;
 	}
 	input.email {

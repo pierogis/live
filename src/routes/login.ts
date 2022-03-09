@@ -41,8 +41,6 @@ export async function post({ request }: { request: Request }) {
 		const emailEntry = formData.get('email');
 		const passphraseEntry = formData.get('passphrase');
 
-		console.log(emailEntry, passphraseEntry);
-
 		if (passphraseEntry == null) {
 			const email = emailEntry.toString();
 
@@ -77,7 +75,7 @@ export async function post({ request }: { request: Request }) {
 				if (passphrases[email] == passphrase.toString()) {
 					let user = await getUser({ email });
 					if (!user) {
-						user = await createUser({ email, name: generateSerial() });
+						user = await createUser({ email, serial: generateSerial() });
 					}
 
 					const cookie = await createSessionCookie({ userId: user.id });
