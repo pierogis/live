@@ -15,6 +15,7 @@
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
+	import { FlowCode, flowStatuses } from './_flow';
 
 	export let email: string;
 	export let generated: boolean;
@@ -22,17 +23,21 @@
 	export let sampleEmail: string;
 	export let samplePhrase: string;
 
-	export let good: boolean = null;
-	export let message: string = null;
+	export let flowCode: FlowCode = null;
 
 	let passphrase = '';
+	const flowStatus = flowStatuses[flowCode];
 </script>
 
 <svelte:head>
 	<title>login</title>
 </svelte:head>
 
-{#if message}<Alert {message} {good} />{/if}
+{#if flowStatus}<Alert
+		message={flowStatus.message}
+		good={flowStatus.alertState === true}
+		bad={flowStatus.alertState === false}
+	/>{/if}
 
 <Card>
 	<form action="/login" method="post">
@@ -40,8 +45,10 @@
 		<div class="input-container">
 			<label for="email">email</label>
 			<input
-				readonly={generated}
-				class="input border inset shadow"
+				readonly={generated && flowStatus && flowStatus.emailState}
+				class="border inset shadow"
+				class:good={flowStatus && flowStatus.emailState === true}
+				class:bad={flowStatus && flowStatus.emailState === false}
 				id="email"
 				type="email"
 				name="email"
@@ -53,7 +60,9 @@
 			<div class="input-container">
 				<label for="passphrase">temporary passphrase</label>
 				<input
-					class="input border inset shadow"
+					class="border inset shadow"
+					class:good={flowStatus && flowStatus.passphraseState === true}
+					class:bad={flowStatus && flowStatus.passphraseState === false}
 					id="passphrase"
 					type="text"
 					name="passphrase"
@@ -63,7 +72,10 @@
 			</div>
 		{/if}
 
-		<button class="submit border inset shadow" type="submit"
+		<button
+			class="border inset shadow good"
+			type="submit"
+			title={generated ? '' : 'email a temporary passphrase'}
 			>{generated ? 'login' : 'generate'}</button
 		>
 
@@ -114,19 +126,16 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	.input {
+	input {
 		width: 16rem;
 	}
-	button {
-		font-family: monospace;
-		background-color: var(--primary-color);
-		color: var(--text-color);
 
-		cursor: pointer;
-	}
-
-	.submit {
+	:global(.good, input.good) {
 		background-color: var(--secondary-color);
+		color: var(--primary-color);
+	}
+	:global(.bad, input.bad) {
+		background-color: var(--accent-color);
 		color: var(--primary-color);
 	}
 </style>

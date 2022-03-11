@@ -8,7 +8,7 @@ import { createSessionCookie } from '$lib/session';
 import { sendEmail } from '$lib/auth';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
 
-/** @type {import('./login').RequestHandler} */
+/** @type {import('./login/index').RequestHandler} */
 export async function get() {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
@@ -21,7 +21,7 @@ export async function get() {
 	};
 }
 
-/** @type {import('./login').RequestHandler} */
+/** @type {import('./login/index').RequestHandler} */
 export async function post({ request }: { request: Request }) {
 	const formData = await request.formData();
 
@@ -41,16 +41,14 @@ export async function post({ request }: { request: Request }) {
 				body: {
 					email: email,
 					generated: true,
-					good: true,
-					message: `Generated passphrase emailed to ${email}`
+					flowCode: 1
 				}
 			};
 		} else {
 			return {
 				status: 400,
 				body: {
-					good: false,
-					message: 'Email required'
+					flowCode: 0
 				}
 			};
 		}
@@ -76,15 +74,14 @@ export async function post({ request }: { request: Request }) {
 						location: '/plates'
 					},
 					body: {
-						message: 'Signed in'
+						flowCode: 4
 					}
 				};
 			} else {
 				return {
 					status: 401,
 					body: {
-						good: false,
-						message: 'Wrong passphrase'
+						flowCode: 2
 					}
 				};
 			}
@@ -92,8 +89,7 @@ export async function post({ request }: { request: Request }) {
 			return {
 				status: 401,
 				body: {
-					good: false,
-					message: 'Wrong email'
+					flowCode: 3
 				}
 			};
 		}

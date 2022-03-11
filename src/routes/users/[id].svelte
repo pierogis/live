@@ -20,11 +20,12 @@
 	export let user: User;
 	export let isUser: boolean;
 	export let isAdmin: boolean;
+
 	const originalUser: User = user;
 </script>
 
 <svelte:head>
-	<title>{'user: ' + user.serial}</title>
+	<title>{'user: ' + user.serial.toUpperCase()}</title>
 </svelte:head>
 
 {#if !isUser}
@@ -50,6 +51,7 @@
 				placeholder={originalUser.serial}
 				maxlength="7"
 				autocomplete="off"
+				autocapitalize="characters"
 			/>
 			<input
 				class="email border inset shadow"
@@ -64,8 +66,8 @@
 				{#if isUser}
 					<!-- svelte-ignore a11y-accesskey -->
 					<button class="logout border inset shadow" type="submit" form="logout" accesskey="l"
-						>logout</button
-					>
+						>logout
+					</button>
 				{/if}
 			</div>
 		</Card>
@@ -79,8 +81,12 @@
 		display: flex;
 		flex-direction: column;
 	}
+	input {
+		background-color: whitesmoke;
+	}
 	input.serial {
 		width: 4.25rem;
+		text-transform: uppercase;
 	}
 	input.email {
 		width: 16rem;

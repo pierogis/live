@@ -6,7 +6,9 @@
 
 <div
 	class="grid"
-	style="--medium-columns: {mediumColumns};--large-columns: {largeColumns};--maximum-columns: {maximumColumns};"
+	style:--medium-columns={mediumColumns}
+	style:--large-columns={largeColumns}
+	style:--maximum-columns={maximumColumns}
 >
 	<slot />
 </div>

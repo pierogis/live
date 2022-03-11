@@ -20,7 +20,7 @@ export async function put({ request, params }: { request: Request; params: { id:
 	let user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'> = {
 		id: parseInt(params.id),
 		...(emailEntry && { email: emailEntry.toString() }),
-		...(serialEntry && { serial: serialEntry.toString() })
+		...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 	};
 
 	user = await updateUser(user);

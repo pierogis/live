@@ -8,7 +8,7 @@
 		}
 
 		return {
-			body: { plate: props.plate, isAdmin }
+			props: { plate: props.plate, isAdmin }
 		};
 	}
 </script>
