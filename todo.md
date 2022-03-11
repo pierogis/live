@@ -1,6 +1,8 @@
 features
 - [ ] word reviews
 - [ ] image upload/fetch
+- [x] session passphrase tracking
+- [ ] reauthenticate on update email
 
 refactor
 - [ ] make db interface shared by tables

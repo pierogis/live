@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 
 export let variables: {
 	databaseUrl: string;
+	cacheUrl: string;
 	sessionName: string;
 	sessionLength: number;
 	encryptionSecret: string;
@@ -14,6 +15,7 @@ export function setupEnv(): void {
 
 	variables = {
 		databaseUrl: process.env.DATABASE_URL,
+		cacheUrl: process.env.CACHE_URL,
 		sessionName: 'session',
 		sessionLength: parseInt(process.env.SESSION_LENGTH),
 		encryptionSecret: process.env.ENCRYPTION_SECRET,
