@@ -2,6 +2,8 @@ features
 - [ ] word reviews
 - [ ] image upload/fetch
 - [x] session passphrase tracking
+    - [x] redis handling
+    - [x] encrypt the passphrases
 - [ ] reauthenticate on update email
 
 refactor

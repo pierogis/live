@@ -1,7 +1,8 @@
 import { createClient } from 'redis';
+import type { RedisClientType } from '@node-redis/client';
 
 import { variables } from '$lib/env';
-import type { RedisClientType } from '@node-redis/client';
+import { encrypt, decrypt } from './encryption';
 
 export let cache: RedisClientType;
 
@@ -21,10 +22,12 @@ function getPassphraseKey(email: string) {
 
 export async function setEmailPassphrase(email: string, passphrase: string) {
 	const key = getPassphraseKey(email);
-	await cache.multi().set(key, passphrase).expire(key, 60).exec();
+	const value = await encrypt(passphrase);
+	await cache.multi().set(key, value).expire(key, 60).exec();
 }
 
 export async function getEmailPassphrase(email): Promise<string> {
 	const key = getPassphraseKey(email);
-	return await cache.get(key);
+	const value = await cache.getDel(key);
+	return await decrypt(value);
 }

@@ -3,7 +3,7 @@ import { parse } from 'cookie';
 import { variables, setupEnv } from '$lib/env';
 import { db, setupDb } from '$lib/database';
 import { cache, setupCache } from '$lib/cache';
-import { deleteSessionCookie, getUserSession } from '$lib/session';
+import { expireSessionCookie, getUserSession } from '$lib/session';
 import { setup, setupWords } from '$lib/words';
 
 import { getUser } from '$lib/database/users';
@@ -39,7 +39,7 @@ export async function handle({ event, resolve }) {
 	let response = await resolve(event);
 
 	if (deleteCookie) {
-		const cookie = deleteSessionCookie();
+		const cookie = expireSessionCookie();
 		response.headers.set('set-cookie', cookie);
 	}
 
