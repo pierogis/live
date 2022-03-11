@@ -6,7 +6,7 @@ import { variables } from '$lib/env';
 export const platesSchema = 'plates';
 
 export let db: Knex;
-export function setupClient() {
+export function setupDb() {
 	db = knex({
 		client: 'pg',
 		connection: variables.databaseUrl,

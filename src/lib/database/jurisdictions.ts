@@ -1,12 +1,9 @@
-import { db, platesSchema } from './client';
+import { db, platesSchema } from '.';
 import type { Jurisdiction } from './models';
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
 	return await db.withSchema(platesSchema).table('jurisdictions').select();
 }
-// export async function listJurisdictions(): Promise<Jurisdiction[]> {
-// 	return await list('jurisdictions');
-// }
 
 export async function getJurisdictions(
 	params: { abbreviation?: string },

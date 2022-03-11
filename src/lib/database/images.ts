@@ -1,4 +1,4 @@
-import { db, platesSchema } from './client';
+import { db, platesSchema } from '.';
 import type { Image } from './models';
 
 export async function getImages(params: { plateId?: number }): Promise<Image[]> {

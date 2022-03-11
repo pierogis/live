@@ -1,4 +1,4 @@
-import { db, platesSchema } from './client';
+import { db, platesSchema } from '.';
 import type { Plate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {

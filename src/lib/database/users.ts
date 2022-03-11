@@ -1,4 +1,4 @@
-import { db, platesSchema } from './client';
+import { db, platesSchema } from '.';
 import type { User } from './models';
 
 export async function getUsers(
