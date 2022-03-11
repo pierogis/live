@@ -81,10 +81,20 @@
 	input[type='password'] {
 		background-color: whitesmoke;
 	}
+
 	input[type='submit'],
 	button {
 		background-color: var(--primary-color);
 		cursor: pointer;
+	}
+
+	input[type='text']:disabled,
+	input[type='email']:disabled,
+	input[type='password']:disabled {
+		background-color: var(--primary-color);
+		color: var(--text-color);
+		text-align: center;
+		text-decoration: none;
 	}
 
 	input[type='text'],
@@ -164,5 +174,16 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
+	}
+
+	.good,
+	input.good {
+		background-color: var(--secondary-color);
+		color: var(--primary-color);
+	}
+	.bad,
+	input.bad {
+		background-color: var(--accent-color);
+		color: var(--primary-color);
 	}
 </style>

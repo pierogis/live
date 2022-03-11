@@ -1,20 +1,16 @@
 features
-- [ ] word reviews
+- [ ] reviews
+    - [ ] add words "editor"
+    - [ ] process in endpoint
+    - [ ] display on profiles
+        - add smaller plates grid with reviews prioritized
+    - [ ] display on plates
 - [ ] image upload/fetch
 - [x] session passphrase tracking
     - [x] redis handling
     - [x] encrypt the passphrases
 - [ ] reauthenticate on update email
-
-refactor
-- [ ] make db interface shared by tables
-    - [ ] methods
-        - [ ] list
-        - [ ] get all
-        - [ ] get one
-        - [ ] update
-        - [ ] delete
-    - [ ] provide the table
+    - [x] not allowing email update for now
 
 bugs
 - [x] goto not available on server on `/account`

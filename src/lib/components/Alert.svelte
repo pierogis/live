@@ -17,7 +17,7 @@
 	}
 	.alert {
 		position: absolute;
-		top: 30%;
+		top: 10%;
 
 		z-index: 15;
 

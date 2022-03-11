@@ -8,7 +8,7 @@
 		const isAdmin = session.user && session.user.isAdmin;
 
 		return {
-			props: { user: props.user, isUser, isAdmin }
+			props: { ...props, isUser, isAdmin }
 		};
 	}
 </script>
@@ -16,17 +16,23 @@
 <script lang="ts">
 	import type { User } from '$lib/database/models';
 	import Card from '$lib/components/Card.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 
 	export let user: User;
 	export let isUser: boolean;
 	export let isAdmin: boolean;
 
 	const originalUser: User = user;
+	export let error: string = null;
 </script>
 
 <svelte:head>
 	<title>{'user: ' + user.serial.toUpperCase()}</title>
 </svelte:head>
+
+{#if error}
+	<Alert message={error} bad={true} good={false} />
+{/if}
 
 {#if !isUser}
 	<Card>
@@ -57,6 +63,7 @@
 				class="email border inset shadow"
 				type="text"
 				name="email"
+				disabled
 				bind:value={user.email}
 				placeholder={originalUser.email}
 			/>
@@ -80,9 +87,6 @@
 	form {
 		display: flex;
 		flex-direction: column;
-	}
-	input {
-		background-color: whitesmoke;
 	}
 	input.serial {
 		width: 4.25rem;

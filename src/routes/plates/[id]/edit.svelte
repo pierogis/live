@@ -15,6 +15,6 @@
 	export let jurisdictions: Jurisdiction[];
 </script>
 
-<form action="/{plate.id}?_method=PUT" method="post">
+<form action="/plates/{plate.id}?_method=PUT" method="post">
 	<PlateTemplate {jurisdictions} {plate} />
 </form>

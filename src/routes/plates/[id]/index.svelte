@@ -19,11 +19,6 @@
 
 	export let plate: Plate;
 	export let isAdmin: boolean;
-
-	// ...plus props from `post` when the page is rendered
-	// in response to a POST request, for example after
-	// submitting the form below
-	// export let errors;
 </script>
 
 <svelte:head>

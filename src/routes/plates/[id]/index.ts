@@ -13,41 +13,54 @@ export async function get({ params }: { params: { id: string } }) {
 }
 
 /** @type {import('./plates/[id]/index').RequestHandler} */
-export async function put({ request, params }: { request: Request; params: { id: string } }) {
-	const formData = await request.formData();
+export async function put({ locals, request, params }) {
+	if (locals.user?.isAdmin) {
+		const formData = await request.formData();
 
-	let data = {};
-	formData.forEach((v, k) => {
-		data[k] = v.valueOf();
-	});
+		let data = {};
+		formData.forEach((v, k) => {
+			data[k] = v.valueOf();
+		});
 
-	let plate: Plate = {
-		id: parseInt(params.id),
-		jurisdiction: data['jurisdiction'],
-		startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
-		endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
-	};
+		let plate: Plate = {
+			id: parseInt(params.id),
+			jurisdiction: data['jurisdiction'],
+			startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
+			endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+		};
 
-	plate = await updatePlate(plate);
+		plate = await updatePlate(plate);
 
-	// redirect to the newly created plate
-	return {
-		status: 303,
-		headers: {
-			location: `/${plate.id}`
-		}
-	};
+		// redirect to the updated plate
+		return {
+			status: 303,
+			headers: {
+				location: `/plates/${plate.id}`
+			}
+		};
+	} else {
+		return {
+			status: 403,
+			body: { error: `not admin` }
+		};
+	}
 }
 
 /** @type {import('./plates/[id]/index').RequestHandler} */
-export async function del({ params }: { params: { id: string } }) {
-	await deletePlate(parseInt(params.id));
+export async function del({ locals, params }) {
+	if (locals.user?.isAdmin) {
+		await deletePlate(parseInt(params.id));
 
-	// redirect to the newly created plate
-	return {
-		status: 303,
-		headers: {
-			location: `/`
-		}
-	};
+		return {
+			status: 303,
+			headers: {
+				location: `/`
+			}
+		};
+	} else {
+		return {
+			status: 403,
+			body: { error: `not admin` }
+		};
+	}
 }

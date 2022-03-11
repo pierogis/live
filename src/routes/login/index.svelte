@@ -129,13 +129,4 @@
 	input {
 		width: 16rem;
 	}
-
-	:global(.good, input.good) {
-		background-color: var(--secondary-color);
-		color: var(--primary-color);
-	}
-	:global(.bad, input.bad) {
-		background-color: var(--accent-color);
-		color: var(--primary-color);
-	}
 </style>

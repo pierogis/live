@@ -26,6 +26,9 @@ exports.up = async function (knex) {
 		table.string('serial').notNullable(7);
 		table.boolean('isAdmin').notNullable().default(false);
 
+		table.unique(['email']);
+		table.unique(['serial']);
+
 		table.check('upper(??) = ??', ['serial', 'serial']);
 	});
 
