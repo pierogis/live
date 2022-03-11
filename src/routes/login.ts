@@ -9,27 +9,14 @@ import { sendEmail } from '$lib/auth';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
 
 /** @type {import('./login').RequestHandler} */
-export async function get({ request }) {
+export async function get() {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
-
-	const query = request.url.split('?', 2)[1];
-
-	let email = '';
-	let generated = false;
-
-	if (query) {
-		const searchParams = new URLSearchParams(query);
-		email = searchParams.get('email') || '';
-		generated = searchParams.get('generated') == 'true';
-	}
 
 	return {
 		body: {
 			samplePhrase,
-			sampleEmail,
-			email,
-			generated
+			sampleEmail
 		}
 	};
 }

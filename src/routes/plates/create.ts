@@ -2,23 +2,12 @@ import { dev } from '$app/env';
 import { listJurisdictions } from '$lib/database/jurisdictions';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
-export async function get(event) {
-	if (dev || event.locals.user.isAdmin) {
-		const jurisdictions = await listJurisdictions();
+export async function get() {
+	const jurisdictions = await listJurisdictions();
 
-		return {
-			body: { jurisdictions }
-		};
-	} else {
-		return {
-			status: 403,
-			body: {
-				error: {
-					message: 'Admin only'
-				}
-			}
-		};
-	}
+	return {
+		body: { jurisdictions }
+	};
 }
 
 // export default async function get({params}) {

@@ -1,16 +1,26 @@
-<script lang="ts">
-	import { session } from '$app/stores';
+<script lang="ts" context="module">
+	/** @type {import('./users/[id]').Load} */
+	export async function load({ props, session }) {
+		if (!props.user) {
+			return { status: 404, error: "user doesn't exist" };
+		}
+		const isUser = session.user && session.user.id == props.user.id;
+		const isAdmin = session.user && session.user.isAdmin;
 
+		return {
+			props: { user: props.user, isUser, isAdmin }
+		};
+	}
+</script>
+
+<script lang="ts">
 	import type { User } from '$lib/database/models';
 	import Card from '$lib/components/Card.svelte';
 
 	export let user: User;
+	export let isUser: boolean;
+	export let isAdmin: boolean;
 	const originalUser: User = user;
-
-	$: user.serial = user.serial.toUpperCase();
-
-	$: isUser = $session.user ? $session.user.id == user.id : false;
-	$: isAdmin = $session.user ? $session.user.id == 1 : false;
 </script>
 
 <svelte:head>

@@ -1,3 +1,12 @@
+<script lang="ts" context="module">
+	import { protect } from '$lib/helpers';
+
+	/** @type {import('./plates/[id]/index').Load} */
+	export async function load(event) {
+		return protect(event);
+	}
+</script>
+
 <script lang="ts">
 	import type { Jurisdiction } from '$lib/database/models';
 

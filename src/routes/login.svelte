@@ -1,3 +1,16 @@
+<script lang="ts" context="module">
+	/** @type {import('./login').Load} */
+	export async function load({ url, props }) {
+		const email = props.email || url.searchParams.get('email') || '';
+		const generated = props.generated || url.searchParams.get('generated') == 'true' || false;
+
+		return {
+			status: 200,
+			props: { ...props, email, generated }
+		};
+	}
+</script>
+
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
@@ -27,6 +40,7 @@
 		<div class="input-container">
 			<label for="email">email</label>
 			<input
+				readonly={generated}
 				class="input border inset shadow"
 				id="email"
 				type="email"
@@ -47,6 +61,13 @@
 					bind:value={passphrase}
 				/>
 			</div>
+		{/if}
+
+		<button class="submit border inset shadow" type="submit"
+			>{generated ? 'login' : 'generate'}</button
+		>
+
+		{#if generated}
 			<!-- svelte-ignore a11y-accesskey -->
 			<button
 				type="submit"
@@ -68,15 +89,11 @@
 				on:click|preventDefault={() => {
 					goto(`/login?email=${email}&generated=true`);
 				}}
-				accesskey="g"
+				accesskey="r"
 			>
 				already have a passphrase?
 			</button>
 		{/if}
-
-		<button class="submit border inset shadow" type="submit"
-			>{generated ? 'login' : 'generate'}</button
-		>
 	</form>
 </Card>
 

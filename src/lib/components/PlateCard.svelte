@@ -5,11 +5,10 @@
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
-	import { session } from '$app/stores';
 
 	export let plate: Plate;
 
-	export let isAdmin = $session.user ? $session.user.isAdmin : false;
+	export let isAdmin: boolean = false;
 	export let showJurisdiction = true;
 	export let showYears = true;
 	export let showScores = true;

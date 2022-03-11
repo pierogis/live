@@ -6,19 +6,13 @@ export async function get({ params }: { params: { id: string } }) {
 	const parsedParams = { ...params, id: parseInt(params.id) };
 	const plate = await getPlate(parsedParams);
 
-	if (plate) {
-		return {
-			status: 200,
-			body: { plate: plate }
-		};
-	}
-
 	return {
-		status: 404
+		status: 200,
+		body: { plate }
 	};
 }
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./plates/[id]/index').RequestHandler} */
 export async function put({ request, params }: { request: Request; params: { id: string } }) {
 	const formData = await request.formData();
 
@@ -45,7 +39,7 @@ export async function put({ request, params }: { request: Request; params: { id:
 	};
 }
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./plates/[id]/index').RequestHandler} */
 export async function del({ params }: { params: { id: string } }) {
 	await deletePlate(parseInt(params.id));
 

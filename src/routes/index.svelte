@@ -1,6 +1,6 @@
 <script context="module">
 	/** @type {import('./index').Load} */
-	export async function load({ params, fetch, session, stuff }) {
+	export async function load() {
 		let redirect = '/plates';
 		return {
 			status: 301,

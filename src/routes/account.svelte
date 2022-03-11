@@ -1,6 +1,6 @@
 <script context="module">
 	/** @type {import('./account').Load} */
-	export async function load({ params, fetch, session, stuff }) {
+	export async function load({ session }) {
 		let redirect = '/login';
 		if (session.user) {
 			redirect = `/users/${session.user.id}`;

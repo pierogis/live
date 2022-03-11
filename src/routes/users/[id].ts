@@ -6,7 +6,7 @@ export async function get({ params }: { params: { id: string } }) {
 	const user = await getUser({ id: parseInt(params.id) });
 
 	return {
-		body: { user: user }
+		body: { user }
 	};
 }
 

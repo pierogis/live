@@ -2,7 +2,7 @@ import type { Plate } from '$lib/database/models';
 import { listPlates, createPlate } from '$lib/database/plates';
 
 /** @type {import('./plates/index').RequestHandler} */
-export async function get(event) {
+export async function get() {
 	const plates = await listPlates();
 
 	return {
