@@ -3,60 +3,36 @@ import { listPlates, createPlate } from '$lib/database/plates';
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function get(event) {
-	try {
-		const plates = await listPlates();
+	const plates = await listPlates();
 
-		return {
-			status: 200,
-			body: { plates }
-		};
-	} catch (error) {
-		console.error(error);
-		return {
-			status: 500,
-			body: {
-				error: {
-					message: 'Internal Server Error'
-				}
-			}
-		};
-	}
+	return {
+		status: 200,
+		body: { plates }
+	};
 }
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function post({ request }: { request: Request }) {
-	try {
-		const formData = await request.formData();
+	const formData = await request.formData();
 
-		let data = {};
-		formData.forEach((v, k) => {
-			data[k] = v.valueOf();
-		});
+	let data = {};
+	formData.forEach((v, k) => {
+		data[k] = v.valueOf();
+	});
 
-		const partial: Omit<Plate, 'id'> = {
-			jurisdiction: data['jurisdiction'],
-			startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
-			endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
-		};
+	const partial: Omit<Plate, 'id'> = {
+		jurisdiction: data['jurisdiction'],
+		startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
+		endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+	};
 
-		const plate = await createPlate(partial);
+	const plate = await createPlate(partial);
 
-		// redirect to the newly created plate
-		return {
-			status: 303,
-			headers: {
-				location: `/plates/${plate.id}`
-			}
-		};
-	} catch (error) {
-		console.error(error);
-		return {
-			status: 500,
-			body: {
-				error: {
-					message: 'Internal Server Error'
-				}
-			}
-		};
-	}
+	// redirect to the newly created plate
+	return {
+		status: 303,
+		headers: {
+			location: `/plates/${plate.id}`
+		}
+	};
 }

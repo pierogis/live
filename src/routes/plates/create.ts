@@ -3,30 +3,18 @@ import { listJurisdictions } from '$lib/database/jurisdictions';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get(event) {
-	try {
-		if (dev || event.locals.user.isAdmin) {
-			const jurisdictions = await listJurisdictions();
+	if (dev || event.locals.user.isAdmin) {
+		const jurisdictions = await listJurisdictions();
 
-			return {
-				body: { jurisdictions }
-			};
-		} else {
-			return {
-				status: 403,
-				body: {
-					error: {
-						message: 'Admin only'
-					}
-				}
-			};
-		}
-	} catch (error) {
-		console.error(error);
 		return {
-			status: 500,
+			body: { jurisdictions }
+		};
+	} else {
+		return {
+			status: 403,
 			body: {
 				error: {
-					message: 'Internal Server Error'
+					message: 'Admin only'
 				}
 			}
 		};
