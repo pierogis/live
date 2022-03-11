@@ -7,6 +7,9 @@
 		"build": "svelte-kit build",
 		"package": "svelte-kit package",
 		"preview": "svelte-kit preview",
+		"db:migrate": "knex migrate:latest --knexfile knexfile.cjs",
+		"db:seed": "knex seed:run --knexfile knexfile.cjs",
+		"db:reset": "knex migrate:rollback --knexfile knexfile.cjs --all",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
@@ -22,6 +25,7 @@
 		"eslint": "^7.32.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^3.2.1",
+		"knex": "^1.0.3",
 		"prettier": "^2.5.1",
 		"prettier-plugin-svelte": "^2.5.0",
 		"svelte": "^3.44.0",
@@ -35,8 +39,8 @@
 	"dependencies": {
 		"@hapi/iron": "^6.0.0",
 		"cookie": "^0.4.1",
-		"knex": "^1.0.3",
 		"nodemailer": "^6.7.2",
-		"pg": "^8.7.3"
+		"pg": "^8.7.3",
+		"redis": "^4.0.4"
 	}
 }
