@@ -36,10 +36,10 @@
 		--secondary-color: rgb(140, 205, 225);
 		--text-color: rgb(58, 96, 106);
 
-		--primary-color-st: rgba(255, 240, 220, 0.2);
-		--accent-color-st: rgba(225, 140, 150, 0.2);
-		--secondary-color-st: rgba(140, 205, 225, 0.2);
-		--text-color-st: rgba(58, 96, 106, 0.2);
+		--primary-color-st: rgba(255, 240, 220, 0.4);
+		--accent-color-st: rgba(225, 140, 150, 0.4);
+		--secondary-color-st: rgba(140, 205, 225, 0.4);
+		--text-color-st: rgba(58, 96, 106, 0.4);
 
 		--primary-color-t: rgba(255, 240, 220, 0);
 		--accent-color-t: rgba(225, 140, 150, 0);
@@ -135,17 +135,17 @@
 	}
 
 	.inset {
-		box-shadow: inset 0.1rem 0.1rem 0px var(--text-color-st),
-			inset -0.1rem -0.1rem 0px var(--text-color-st);
+		--inset: inset 0rem 0rem 0rem 0.1rem var(--text-color-st);
+		box-shadow: var(--inset);
 	}
 
 	.shadow {
-		box-shadow: 0px 0px 0.2rem 0px var(--text-color-st);
+		--shadow: 0px 0px 0.4rem 0px var(--text-color-st);
+		box-shadow: var(--shadow);
 	}
 
 	.inset.shadow {
-		box-shadow: inset 0.1rem 0.1rem 0px var(--text-color-st),
-			inset -0.1rem -0.1rem 0px var(--text-color-st), 0px 0px 0.4rem 0px var(--text-color-st);
+		box-shadow: var(--inset), var(--shadow);
 	}
 
 	.nav {
