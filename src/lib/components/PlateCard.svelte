@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
 	import type { Plate, Score, Image } from '$lib/database/models';
 
 	import Card from './Card.svelte';
@@ -13,25 +11,20 @@
 	export let showYears = true;
 	export let showScores = true;
 
-	let scores: Score[] = [];
-	let images: Image[] = [];
-
-	async function getScores(): Promise<void> {
-		const response = await fetch(`/plates/${plate.id}/scores`);
+	async function getScores(plateId: number): Promise<Score[]> {
+		const response = await fetch(`/plates/${plateId}/scores`);
 		const data = await response.json();
-		scores = data.scores;
+		return data.scores;
 	}
 
-	async function getImages(): Promise<void> {
-		const response = await fetch(`/plates/${plate.id}/images`);
+	async function getImages(plateId: number): Promise<Image[]> {
+		const response = await fetch(`/plates/${plateId}/images`);
 		const data = await response.json();
-		images = data.images;
+		return data.images;
 	}
 
-	onMount(async () => {
-		await getScores();
-		await getImages();
-	});
+	let scoresPromise: Promise<Score[]> = getScores(plate.id);
+	let imagesPromise: Promise<Image[]> = getImages(plate.id);
 </script>
 
 <Card>
@@ -47,15 +40,28 @@
 		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
 	{/if}
 
-	<a
-		class="image-link"
-		href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}
-	>
-		<img
-			class="image inset shadow"
-			src="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
-			alt={`${plate.startYear || ''}-${plate.endYear || ''} ${plate.jurisdiction} license plate`}
-		/>
+	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}>
+		<div class="image-container">
+			{#await imagesPromise then images}
+				{#if images[0]}
+					<img
+						class="image inset shadow"
+						src={images[0].url}
+						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+							plate.jurisdiction
+						} license plate`}
+					/>
+				{:else}
+					<img
+						class="image inset shadow"
+						src={'/static/karl.svg'}
+						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+							plate.jurisdiction
+						} license plate`}
+					/>
+				{/if}
+			{/await}
+		</div>
 	</a>
 
 	{#if showYears}
@@ -63,8 +69,11 @@
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
-
-	{#if showScores}<Scores {scores} />{/if}
+	{#if showScores}
+		{#await scoresPromise then scores}
+			<Scores scores={scores || []} />
+		{/await}
+	{/if}
 </Card>
 
 <style>
@@ -80,6 +89,8 @@
 	}
 	.image {
 		width: 90%;
+		object-fit: contain;
+
 		border-top: solid 0.2rem var(--text-color);
 		border-left: solid 0.2rem var(--text-color);
 		border-bottom: solid 0.2rem var(--text-color);
@@ -87,7 +98,7 @@
 		border-radius: 0.6rem;
 	}
 
-	.image-link {
+	.image-container {
 		display: flex;
 		justify-content: center;
 	}

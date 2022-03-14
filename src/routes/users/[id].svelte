@@ -72,7 +72,7 @@
 
 				{#if isUser}
 					<!-- svelte-ignore a11y-accesskey -->
-					<button class="logout border inset shadow" type="submit" form="logout" accesskey="l"
+					<button class="bad border inset shadow" type="submit" form="logout" accesskey="l"
 						>logout
 					</button>
 				{/if}
@@ -99,9 +99,5 @@
 	.buttons {
 		display: flex;
 		gap: 1rem;
-	}
-	.logout {
-		background-color: var(--accent-color);
-		color: var(--primary-color);
 	}
 </style>

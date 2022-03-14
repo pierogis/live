@@ -1,5 +1,6 @@
 import type { Plate } from '$lib/database/models';
 import { listPlates, createPlate } from '$lib/database/plates';
+import { createImage } from '$lib/database/images';
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function get() {
@@ -14,26 +15,30 @@ export async function get() {
 /** @type {import('./plates/index').RequestHandler} */
 export async function post({ locals, request }) {
 	if (locals.user?.isAdmin) {
-		const formData = await request.formData();
+		const formData: FormData = await request.formData();
 
-		let data = {};
-		formData.forEach((v, k) => {
-			data[k] = v.valueOf();
-		});
+		const jurisdictionEntry = formData.get('jurisdiction');
+		const startYearEntry = formData.get('startYear');
+		const endYearEntry = formData.get('endYear');
 
 		const partial: Omit<Plate, 'id'> = {
-			jurisdiction: data['jurisdiction'],
-			startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
-			endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+			jurisdiction: jurisdictionEntry.toString(),
+			startYear: startYearEntry ? parseInt(startYearEntry.toString()) : null,
+			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null
 		};
 
 		const plate = await createPlate(partial);
+
+		const imageUrlEntry = formData.get('imageUrl');
+		if (imageUrlEntry) {
+			const image = await createImage({ plateId: plate.id, url: imageUrlEntry.toString() });
+		}
 
 		// redirect to the newly created plate
 		return {
 			status: 303,
 			headers: {
-				location: `/plates/${plate.id}`
+				location: `/plates/${plate.id}/edit`
 			}
 		};
 	} else {

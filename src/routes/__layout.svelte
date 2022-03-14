@@ -22,6 +22,9 @@
 
 <nav class="nav">
 	<a href="/jurisdictions"><h3 class="nav-box border inset shadow">jurisdictions</h3></a>
+	{#if user.isAdmin}
+		<a href="/plates/create"><h3 class="nav-box border inset shadow">create</h3></a>
+	{/if}
 	<a href="/account"
 		><h3 class="nav-box border inset shadow">{user && user.serial ? user.serial : 'login'}</h3></a
 	>
@@ -78,8 +81,10 @@
 
 	input[type='text'],
 	input[type='email'],
-	input[type='password'] {
+	input[type='password'],
+	input[type='url'] {
 		background-color: whitesmoke;
+		padding: 0.1rem 0.2rem;
 	}
 
 	input[type='submit'],

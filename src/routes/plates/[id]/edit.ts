@@ -1,3 +1,4 @@
+import { getImages } from '$lib/database/images';
 import { listJurisdictions } from '$lib/database/jurisdictions';
 import { getPlate } from '$lib/database/plates';
 
@@ -5,10 +6,11 @@ import { getPlate } from '$lib/database/plates';
 export async function get({ params }) {
 	const parsedParams = { ...params, id: parseInt(params.id) };
 	const plate = await getPlate(parsedParams);
+	const images = await getImages({ plateId: plate.id });
 
-	const jurisdictions = listJurisdictions();
+	const jurisdictions = await listJurisdictions();
 
 	return {
-		body: { plate, jurisdictions }
+		body: { plate, jurisdictions, images }
 	};
 }

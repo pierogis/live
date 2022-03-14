@@ -37,6 +37,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.54.0",
+		"@aws-sdk/s3-request-presigner": "^3.54.0",
 		"@hapi/iron": "^6.0.0",
 		"cookie": "^0.4.1",
 		"nodemailer": "^6.7.2",

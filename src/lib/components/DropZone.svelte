@@ -1,5 +1,5 @@
 <script lang="ts">
-	let inputElement: HTMLInputElement;
+	export let inputElement: HTMLInputElement;
 
 	function dropAction(element: HTMLElement) {
 		const dropHandler = (event: DragEvent) => {
@@ -42,12 +42,14 @@
 	<input
 		bind:this={inputElement}
 		type="file"
-		name="images"
+		name="image"
 		accept="image/*"
 		on:change={changeThumbnail}
 	/>
 	<img class="image" src={thumbnailSrc} alt="upload" />
 </div>
+
+<form />
 
 <style>
 	.zone {

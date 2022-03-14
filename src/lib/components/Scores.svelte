@@ -27,10 +27,6 @@
 
 	const userId = 0;
 
-	const partialScore = {
-		value: null,
-		description: null
-	};
 	let userReview = scores
 		.filter((score) => score.userId == userId)
 		.reduce(
