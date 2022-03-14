@@ -11,6 +11,8 @@
 	export let showYears = true;
 	export let showScores = true;
 
+	export let small: boolean;
+
 	async function getScores(plateId: number): Promise<Score[]> {
 		const response = await fetch(`/plates/${plateId}/scores`);
 		const data = await response.json();
@@ -29,10 +31,10 @@
 
 <Card>
 	{#if isAdmin}
-		<form class="admin left" action="/plates/{plate.id}/edit">
+		<form class="admin-controls left" action="/plates/{plate.id}/edit">
 			<input type="submit" value="✎" />
 		</form>
-		<form class="admin right" action="/plates/{plate.id}?_method=DELETE" method="post">
+		<form class="admin-controls right" action="/plates/{plate.id}?_method=DELETE" method="post">
 			<input type="submit" value="❌" />
 		</form>
 	{/if}
@@ -46,7 +48,8 @@
 				{#if images[0]}
 					<img
 						class="image inset shadow"
-						src={images[0].url}
+						class:small
+						src={`${images[0].url}/${small ? 'small' : 'medium'}`}
 						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
 							plate.jurisdiction
 						} license plate`}
@@ -54,6 +57,7 @@
 				{:else}
 					<img
 						class="image inset shadow"
+						class:small
 						src={'/static/karl.svg'}
 						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
 							plate.jurisdiction
@@ -77,18 +81,17 @@
 </Card>
 
 <style>
-	.admin {
+	.admin-controls {
 		position: absolute;
 		display: flex;
 	}
-	.admin.left {
+	.admin-controls.left {
 		left: 0.4rem;
 	}
-	.admin.right {
+	.admin-controls.right {
 		right: 0.4rem;
 	}
 	.image {
-		width: 90%;
 		object-fit: contain;
 
 		border-top: solid 0.2rem var(--text-color);
@@ -96,6 +99,16 @@
 		border-bottom: solid 0.2rem var(--text-color);
 		border-right: solid 0.2rem var(--text-color);
 		border-radius: 0.6rem;
+
+		width: 100%;
+
+		max-width: 400px;
+		max-height: 200px;
+	}
+
+	.image.small {
+		max-width: 200px;
+		max-height: 100px;
 	}
 
 	.image-container {

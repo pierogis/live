@@ -22,7 +22,7 @@
 
 <nav class="nav">
 	<a href="/jurisdictions"><h3 class="nav-box border inset shadow">jurisdictions</h3></a>
-	{#if user.isAdmin}
+	{#if user?.isAdmin}
 		<a href="/plates/create"><h3 class="nav-box border inset shadow">create</h3></a>
 	{/if}
 	<a href="/account"
@@ -170,9 +170,28 @@
 	.content {
 		display: flex;
 		justify-content: center;
+		flex-wrap: wrap;
 
 		padding: 1.6rem;
 		padding-top: 0;
+	}
+
+	.divider {
+		width: 8px;
+		border-radius: 4px;
+
+		background-color: var(--accent-color);
+	}
+
+	@media only screen and (max-width: 640px) {
+		.content {
+			flex-direction: column;
+			align-items: center;
+		}
+		.divider {
+			height: 8px;
+			width: 100%;
+		}
 	}
 
 	.nav-box {

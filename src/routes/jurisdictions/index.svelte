@@ -13,6 +13,6 @@
 
 <CardsGrid>
 	{#each Object.entries(jurisdictionsPlate) as [jurisdiction, plate]}
-		<PlateCard {plate} showJurisdiction={true} showYears={false} showScores={false} />
+		<PlateCard {plate} showJurisdiction={true} showYears={false} showScores={false} small={true} />
 	{/each}
 </CardsGrid>

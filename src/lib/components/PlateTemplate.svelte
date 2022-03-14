@@ -44,7 +44,7 @@
 		type="url"
 		class="border inset shadow"
 		name="imageUrl"
-		value={images[0] ? images[0].url : ''}
+		value={images ? images[0].url : ''}
 		placeholder="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 	/>
 

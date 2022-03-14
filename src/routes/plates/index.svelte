@@ -13,6 +13,6 @@
 
 <CardsGrid>
 	{#each plates as plate}
-		<PlateCard {plate} />
+		<PlateCard {plate} small={true} />
 	{/each}
 </CardsGrid>

@@ -25,14 +25,54 @@
 	<title>{'plate: ' + plate.id}</title>
 </svelte:head>
 
-<PlateCard {plate} {isAdmin} />
+<div class="top">
+	<div class="card">
+		<PlateCard {plate} {isAdmin} small={false} />
+	</div>
 
-<div class="description">This is a description of the license plate of which we are speaking.</div>
+	<div class="description">
+		This is a description of the license plate of which we are speaking. This is a description of
+		the license plate of which we are speaking. This is a description of the license plate of which
+		we are speaking.
+	</div>
+</div>
 
+<div id="reviews" class="divider horizontal" />
+
+<!-- <Reviews /> -->
 <style>
+	.top {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		padding: 32px;
+
+		justify-content: center;
+		align-items: center;
+		width: 90%;
+	}
+
+	.card {
+		flex: 1 240px;
+	}
+
 	.description {
+		flex: 3;
 		font-family: 'Lora';
 		font-weight: normal;
 		font-size: 0.8rem;
+		padding: 1rem;
+	}
+
+	.divider.horizontal {
+		height: 8px;
+		width: 90vw;
+	}
+
+	@media only screen and (max-width: 40rem) {
+		.top {
+			flex-direction: column;
+		}
 	}
 </style>
