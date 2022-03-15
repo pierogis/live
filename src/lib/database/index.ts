@@ -9,7 +9,7 @@ export const platesSchema = 'plates';
 export let db: Knex;
 export function setupDb() {
 	db = knex({
-		client: 'pg',
+		client: 'postgres',
 		connection: {
 			connectionString: variables.databaseUrl,
 			ssl: dev ? false : { rejectUnauthorized: false }
