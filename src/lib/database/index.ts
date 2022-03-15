@@ -9,7 +9,10 @@ export let db: Knex;
 export function setupDb() {
 	db = knex({
 		client: 'pg',
-		connection: variables.databaseUrl,
+		connection: {
+			connectionString: variables.databaseUrl,
+			ssl: { rejectUnauthorized: false }
+		},
 		searchPath: ['knex', 'public']
 	});
 }

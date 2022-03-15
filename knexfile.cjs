@@ -4,7 +4,10 @@
 module.exports = {
 	development: {
 		client: 'postgresql',
-		connection: require('dotenv').config({ path: '.env' }).parsed.DATABASE_URL,
+		connection: {
+			connectionString: require('dotenv').config({ path: '.env' }).parsed.DATABASE_URL,
+			ssl: { rejectUnauthorized: false }
+		},
 		migrations: {
 			extension: 'cjs'
 		}
