@@ -3,7 +3,7 @@
 
 	/** @type {import('./__error').Load} */
 	export function load({ error, status }) {
-		const message = `${status}${dev ? `: ${error.message}` : ''}`;
+		const message = `Error: ${status}: ${error.message}`;
 		dev && console.error(message);
 		return {
 			props: {
