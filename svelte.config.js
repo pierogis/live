@@ -9,6 +9,9 @@ const config = {
 		adapter: adapter(),
 		methodOverride: {
 			allowed: ['PUT', 'PATCH', 'DELETE']
+		},
+		files: {
+			assets: 'static'
 		}
 	}
 };

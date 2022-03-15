@@ -58,7 +58,7 @@
 					<img
 						class="image inset shadow"
 						class:small
-						src={'/static/karl.svg'}
+						src={'/karl.svg'}
 						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
 							plate.jurisdiction
 						} license plate`}
