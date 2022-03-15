@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { Score, Review } from '$lib/database/models';
+	import type { Score } from '@prisma/client';
+	import type { Review } from '$lib/database/models';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 
@@ -38,27 +39,27 @@
 			{
 				overall: {
 					value: null,
-					description: null
+					explanation: null
 				},
 				identifiability: {
 					value: null,
-					description: null
+					explanation: null
 				},
 				colors: {
 					value: null,
-					description: null
+					explanation: null
 				},
 				symbols: {
 					value: null,
-					description: null
+					explanation: null
 				},
 				typeface: {
 					value: null,
-					description: null
+					explanation: null
 				},
 				clarity: {
 					value: null,
-					description: null
+					explanation: null
 				}
 			}
 		);

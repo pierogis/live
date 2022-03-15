@@ -1,6 +1,6 @@
 import { getPlates } from '$lib/database/plates';
 import { listJurisdictions } from '$lib/database/jurisdictions';
-import type { Plate } from '$lib/database/models';
+import type { Plate } from '@prisma/client';
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function get() {

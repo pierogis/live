@@ -1,29 +1,23 @@
-import { db, platesSchema } from '.';
-import type { Jurisdiction } from './models';
+import { prisma } from '.';
+import type { Jurisdiction } from '@prisma/client';
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
-	return await db.withSchema(platesSchema).table('jurisdictions').select();
+	const jurisdictions = await prisma.jurisdiction.findMany();
+	return jurisdictions;
 }
 
 export async function getJurisdictions(
-	params: { abbreviation?: string },
-	count: number = null,
+	params: Partial<Jurisdiction>,
+	take: number = undefined,
 	skip = 0
 ): Promise<Jurisdiction[]> {
-	const jurisdictionsQuery = db
-		.withSchema(platesSchema)
-		.table('jurisdictions')
-		.select()
-		.where(params)
-		.offset(skip);
+	const jurisdictions = await prisma.jurisdiction.findMany({ where: params, take, skip });
 
-	if (count != null) {
-		jurisdictionsQuery.limit(count);
-	}
-
-	return await jurisdictionsQuery;
+	return jurisdictions;
 }
 
-export async function getJurisdiction(params: { abbreviation?: string }): Promise<Jurisdiction> {
-	return (await getJurisdictions(params, 1))[0];
+export async function getJurisdiction(params: Partial<Jurisdiction>): Promise<Jurisdiction> {
+	const jurisdiction = await prisma.jurisdiction.findFirst({ where: params });
+
+	return jurisdiction;
 }

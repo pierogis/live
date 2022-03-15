@@ -1,49 +1,35 @@
-import { db, platesSchema } from '.';
-import type { User } from './models';
+import { prisma } from '.';
+import type { User } from '@prisma/client';
 
 export async function getUsers(
-	params: { id?: number; serial?: string; email?: string },
-	count: number = null,
+	params: Partial<Omit<User, 'isAdmin'>>,
+	take: number = undefined,
 	skip = 0
 ): Promise<User[]> {
-	const usersQuery = db.withSchema(platesSchema).table('users').select().where(params).offset(skip);
+	const users = await prisma.user.findMany({ where: params, take, skip });
 
-	if (count != null) {
-		usersQuery.limit(count);
-	}
-
-	return await usersQuery;
+	return users;
 }
 
-export async function getUser(params: {
-	id?: number;
-	serial?: string;
-	email?: string;
-}): Promise<User> {
-	return (await getUsers(params, 1))[0];
+export async function getUser(params: Partial<Omit<User, 'isAdmin'>>): Promise<User> {
+	const user = await prisma.user.findFirst({ where: params });
+
+	return user;
 }
 
-export async function createUser(user: Omit<User, 'id' | 'isAdmin'>): Promise<User> {
-	user.serial = user.serial.toUpperCase();
-	const result = await db
-		.withSchema(platesSchema)
-		.table('users')
-		.insert(user)
-		.returning(['id', 'email', 'serial', 'isAdmin']);
-	return result[0];
+export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>): Promise<User> {
+	const user = await prisma.user.create({ data: partial });
+
+	return user;
 }
 
-export async function updateUser(user: Partial<User> & Pick<User, 'id'>): Promise<User> {
-	const { id, ...partial } = user;
-	const result = await db
-		.withSchema(platesSchema)
-		.table('users')
-		.update(partial)
-		.where({ id })
-		.returning(['id', 'serial', 'email', 'isAdmin']);
-	return { id, ...result[0] };
+export async function updateUser(
+	user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'>
+): Promise<User> {
+	const { id, ...data } = user;
+	return await prisma.user.update({ where: { id }, data });
 }
 
 export async function deleteUser(id: number): Promise<void> {
-	return await db.withSchema(platesSchema).table('users').where({ id }).del();
+	await prisma.user.delete({ where: { id } });
 }

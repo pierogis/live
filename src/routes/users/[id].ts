@@ -1,4 +1,4 @@
-import type { User } from '$lib/database/models';
+import type { User } from '@prisma/client';
 import { getUser, updateUser, deleteUser } from '$lib/database/users';
 
 /** @type {import('./users/[id]').RequestHandler} */

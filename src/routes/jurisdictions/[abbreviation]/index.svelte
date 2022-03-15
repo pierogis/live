@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
-	import type { Jurisdiction, Plate } from '$lib/database/models';
+	import type { Jurisdiction, Plate } from '@prisma/client';
 
 	export let jurisdiction: Jurisdiction;
 	export let plates: Plate[];

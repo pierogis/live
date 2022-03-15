@@ -1,22 +1,12 @@
-import { db, platesSchema } from '.';
-
-import type { Category, Score } from './models';
+import { prisma } from '.';
+import type { Score } from '@prisma/client';
 
 export async function getScores(
-	params: { plateId?: number; userId?: string; category?: Category },
-	count: number = null,
+	params: Partial<Omit<Score, 'explanation'>>,
+	take: number = undefined,
 	skip = 0
 ): Promise<Score[]> {
-	const scoresQuery = db
-		.withSchema(platesSchema)
-		.table('scores')
-		.select()
-		.where(params)
-		.offset(skip);
+	const scores = await prisma.score.findMany({ where: params, take, skip });
 
-	if (count != null) {
-		scoresQuery.limit(count);
-	}
-
-	return await scoresQuery;
+	return scores;
 }

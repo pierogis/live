@@ -1,6 +1,7 @@
-import type { Plate } from '$lib/database/models';
+import type { Plate } from '@prisma/client';
 import { listPlates, createPlate } from '$lib/database/plates';
 import { createImage } from '$lib/database/images';
+import { getJurisdiction } from '$lib/database/jurisdictions';
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function get() {
@@ -22,7 +23,7 @@ export async function post({ locals, request }) {
 		const endYearEntry = formData.get('endYear');
 
 		const partial: Omit<Plate, 'id'> = {
-			jurisdiction: jurisdictionEntry.toString(),
+			jurisdictionId: (await getJurisdiction({ abbreviation: jurisdictionEntry.toString() })).id,
 			startYear: startYearEntry ? parseInt(startYearEntry.toString()) : null,
 			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null
 		};

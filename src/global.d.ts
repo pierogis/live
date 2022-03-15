@@ -1,6 +1,6 @@
 interface ImportMetaEnv {}
 
-import type { Jurisdiction, Plate, Score, User, Image } from '$lib/database/models';
+import type { Jurisdiction, Plate, Score, User, Image } from '@prisma/client';
 import { knex } from 'knex';
 import type { Knex } from 'knex';
 

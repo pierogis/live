@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Plate, Score, Image } from '$lib/database/models';
+	import type { Plate, Score, Image } from '@prisma/client';
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
 
-	export let plate: Plate;
+	export let plate: PlateWithJurisdiction;
 
 	export let isAdmin: boolean = false;
 	export let showJurisdiction = true;
@@ -39,7 +39,9 @@
 		</form>
 	{/if}
 	{#if showJurisdiction}
-		<a class="link" href={'/jurisdictions/' + plate.jurisdiction}>{plate.jurisdiction}</a>
+		<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
+			>{plate.jurisdiction.abbreviation}</a
+		>
 	{/if}
 
 	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}>

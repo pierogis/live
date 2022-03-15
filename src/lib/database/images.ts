@@ -1,18 +1,18 @@
-import { db, platesSchema } from '.';
-import type { Image } from './models';
+import { prisma } from '.';
+import type { Image } from '@prisma/client';
 
-export async function getImages(params: { id?: number; plateId?: number }): Promise<Image[]> {
-	const images = await db.withSchema(platesSchema).table('images').select().where(params);
+export async function getImages(
+	params: Partial<Omit<Image, 'url'>>,
+	take: number = undefined,
+	skip = 0
+): Promise<Image[]> {
+	const images = await prisma.image.findMany({ where: params, take, skip });
 
 	return images;
 }
 
-export async function createImage(partial: Omit<Image, 'id'>): Promise<Image> {
-	const images = await db
-		.withSchema(platesSchema)
-		.table('images')
-		.insert({ plateId: partial.plateId, url: partial.url })
-		.returning(['id', 'plateId', 'url']);
+export async function createImage(data: Omit<Image, 'id'>): Promise<Image> {
+	const image = await prisma.image.create({ data });
 
-	return images[0];
+	return image;
 }

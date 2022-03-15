@@ -15,7 +15,7 @@
 
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import type { Plate } from '$lib/database/models';
+	import type { Plate } from '@prisma/client';
 
 	export let plate: Plate;
 	export let isAdmin: boolean;

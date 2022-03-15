@@ -1,4 +1,4 @@
-import type { Plate } from '$lib/database/models';
+import type { Plate } from '@prisma/client';
 import { getPlate, updatePlate, deletePlate } from '$lib/database/plates';
 
 /** @type {import('./plates/[id]').RequestHandler} */
