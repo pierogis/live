@@ -3,10 +3,10 @@
  */
 module.exports = {
 	development: {
-		client: 'postgresql',
+		client: 'pg',
 		connection: {
 			connectionString: require('dotenv').config({ path: '.env' }).parsed.DATABASE_URL,
-			ssl: { rejectUnauthorized: false }
+			ssl: { rejectUnauthorized: false } // comment out this line if using local pg
 		},
 		migrations: {
 			extension: 'cjs'

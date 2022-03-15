@@ -2,6 +2,7 @@ import knex from 'knex';
 import type { Knex } from 'knex';
 
 import { variables } from '$lib/env';
+import { dev } from '$app/env';
 
 export const platesSchema = 'plates';
 
@@ -11,7 +12,7 @@ export function setupDb() {
 		client: 'pg',
 		connection: {
 			connectionString: variables.databaseUrl,
-			ssl: { rejectUnauthorized: false }
+			ssl: dev ? false : { rejectUnauthorized: false }
 		},
 		searchPath: ['knex', 'public']
 	});
