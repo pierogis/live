@@ -1,5 +1,6 @@
 import { prisma } from '.';
 import type { Plate } from '@prisma/client';
+import type { FullPlate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {
 	const plates = await prisma.plate.findMany();
@@ -16,8 +17,39 @@ export async function getPlates(
 	return plates;
 }
 
+export async function getPlatePerJurisdiction(take: number = undefined, skip = 0) {
+	// one plate per jurisdiction
+	const plates = await prisma.plate.findMany({
+		take,
+		skip,
+		distinct: ['jurisdictionId'],
+		include: { jurisdiction: true, images: true }
+	});
+
+	return plates;
+}
+
+export async function getFullPlates(take: number = undefined, skip = 0) {
+	const plates = await prisma.plate.findMany({
+		take,
+		skip,
+		include: { jurisdiction: true, scores: true, images: true }
+	});
+
+	return plates;
+}
+
+export async function getFullPlate(params: Partial<Plate>) {
+	const plate = await prisma.plate.findUnique({
+		where: params,
+		include: { jurisdiction: true, scores: true, images: true }
+	});
+
+	return plate;
+}
+
 export async function getPlate(params: Partial<Plate>): Promise<Plate> {
-	const plate = await prisma.plate.findFirst({ where: params });
+	const plate = await prisma.plate.findUnique({ where: params });
 
 	return plate;
 }
@@ -28,7 +60,7 @@ export async function createPlate(partial: Omit<Plate, 'id'>): Promise<Plate> {
 	return plate;
 }
 
-export async function updatePlate(plate: Partial<Plate> & Pick<Plate, 'id'>): Promise<Plate> {
+export async function updatePlate(plate: Partial<FullPlate> & Pick<Plate, 'id'>) {
 	const { id, ...partial } = plate;
 	return await prisma.plate.update({ where: { id }, data: partial });
 }

@@ -1,9 +1,9 @@
 import type { User } from '@prisma/client';
-import { getUser, updateUser, deleteUser } from '$lib/database/users';
+import { getUserWithScores, updateUser, deleteUser } from '$lib/database/users';
 
 /** @type {import('./users/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
-	const user = await getUser({ id: parseInt(params.id) });
+	const user = await getUserWithScores({ id: parseInt(params.id) });
 
 	return {
 		body: { user }

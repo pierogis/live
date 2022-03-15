@@ -1,11 +1,11 @@
 import type { Plate } from '@prisma/client';
-import { listPlates, createPlate } from '$lib/database/plates';
+import { getFullPlates, createPlate } from '$lib/database/plates';
 import { createImage } from '$lib/database/images';
 import { getJurisdiction } from '$lib/database/jurisdictions';
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function get() {
-	const plates = await listPlates();
+	const plates = await getFullPlates();
 
 	return {
 		status: 200,

@@ -3,8 +3,9 @@
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 	import type { Jurisdiction, Plate } from '@prisma/client';
 
-	export let jurisdiction: Jurisdiction;
-	export let plates: Plate[];
+	export let jurisdiction: Jurisdiction & {
+		plates: Plate[];
+	};
 </script>
 
 <svelte:head>
@@ -17,8 +18,8 @@
 
 <div class="jurisdiction-plates">
 	<CardsGrid>
-		{#each plates as plate}
-			<PlateCard {plate} showJurisdiction={false} small={true} />
+		{#each jurisdiction.plates as plate}
+			<PlateCard {plate} small={true} />
 		{/each}
 	</CardsGrid>
 </div>

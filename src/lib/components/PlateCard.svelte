@@ -1,32 +1,15 @@
 <script lang="ts">
-	import type { Plate, Score, Image } from '@prisma/client';
+	import type { FullPlate } from '$lib/database/models';
 
 	import Card from './Card.svelte';
 	import Scores from './Scores.svelte';
 
-	export let plate: PlateWithJurisdiction;
+	export let plate: FullPlate;
 
-	export let isAdmin: boolean = false;
-	export let showJurisdiction = true;
+	export let isAdmin = false;
 	export let showYears = true;
-	export let showScores = true;
 
 	export let small: boolean;
-
-	async function getScores(plateId: number): Promise<Score[]> {
-		const response = await fetch(`/plates/${plateId}/scores`);
-		const data = await response.json();
-		return data.scores;
-	}
-
-	async function getImages(plateId: number): Promise<Image[]> {
-		const response = await fetch(`/plates/${plateId}/images`);
-		const data = await response.json();
-		return data.images;
-	}
-
-	let scoresPromise: Promise<Score[]> = getScores(plate.id);
-	let imagesPromise: Promise<Image[]> = getImages(plate.id);
 </script>
 
 <Card>
@@ -38,35 +21,32 @@
 			<input type="submit" value="❌" />
 		</form>
 	{/if}
-	{#if showJurisdiction}
-		<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
-			>{plate.jurisdiction.abbreviation}</a
-		>
-	{/if}
 
-	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction : 'plates/' + plate.id)}>
+	<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
+		>{plate.jurisdiction.abbreviation}</a
+	>
+
+	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : 'plates/' + plate.id)}>
 		<div class="image-container">
-			{#await imagesPromise then images}
-				{#if images[0]}
-					<img
-						class="image inset shadow"
-						class:small
-						src={`${images[0].url}/${small ? 'small' : 'medium'}`}
-						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
-							plate.jurisdiction
-						} license plate`}
-					/>
-				{:else}
-					<img
-						class="image inset shadow"
-						class:small
-						src={'/karl.svg'}
-						alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
-							plate.jurisdiction
-						} license plate`}
-					/>
-				{/if}
-			{/await}
+			{#if plate.images}
+				<img
+					class="image inset shadow"
+					class:small
+					src={`${plate.images[0].url}/${small ? 'small' : 'medium'}`}
+					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+						plate.jurisdiction
+					} license plate`}
+				/>
+			{:else}
+				<img
+					class="image inset shadow"
+					class:small
+					src={'/karl.svg'}
+					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+						plate.jurisdiction.abbreviation
+					} license plate`}
+				/>
+			{/if}
 		</div>
 	</a>
 
@@ -75,10 +55,8 @@
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
-	{#if showScores}
-		{#await scoresPromise then scores}
-			<Scores scores={scores || []} />
-		{/await}
+	{#if plate.scores}
+		<Scores scores={plate.scores} />
 	{/if}
 </Card>
 

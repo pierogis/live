@@ -21,3 +21,12 @@ export async function getJurisdiction(params: Partial<Jurisdiction>): Promise<Ju
 
 	return jurisdiction;
 }
+
+export async function getJurisidictionWithPlates(params: Partial<Jurisdiction>) {
+	const jurisdictions = await prisma.jurisdiction.findUnique({
+		where: params,
+		include: { plates: { include: { jurisdiction: true, images: true, scores: true } } }
+	});
+
+	return jurisdictions;
+}

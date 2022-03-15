@@ -11,13 +11,19 @@ export async function getUsers(
 	return users;
 }
 
-export async function getUser(params: Partial<Omit<User, 'isAdmin'>>): Promise<User> {
-	const user = await prisma.user.findFirst({ where: params });
+export async function getUser(params: Partial<Omit<User, 'isAdmin'>>) {
+	const user = await prisma.user.findUnique({ where: params });
 
 	return user;
 }
 
-export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>): Promise<User> {
+export async function getUserWithScores(params: Partial<Omit<User, 'isAdmin'>>) {
+	const user = await prisma.user.findUnique({ where: params, include: { scores: true } });
+
+	return user;
+}
+
+export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>) {
 	const user = await prisma.user.create({ data: partial });
 
 	return user;

@@ -45,3 +45,9 @@ export type Review = {
 // 	serial: string;
 // 	isAdmin: boolean;
 // }
+
+export type FullPlate = Plate & {
+	jurisdiction?: Jurisdiction;
+	scores?: Jurisdiction;
+	images?: Jurisdiction;
+};

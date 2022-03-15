@@ -20,7 +20,7 @@ export async function handle({ event, resolve }) {
 
 	if (variables.sessionName in cookies) {
 		try {
-			let { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
+			const { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
 
 			if (userId) {
 				const user = await getUser({ id: userId });
@@ -35,7 +35,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	let response = await resolve(event);
+	const response = await resolve(event);
 
 	if (deleteCookie) {
 		const cookie = expireSessionCookie();
