@@ -3,8 +3,9 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "svelte-kit dev",
-		"build": "prisma generate && prisma migrate deploy && svelte-kit build",
-		"prepare": "svelte-kit sync && prisma generate",
+		"build": "svelte-kit build",
+		"vercel-build": "prisma generate && prisma migrate deploy && next build",
+		"prepare": "svelte-kit sync",
 		"package": "svelte-kit package",
 		"preview": "svelte-kit preview",
 		"db:migrate": "prisma migrate",
