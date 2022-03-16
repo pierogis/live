@@ -1,3 +1,16 @@
+<script lang="ts" context="module">
+	/** @type {import('./jurisdictions/[id]').Load} */
+	export async function load({ props }) {
+		if (!props.jurisdiction) {
+			return { status: 404, error: "jurisdiction doesn't exist" };
+		}
+
+		return {
+			props: { ...props }
+		};
+	}
+</script>
+
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
