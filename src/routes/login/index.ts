@@ -62,7 +62,7 @@ export async function post({ request }: { request: Request }) {
 			if (correctPassphrase == passphrase.toString()) {
 				let user = await getUser({ email });
 				if (!user) {
-					user = await createUser({ email, serial: generateSerial() });
+					user = await createUser({ email, serial: generateSerial().toUpperCase() });
 				}
 
 				const cookie = await createSessionCookie({ userId: user.id });

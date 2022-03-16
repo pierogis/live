@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Plate } from '$lib/database/models';
+	import type { Plate } from '@prisma/client';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';

@@ -1,10 +1,10 @@
-import type { Plate } from '$lib/database/models';
-import { getPlate, updatePlate, deletePlate } from '$lib/database/plates';
+import type { Plate } from '@prisma/client';
+import { updatePlate, deletePlate, getFullPlate } from '$lib/database/plates';
 
 /** @type {import('./plates/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	const parsedParams = { ...params, id: parseInt(params.id) };
-	const plate = await getPlate(parsedParams);
+	const plate = await getFullPlate(parsedParams);
 
 	return {
 		status: 200,
@@ -15,21 +15,20 @@ export async function get({ params }: { params: { id: string } }) {
 /** @type {import('./plates/[id]/index').RequestHandler} */
 export async function put({ locals, request, params }) {
 	if (locals.user?.isAdmin) {
-		const formData = await request.formData();
+		const formData: FormData = await request.formData();
 
-		let data = {};
-		formData.forEach((v, k) => {
-			data[k] = v.valueOf();
-		});
+		const jurisdictionEntry = formData.get('jurisdiction');
+		const startYearEntry = formData.get('startYear');
+		const endYearEntry = formData.get('endYear');
 
-		let plate: Plate = {
+		const plate = {
 			id: parseInt(params.id),
-			jurisdiction: data['jurisdiction'],
-			startYear: data['startYear'] != '' ? parseInt(data['startYear']) : null,
-			endYear: data['endYear'] != '' ? parseInt(data['endYear']) : null
+			jurisdiction: { abbreviation: jurisdictionEntry.toString() },
+			startYear: startYearEntry != '' ? parseInt(startYearEntry.toString()) : null,
+			endYear: endYearEntry != '' ? parseInt(endYearEntry.toString()) : null
 		};
 
-		plate = await updatePlate(plate);
+		await updatePlate(plate);
 
 		// redirect to the updated plate
 		return {

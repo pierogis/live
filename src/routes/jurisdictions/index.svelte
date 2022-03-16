@@ -1,10 +1,12 @@
 <script lang="ts">
-	import type { Plate } from '$lib/database/models';
+	import type { Jurisdiction, Plate } from '@prisma/client';
 
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 	import PlateCard from '$lib/components/PlateCard.svelte';
 
-	export let jurisdictionsPlate: { [key: string]: Plate };
+	export let plates: (Plate & {
+		jurisdiction: Jurisdiction;
+	})[];
 </script>
 
 <svelte:head>
@@ -12,7 +14,7 @@
 </svelte:head>
 
 <CardsGrid>
-	{#each Object.entries(jurisdictionsPlate) as [jurisdiction, plate]}
-		<PlateCard {plate} showJurisdiction={true} showYears={false} showScores={false} small={true} />
+	{#each plates as plate}
+		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { session } from '$app/stores';
-	import type { User } from '$lib/database/models';
+	import type { User } from '@prisma/client';
 
 	let user: User = $session.user;
 </script>

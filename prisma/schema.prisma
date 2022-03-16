@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Image {
+  id      Int     @id(map: "Image_pkey") @default(autoincrement())
+  plateId Int
+  url     String? @db.VarChar(255)
+  plate   Plate   @relation(fields: [plateId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Image_plateId_foreign")
+}
+
+model Jurisdiction {
+  id           Int     @id(map: "Jurisdiction_pkey") @default(autoincrement())
+  abbreviation String  @db.VarChar(2)
+  name         String  @db.VarChar(255)
+  plates       Plate[]
+}
+
+model Plate {
+  id                               Int          @id(map: "Plate_pkey") @default(autoincrement())
+  jurisdictionId                   Int
+  startYear                        Int?
+  endYear                          Int?
+  jurisdiction                     Jurisdiction @relation(fields: [jurisdictionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Plate_jurisdictionId_fkey")
+  images                           Image[]
+  scores                           Score[]
+}
+
+enum Category {
+  overall
+  identifiability
+  colors
+  symbols
+  typeface
+  clarity
+}
+
+model Score {
+  plateId     Int
+  userId      Int
+  category    Category
+  value       Int?
+  explanation String? @db.VarChar(255)
+  plate       Plate   @relation(fields: [plateId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Score_plateId_fkey")
+  user        User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Score_userId_fkey")
+
+  @@id([plateId, userId, category], map: "Score_pkey")
+}
+
+model User {
+  id      Int     @id(map: "User_pkey") @default(autoincrement())
+  email   String  @unique(map: "User_email_unique") @db.VarChar(255)
+  serial  String  @unique(map: "User_serial_unique") @db.VarChar(255)
+  isAdmin Boolean @default(false)
+  scores  Score[]
+}

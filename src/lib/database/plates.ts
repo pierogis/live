@@ -1,53 +1,70 @@
-import { db, platesSchema } from '.';
-import type { Plate } from './models';
+import { prisma } from '.';
+import type { Plate } from '@prisma/client';
+import type { FullPlate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {
-	return await db.withSchema(platesSchema).table('plates').select();
+	const plates = await prisma.plate.findMany();
+	return plates;
 }
 
 export async function getPlates(
-	params: { id?: number; jurisdiction?: string },
-	count: number = null,
+	params: Partial<Plate>,
+	take: number = undefined,
 	skip = 0
 ): Promise<Plate[]> {
-	const platesQuery = db
-		.withSchema(platesSchema)
-		.table('plates')
-		.select()
-		.where(params)
-		.offset(skip);
+	const plates = await prisma.plate.findMany({ where: params, take, skip });
 
-	if (count != null) {
-		platesQuery.limit(count);
-	}
-
-	return await platesQuery;
+	return plates;
 }
 
-export async function getPlate(params: { id?: number; jurisdiction?: string }): Promise<Plate> {
-	return (await getPlates(params, 1))[0];
+export async function getPlatePerJurisdiction(take: number = undefined, skip = 0) {
+	// one plate per jurisdiction
+	const plates = await prisma.plate.findMany({
+		take,
+		skip,
+		distinct: ['jurisdictionId'],
+		include: { jurisdiction: true, images: true }
+	});
+
+	return plates;
 }
 
-export async function createPlate(plate: Omit<Plate, 'id'>): Promise<Plate> {
-	const result = await db
-		.withSchema(platesSchema)
-		.table('plates')
-		.insert(plate)
-		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
-	return result[0];
+export async function getFullPlates(take: number = undefined, skip = 0) {
+	const plates = await prisma.plate.findMany({
+		take,
+		skip,
+		include: { jurisdiction: true, scores: true, images: true }
+	});
+
+	return plates;
 }
 
-export async function updatePlate(plate: Plate): Promise<Plate> {
+export async function getFullPlate(params: Partial<Plate>) {
+	const plate = await prisma.plate.findUnique({
+		where: params,
+		include: { jurisdiction: true, scores: true, images: true }
+	});
+
+	return plate;
+}
+
+export async function getPlate(params: Partial<Plate>): Promise<Plate> {
+	const plate = await prisma.plate.findUnique({ where: params });
+
+	return plate;
+}
+
+export async function createPlate(partial: Omit<Plate, 'id'>): Promise<Plate> {
+	const plate = await prisma.plate.create({ data: partial });
+
+	return plate;
+}
+
+export async function updatePlate(plate: Partial<FullPlate> & Pick<Plate, 'id'>) {
 	const { id, ...partial } = plate;
-	const result = await db
-		.withSchema(platesSchema)
-		.table('plates')
-		.update(partial)
-		.where({ id })
-		.returning(['id', 'jurisdiction', 'startYear', 'endYear']);
-	return { id, ...result[0] };
+	return await prisma.plate.update({ where: { id }, data: partial });
 }
 
 export async function deletePlate(id: number): Promise<void> {
-	return await db.withSchema(platesSchema).table('plates').where({ id }).del();
+	await prisma.plate.delete({ where: { id } });
 }

@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-	import type { User } from '$lib/database/models';
+	import type { User } from '@prisma/client';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 

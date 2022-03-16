@@ -1,3 +1,4 @@
+/** @type {Omit<import('@prisma/client').Jurisdiction, 'id'>[]} */
 const jurisdictions = [
 	{ abbreviation: 'al', name: 'alabama' },
 	{ abbreviation: 'ak', name: 'alaska' },
@@ -57,8 +58,6 @@ const jurisdictions = [
 	{ abbreviation: 'wy', name: 'wyoming' }
 ];
 
-const schema = 'plates';
-exports.seed = async function (knex) {
-	await knex.withSchema(schema).table('jurisdictions').del();
-	await knex.withSchema(schema).table('jurisdictions').insert(jurisdictions);
+module.exports = {
+	jurisdictions
 };

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import DropZone from '$lib/components/DropZone.svelte';
-	import type { Jurisdiction, Plate, Image } from '$lib/database/models';
+	import type { FullPlate } from '$lib/database/models';
+	import type { Jurisdiction, Plate, Image } from '@prisma/client';
 	import Scores from './Scores.svelte';
 
 	export let jurisdictions: Jurisdiction[];
-	export let plate: Plate = null;
+	export let plate: FullPlate = null;
 	export let images: Image[] = null;
 	// export let showImageInput = false;
 
@@ -24,7 +25,7 @@
 		name="jurisdiction"
 		maxlength="2"
 		placeholder="oh"
-		value={plate ? plate.jurisdiction : ''}
+		value={plate ? plate.jurisdiction.abbreviation : ''}
 	/>
 
 	<datalist id="jurisdictions">

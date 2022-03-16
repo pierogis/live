@@ -1,7 +1,6 @@
 import { parse } from 'cookie';
 
 import { variables, setupEnv } from '$lib/env';
-import { db, setupDb } from '$lib/database';
 import { cache, setupCache } from '$lib/cache';
 import { expireSessionCookie, getUserSession } from '$lib/session';
 import { setup, setupWords } from '$lib/words';
@@ -11,7 +10,7 @@ import { getUser } from '$lib/database/users';
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	if (!variables) setupEnv();
-	if (!db) setupDb();
+	// if (!db) setupDb();
 	if (!setup) setupWords();
 	if (!cache) setupCache();
 
@@ -21,7 +20,7 @@ export async function handle({ event, resolve }) {
 
 	if (variables.sessionName in cookies) {
 		try {
-			let { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
+			const { userId } = await getUserSession<{ userId: number }>(cookies[variables.sessionName]);
 
 			if (userId) {
 				const user = await getUser({ id: userId });
@@ -36,7 +35,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	let response = await resolve(event);
+	const response = await resolve(event);
 
 	if (deleteCookie) {
 		const cookie = expireSessionCookie();

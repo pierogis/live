@@ -1,10 +1,24 @@
+<script lang="ts" context="module">
+	/** @type {import('./jurisdictions/[id]').Load} */
+	export async function load({ props }) {
+		if (!props.jurisdiction) {
+			return { status: 404, error: "jurisdiction doesn't exist" };
+		}
+
+		return {
+			props: { ...props }
+		};
+	}
+</script>
+
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
-	import type { Jurisdiction, Plate } from '$lib/database/models';
+	import type { Jurisdiction, Plate } from '@prisma/client';
 
-	export let jurisdiction: Jurisdiction;
-	export let plates: Plate[];
+	export let jurisdiction: Jurisdiction & {
+		plates: Plate[];
+	};
 </script>
 
 <svelte:head>
@@ -17,8 +31,8 @@
 
 <div class="jurisdiction-plates">
 	<CardsGrid>
-		{#each plates as plate}
-			<PlateCard {plate} showJurisdiction={false} small={true} />
+		{#each jurisdiction.plates as plate}
+			<PlateCard {plate} small={true} />
 		{/each}
 	</CardsGrid>
 </div>

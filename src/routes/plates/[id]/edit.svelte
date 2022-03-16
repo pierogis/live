@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-	import type { Jurisdiction, Plate, Image } from '$lib/database/models';
+	import type { Jurisdiction, Plate, Image } from '@prisma/client';
 
 	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
 

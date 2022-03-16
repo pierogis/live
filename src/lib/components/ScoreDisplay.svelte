@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Score } from '$lib/database/models';
+	import type { Score } from '@prisma/client';
 
-	export let editorialScore: Score;
-	export let userScore: Pick<Score, 'value' | 'description'>;
+	export let editorialScore: Pick<Score, 'value' | 'explanation'>;
+	export let userScore: Pick<Score, 'value' | 'explanation'>;
 	let placeholderScore = { value: 0, description: '' };
 
 	$: user = userScore.value != null;
