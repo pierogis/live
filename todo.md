@@ -1,4 +1,5 @@
 features
+
 - [ ] reviews
   - [ ] add words "editor"
   - [ ] process in endpoint
@@ -6,6 +7,7 @@ features
     - add smaller plates grid with reviews prioritized
   - [ ] display on plates
 - [ ] image upload/fetch
+
   - [x] fetch
   - [ ] upload
 
@@ -16,5 +18,6 @@ features
   - [x] not allowing email update for now
 
 bugs
+
 - [x] goto not available on server on `/account`
   - [x] add redirect "fallback" to endpoint

@@ -3,15 +3,12 @@ import { parse } from 'cookie';
 import { variables, setupEnv } from '$lib/env';
 import { cache, setupCache } from '$lib/cache';
 import { expireSessionCookie, getUserSession } from '$lib/session';
-import { setup, setupWords } from '$lib/words';
 
 import { getUser } from '$lib/database/users';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	if (!variables) setupEnv();
-	// if (!db) setupDb();
-	if (!setup) setupWords();
 	if (!cache) setupCache();
 
 	const cookies = parse(event.request.headers.get('cookie') || '');
