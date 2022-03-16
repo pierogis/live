@@ -11,7 +11,7 @@ const config = {
 			allowed: ['PUT', 'PATCH', 'DELETE']
 		},
 		files: {
-			assets: 'static'
+			assets: 'static/**'
 		}
 	}
 };
