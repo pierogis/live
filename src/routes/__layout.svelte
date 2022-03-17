@@ -62,12 +62,12 @@
 		font-family: 'Courier', monospace;
 		font-weight: 600;
 		font-style: normal;
-		font-size: 20px;
+		font-size: 16px;
 		color: var(--text-color);
 
 		background: transparent;
 	}
-	@media only screen and (max-width: 400px) {
+	@media only screen and (max-width: 320px) {
 		* {
 			font-size: 5vw;
 		}
@@ -125,6 +125,13 @@
 
 	a {
 		text-decoration: none;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	}
+
+	a:focus,
+	a:visited,
+	a:active {
+		outline: none;
 	}
 
 	.title {
@@ -186,7 +193,7 @@
 	@media only screen and (max-width: 640px) {
 		.content {
 			flex-direction: column;
-			align-items: center;
+			align-content: center;
 		}
 		.divider {
 			height: 8px;

@@ -39,94 +39,86 @@
 		bad={flowStatus.alertState === false}
 	/>{/if}
 
+<form id="login" action="/login" method="post" />
 <Card>
-	<form action="/login" method="post">
-		<input type="hidden" name="generated" value={!generated} />
-		<div class="input-container">
-			<label for="email">email</label>
-			<input
-				readonly={generated && flowStatus && flowStatus.emailState}
-				class="border inset shadow"
-				class:good={flowStatus && flowStatus.emailState === true}
-				class:bad={flowStatus && flowStatus.emailState === false}
-				id="email"
-				type="email"
-				name="email"
-				placeholder={sampleEmail}
-				bind:value={email}
-			/>
-		</div>
-		{#if generated}
-			<div class="input-container">
-				<label for="passphrase">temporary passphrase</label>
-				<input
-					class="border inset shadow"
-					class:good={flowStatus && flowStatus.passphraseState === true}
-					class:bad={flowStatus && flowStatus.passphraseState === false}
-					id="passphrase"
-					type="text"
-					name="passphrase"
-					placeholder={samplePhrase}
-					bind:value={passphrase}
-				/>
-			</div>
-		{/if}
+	<input type="hidden" name="generated" form="login" value={!generated} />
+	<label for="email">email</label>
+	<input
+		readonly={generated && flowStatus && flowStatus.emailState}
+		class="border inset shadow"
+		class:good={flowStatus && flowStatus.emailState === true}
+		class:bad={flowStatus && flowStatus.emailState === false}
+		id="email"
+		type="email"
+		name="email"
+		form="login"
+		placeholder={sampleEmail}
+		bind:value={email}
+	/>
+	{#if generated}
+		<label for="passphrase">temporary passphrase</label>
+		<input
+			class="border inset shadow"
+			class:good={flowStatus && flowStatus.passphraseState === true}
+			class:bad={flowStatus && flowStatus.passphraseState === false}
+			id="passphrase"
+			type="text"
+			name="passphrase"
+			form="login"
+			placeholder={samplePhrase}
+			bind:value={passphrase}
+		/>
+	{/if}
 
+	<button
+		class="border inset shadow good"
+		type="submit"
+		form="login"
+		title={generated ? '' : 'email a temporary passphrase'}
+		>{generated ? 'login' : 'generate'}</button
+	>
+
+	{#if generated}
+		<!-- svelte-ignore a11y-accesskey -->
 		<button
-			class="border inset shadow good"
 			type="submit"
-			title={generated ? '' : 'email a temporary passphrase'}
-			>{generated ? 'login' : 'generate'}</button
+			formmethod="get"
+			form="login"
+			class="shortcut border inset shadow"
+			on:click|preventDefault={() => {
+				goto(`/login?email=${email}`);
+			}}
+			accesskey="g"
 		>
-
-		{#if generated}
-			<!-- svelte-ignore a11y-accesskey -->
-			<button
-				type="submit"
-				formmethod="get"
-				class="border inset shadow"
-				on:click|preventDefault={() => {
-					goto(`/login?email=${email}`);
-				}}
-				accesskey="g"
-			>
-				need a new passphrase?
-			</button>
-		{:else}
-			<!-- svelte-ignore a11y-accesskey -->
-			<button
-				type="submit"
-				formmethod="get"
-				class="border inset shadow"
-				on:click|preventDefault={() => {
-					goto(`/login?email=${email}&generated=true`);
-				}}
-				accesskey="r"
-			>
-				already have a passphrase?
-			</button>
-		{/if}
-	</form>
+			need a new passphrase?
+		</button>
+	{:else}
+		<!-- svelte-ignore a11y-accesskey -->
+		<button
+			type="submit"
+			formmethod="get"
+			form="login"
+			class="shortcut border inset shadow"
+			on:click|preventDefault={() => {
+				goto(`/login?email=${email}&generated=true`);
+			}}
+			accesskey="r"
+		>
+			already have a passphrase?
+		</button>
+	{/if}
 </Card>
 
 <style>
-	form {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-	}
 	label {
 		display: block;
 		margin-bottom: 0.25rem;
 	}
-	.input-container {
-		width: 20rem;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	.shortcut {
+		font-size: 0.8rem;
 	}
 	input {
-		width: 16rem;
+		width: 20rem;
+		max-width: 90%;
 	}
 </style>
