@@ -1,5 +1,5 @@
 import { prisma } from '.';
-import type { Plate } from '@prisma/client';
+import type { Plate, Prisma } from '@prisma/client';
 import type { FullPlate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {
@@ -54,7 +54,7 @@ export async function getPlate(params: Partial<Plate>): Promise<Plate> {
 	return plate;
 }
 
-export async function createPlate(partial: Omit<Plate, 'id'>): Promise<Plate> {
+export async function createPlate(partial: Prisma.PlateCreateInput): Promise<Plate> {
 	const plate = await prisma.plate.create({ data: partial });
 
 	return plate;

@@ -6,7 +6,7 @@
 
 	export let plate: FullPlate;
 
-	export let isAdmin = false;
+	export let isAdmin: boolean = false;
 	export let showYears = true;
 
 	export let small: boolean;
@@ -14,11 +14,8 @@
 
 <Card>
 	{#if isAdmin}
-		<form class="admin-controls left" action="/plates/{plate.id}/edit">
+		<form class="edit" action="/plates/{plate.id}/edit" method="get">
 			<input type="submit" value="✎" />
-		</form>
-		<form class="admin-controls right" action="/plates/{plate.id}?_method=DELETE" method="post">
-			<input type="submit" value="❌" />
 		</form>
 	{/if}
 
@@ -32,7 +29,7 @@
 				<img
 					class="image inset shadow"
 					class:small
-					src={`${plate.images[0].url}/${small ? 'small' : 'medium'}`}
+					src={plate.images[0].url}
 					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
 						plate.jurisdiction
 					} license plate`}
@@ -56,21 +53,20 @@
 		>
 	{/if}
 	{#if plate.scores}
-		<Scores scores={plate.scores} />
+		<Scores scores={plate.scores} scoreChangeUrl={`/plates/${plate.id}/scores/`} />
 	{/if}
 </Card>
 
 <style>
-	.admin-controls {
+	.edit {
 		position: absolute;
 		display: flex;
-	}
-	.admin-controls.left {
+
+		background-color: transparent;
+
 		left: 0.4rem;
 	}
-	.admin-controls.right {
-		right: 0.4rem;
-	}
+
 	.image {
 		object-fit: contain;
 

@@ -1,7 +1,5 @@
-import type { Plate } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { getFullPlates, createPlate } from '$lib/database/plates';
-import { createImage } from '$lib/database/images';
-import { getJurisdiction } from '$lib/database/jurisdictions';
 
 /** @type {import('./plates/index').RequestHandler} */
 export async function get() {
@@ -21,19 +19,27 @@ export async function post({ locals, request }) {
 		const jurisdictionEntry = formData.get('jurisdiction');
 		const startYearEntry = formData.get('startYear');
 		const endYearEntry = formData.get('endYear');
+		const imageUrlEntry = formData.get('imageUrl');
 
-		const partial: Omit<Plate, 'id'> = {
-			jurisdictionId: (await getJurisdiction({ abbreviation: jurisdictionEntry.toString() })).id,
+		if (!jurisdictionEntry) {
+			return {
+				status: 400,
+				body: { error: `jurisdiction not provided` }
+			};
+		}
+
+		const partial: Prisma.PlateCreateInput = {
+			jurisdiction: { connect: { abbreviation: jurisdictionEntry.toString() } },
 			startYear: startYearEntry ? parseInt(startYearEntry.toString()) : null,
-			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null
+			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null,
+			images: imageUrlEntry
+				? {
+						create: [{ url: imageUrlEntry.toString() }]
+				  }
+				: undefined
 		};
 
 		const plate = await createPlate(partial);
-
-		const imageUrlEntry = formData.get('imageUrl');
-		if (imageUrlEntry) {
-			const image = await createImage({ plateId: plate.id, url: imageUrlEntry.toString() });
-		}
 
 		// redirect to the newly created plate
 		return {

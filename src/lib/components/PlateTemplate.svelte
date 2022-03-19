@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
-	import DropZone from '$lib/components/DropZone.svelte';
+	// import DropZone from '$lib/components/DropZone.svelte';
 	import type { FullPlate } from '$lib/database/models';
-	import type { Jurisdiction, Plate, Image } from '@prisma/client';
-	import Scores from './Scores.svelte';
+	import type { Jurisdiction, Image } from '@prisma/client';
 
 	export let jurisdictions: Jurisdiction[];
 	export let plate: FullPlate = null;
-	export let images: Image[] = null;
 	// export let showImageInput = false;
 
 	// let imageInputElement: HTMLInputElement;
@@ -18,11 +16,18 @@
 </script>
 
 <Card>
+	{#if plate}
+		<form class="delete" action="/plates/{plate.id}?_method=DELETE" method="post">
+			<input type="submit" value="❌" />
+		</form>
+	{/if}
+
 	<input
 		type="text"
 		class="jurisdiction border inset shadow"
 		list="jurisdictions"
 		name="jurisdiction"
+		required
 		maxlength="2"
 		placeholder="oh"
 		value={plate ? plate.jurisdiction.abbreviation : ''}
@@ -45,7 +50,7 @@
 		type="url"
 		class="border inset shadow"
 		name="imageUrl"
-		value={images ? images[0].url : ''}
+		value={plate.images ? plate.images[0].url : ''}
 		placeholder="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 	/>
 
@@ -66,16 +71,27 @@
 			maxlength="4"
 		/>
 	</span>
-	<Scores scores={[]} />
 	<input class="border inset shadow" type="submit" method="post" value="submit" />
 </Card>
 
 <style>
+	.delete {
+		position: absolute;
+		display: flex;
+
+		background-color: transparent;
+
+		right: 0.4rem;
+	}
+
 	input[type='text'].jurisdiction {
 		width: 2em;
 	}
 	input[type='text'].year {
 		width: 3em;
+	}
+	input[type='url'] {
+		width: 20em;
 	}
 	.image-input {
 		max-height: 196px;

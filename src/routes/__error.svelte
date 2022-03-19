@@ -2,8 +2,8 @@
 	import { dev } from '$app/env';
 
 	/** @type {import('./__error').Load} */
-	export function load({ error, status }) {
-		const message = `Error: ${status}: ${error.message}`;
+	export function load({ error, status, session }) {
+		const message = `${status}${dev || session.user?.isAdmin ? `: ${error.message}` : ''}`;
 		dev && console.error(message);
 		return {
 			props: {
