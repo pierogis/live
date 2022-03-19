@@ -1,11 +1,10 @@
 import { dev } from '$app/env';
-
 import { variables } from '$lib/env';
+
 import { createUser, getUser } from '$lib/database/users';
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/words';
-
+import { sendPassphraseEmail } from '$lib/auth';
 import { createSessionCookie } from '$lib/session';
-import { sendEmail } from '$lib/auth';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
 
 /** @type {import('./login/index').RequestHandler} */
@@ -32,7 +31,7 @@ export async function post({ request }: { request: Request }) {
 		const email = emailEntry.toString();
 
 		if (emailEntry) {
-			const generatedPassphrase = dev ? variables.devPassphrase : await sendEmail(email);
+			const generatedPassphrase = dev ? variables.devPassphrase : await sendPassphraseEmail(email);
 
 			await setEmailPassphrase(email, generatedPassphrase);
 

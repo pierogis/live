@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import { variables } from '$lib/env';
 import { generatePhrase } from './words';
 
-export async function sendEmail(email: string): Promise<string> {
+export async function sendPassphraseEmail(email: string): Promise<string> {
 	const generatedPassphrase = generatePhrase();
 	// send email with generated passphrase
 	const transporter = nodemailer.createTransport({
@@ -18,11 +18,27 @@ export async function sendEmail(email: string): Promise<string> {
 
 	// send mail with defined transport object
 	const info = await transporter.sendMail({
-		from: '"Karlbot" <no-reply@pierogis.live>', // sender address
-		to: email, // list of receivers
-		subject: 'generated passphrase', // Subject line
-		text: generatedPassphrase, // plain text body
-		html: `<b>${generatedPassphrase}</b>` // html body
+		from: '"Karlbot" <no-reply@pierogis.live>',
+		to: email,
+		subject: 'generated passphrase',
+		text: `hello ${email},
+			\n
+			\n
+			this is your one time passphrase:
+			\n
+			${generatedPassphrase}
+			\n
+			it will be valid for 1 minute
+		`,
+		html: `hello <i>${email}</i>,
+			<br>
+			<br>
+			this is your one time passphrase:
+			<br>
+			<b>${generatedPassphrase}</b>
+			<br>
+			it will be valid for 1 minute
+		`
 	});
 
 	return generatedPassphrase;
