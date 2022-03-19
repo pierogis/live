@@ -1,5 +1,5 @@
 /** @type {Omit<import('@prisma/client').Jurisdiction, 'id'>[]} */
-const jurisdictions = [
+export const jurisdictions = [
 	{ abbreviation: 'al', name: 'alabama' },
 	{ abbreviation: 'ak', name: 'alaska' },
 	{ abbreviation: 'as', name: 'american samoa' },
@@ -57,7 +57,3 @@ const jurisdictions = [
 	{ abbreviation: 'wi', name: 'wisconsin' },
 	{ abbreviation: 'wy', name: 'wyoming' }
 ];
-
-module.exports = {
-	jurisdictions
-};

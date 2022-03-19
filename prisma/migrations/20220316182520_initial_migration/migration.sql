@@ -34,7 +34,7 @@ CREATE TABLE "Score" (
     "plateId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "category" "Category" NOT NULL,
-    "value" INTEGER,
+    "value" INTEGER CONSTRAINT serial_is_capital CHECK ("value" <= 10),
     "explanation" VARCHAR(255),
 
     CONSTRAINT "Score_pkey" PRIMARY KEY ("plateId","userId","category")
@@ -44,11 +44,14 @@ CREATE TABLE "Score" (
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "serial" VARCHAR(255) NOT NULL,
+    "serial" VARCHAR(255) NOT NULL CONSTRAINT serial_is_capital CHECK ("serial" = UPPER("serial")),
     "isAdmin" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Jurisdiction_abbreviation_unique" ON "Jurisdiction"("abbreviation");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_unique" ON "User"("email");
@@ -57,13 +60,13 @@ CREATE UNIQUE INDEX "User_email_unique" ON "User"("email");
 CREATE UNIQUE INDEX "User_serial_unique" ON "User"("serial");
 
 -- AddForeignKey
-ALTER TABLE "Image" ADD CONSTRAINT "Image_plateId_foreign" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "Image" ADD CONSTRAINT "Image_plateId_fkey" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "Plate" ADD CONSTRAINT "Plate_jurisdictionId_fkey" FOREIGN KEY ("jurisdictionId") REFERENCES "Jurisdiction"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "Plate" ADD CONSTRAINT "Plate_jurisdictionId_fkey" FOREIGN KEY ("jurisdictionId") REFERENCES "Jurisdiction"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "Score" ADD CONSTRAINT "Score_plateId_fkey" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "Score" ADD CONSTRAINT "Score_plateId_fkey" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "Score" ADD CONSTRAINT "Score_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "Score" ADD CONSTRAINT "Score_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
