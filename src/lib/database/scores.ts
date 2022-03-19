@@ -10,3 +10,27 @@ export async function getScores(
 
 	return scores;
 }
+
+export async function upsertScore(
+	params: Partial<Score> & Pick<Score, 'plateId' | 'userId' | 'category'>
+): Promise<Score> {
+	const score = await prisma.score.upsert({
+		where: {
+			plateId_userId_category: {
+				plateId: params.plateId,
+				userId: params.userId,
+				category: params.category
+			}
+		},
+		update: { value: params.value, explanation: params.explanation },
+		create: {
+			plateId: params.plateId,
+			userId: params.userId,
+			category: params.category,
+			value: params.value,
+			explanation: params.explanation
+		}
+	});
+
+	return score;
+}

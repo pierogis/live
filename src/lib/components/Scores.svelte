@@ -3,8 +3,11 @@
 	import type { Review } from '$lib/database/models';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
+	import { session } from '$app/stores';
+	import ScoreGraph from './ScoreGraph.svelte';
 
 	export let scores: Score[];
+	export let scoreChangeUrl: string;
 
 	const categories = {
 		identifiability: { emoji: '👁️' },
@@ -19,17 +22,15 @@
 
 	let editorial: Review;
 	$: editorial = scores
-		.filter((score) => score.userId == 0)
+		.filter((score) => score.userId == 1)
 		.reduce((previous, score) => {
 			previous[score.category] = score;
 
 			return previous;
 		}, {});
 
-	const userId = 0;
-
 	let userReview = scores
-		.filter((score) => score.userId == userId)
+		.filter((score) => score.userId == $session.user?.id)
 		.reduce(
 			(previous, score) => {
 				previous[score.category] = score;
@@ -63,46 +64,43 @@
 				}
 			}
 		);
-
-	let reviews: {
-		[userId: string]: Review;
-	} = {};
-
-	// $: review = editorial
-	// 	? editorial
-	// 	: reviews.reduce((previous, review) => {
-	// 			previous.overall.value = review.overall.value / reviews.length;
-	// 			previous.identifiability.value = review.identifiability / reviews.length;
-	// 			previous.colors.value = review.colors.value / reviews.length;
-	// 			previous.symbols.value = review.symbols.value / reviews.length;
-	// 			previous.typeface.value = review.typeface.value / reviews.length;
-	// 			previous.clarity.value = review.clarity.value / reviews.length;
-	// 			return previous;
-	// 	  });
-
-	// if no user score for this category, show editorial
-	// if user score, font color should be differents
 </script>
 
 <div class="scores">
 	<div aria-describedby="score-summary" class="inner">
-		<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
+		<ScoreDisplay
+			editorialScore={editorial['overall']}
+			bind:userScore={userReview['overall']}
+			scoreChangeUrl={scoreChangeUrl + 'overall'}
+		/>
 	</div>
 
 	<div role="tooltip" class="review border inset shadow" id="score-summary">
 		<div class="category">
 			<span class="emoji" title="overall">🌡️</span>
-			<ScoreDisplay editorialScore={editorial['overall']} bind:userScore={userReview['overall']} />
-			<div class="graph" />
+			<ScoreDisplay
+				editorialScore={editorial['overall']}
+				bind:userScore={userReview['overall']}
+				scoreChangeUrl={scoreChangeUrl + 'overall'}
+			/>
+			<div class="graph">
+				<ScoreGraph scores={scores.filter((score) => score.category == 'overall')} />
+			</div>
 		</div>
 
 		<div class="overall-seperator" />
 
-		{#each Object.entries(categories) as [name, meta]}
+		{#each Object.entries(categories) as [category, meta]}
 			<div class="category">
-				<span class="emoji" title={name}>{meta.emoji}</span>
-				<ScoreDisplay editorialScore={editorial[name]} bind:userScore={userReview[name]} />
-				<div class="graph" />
+				<span class="emoji" title={category}>{meta.emoji}</span>
+				<ScoreDisplay
+					editorialScore={editorial[category]}
+					bind:userScore={userReview[category]}
+					scoreChangeUrl={scoreChangeUrl + category}
+				/>
+				<div class="graph">
+					<ScoreGraph scores={scores.filter((score) => score.category == category)} />
+				</div>
 				<br />
 			</div>
 		{/each}
@@ -112,11 +110,6 @@
 <style>
 	.scores {
 		position: relative;
-		display: inline-block;
-		font-size: 1em;
-		font-family: monospace;
-
-		user-select: none;
 	}
 
 	.category {
@@ -136,17 +129,15 @@
 
 	.review {
 		padding: 0.2rem;
-		width: 10rem;
+		width: 12rem;
 		top: 0%;
 		left: 50%;
 
 		background-color: var(--primary-color);
 
-		/* differential with inner's border, see [0]*/
-		margin: -0.4rem;
+		margin-top: -0.5rem;
 
-		/* half of width plus 5px offset for border to center */
-		margin-left: -5.6rem;
+		margin-left: -6.57rem;
 	}
 
 	.inner {
