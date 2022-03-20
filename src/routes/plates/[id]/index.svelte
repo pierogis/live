@@ -23,8 +23,6 @@
 	export let isAdmin: boolean;
 
 	const editorial = plate.scores.filter((score) => score.userId == 1);
-
-	console.log(editorial);
 </script>
 
 <svelte:head>
