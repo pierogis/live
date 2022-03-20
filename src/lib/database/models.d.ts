@@ -1,4 +1,4 @@
-import type { Category, Score } from '@prisma/client';
+import type { Category, Score, Plate } from '@prisma/client';
 
 export type Review = {
 	[category in Category]?: { value: number; explanation: string };

@@ -15,10 +15,16 @@
 
 <script lang="ts">
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import type { Plate } from '@prisma/client';
+	import ScoreDisplay from '$lib/components/ScoreDisplay.svelte';
+	import { categoriesInfo } from '$lib/categoriesInfo';
+	import type { FullPlate } from '$lib/database/models';
 
-	export let plate: Plate;
+	export let plate: FullPlate;
 	export let isAdmin: boolean;
+
+	const editorial = plate.scores.filter((score) => score.userId == 1);
+
+	console.log(editorial);
 </script>
 
 <svelte:head>
@@ -30,16 +36,23 @@
 		<PlateCard {plate} {isAdmin} small={false} />
 	</div>
 
-	<div class="description">
-		This is a description of the license plate of which we are speaking. This is a description of
-		the license plate of which we are speaking. This is a description of the license plate of which
-		we are speaking.
-	</div>
+	{#if editorial}
+		<div class="editorial">
+			{#each editorial as score}
+				<span class="category-emoji">{categoriesInfo[score.category].emoji}</span>
+				<span class="category-name">{score.category}</span>
+				<div class="category-score">
+					<ScoreDisplay editorialScore={score} />
+				</div>
+				<span class="category-explanation">{score.explanation}</span>
+			{/each}
+		</div>
+	{/if}
 </div>
 
-<div id="reviews" class="divider horizontal" />
+<div class="divider horizontal" />
 
-<!-- <Reviews /> -->
+<!-- <Reviews id="reviews"/> -->
 <style>
 	.top {
 		display: flex;
@@ -53,16 +66,38 @@
 		width: 90%;
 	}
 
+	.category-emoji {
+		margin: 0.5rem;
+		grid-column: 1;
+	}
+
+	.category-name {
+		grid-column: 2;
+	}
+
+	.category-score {
+		grid-column: 3;
+	}
+
+	.category-explanation {
+		grid-column: 4;
+	}
+
 	.card {
 		flex: 1 240px;
 	}
 
-	.description {
+	.editorial {
 		flex: 3;
 		font-family: 'Lora';
 		font-weight: normal;
 		font-size: 0.8rem;
 		padding: 1rem;
+
+		display: grid;
+		align-items: center;
+		justify-items: left;
+		grid-template-columns: 0.8fr 3fr 2fr 8fr;
 	}
 
 	.divider.horizontal {

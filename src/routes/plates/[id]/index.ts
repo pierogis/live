@@ -1,4 +1,4 @@
-import type { Plate } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { updatePlate, deletePlate, getFullPlate } from '$lib/database/plates';
 
 /** @type {import('./plates/[id]').RequestHandler} */
@@ -20,15 +20,26 @@ export async function put({ locals, request, params }) {
 		const jurisdictionEntry = formData.get('jurisdiction');
 		const startYearEntry = formData.get('startYear');
 		const endYearEntry = formData.get('endYear');
+		const imageUrlEntry = formData.get('image');
 
-		const plate = {
-			id: parseInt(params.id),
-			jurisdiction: { abbreviation: jurisdictionEntry.toString() },
+		const partial: Prisma.PlateUpdateInput = {
+			jurisdiction: { connect: { abbreviation: jurisdictionEntry.toString() } },
 			startYear: startYearEntry != '' ? parseInt(startYearEntry.toString()) : null,
-			endYear: endYearEntry != '' ? parseInt(endYearEntry.toString()) : null
+			endYear: endYearEntry != '' ? parseInt(endYearEntry.toString()) : null,
+			images: imageUrlEntry
+				? {
+						upsert: [
+							{
+								where: { url: imageUrlEntry.toString() },
+								update: { url: imageUrlEntry.toString() },
+								create: { url: imageUrlEntry.toString() }
+							}
+						]
+				  }
+				: undefined
 		};
 
-		await updatePlate(plate);
+		const plate = await updatePlate(parseInt(params.id), partial);
 
 		// redirect to the updated plate
 		return {

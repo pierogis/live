@@ -40,12 +40,12 @@
 <style>
 	.jurisdiction-description {
 		flex: 1;
-		padding: 0.4rem;
+		padding: 2rem;
 		font-family: 'Lora';
 		font-weight: normal;
 	}
 	.jurisdiction-plates {
-		flex: 3;
+		flex: 2;
 		padding: 1.2rem;
 	}
 </style>

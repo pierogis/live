@@ -35,8 +35,8 @@
 	{#each Object.values(quotients) as count, i}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect
-				height={1 + (count / scores.length) * 10}
-				y={19 - (count / scores.length) * 10}
+				height={1 + (count / scores.length || 0) * 12}
+				y={19 - (count / scores.length || 0) * 12}
 				width={barWidth}
 			/>
 		</g>

@@ -59,6 +59,9 @@ CREATE UNIQUE INDEX "User_email_unique" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "User_serial_unique" ON "User"("serial");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Image_url_unique" ON "Image"("url");
+
 -- AddForeignKey
 ALTER TABLE "Image" ADD CONSTRAINT "Image_plateId_fkey" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 

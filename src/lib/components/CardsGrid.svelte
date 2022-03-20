@@ -5,9 +5,11 @@
 <style>
 	.grid {
 		display: flex;
-		gap: 4rem;
 
 		justify-content: center;
 		flex-wrap: wrap;
+	}
+	:global(.grid > *) {
+		margin: 1rem 2rem 1rem 2rem;
 	}
 </style>

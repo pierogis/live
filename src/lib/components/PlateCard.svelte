@@ -2,7 +2,7 @@
 	import type { FullPlate } from '$lib/database/models';
 
 	import Card from './Card.svelte';
-	import Scores from './Scores.svelte';
+	import ScoreSheet from './ScoreSheet.svelte';
 
 	export let plate: FullPlate;
 
@@ -53,7 +53,7 @@
 		>
 	{/if}
 	{#if plate.scores}
-		<Scores scores={plate.scores} scoreChangeUrl={`/plates/${plate.id}/scores/`} />
+		<ScoreSheet scores={plate.scores} scoreChangeUrl={`/plates/${plate.id}/scores/`} />
 	{/if}
 </Card>
 

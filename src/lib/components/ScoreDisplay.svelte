@@ -4,12 +4,13 @@
 
 	import type { Score } from '@prisma/client';
 
-	export let scoreChangeUrl: string;
+	export let scoreChangeUrl: string = null;
 	export let editorialScore: Pick<Score, 'value' | 'explanation'>;
-	export let userScore: Pick<Score, 'value' | 'explanation'>;
+	export let userScore: Pick<Score, 'value' | 'explanation'> = null;
 	let placeholderScore = { value: 0, description: '' };
 
-	$: user = userScore.value != null;
+	$: interactive = userScore != null;
+	$: user = userScore?.value != null;
 	$: placeholder = !user && editorialScore == null;
 	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
 
@@ -32,35 +33,41 @@
 		element: HTMLElement,
 		params: { pointStatus: PointStatus; i: number }
 	) {
-		async function handlePointerDown(event) {
-			if (!$session.user) {
-				goto('/login');
-			} else {
-				if (userScore.value == 2 * params.i + 2) {
-					userScore.value = 2 * params.i + 1;
-				} else if (userScore.value == 2 * params.i + 1) {
-					userScore.value = 2 * params.i;
+		async function handlePointerDown(event: PointerEvent) {
+			if (event.button == 0) {
+				if (!$session.user) {
+					goto('/login');
 				} else {
-					userScore.value = 2 * params.i + 2;
-				}
+					if (userScore.value == 2 * params.i + 2) {
+						userScore.value = 2 * params.i + 1;
+					} else if (userScore.value == 2 * params.i + 1) {
+						userScore.value = 2 * params.i;
+					} else {
+						userScore.value = 2 * params.i + 2;
+					}
 
-				let formData = new FormData();
-				formData.append('value', userScore.value.toString());
-				const res = fetch(scoreChangeUrl, {
-					method: 'PUT',
-					body: formData
-				});
+					let formData = new FormData();
+					formData.append('value', userScore.value.toString());
+					const res = fetch(scoreChangeUrl, {
+						method: 'PUT',
+						body: formData
+					});
+				}
 			}
 		}
 
-		element.addEventListener('pointerdown', handlePointerDown);
+		if (scoreChangeUrl) {
+			element.addEventListener('pointerdown', handlePointerDown);
+		}
 
 		return {
 			update(newParams: { pointStatus: PointStatus; i: number }) {
 				params = newParams;
 			},
 			destroy() {
-				element.removeEventListener('click', handlePointerDown);
+				if (scoreChangeUrl) {
+					element.removeEventListener('pointerdown', handlePointerDown);
+				}
 			}
 		};
 	}
@@ -68,7 +75,13 @@
 
 <div class="scores-container">
 	{#each pointStatuses as pointStatus, i (i)}
-		<span class="score" class:user class:placeholder use:changeScoreAction={{ pointStatus, i }}>
+		<span
+			class="score"
+			class:user
+			class:placeholder
+			class:interactive
+			use:changeScoreAction={{ pointStatus, i }}
+		>
 			{pointStatus}
 		</span>
 	{/each}
@@ -78,13 +91,18 @@
 	.score {
 		font-size: 1.2rem;
 
-		cursor: pointer;
+		cursor: default;
+
 		-webkit-user-select: none;
 		user-select: none;
 	}
 
 	.user {
 		color: var(--accent-color);
+	}
+
+	.interactive {
+		cursor: pointer;
 	}
 
 	.placeholder {

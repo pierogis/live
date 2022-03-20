@@ -2,12 +2,12 @@ features
 
 - [ ] reviews
   - [ ] add words "editor"
-  - [ ] process in endpoint
+  - [x] process in endpoint
   - [ ] display on profiles
     - add smaller plates grid with reviews prioritized
   - [ ] display on plates
-- [ ] image upload/fetch
 
+- [ ] image upload/fetch
   - [x] fetch
   - [ ] upload
 

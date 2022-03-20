@@ -5,17 +5,10 @@
 	import ScoreDisplay from './ScoreDisplay.svelte';
 	import { session } from '$app/stores';
 	import ScoreGraph from './ScoreGraph.svelte';
+	import { categoriesInfo } from '$lib/categoriesInfo';
 
 	export let scores: Score[];
 	export let scoreChangeUrl: string;
-
-	const categories = {
-		identifiability: { emoji: '👁️' },
-		colors: { emoji: '🎨' },
-		symbols: { emoji: '💫' },
-		typeface: { emoji: '🔤' },
-		clarity: { emoji: '👓' }
-	};
 
 	// if editorial review, use that
 	// if no editorial, show averages
@@ -64,6 +57,8 @@
 				}
 			}
 		);
+
+	const { overall, ...categories } = categoriesInfo;
 </script>
 
 <div class="scores">
@@ -77,7 +72,7 @@
 
 	<div role="tooltip" class="review border inset shadow" id="score-summary">
 		<div class="category">
-			<span class="emoji" title="overall">🌡️</span>
+			<span class="emoji" title="overall">{overall.emoji}</span>
 			<ScoreDisplay
 				editorialScore={editorial['overall']}
 				bind:userScore={userReview['overall']}
@@ -129,7 +124,7 @@
 
 	.review {
 		padding: 0.2rem;
-		width: 12rem;
+		width: 11rem;
 		top: 0%;
 		left: 50%;
 
@@ -137,7 +132,7 @@
 
 		margin-top: -0.5rem;
 
-		margin-left: -6.57rem;
+		margin-left: -6.09rem;
 	}
 
 	.inner {
