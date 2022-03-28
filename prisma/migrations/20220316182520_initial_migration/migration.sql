@@ -34,10 +34,18 @@ CREATE TABLE "Score" (
     "plateId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "category" "Category" NOT NULL,
-    "value" INTEGER CONSTRAINT serial_is_capital CHECK ("value" <= 10),
-    "explanation" VARCHAR(255),
+    "value" INTEGER CONSTRAINT value_within_0_10 CHECK ("value" >= 0 AND "value" <= 10),
 
     CONSTRAINT "Score_pkey" PRIMARY KEY ("plateId","userId","category")
+);
+
+-- CreateTable
+CREATE TABLE "Review" (
+    "plateId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "description" VARCHAR(1024) NOT NULL,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("plateId","userId")
 );
 
 -- CreateTable
@@ -73,3 +81,9 @@ ALTER TABLE "Score" ADD CONSTRAINT "Score_plateId_fkey" FOREIGN KEY ("plateId") 
 
 -- AddForeignKey
 ALTER TABLE "Score" ADD CONSTRAINT "Score_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_plateId_fkey" FOREIGN KEY ("plateId") REFERENCES "Plate"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE NO ACTION;

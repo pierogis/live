@@ -227,6 +227,12 @@
 		color: var(--text-color);
 	}
 
+	.title,
+	.nav-box {
+		user-select: none;
+		-webkit-user-select: none;
+	}
+
 	.good,
 	input.good {
 		background-color: var(--secondary-color);

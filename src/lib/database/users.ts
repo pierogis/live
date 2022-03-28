@@ -23,6 +23,12 @@ export async function getUserWithScores(params: Partial<Omit<User, 'isAdmin'>>) 
 	return user;
 }
 
+export async function getUserWithReviews(params: Partial<Omit<User, 'isAdmin'>>) {
+	const user = await prisma.user.findUnique({ where: params, include: { reviews: true } });
+
+	return user;
+}
+
 export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>) {
 	const user = await prisma.user.create({ data: partial });
 

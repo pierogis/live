@@ -10,6 +10,8 @@
 	export let scores: Score[];
 	export let scoreChangeUrl: string;
 
+	export let tooltip = false;
+
 	// if editorial review, use that
 	// if no editorial, show averages
 
@@ -58,7 +60,7 @@
 			}
 		);
 
-	const { overall, ...categories } = categoriesInfo;
+	const { overall, ...subCategoriesInfo } = categoriesInfo;
 </script>
 
 <div class="scores">
@@ -70,6 +72,7 @@
 		/>
 	</div>
 
+	{#if tooltip}{/if}
 	<div role="tooltip" class="review border inset shadow" id="score-summary">
 		<div class="category">
 			<span class="emoji" title="overall">{overall.emoji}</span>
@@ -85,7 +88,7 @@
 
 		<div class="overall-seperator" />
 
-		{#each Object.entries(categories) as [category, meta]}
+		{#each Object.entries(subCategoriesInfo) as [category, meta]}
 			<div class="category">
 				<span class="emoji" title={category}>{meta.emoji}</span>
 				<ScoreDisplay

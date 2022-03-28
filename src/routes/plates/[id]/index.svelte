@@ -22,7 +22,8 @@
 	export let plate: FullPlate;
 	export let isAdmin: boolean;
 
-	const editorial = plate.scores.filter((score) => score.userId == 1);
+	const editorial = plate.reviews.find((review) => review.userId == 1);
+	const editorialScores = plate.scores.filter((score) => score.userId == 1);
 </script>
 
 <svelte:head>
@@ -36,13 +37,13 @@
 
 	{#if editorial}
 		<div class="editorial">
-			{#each editorial as score}
+			<div class="review">{editorial.description}</div>
+			{#each editorialScores as score}
 				<span class="category-emoji">{categoriesInfo[score.category].emoji}</span>
 				<span class="category-name">{score.category}</span>
 				<div class="category-score">
 					<ScoreDisplay editorialScore={score} />
 				</div>
-				<span class="category-explanation">{score.explanation}</span>
 			{/each}
 		</div>
 	{/if}
@@ -75,10 +76,13 @@
 
 	.category-score {
 		grid-column: 3;
+		padding-bottom: 0.2rem;
 	}
 
 	.category-explanation {
 		grid-column: 4;
+		font-family: 'Lora';
+		font-weight: normal;
 	}
 
 	.card {
@@ -87,20 +91,25 @@
 
 	.editorial {
 		flex: 3;
-		font-family: 'Lora';
-		font-weight: normal;
-		font-size: 0.8rem;
 		padding: 1rem;
 
 		display: grid;
 		align-items: center;
 		justify-items: left;
 		grid-template-columns: 0.8fr 3fr 2fr 8fr;
+		gap: 0.2rem;
+	}
+
+	.review {
+		width: 90%;
+		display: flex;
+		align-content: left;
 	}
 
 	.divider.horizontal {
 		height: 8px;
 		width: 90vw;
+		margin: 1rem;
 	}
 
 	@media only screen and (max-width: 40rem) {

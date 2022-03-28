@@ -29,9 +29,9 @@
 				<img
 					class="image inset shadow"
 					class:small
-					src={plate.images[0].url}
-					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
-						plate.jurisdiction
+					src={plate.images[0]?.url || ''}
+					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
+						plate.jurisdiction.abbreviation
 					} license plate`}
 				/>
 			{:else}

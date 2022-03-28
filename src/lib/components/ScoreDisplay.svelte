@@ -5,8 +5,8 @@
 	import type { Score } from '@prisma/client';
 
 	export let scoreChangeUrl: string = null;
-	export let editorialScore: Pick<Score, 'value' | 'explanation'>;
-	export let userScore: Pick<Score, 'value' | 'explanation'> = null;
+	export let editorialScore: Pick<Score, 'value'>;
+	export let userScore: Pick<Score, 'value'> = null;
 	let placeholderScore = { value: 0, description: '' };
 
 	$: interactive = userScore != null;

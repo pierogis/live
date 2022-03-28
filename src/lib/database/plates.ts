@@ -1,5 +1,6 @@
 import { prisma } from '.';
 import type { Plate, Prisma } from '@prisma/client';
+import type { FullPlate } from './models';
 
 export async function listPlates(): Promise<Plate[]> {
 	const plates = await prisma.plate.findMany();
@@ -45,10 +46,15 @@ export async function getFullPlates(take: number = undefined, skip = 0) {
 	return plates;
 }
 
-export async function getFullPlate(params: Partial<Plate>) {
+export async function getFullPlate(params: Partial<Plate>): Promise<FullPlate> {
 	const plate = await prisma.plate.findUnique({
 		where: params,
-		include: { jurisdiction: true, scores: true, images: true }
+		include: {
+			jurisdiction: true,
+			scores: true,
+			images: true,
+			reviews: true
+		}
 	});
 
 	return plate;

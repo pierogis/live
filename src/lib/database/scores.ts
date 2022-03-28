@@ -22,13 +22,12 @@ export async function upsertScore(
 				category: params.category
 			}
 		},
-		update: { value: params.value, explanation: params.explanation },
+		update: { value: params.value },
 		create: {
 			plateId: params.plateId,
 			userId: params.userId,
 			category: params.category,
-			value: params.value,
-			explanation: params.explanation
+			value: params.value
 		}
 	});
 
