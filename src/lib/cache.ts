@@ -6,6 +6,8 @@ import { encrypt, decrypt } from './encryption';
 
 export let cache: RedisClientType;
 
+const keyPrefix = 'emporium:';
+
 export async function setupCache() {
 	cache = createClient({
 		url: variables.cacheUrl
@@ -17,7 +19,7 @@ export async function setupCache() {
 }
 
 function getPassphraseKey(email: string) {
-	return `passphrases:${email}`;
+	return `${keyPrefix}passphrases:${email}`;
 }
 
 export async function setEmailPassphrase(email: string, passphrase: string) {
