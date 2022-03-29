@@ -1,3 +1,7 @@
 [build]
-  command = "prisma generate && prisma migrate deploy && svelte-kit build && cp node_modules/@prisma/engines/*query* .netlify/functions-internal && cp prisma/schema.prisma .netlify/functions-internal"
+  command = "prisma generate && prisma migrate deploy && svelte-kit build"
   publish = "public/"
+
+[functions]
+  external_node_modules = ["@prisma/client"]
+  node_bundler = "esbuild"
