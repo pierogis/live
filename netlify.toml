@@ -1,3 +1,3 @@
 [build]
-  command = "prisma generate && prisma migrate deploy && svelte-kit build"
+  command = "prisma generate && prisma migrate deploy && svelte-kit build && cp node_modules/@prisma/engines/*query* .netlify/functions-internal && cp prisma/schema.prisma .netlify/functions-internal"
   publish = "public/"
