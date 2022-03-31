@@ -53,7 +53,7 @@ export async function getFullPlate(params: Partial<Plate>): Promise<FullPlate> {
 			jurisdiction: true,
 			scores: true,
 			images: true,
-			reviews: true
+			reviews: { include: { user: true } }
 		}
 	});
 

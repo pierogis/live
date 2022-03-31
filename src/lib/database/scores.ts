@@ -33,3 +33,17 @@ export async function upsertScore(
 
 	return score;
 }
+
+export async function deleteScore(
+	params: Pick<Score, 'plateId' | 'userId' | 'category'>
+): Promise<void> {
+	await prisma.score.delete({
+		where: {
+			plateId_userId_category: {
+				plateId: params.plateId,
+				userId: params.userId,
+				category: params.category
+			}
+		}
+	});
+}

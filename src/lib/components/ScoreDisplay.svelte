@@ -2,20 +2,18 @@
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
 
-	import type { Score } from '@prisma/client';
-
-	export let scoreChangeUrl: string = null;
-	export let editorialScore: Pick<Score, 'value'>;
-	export let userScore: Pick<Score, 'value'> = null;
-	let placeholderScore = { value: 0, description: '' };
+	export let categoryScoreUrl: string = null;
+	export let editorialScore: number;
+	export let userScore: number = null;
+	let placeholderScore = 0;
 
 	$: interactive = userScore != null;
-	$: user = userScore?.value != null;
+	$: user = userScore != null;
 	$: placeholder = !user && editorialScore == null;
 	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
 
-	$: halfScores = displayScore.value % 2;
-	$: fullScores = (displayScore.value - halfScores) / 2;
+	$: halfScores = displayScore % 2;
+	$: fullScores = (displayScore - halfScores) / 2;
 	$: emptyScores = 5 - (fullScores + halfScores);
 
 	enum PointStatus {
@@ -38,17 +36,17 @@
 				if (!$session.user) {
 					goto('/login');
 				} else {
-					if (userScore.value == 2 * params.i + 2) {
-						userScore.value = 2 * params.i + 1;
-					} else if (userScore.value == 2 * params.i + 1) {
-						userScore.value = 2 * params.i;
+					if (userScore == 2 * params.i + 2) {
+						userScore = 2 * params.i + 1;
+					} else if (userScore == 2 * params.i + 1) {
+						userScore = 2 * params.i;
 					} else {
-						userScore.value = 2 * params.i + 2;
+						userScore = 2 * params.i + 2;
 					}
 
 					let formData = new FormData();
-					formData.append('value', userScore.value.toString());
-					const res = fetch(scoreChangeUrl, {
+					formData.append('value', userScore.toString());
+					const res = fetch(categoryScoreUrl, {
 						method: 'PUT',
 						body: formData
 					});
@@ -56,7 +54,7 @@
 			}
 		}
 
-		if (scoreChangeUrl) {
+		if (categoryScoreUrl) {
 			element.addEventListener('pointerdown', handlePointerDown);
 		}
 
@@ -65,7 +63,7 @@
 				params = newParams;
 			},
 			destroy() {
-				if (scoreChangeUrl) {
+				if (categoryScoreUrl) {
 					element.removeEventListener('pointerdown', handlePointerDown);
 				}
 			}

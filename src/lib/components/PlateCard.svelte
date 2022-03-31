@@ -53,7 +53,7 @@
 		>
 	{/if}
 	{#if plate.scores}
-		<ScoreSheet scores={plate.scores} scoreChangeUrl={`/plates/${plate.id}/scores/`} />
+		<ScoreSheet scores={plate.scores} scoreUrl={`/plates/${plate.id}/scores/`} />
 	{/if}
 </Card>
 

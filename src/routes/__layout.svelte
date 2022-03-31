@@ -102,7 +102,8 @@
 	input[type='text'],
 	input[type='email'],
 	input[type='password'],
-	input[type='url'] {
+	input[type='url'],
+	textarea {
 		background-color: var(--input-color);
 		padding: 0.1rem 0.2rem;
 	}
@@ -115,7 +116,9 @@
 
 	input[type='text']:disabled,
 	input[type='email']:disabled,
-	input[type='password']:disabled {
+	input[type='password']:disabled,
+	input[type='url']:disabled,
+	textarea:disabled {
 		background-color: var(--primary-color);
 		color: var(--text-color);
 		text-align: center;
@@ -214,6 +217,7 @@
 		.content {
 			flex-direction: column;
 			align-content: center;
+			align-items: center;
 		}
 		.divider {
 			height: 8px;

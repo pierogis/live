@@ -16,6 +16,10 @@
 	export let jurisdictions: Jurisdiction[];
 </script>
 
+<svelte:head>
+	<title>plate: {plate.id} edit</title>
+</svelte:head>
+
 <form action="/plates/{plate.id}?_method=PUT" method="post">
 	<PlateTemplate {jurisdictions} {plate} />
 </form>
