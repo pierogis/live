@@ -1,5 +1,6 @@
 import { prisma } from '.';
 import type { Jurisdiction } from '@prisma/client';
+import type { FullPlate } from './models';
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
 	const jurisdictions = await prisma.jurisdiction.findMany();
@@ -22,10 +23,21 @@ export async function getJurisdiction(params: Partial<Jurisdiction>): Promise<Ju
 	return jurisdiction;
 }
 
-export async function getJurisidictionWithPlates(params: Partial<Jurisdiction>) {
+export async function getJurisidictionWithPlates(
+	params: Partial<Jurisdiction>
+): Promise<Jurisdiction & { plates: FullPlate[] }> {
 	const jurisdictions = await prisma.jurisdiction.findUnique({
 		where: params,
-		include: { plates: { include: { jurisdiction: true, images: true, scores: true } } }
+		include: {
+			plates: {
+				include: {
+					jurisdiction: true,
+					images: true,
+					scores: true,
+					reviews: { include: { user: true } }
+				}
+			}
+		}
 	});
 
 	return jurisdictions;

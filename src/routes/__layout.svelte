@@ -199,6 +199,8 @@
 
 	.content {
 		display: flex;
+		flex-direction: column;
+		align-items: center;
 		justify-content: center;
 		flex-wrap: wrap;
 
@@ -213,12 +215,7 @@
 		background-color: var(--accent-color);
 	}
 
-	@media only screen and (max-width: 640px) {
-		.content {
-			flex-direction: column;
-			align-content: center;
-			align-items: center;
-		}
+	@media only screen and (max-width: 40rem) {
 		.divider {
 			height: 8px;
 			width: 100%;

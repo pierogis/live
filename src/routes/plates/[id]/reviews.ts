@@ -1,31 +1,32 @@
-import { deleteScore, upsertScore } from '$lib/database/scores';
+import { deleteReview, upsertReview } from '$lib/database/reviews';
 import type { Category } from '@prisma/client';
+import { reviewDescriptionInputName } from './_form';
 
-/** @type {import('./plates/[id]/scores/[category]').RequestHandler} */
+/** @type {import('./plates/[id]/reviews').RequestHandler} */
 export async function put({ locals, request, params }) {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 
 		const plateId = parseInt(params.id);
 		const userId: number = locals.user.id;
-		const category: Category = params.category;
 
-		const valueEntry = formData.get('value');
+		const descriptionEntry = formData.get(reviewDescriptionInputName);
 
-		const score = {
+		const review = {
 			plateId,
 			userId,
-			category,
-			value: valueEntry ? parseInt(valueEntry.toString()) : undefined
+			description: descriptionEntry ? descriptionEntry.toString() : undefined
 		};
 
-		await upsertScore(score);
+		await upsertReview(review);
+
+		console.log('karl');
 
 		// redirect to the updated plate
 		return {
 			status: 303,
 			headers: {
-				location: `/plates/${plateId}/scores`
+				location: `/plates/${plateId}`
 			}
 		};
 	} else {
@@ -38,20 +39,20 @@ export async function put({ locals, request, params }) {
 	}
 }
 
-/** @type {import('./plates/[id]/scores/[category]').RequestHandler} */
+/** @type {import('./plates/[id]/reviews/[category]').RequestHandler} */
 export async function del({ locals, params }) {
 	if (locals.user) {
 		const plateId = parseInt(params.id);
 		const userId: number = locals.user.id;
 		const category: Category = params.category;
 
-		const score = {
+		const review = {
 			plateId,
 			userId,
 			category
 		};
 
-		await deleteScore(score);
+		await deleteReview(review);
 
 		// redirect to the updated plate
 		return {

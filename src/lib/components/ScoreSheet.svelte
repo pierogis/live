@@ -52,7 +52,7 @@
 				if (!$session.user) {
 					goto('/login');
 				} else {
-					delete userScores[params.category];
+					userScores[params.category] = null;
 					const res = fetch(scoreUrl + params.category, {
 						method: 'DELETE'
 					});
@@ -127,7 +127,7 @@
 						<ScoreGraph scores={scores.filter((score) => score.category == category)} />
 					</div>
 				{:else}
-					<button
+					<input
 						class="clear"
 						type="submit"
 						action={scoreUrl + category}
@@ -210,5 +210,11 @@
 	.category-emoji,
 	.clear {
 		flex: 1;
+		text-align: center;
+	}
+
+	.clear {
+		font-size: 0.7rem;
+		padding: 0;
 	}
 </style>

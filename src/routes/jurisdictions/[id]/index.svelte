@@ -12,12 +12,14 @@
 </script>
 
 <script lang="ts">
+	import type { Jurisdiction } from '@prisma/client';
+	import type { FullPlate } from '$lib/database/models';
+
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
-	import type { Jurisdiction, Plate } from '@prisma/client';
 
 	export let jurisdiction: Jurisdiction & {
-		plates: Plate[];
+		plates: FullPlate[];
 	};
 </script>
 
@@ -25,19 +27,32 @@
 	<title>{jurisdiction.name}</title>
 </svelte:head>
 
-<div class="jurisdiction-description">Ah, the sunshine jurisdiction.</div>
+<div class="top">
+	<div class="jurisdiction-plates">
+		<CardsGrid>
+			{#each jurisdiction.plates as plate}
+				<PlateCard {plate} small={true} />
+			{/each}
+		</CardsGrid>
+	</div>
 
-<div class="divider" />
+	<div class="divider" />
 
-<div class="jurisdiction-plates">
-	<CardsGrid>
-		{#each jurisdiction.plates as plate}
-			<PlateCard {plate} small={true} />
-		{/each}
-	</CardsGrid>
+	<div class="jurisdiction-description">Ah, the sunshine jurisdiction.</div>
 </div>
 
 <style>
+	.top {
+		width: 90%;
+		padding: 1rem;
+
+		display: flex;
+		flex-direction: row;
+
+		justify-content: center;
+		align-items: center;
+	}
+
 	.jurisdiction-description {
 		flex: 1;
 		padding: 2rem;
@@ -45,7 +60,7 @@
 		font-weight: normal;
 	}
 	.jurisdiction-plates {
-		flex: 2;
+		flex: 3;
 		padding: 1.2rem;
 	}
 </style>

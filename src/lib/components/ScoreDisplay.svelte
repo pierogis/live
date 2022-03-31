@@ -7,7 +7,7 @@
 	export let userScore: number = null;
 	let placeholderScore = 0;
 
-	$: interactive = userScore != null;
+	$: interactive = categoryScoreUrl != null;
 	$: user = userScore != null;
 	$: placeholder = !user && editorialScore == null;
 	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;

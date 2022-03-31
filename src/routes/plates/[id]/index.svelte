@@ -12,12 +12,15 @@
 </script>
 
 <script lang="ts">
+	import type { User } from '@prisma/client';
 	import { session } from '$app/stores';
+
+	import type { FullPlate } from '$lib/database/models';
+	import { reviewDescriptionInputName } from './_form';
+
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import Review from '$lib/components/Review.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-	import type { FullPlate } from '$lib/database/models';
-	import type { User } from '@prisma/client';
 
 	export let plate: FullPlate;
 	export let user: User;
@@ -25,15 +28,19 @@
 	const editorialReview = plate.reviews.find((review) => review.user.id == 1);
 	const editorialScores = plate.scores.filter((score) => score.userId == 1);
 
-	const userReview = plate.reviews.find((review) => review.user.id == user?.id);
+	const userReview = plate.reviews.find((review) => review.user.id == user?.id) || {
+		plateId: plate.id,
+		userId: user.id,
+		description: ''
+	};
 	const userScores = plate.scores.filter((score) => score.userId == user?.id);
 
 	const reviewFormId = 'review';
-	const editorialTextareaId = 'editorial';
+	const reviewTextareaId = 'editorial';
 </script>
 
 <svelte:head>
-	<title>{'plate: ' + plate.id}</title>
+	<title>{plate.jurisdiction.name} plate ({plate.startYear}-{plate.endYear || '?'})</title>
 </svelte:head>
 
 <div class="top">
@@ -60,13 +67,13 @@
 			graph={false}
 		/>
 		{#if $session.user}
-			<form id={reviewFormId} action={`/plates/${plate.id}/reviews`} method="put" />
-			<input hidden form={reviewFormId} type="text" name="userId" value={$session.user?.id} />
-			<label hidden for={editorialTextareaId}>editorial</label>
+			<form id={reviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
+			<label hidden for={reviewTextareaId}>editorial</label>
 			<textarea
-				id={editorialTextareaId}
+				id={reviewTextareaId}
 				class="border inset shadow"
 				form={reviewFormId}
+				name={reviewDescriptionInputName}
 				type="text"
 				rows="8"
 				bind:value={userReview.description}
@@ -79,7 +86,6 @@
 </div>
 
 <div class="divider horizontal" />
-
 <div class="reviews">
 	<span style:text-decoration="underline">reviews</span>
 	{#each plate.reviews as review}
@@ -87,7 +93,6 @@
 	{/each}
 </div>
 
-<!-- <Reviews id="reviews"/> -->
 <style>
 	.top {
 		width: 90%;

@@ -31,7 +31,7 @@
 	const dividerWidth = 1;
 </script>
 
-<svg height="20px" width="24px">
+<svg height="20px" width="20px">
 	{#each Object.values(quotients) as count, i}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect
