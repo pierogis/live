@@ -208,6 +208,11 @@
 		padding-top: 0;
 	}
 
+	.no-select {
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
 	.divider {
 		width: 8px;
 		border-radius: 4px;
@@ -226,12 +231,6 @@
 		display: inline;
 		background-color: var(--primary-color);
 		color: var(--text-color);
-	}
-
-	.title,
-	.nav-box {
-		user-select: none;
-		-webkit-user-select: none;
 	}
 
 	.good,

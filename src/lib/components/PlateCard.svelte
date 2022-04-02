@@ -15,7 +15,7 @@
 <Card>
 	{#if isAdmin}
 		<form class="edit" action="/plates/{plate.id}/edit" method="get">
-			<input type="submit" value="✎" />
+			<input type="submit" value="✎" class="no-select" />
 		</form>
 	{/if}
 

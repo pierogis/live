@@ -90,9 +90,6 @@
 		font-size: 1.2rem;
 
 		cursor: default;
-
-		-webkit-user-select: none;
-		user-select: none;
 	}
 
 	.user {

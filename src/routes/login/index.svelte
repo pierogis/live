@@ -33,11 +33,13 @@
 	<title>login</title>
 </svelte:head>
 
-{#if flowStatus}<Alert
+{#if flowStatus}
+	<Alert
 		message={flowStatus.message}
 		good={flowStatus.alertState === true}
 		bad={flowStatus.alertState === false}
-	/>{/if}
+	/>
+{/if}
 
 <form id="login" action="/login" method="post" />
 <Card>
@@ -58,7 +60,7 @@
 	{#if generated}
 		<label for="passphrase">temporary passphrase</label>
 		<input
-			class="border inset shadow"
+			class="border inset shadow no-select"
 			class:good={flowStatus && flowStatus.passphraseState === true}
 			class:bad={flowStatus && flowStatus.passphraseState === false}
 			id="passphrase"
@@ -71,12 +73,12 @@
 	{/if}
 
 	<button
-		class="border inset shadow good"
+		class="border inset shadow good no-select"
 		type="submit"
 		form="login"
 		title={generated ? '' : 'email a temporary passphrase'}
-		>{generated ? 'login' : 'generate'}</button
-	>
+		>{generated ? 'login' : 'generate'}
+	</button>
 
 	{#if generated}
 		<!-- svelte-ignore a11y-accesskey -->
@@ -84,7 +86,7 @@
 			type="submit"
 			formmethod="get"
 			form="login"
-			class="shortcut border inset shadow"
+			class="shortcut border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}`);
 			}}
@@ -98,7 +100,7 @@
 			type="submit"
 			formmethod="get"
 			form="login"
-			class="shortcut border inset shadow"
+			class="shortcut border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}&generated=true`);
 			}}

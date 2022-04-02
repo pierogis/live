@@ -77,7 +77,7 @@
 	}
 </script>
 
-<div style:position="relative">
+<div style:position="relative" class="no-select">
 	{#if tooltip}
 		<div aria-describedby="score-summary" class="inner">
 			<ScoreDisplay
@@ -153,9 +153,6 @@
 		z-index: 1;
 
 		text-align: center;
-
-		-webkit-user-select: none;
-		user-select: none;
 
 		top: 0%;
 		left: 50%;

@@ -68,12 +68,17 @@
 				placeholder={originalUser.email}
 			/>
 			<div class="buttons">
-				<button class="border inset shadow" type="submit">update</button>
+				<button class="border inset shadow no-select" type="submit">update</button>
 
 				{#if isUser}
 					<!-- svelte-ignore a11y-accesskey -->
-					<button class="bad border inset shadow" type="submit" form="logout" accesskey="l"
-						>logout
+					<button
+						class="bad border inset shadow no-select"
+						type="submit"
+						form="logout"
+						accesskey="l"
+					>
+						logout
 					</button>
 				{/if}
 			</div>

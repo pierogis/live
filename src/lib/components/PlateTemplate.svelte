@@ -18,7 +18,7 @@
 <Card>
 	{#if plate}
 		<form class="delete" action="/plates/{plate.id}?_method=DELETE" method="post">
-			<input type="submit" value="❌" />
+			<input class="no-select" type="submit" value="❌" />
 		</form>
 	{/if}
 
@@ -71,7 +71,7 @@
 			maxlength="4"
 		/>
 	</span>
-	<input class="border inset shadow" type="submit" method="post" value="submit" />
+	<input class="border inset shadow no-select" type="submit" method="post" value="submit" />
 </Card>
 
 <style>

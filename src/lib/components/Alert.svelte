@@ -4,7 +4,7 @@
 	export let bad: boolean;
 </script>
 
-<div class="alert border inset shadow" class:good class:bad>{message}</div>
+<div class="alert border inset shadow no-select" class:good class:bad>{message}</div>
 
 <style>
 	@keyframes fadeout {

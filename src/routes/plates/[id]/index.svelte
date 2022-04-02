@@ -78,7 +78,9 @@
 				rows="8"
 				bind:value={userReview.description}
 			/>
-			<button class="border inset shadow good" type="submit" form={reviewFormId}>submit</button>
+			<button class="border inset shadow good no-select" type="submit" form={reviewFormId}>
+				submit
+			</button>
 		{:else}
 			<button action="/login" method="get">login to review</button>
 		{/if}
