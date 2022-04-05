@@ -14,7 +14,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
-	import Alert from '$lib/components/Alert.svelte';
 	import { FlowCode, flowStatuses } from './_flow';
 
 	export let email: string;
@@ -36,7 +35,7 @@
 <form id="login" action="/login" method="post" />
 <Card>
 	{#if flowStatus}
-		<Alert message={flowStatus.message} />
+		<div class="no-select">{flowStatus.message}</div>
 	{/if}
 
 	<input type="hidden" name="generated" form="login" value={!generated} />
@@ -112,9 +111,11 @@
 		display: block;
 		margin-bottom: 0.25rem;
 	}
+
 	.shortcut {
 		font-size: 0.8rem;
 	}
+
 	input {
 		width: 20rem;
 		max-width: 90%;
