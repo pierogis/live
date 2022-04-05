@@ -1,9 +1,10 @@
 export enum FlowCode {
-	noEmail = 0,
-	generated = 1,
-	badPassphrase = 2,
-	badEmail = 3,
-	signedIn = 4
+	default = 0,
+	noEmail = 1,
+	generated = 2,
+	badPassphrase = 3,
+	badEmail = 4,
+	signedIn = 5
 }
 
 export interface FlowStatus {
@@ -18,27 +19,33 @@ export const flowStatuses: { [code in FlowCode]: FlowStatus } = {
 		alertState: false,
 		emailState: false,
 		passphraseState: null,
-		message: 'email required'
+		message: 'generate a 1 minute passphrase'
 	},
 	1: {
+		alertState: false,
+		emailState: false,
+		passphraseState: null,
+		message: 'email required'
+	},
+	2: {
 		alertState: true,
 		emailState: true,
 		passphraseState: null,
 		message: `1 minute passphrase emailed`
 	},
-	2: {
+	3: {
 		alertState: false,
 		emailState: true,
 		passphraseState: false,
 		message: `wrong passphrase`
 	},
-	3: {
+	4: {
 		alertState: false,
 		emailState: false,
 		passphraseState: null,
 		message: `wrong email`
 	},
-	4: {
+	5: {
 		alertState: true,
 		emailState: null,
 		passphraseState: null,

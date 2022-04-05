@@ -19,7 +19,7 @@
 	$: editorialScores = scores
 		.filter((score) => score.userId == 1)
 		.reduce((previous, score) => {
-			previous[score.category] = score;
+			previous[score.category] = score.value;
 
 			return previous;
 		}, {});

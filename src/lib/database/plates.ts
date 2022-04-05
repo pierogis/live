@@ -22,24 +22,37 @@ export async function getPlates(
 	return plates;
 }
 
-export async function getPlatePerJurisdiction(take: number = undefined, skip = 0) {
+export async function getPlatePerJurisdiction(
+	take: number = undefined,
+	skip = 0
+): Promise<FullPlate[]> {
 	// one plate per jurisdiction
 	const plates = await prisma.plate.findMany({
 		take,
 		skip,
 		distinct: ['jurisdictionId'],
-		include: { jurisdiction: true, images: true },
+		include: {
+			jurisdiction: true,
+			scores: true,
+			images: true,
+			reviews: { include: { user: true } }
+		},
 		orderBy: [{ jurisdiction: { abbreviation: 'asc' } }]
 	});
 
 	return plates;
 }
 
-export async function getFullPlates(take: number = undefined, skip = 0) {
+export async function getFullPlates(take: number = undefined, skip = 0): Promise<FullPlate[]> {
 	const plates = await prisma.plate.findMany({
 		take,
 		skip,
-		include: { jurisdiction: true, scores: true, images: true },
+		include: {
+			jurisdiction: true,
+			scores: true,
+			images: true,
+			reviews: { include: { user: true } }
+		},
 		orderBy: [{ id: 'desc' }]
 	});
 

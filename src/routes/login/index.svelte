@@ -33,16 +33,12 @@
 	<title>login</title>
 </svelte:head>
 
-{#if flowStatus}
-	<Alert
-		message={flowStatus.message}
-		good={flowStatus.alertState === true}
-		bad={flowStatus.alertState === false}
-	/>
-{/if}
-
 <form id="login" action="/login" method="post" />
 <Card>
+	{#if flowStatus}
+		<Alert message={flowStatus.message} />
+	{/if}
+
 	<input type="hidden" name="generated" form="login" value={!generated} />
 	<label for="email">email</label>
 	<input
@@ -60,7 +56,7 @@
 	{#if generated}
 		<label for="passphrase">temporary passphrase</label>
 		<input
-			class="border inset shadow no-select"
+			class="border inset shadow"
 			class:good={flowStatus && flowStatus.passphraseState === true}
 			class:bad={flowStatus && flowStatus.passphraseState === false}
 			id="passphrase"

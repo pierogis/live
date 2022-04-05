@@ -6,6 +6,7 @@ import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/words
 import { sendPassphraseEmail } from '$lib/auth';
 import { createSessionCookie } from '$lib/session';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
+import { FlowCode } from './_flow';
 
 /** @type {import('./login/index').RequestHandler} */
 export async function get() {
@@ -15,7 +16,8 @@ export async function get() {
 	return {
 		body: {
 			samplePhrase,
-			sampleEmail
+			sampleEmail,
+			flowCode: FlowCode.default
 		}
 	};
 }
@@ -40,14 +42,14 @@ export async function post({ request }: { request: Request }) {
 				body: {
 					email: email,
 					generated: true,
-					flowCode: 1
+					flowCode: FlowCode.generated
 				}
 			};
 		} else {
 			return {
 				status: 400,
 				body: {
-					flowCode: 0
+					flowCode: FlowCode.noEmail
 				}
 			};
 		}
@@ -73,14 +75,14 @@ export async function post({ request }: { request: Request }) {
 						location: '/plates'
 					},
 					body: {
-						flowCode: 4
+						flowCode: FlowCode.signedIn
 					}
 				};
 			} else {
 				return {
 					status: 401,
 					body: {
-						flowCode: 2
+						flowCode: FlowCode.badPassphrase
 					}
 				};
 			}
@@ -88,7 +90,7 @@ export async function post({ request }: { request: Request }) {
 			return {
 				status: 401,
 				body: {
-					flowCode: 3
+					flowCode: FlowCode.badEmail
 				}
 			};
 		}

@@ -1,6 +1,6 @@
 import { getPlatePerJurisdiction } from '$lib/database/plates';
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
+/** @type {import('./jurisdictions/index').RequestHandler} */
 export async function get() {
 	const plates = await getPlatePerJurisdiction();
 

@@ -1,12 +1,9 @@
 <script lang="ts">
-	import type { Jurisdiction, Plate } from '@prisma/client';
-
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 	import PlateCard from '$lib/components/PlateCard.svelte';
+	import type { FullPlate } from '$lib/database/models';
 
-	export let plates: (Plate & {
-		jurisdiction: Jurisdiction;
-	})[];
+	export let plates: FullPlate[];
 </script>
 
 <svelte:head>
