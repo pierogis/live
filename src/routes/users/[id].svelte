@@ -16,23 +16,17 @@
 <script lang="ts">
 	import type { User } from '@prisma/client';
 	import Card from '$lib/components/Card.svelte';
-	import Alert from '$lib/components/Alert.svelte';
 
 	export let user: User;
 	export let isUser: boolean;
 	export let isAdmin: boolean;
 
 	const originalUser: User = user;
-	export let error: string = null;
 </script>
 
 <svelte:head>
 	<title>{'user: ' + user.serial.toUpperCase()}</title>
 </svelte:head>
-
-{#if error}
-	<Alert message={error} bad={true} good={false} />
-{/if}
 
 {#if !isUser}
 	<Card>

@@ -44,7 +44,6 @@
 <style>
 	.top {
 		width: 90%;
-		padding: 1rem;
 
 		display: flex;
 		flex-direction: row;

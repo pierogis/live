@@ -58,7 +58,7 @@
 <div class="divider horizontal" />
 
 <div class="user-review">
-	<span style:text-decoration="underline">user review</span>
+	<span class="section">user review</span>
 	<div>
 		<ScoreSheet
 			scores={userScores}
@@ -89,7 +89,7 @@
 
 <div class="divider horizontal" />
 <div class="reviews">
-	<span style:text-decoration="underline">reviews</span>
+	<span class="section">reviews</span>
 	{#each plate.reviews as review}
 		<Review {review} scores={userScores} />
 	{/each}
@@ -98,7 +98,6 @@
 <style>
 	.top {
 		width: 90%;
-		padding: 1rem;
 
 		display: flex;
 		flex-direction: row;
@@ -150,7 +149,6 @@
 	}
 
 	.user-review > div {
-		padding: 1rem;
 		width: 90%;
 
 		display: flex;
@@ -161,13 +159,7 @@
 	}
 
 	textarea {
-		margin: 2rem;
-		padding: 1rem;
-		line-height: 1.5;
-
 		width: 100%;
-
-		text-align: left;
 	}
 
 	@media only screen and (max-width: 70rem) {
@@ -177,5 +169,10 @@
 		.user-review > div {
 			flex-direction: column;
 		}
+	}
+
+	.section {
+		text-decoration: 'underline';
+		margin-bottom: 1rem;
 	}
 </style>

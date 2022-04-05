@@ -16,7 +16,7 @@ export async function upsertReview(
 ): Promise<Review> {
 	const review = await prisma.review.upsert({
 		where: {
-			Review_userId_plateId_unique: {
+			plateId_userId: {
 				plateId: params.plateId,
 				userId: params.userId
 			}
@@ -35,7 +35,7 @@ export async function upsertReview(
 export async function deleteReview(params: Pick<Review, 'plateId' | 'userId'>): Promise<void> {
 	await prisma.review.delete({
 		where: {
-			Review_userId_plateId_unique: {
+			plateId_userId: {
 				plateId: params.plateId,
 				userId: params.userId
 			}

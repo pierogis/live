@@ -14,23 +14,28 @@
 	/>
 </svelte:head>
 
-<header class="header">
-	<div>
-		<a href="/"> <h3 class="title nav-box border inset shadow">karl's plate emporium</h3></a>
-	</div>
+<header>
+	<a href="/"><h3 class="link-box border inset shadow">karl's plate emporium</h3></a>
 </header>
 
-<nav class="nav">
-	<a href="/jurisdictions"><h3 class="nav-box border inset shadow">jurisdictions</h3></a>
+<nav>
+	<a href="/jurisdictions"><h3 class="link-box border inset shadow">jurisdictions</h3></a>
 	{#if user?.isAdmin}
-		<a href="/plates/create"><h3 class="nav-box border inset shadow">create</h3></a>
+		<a href="/plates/create"><h3 class="link-box border inset shadow">create</h3></a>
 	{/if}
-	<a href="/account"
-		><h3 class="nav-box border inset shadow">{user && user.serial ? user.serial : 'login'}</h3></a
-	>
+	<a href="/account">
+		<h3 class="link-box border inset shadow">{user && user.serial ? user.serial : 'login'}</h3>
+	</a>
 </nav>
 
 <div class="content"><slot /></div>
+
+<footer>
+	<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
+		@pierogis_live
+	</a>
+	<a class="border shadow inset link-box" href="/careers">careers</a>
+</footer>
 
 <style global>
 	:root {
@@ -86,6 +91,8 @@
 		color: var(--text-color);
 
 		background: transparent;
+
+		z-index: 0;
 	}
 	@media only screen and (max-width: 320px) {
 		* {
@@ -130,16 +137,20 @@
 	input[type='password'],
 	input[type='submit'],
 	button,
-	.nav-box {
+	.link-box {
 		font-weight: bold;
 		padding: 0.2rem 0.4rem;
 	}
 
-	.header {
+	header {
 		position: sticky;
+		z-index: 1;
 		top: 0;
 
-		padding-top: 1.6rem;
+		display: flex;
+		justify-content: center;
+
+		padding-top: 1rem;
 
 		background-color: transparent;
 
@@ -155,10 +166,6 @@
 	a:visited,
 	a:active {
 		outline: none;
-	}
-
-	.title {
-		z-index: 10;
 	}
 
 	.border {
@@ -183,9 +190,8 @@
 		box-shadow: var(--inset), var(--shadow);
 	}
 
-	.nav {
-		padding: 2rem;
-		padding-top: 2rem;
+	nav {
+		padding-top: 1rem;
 		padding-bottom: 2rem;
 
 		background-color: transparent;
@@ -201,6 +207,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		align-content: center;
 		justify-content: center;
 		flex-wrap: wrap;
 
@@ -227,8 +234,7 @@
 		}
 	}
 
-	.nav-box {
-		display: inline;
+	.link-box {
 		background-color: var(--primary-color);
 		color: var(--text-color);
 	}
@@ -242,5 +248,33 @@
 	input.bad {
 		background-color: var(--accent-color);
 		color: var(--primary-color);
+	}
+
+	textarea {
+		margin: 2rem;
+		padding: 0.8rem;
+		line-height: 1.5;
+
+		text-align: left;
+	}
+
+	footer {
+		position: static;
+		z-index: 1;
+		bottom: 0;
+
+		display: flex;
+		justify-content: center;
+		gap: 1rem;
+
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+
+		text-align: center;
+		border-top: 2px dashed var(--text-color-st);
+	}
+
+	footer > * {
+		font-size: 0.8rem;
 	}
 </style>
