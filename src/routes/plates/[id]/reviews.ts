@@ -38,7 +38,6 @@ export async function put({ locals, request, params }) {
 
 /** @type {import('./plates/[id]/reviews').RequestHandler} */
 export async function del({ locals, params }) {
-	console.log(params);
 	if (locals.user) {
 		const plateId = parseInt(params.id);
 		const userId: number = locals.user.id;
@@ -47,8 +46,6 @@ export async function del({ locals, params }) {
 			plateId,
 			userId
 		};
-
-		console.log(reviewParams);
 
 		await deleteReview(reviewParams);
 
