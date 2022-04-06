@@ -1,5 +1,4 @@
 import { deleteReview, upsertReview } from '$lib/database/reviews';
-import type { Category } from '@prisma/client';
 import { reviewDescriptionInputName } from './_form';
 
 /** @type {import('./plates/[id]/reviews').RequestHandler} */
@@ -20,8 +19,6 @@ export async function put({ locals, request, params }) {
 
 		await upsertReview(review);
 
-		console.log('karl');
-
 		// redirect to the updated plate
 		return {
 			status: 303,
@@ -39,20 +36,21 @@ export async function put({ locals, request, params }) {
 	}
 }
 
-/** @type {import('./plates/[id]/reviews/[category]').RequestHandler} */
+/** @type {import('./plates/[id]/reviews').RequestHandler} */
 export async function del({ locals, params }) {
+	console.log(params);
 	if (locals.user) {
 		const plateId = parseInt(params.id);
 		const userId: number = locals.user.id;
-		const category: Category = params.category;
 
-		const review = {
+		const reviewParams = {
 			plateId,
-			userId,
-			category
+			userId
 		};
 
-		await deleteReview(review);
+		console.log(reviewParams);
+
+		await deleteReview(reviewParams);
 
 		// redirect to the updated plate
 		return {

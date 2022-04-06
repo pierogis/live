@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import Card from '$lib/components/Card.svelte';
 	// import DropZone from '$lib/components/DropZone.svelte';
 	import type { FullPlate } from '$lib/database/models';
-	import type { Jurisdiction, Image } from '@prisma/client';
+	import type { Jurisdiction } from '@prisma/client';
 
 	export let jurisdictions: Jurisdiction[];
 	export let plate: FullPlate = null;
@@ -13,12 +15,17 @@
 	// function handleImageSubmit() {
 	// 	createImage(plate.id, imageInputElement.files && imageInputElement.files[0]);
 	// }
+
+	async function handleDelete(event: MouseEvent) {
+		await fetch(`/plates/${plate.id}`, { method: 'delete' });
+		goto('/plates');
+	}
 </script>
 
 <Card>
 	{#if plate}
-		<form class="delete" action="/plates/{plate.id}?_method=DELETE" method="post">
-			<input class="no-select" type="submit" value="❌" />
+		<form class="delete" action={`/plates/${plate.id}?_method=DELETE`} method="post">
+			<input class="no-select" type="submit" value="❌" on:click|preventDefault={handleDelete} />
 		</form>
 	{/if}
 

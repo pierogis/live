@@ -49,8 +49,6 @@
 	<img class="image" src={thumbnailSrc} alt="upload" />
 </div>
 
-<form />
-
 <style>
 	.zone {
 		display: grid;

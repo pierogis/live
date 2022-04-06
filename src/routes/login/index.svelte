@@ -26,15 +26,17 @@
 
 	let passphrase = '';
 	const flowStatus = flowStatuses[flowCode];
+
+	const loginFormId = 'login';
 </script>
 
 <svelte:head>
 	<title>login</title>
 </svelte:head>
 
-<form id="login" action="/login" method="post" />
+<form id={loginFormId} action="/login" method="post" netlify />
 <Card>
-	<input type="hidden" name="generated" form="login" value={!generated} />
+	<input type="hidden" name="generated" form={loginFormId} value={!generated} />
 	<label for="email">email</label>
 	<input
 		readonly={generated && flowStatus && flowStatus.emailState}
@@ -44,7 +46,7 @@
 		id="email"
 		type="email"
 		name="email"
-		form="login"
+		form={loginFormId}
 		placeholder={sampleEmail}
 		bind:value={email}
 	/>
@@ -57,7 +59,7 @@
 			id="passphrase"
 			type="text"
 			name="passphrase"
-			form="login"
+			form={loginFormId}
 			placeholder={samplePhrase}
 			bind:value={passphrase}
 		/>
@@ -66,7 +68,7 @@
 	<button
 		class="border inset shadow good no-select"
 		type="submit"
-		form="login"
+		form={loginFormId}
 		title={generated ? '' : 'email a temporary passphrase'}
 		>{generated ? 'login' : 'generate'}
 	</button>
@@ -76,7 +78,7 @@
 		<button
 			type="submit"
 			formmethod="get"
-			form="login"
+			form={loginFormId}
 			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}`);
@@ -90,7 +92,7 @@
 		<button
 			type="submit"
 			formmethod="get"
-			form="login"
+			form={loginFormId}
 			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}&generated=true`);

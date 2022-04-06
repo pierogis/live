@@ -28,15 +28,30 @@
 	const editorialReview = plate.reviews.find((review) => review.user.id == 1);
 	const editorialScores = plate.scores.filter((score) => score.userId == 1);
 
-	const userReview = plate.reviews.find((review) => review.user.id == user?.id) || {
+	const emptyUserReview = {
 		plateId: plate.id,
 		userId: user?.id,
 		description: ''
 	};
+
+	let userReview = plate.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
 	const userScores = plate.scores.filter((score) => score.userId == user?.id);
 
-	const reviewFormId = 'review';
+	const submitReviewFormId = 'review';
+	const deleteReviewFormId = 'delete';
 	const reviewTextareaId = 'editorial';
+
+	async function handleSubmitReview() {
+		let formData = new FormData();
+
+		formData.append(reviewDescriptionInputName, userReview.description);
+		await fetch(`/plates/${plate.id}/reviews`, { method: 'put', body: formData });
+	}
+
+	async function handleDeleteReview() {
+		await fetch(`/plates/${plate.id}/reviews`, { method: 'delete' });
+		userReview = emptyUserReview;
+	}
 </script>
 
 <svelte:head>
@@ -59,6 +74,18 @@
 
 <span class="section">user review</span>
 {#if $session.user}
+	<form
+		id={submitReviewFormId}
+		action={`/plates/${plate.id}/reviews?_method=PUT`}
+		method="post"
+		netlify
+	/>
+	<form
+		id={deleteReviewFormId}
+		action={`/plates/${plate.id}/reviews?_method=DELETE`}
+		method="post"
+		netlify
+	/>
 	<div class="user-review">
 		<ScoreSheet
 			scores={userScores}
@@ -66,21 +93,35 @@
 			tooltip={false}
 			graph={false}
 		/>
-		<form id={reviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
 		<label hidden for={reviewTextareaId}>editorial</label>
 		<textarea
 			id={reviewTextareaId}
 			class="border inset shadow"
-			form={reviewFormId}
+			form={submitReviewFormId}
 			name={reviewDescriptionInputName}
 			type="text"
 			rows="8"
 			bind:value={userReview.description}
 		/>
 	</div>
-	<button class="border inset shadow good no-select" type="submit" form={reviewFormId}>
-		submit
-	</button>
+	<div>
+		<button
+			class="border inset shadow good no-select"
+			type="submit"
+			form={submitReviewFormId}
+			on:click|preventDefault={handleSubmitReview}
+		>
+			submit
+		</button>
+		<button
+			class="border inset shadow bad no-select"
+			type="submit"
+			form={deleteReviewFormId}
+			on:click|preventDefault={handleDeleteReview}
+		>
+			delete
+		</button>
+	</div>
 {:else}
 	<button class="border inset shadow good no-select" action="/login" method="get">login</button>
 {/if}
@@ -125,6 +166,7 @@
 		align-items: center;
 
 		white-space: pre-line;
+		line-height: 1.4;
 	}
 
 	.divider.horizontal {

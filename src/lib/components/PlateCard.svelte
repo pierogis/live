@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import type { FullPlate } from '$lib/database/models';
 
 	import Card from './Card.svelte';
@@ -15,9 +16,11 @@
 
 <Card>
 	{#if isAdmin}
-		<form class="edit" action="/plates/{plate.id}/edit" method="get">
-			<input type="submit" value="✎" class="no-select" />
-		</form>
+		<a
+			class="edit no-select"
+			href={`/plates/${plate.id}/edit`}
+			on:click|preventDefault={() => goto(`/plates/${plate.id}/edit`)}>✎</a
+		>
 	{/if}
 
 	<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}

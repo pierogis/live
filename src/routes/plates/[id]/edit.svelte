@@ -20,6 +20,6 @@
 	<title>plate: {plate.id} edit</title>
 </svelte:head>
 
-<form action="/plates/{plate.id}?_method=PUT" method="post">
+<form action="/plates/{plate.id}?_method=PUT" method="post" netlify>
 	<PlateTemplate {jurisdictions} {plate} />
 </form>
