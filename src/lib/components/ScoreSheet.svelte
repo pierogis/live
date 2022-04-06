@@ -88,7 +88,7 @@
 		</div>
 	{/if}
 
-	<div role={tooltip ? 'tooltip' : ''} class="scores border inset shadow" id="score-summary">
+	<div role={tooltip ? 'tooltip' : ''} class="scoresheet border inset shadow" id="score-summary">
 		<div class="category">
 			<span class="category-emoji" title="overall">{overall.emoji}</span>
 			<ScoreDisplay
@@ -161,7 +161,7 @@
 		margin-left: -6.09rem;
 	}
 
-	.scores {
+	.scoresheet {
 		padding: 0.2rem;
 		width: 11rem;
 

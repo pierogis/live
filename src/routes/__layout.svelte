@@ -96,8 +96,6 @@
 		color: var(--text-color);
 
 		background: transparent;
-
-		z-index: 0;
 	}
 	@media only screen and (max-width: 320px) {
 		* {
@@ -240,7 +238,7 @@
 
 	header {
 		position: sticky;
-		z-index: 1;
+		z-index: 2;
 		top: 0;
 
 		display: flex;
