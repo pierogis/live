@@ -57,39 +57,38 @@
 
 <div class="divider horizontal" />
 
-<div class="user-review">
-	<span class="section">user review</span>
-	<div>
-		{#if $session.user}
-			<ScoreSheet
-				scores={userScores}
-				scoreUrl={`/plates/${plate.id}/scores/`}
-				tooltip={false}
-				graph={false}
-			/>
-			<form id={reviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
-			<label hidden for={reviewTextareaId}>editorial</label>
-			<textarea
-				id={reviewTextareaId}
-				class="border inset shadow"
-				form={reviewFormId}
-				name={reviewDescriptionInputName}
-				type="text"
-				rows="8"
-				bind:value={userReview.description}
-			/>
-			<button class="border inset shadow good no-select" type="submit" form={reviewFormId}>
-				submit
-			</button>
-		{:else}
-			<button class="border inset shadow good no-select" action="/login" method="get">login</button>
-		{/if}
+<span class="section">user review</span>
+{#if $session.user}
+	<div class="user-review">
+		<ScoreSheet
+			scores={userScores}
+			scoreUrl={`/plates/${plate.id}/scores/`}
+			tooltip={false}
+			graph={false}
+		/>
+		<form id={reviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
+		<label hidden for={reviewTextareaId}>editorial</label>
+		<textarea
+			id={reviewTextareaId}
+			class="border inset shadow"
+			form={reviewFormId}
+			name={reviewDescriptionInputName}
+			type="text"
+			rows="8"
+			bind:value={userReview.description}
+		/>
 	</div>
-</div>
+	<button class="border inset shadow good no-select" type="submit" form={reviewFormId}>
+		submit
+	</button>
+{:else}
+	<button class="border inset shadow good no-select" action="/login" method="get">login</button>
+{/if}
 
 <div class="divider horizontal" />
+
+<span class="section">reviews</span>
 <div class="reviews">
-	<span class="section">reviews</span>
 	{#each plate.reviews as review}
 		<Review {review} scores={userScores} />
 	{/each}
@@ -118,7 +117,7 @@
 	.editorial {
 		width: 90%;
 		height: 90%;
-		padding: 2rem;
+		padding-left: 2rem;
 
 		flex: 2;
 		display: flex;
@@ -141,23 +140,20 @@
 	}
 
 	.user-review {
-		width: 90%;
-	}
-
-	.user-review,
-	.reviews {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.user-review > div {
-		width: 90%;
+		width: 80%;
 
 		display: flex;
 		flex-direction: row;
 
+		gap: 1rem;
+
+		justify-content: center;
+		align-items: center;
+	}
+
+	.reviews {
+		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 	}
@@ -169,9 +165,12 @@
 	@media only screen and (max-width: 70rem) {
 		.top {
 			flex-direction: column;
-			padding-bottom: 0;
 		}
-		.user-review > div {
+		.editorial {
+			padding-top: 2rem;
+			padding-left: 0;
+		}
+		.user-review {
 			flex-direction: column;
 		}
 	}

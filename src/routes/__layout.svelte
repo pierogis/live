@@ -34,8 +34,9 @@
 	<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
 		@pierogis_live
 	</a>
-	<a class="border shadow inset link-box" href="https://pierogis.live/careers">careers</a>
+	<a class="border shadow inset link-box" href="https://careers.pierogis.live">careers</a>
 	<a class="border shadow inset link-box" href="/plates/faq">faq</a>
+	<a class="border shadow inset link-box" href="https://github.com/pierogis/emporium">github</a>
 </footer>
 
 <style global>
@@ -221,7 +222,7 @@
 	}
 
 	textarea {
-		margin: 2rem;
+		margin: 1rem;
 		padding: 0.5rem;
 		padding-top: 0.2rem;
 		padding-bottom: 0.2rem;
@@ -273,7 +274,7 @@
 		justify-content: center;
 		flex-wrap: wrap;
 
-		padding: 7.6rem;
+		padding-bottom: 10rem;
 		padding-top: 0;
 	}
 
@@ -287,6 +288,7 @@
 		padding-bottom: 1rem;
 
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: center;
 		gap: 1rem;
 
