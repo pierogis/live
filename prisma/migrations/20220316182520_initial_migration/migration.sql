@@ -44,7 +44,7 @@ CREATE TABLE "Review" (
     "id" SERIAL NOT NULL,
     "plateId" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
-    "description" VARCHAR(1024) NOT NULL,
+    "description" VARCHAR(2047) NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
 );

@@ -96,7 +96,7 @@
 
 <style>
 	.top {
-		width: 90%;
+		width: 75%;
 
 		display: flex;
 		flex-direction: row;
@@ -117,7 +117,7 @@
 	.editorial {
 		width: 90%;
 		height: 90%;
-		padding-left: 2rem;
+		padding-left: 4rem;
 
 		flex: 2;
 		display: flex;
@@ -129,7 +129,7 @@
 
 	.divider.horizontal {
 		height: var(--divider-size);
-		width: 80vw;
+		width: 90vw;
 		margin: 1rem;
 	}
 

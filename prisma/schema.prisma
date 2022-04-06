@@ -45,7 +45,7 @@ model Review {
   id          Int      @id(map: "Review_pkey") @default(autoincrement())
   plateId     Int
   userId      Int
-  description String  @db.VarChar(1024)
+  description String  @db.VarChar(2047)
   plate       Plate   @relation(fields: [plateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_plateId_fkey")
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_userId_fkey")
 
