@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Plate } from '@prisma/client';
+	import type { FullPlate } from '$lib/database/models';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 
-	export let plates: Plate[];
+	export let plates: FullPlate[];
 </script>
 
 <svelte:head>

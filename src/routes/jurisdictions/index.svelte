@@ -12,6 +12,6 @@
 
 <CardsGrid>
 	{#each plates as plate}
-		<PlateCard {plate} showYears={false} small={true} />
+		<PlateCard {plate} showYears={false} small={true} showScores={false} />
 	{/each}
 </CardsGrid>

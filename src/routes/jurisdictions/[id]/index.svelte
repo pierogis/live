@@ -28,17 +28,11 @@
 </svelte:head>
 
 <div class="top">
-	<div class="jurisdiction-plates">
-		<CardsGrid>
-			{#each jurisdiction.plates as plate}
-				<PlateCard {plate} small={true} />
-			{/each}
-		</CardsGrid>
-	</div>
-
-	<div class="divider" />
-
-	<div class="jurisdiction-description">Ah, the sunshine jurisdiction.</div>
+	<CardsGrid>
+		{#each jurisdiction.plates as plate}
+			<PlateCard {plate} small={true} />
+		{/each}
+	</CardsGrid>
 </div>
 
 <style>
@@ -50,16 +44,5 @@
 
 		justify-content: center;
 		align-items: center;
-	}
-
-	.jurisdiction-description {
-		flex: 1;
-		padding: 2rem;
-		font-family: 'Lora';
-		font-weight: normal;
-	}
-	.jurisdiction-plates {
-		flex: 3;
-		padding: 1.2rem;
 	}
 </style>

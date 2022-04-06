@@ -16,8 +16,8 @@ export interface FlowStatus {
 
 export const flowStatuses: { [code in FlowCode]: FlowStatus } = {
 	0: {
-		alertState: false,
-		emailState: false,
+		alertState: null,
+		emailState: null,
 		passphraseState: null,
 		message: 'generate a 1 minute passphrase'
 	},

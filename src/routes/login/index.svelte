@@ -34,10 +34,6 @@
 
 <form id="login" action="/login" method="post" />
 <Card>
-	{#if flowStatus}
-		<div class="no-select">{flowStatus.message}</div>
-	{/if}
-
 	<input type="hidden" name="generated" form="login" value={!generated} />
 	<label for="email">email</label>
 	<input
@@ -81,7 +77,7 @@
 			type="submit"
 			formmethod="get"
 			form="login"
-			class="shortcut border inset shadow no-select"
+			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}`);
 			}}
@@ -95,7 +91,7 @@
 			type="submit"
 			formmethod="get"
 			form="login"
-			class="shortcut border inset shadow no-select"
+			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
 				goto(`/login?email=${email}&generated=true`);
 			}}
@@ -105,19 +101,31 @@
 		</button>
 	{/if}
 </Card>
+<br />
+{#if flowStatus}
+	<div
+		class="border inset shadow no-select alert"
+		class:good={flowStatus.alertState == true}
+		class:bad={flowStatus.alertState == false}
+	>
+		{flowStatus.message}
+	</div>
+{/if}
 
 <style>
 	label {
 		display: block;
 		margin-bottom: 0.25rem;
-	}
 
-	.shortcut {
-		font-size: 0.8rem;
+		text-decoration: underline;
 	}
 
 	input {
 		width: 20rem;
 		max-width: 90%;
+	}
+
+	.alert {
+		padding: 1rem;
 	}
 </style>

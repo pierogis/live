@@ -30,7 +30,7 @@
 
 	const userReview = plate.reviews.find((review) => review.user.id == user?.id) || {
 		plateId: plate.id,
-		userId: user.id,
+		userId: user?.id,
 		description: ''
 	};
 	const userScores = plate.scores.filter((score) => score.userId == user?.id);
@@ -60,13 +60,13 @@
 <div class="user-review">
 	<span class="section">user review</span>
 	<div>
-		<ScoreSheet
-			scores={userScores}
-			scoreUrl={`/plates/${plate.id}/scores/`}
-			tooltip={false}
-			graph={false}
-		/>
 		{#if $session.user}
+			<ScoreSheet
+				scores={userScores}
+				scoreUrl={`/plates/${plate.id}/scores/`}
+				tooltip={false}
+				graph={false}
+			/>
 			<form id={reviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
 			<label hidden for={reviewTextareaId}>editorial</label>
 			<textarea
@@ -82,7 +82,7 @@
 				submit
 			</button>
 		{:else}
-			<button action="/login" method="get">login to review</button>
+			<button class="border inset shadow good no-select" action="/login" method="get">login</button>
 		{/if}
 	</div>
 </div>
@@ -104,6 +104,8 @@
 
 		justify-content: center;
 		align-items: center;
+
+		padding-bottom: 2rem;
 	}
 
 	.plate {
@@ -116,17 +118,19 @@
 	.editorial {
 		width: 90%;
 		height: 90%;
-		padding: 1rem;
+		padding: 2rem;
 
-		flex: 1;
+		flex: 2;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+		white-space: pre-line;
 	}
 
 	.divider.horizontal {
-		height: 8px;
-		width: 90vw;
+		height: var(--divider-size);
+		width: 80vw;
 		margin: 1rem;
 	}
 
@@ -165,6 +169,7 @@
 	@media only screen and (max-width: 70rem) {
 		.top {
 			flex-direction: column;
+			padding-bottom: 0;
 		}
 		.user-review > div {
 			flex-direction: column;
@@ -172,7 +177,7 @@
 	}
 
 	.section {
-		text-decoration: 'underline';
+		text-decoration: underline;
 		margin-bottom: 1rem;
 	}
 </style>

@@ -8,6 +8,7 @@
 
 	export let isAdmin: boolean = false;
 	export let showYears = true;
+	export let showScores = true;
 
 	export let small: boolean;
 </script>
@@ -52,7 +53,7 @@
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
-	{#if plate.scores}
+	{#if showScores}
 		<ScoreSheet scores={plate.scores} scoreUrl={`/plates/${plate.id}/scores/`} />
 	{/if}
 </Card>

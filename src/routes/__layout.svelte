@@ -24,7 +24,7 @@
 		<a href="/plates/create"><h3 class="link-box border inset shadow">create</h3></a>
 	{/if}
 	<a href="/account">
-		<h3 class="link-box border inset shadow">{user && user.serial ? user.serial : 'login'}</h3>
+		<h3 class="link-box border inset shadow" class:good={!user}>{user ? user.serial : 'login'}</h3>
 	</a>
 </nav>
 
@@ -34,10 +34,12 @@
 	<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
 		@pierogis_live
 	</a>
-	<a class="border shadow inset link-box" href="/careers">careers</a>
+	<a class="border shadow inset link-box" href="https://pierogis.live/careers">careers</a>
+	<a class="border shadow inset link-box" href="/plates/faq">faq</a>
 </footer>
 
 <style global>
+	/* default styles */
 	:root {
 		--primary-color: rgba(255, 240, 220, 1);
 		--accent-color: rgba(225, 140, 150, 1);
@@ -54,6 +56,8 @@
 		--accent-color-t: rgba(225, 140, 150, 0);
 		--secondary-color-t: rgba(140, 205, 225, 0);
 		--text-color-t: rgba(58, 96, 106, 0);
+
+		--divider-size: 0.4rem;
 	}
 
 	@media (prefers-color-scheme: dark) {
@@ -102,10 +106,11 @@
 
 	html {
 		color: var(--text-color);
-
 		background-color: var(--primary-color);
 	}
+	/* end default styles */
 
+	/* global css class/element style */
 	input[type='text'],
 	input[type='email'],
 	input[type='password'],
@@ -142,21 +147,6 @@
 		padding: 0.2rem 0.4rem;
 	}
 
-	header {
-		position: sticky;
-		z-index: 1;
-		top: 0;
-
-		display: flex;
-		justify-content: center;
-
-		padding-top: 1rem;
-
-		background-color: transparent;
-
-		text-align: center;
-	}
-
 	a {
 		text-decoration: none;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -190,6 +180,78 @@
 		box-shadow: var(--inset), var(--shadow);
 	}
 
+	.no-select {
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	.divider {
+		width: var(--divider-size);
+		border-radius: 4px;
+
+		background-color: var(--accent-color);
+	}
+
+	@media only screen and (max-width: 40rem) {
+		.divider {
+			height: var(--divider-size);
+			width: 100%;
+		}
+	}
+
+	.link-box {
+		background-color: var(--primary-color);
+		color: var(--text-color);
+	}
+
+	.good,
+	input.good {
+		background-color: var(--secondary-color);
+		color: var(--primary-color);
+	}
+	.bad,
+	input.bad {
+		background-color: var(--accent-color);
+		color: var(--primary-color);
+	}
+
+	input.good::placeholder,
+	input.bad::placeholder {
+		color: var(--primary-color-st);
+	}
+
+	textarea {
+		margin: 2rem;
+		padding: 0.5rem;
+		padding-top: 0.2rem;
+		padding-bottom: 0.2rem;
+		line-height: 1.4;
+
+		text-align: left;
+	}
+	/* end global css class/element style */
+
+	/* global layout style */
+	body > div {
+		position: relative;
+		min-height: 100vh;
+	}
+
+	header {
+		position: sticky;
+		z-index: 1;
+		top: 0;
+
+		display: flex;
+		justify-content: center;
+
+		padding-top: 1rem;
+
+		background-color: transparent;
+
+		text-align: center;
+	}
+
 	nav {
 		padding-top: 1rem;
 		padding-bottom: 2rem;
@@ -211,64 +273,22 @@
 		justify-content: center;
 		flex-wrap: wrap;
 
-		padding: 1.6rem;
+		padding: 7.6rem;
 		padding-top: 0;
 	}
 
-	.no-select {
-		-webkit-user-select: none;
-		user-select: none;
-	}
-
-	.divider {
-		width: 8px;
-		border-radius: 4px;
-
-		background-color: var(--accent-color);
-	}
-
-	@media only screen and (max-width: 40rem) {
-		.divider {
-			height: 8px;
-			width: 100%;
-		}
-	}
-
-	.link-box {
-		background-color: var(--primary-color);
-		color: var(--text-color);
-	}
-
-	.good,
-	input.good {
-		background-color: var(--secondary-color);
-		color: var(--primary-color);
-	}
-	.bad,
-	input.bad {
-		background-color: var(--accent-color);
-		color: var(--primary-color);
-	}
-
-	textarea {
-		margin: 2rem;
-		padding: 0.8rem;
-		line-height: 1.5;
-
-		text-align: left;
-	}
-
 	footer {
-		position: static;
-		z-index: 1;
+		position: absolute;
 		bottom: 0;
+
+		width: 100%;
+
+		padding-top: 1rem;
+		padding-bottom: 1rem;
 
 		display: flex;
 		justify-content: center;
 		gap: 1rem;
-
-		padding-top: 1rem;
-		padding-bottom: 1rem;
 
 		text-align: center;
 		border-top: 2px dashed var(--text-color-st);
