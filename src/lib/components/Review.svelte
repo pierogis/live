@@ -9,7 +9,7 @@
 
 <div class="review">
 	<Card>
-		<span class="serial border inset shadow">{review.user.serial}</span>
+		<a class="serial border inset shadow" href={`/users/${review.user.id}`}>{review.user.serial}</a>
 		<textarea readonly class="description border inset shadow" cols="40" rows="40"
 			>{review.description}</textarea
 		>

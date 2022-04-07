@@ -17,14 +17,14 @@
 	// }
 
 	async function handleDelete(event: MouseEvent) {
-		await fetch(`/plates/${plate.id}`, { method: 'delete' });
+		await fetch(`/api/plates/${plate.id}`, { method: 'delete' });
 		goto('/plates');
 	}
 </script>
 
 <Card>
 	{#if plate}
-		<form class="delete" action={`/plates/${plate.id}?_method=DELETE`} method="post">
+		<form class="delete" action={`/plates/${plate.id}/delete`} method="post">
 			<input class="no-select" type="submit" value="❌" on:click|preventDefault={handleDelete} />
 		</form>
 	{/if}
@@ -100,10 +100,10 @@
 	input[type='url'] {
 		width: 20em;
 	}
-	.image-input {
+	/* .image-input {
 		max-height: 196px;
 
 		display: flex;
 		justify-content: center;
-	}
+	} */
 </style>

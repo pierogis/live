@@ -11,7 +11,7 @@ export async function getReviews(
 	return reviews;
 }
 
-export async function upsertReview(
+export async function insertReview(
 	params: Partial<Review> & Pick<Review, 'plateId' | 'userId'>
 ): Promise<Review> {
 	const review = await prisma.review.upsert({
@@ -27,6 +27,17 @@ export async function upsertReview(
 			userId: params.userId,
 			description: params.description
 		}
+	});
+
+	return review;
+}
+
+export async function updateReview(params: Review): Promise<Review> {
+	const review = await prisma.review.update({
+		where: {
+			id: params.id
+		},
+		data: { description: params.description }
 	});
 
 	return review;

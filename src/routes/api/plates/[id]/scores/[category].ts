@@ -1,44 +1,40 @@
+// api/plates/[id]/scores/[category].ts
+
 import { deleteScore, upsertScore } from '$lib/database/scores';
 import type { Category } from '@prisma/client';
 
-/** @type {import('./plates/[id]/scores/[category]').RequestHandler} */
-export async function put({ locals, request, params }) {
+/** @type {import('./api/plates/[id]/scores/[category]').RequestHandler} */
+export async function put({ locals, params, request }) {
 	if (locals.user) {
-		const formData: FormData = await request.formData();
-
 		const plateId = parseInt(params.id);
 		const userId: number = locals.user.id;
 		const category: Category = params.category;
 
-		const valueEntry = formData.get('value');
+		const body: { value: number } = await request.json();
 
-		const score = {
+		const data = {
 			plateId,
 			userId,
 			category,
-			value: valueEntry ? parseInt(valueEntry.toString()) : undefined
+			value: body.value || undefined
 		};
 
-		await upsertScore(score);
+		const score = await upsertScore(data);
 
 		// redirect to the updated plate
 		return {
-			status: 303,
-			headers: {
-				location: `/plates/${plateId}/scores`
-			}
+			status: 200,
+			body: score
 		};
 	} else {
 		return {
-			status: 301,
-			headers: {
-				location: `/login`
-			}
+			status: 401,
+			body: { error: `not signed in` }
 		};
 	}
 }
 
-/** @type {import('./plates/[id]/scores/[category]').RequestHandler} */
+/** @type {import('./api/plates/[id]/scores/[category]').RequestHandler} */
 export async function del({ locals, params }) {
 	if (locals.user) {
 		const plateId = parseInt(params.id);
@@ -55,17 +51,12 @@ export async function del({ locals, params }) {
 
 		// redirect to the updated plate
 		return {
-			status: 303,
-			headers: {
-				location: `/plates/${plateId}`
-			}
+			status: 200
 		};
 	} else {
 		return {
-			status: 301,
-			headers: {
-				location: `/login`
-			}
+			status: 401,
+			body: { error: `not signed in` }
 		};
 	}
 }

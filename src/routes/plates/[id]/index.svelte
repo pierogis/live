@@ -1,12 +1,17 @@
+<!-- plates/[id]/index.svelte -->
 <script lang="ts" context="module">
 	/** @type {import('./plates/[id]/index').Load} */
-	export async function load({ props, session }) {
-		if (!props.plate) {
+	export async function load({ session, params, fetch }) {
+		const response = await fetch(`/api/plates/${params.id}`);
+
+		if (response.status == 404) {
 			return { status: 404, error: "plate doesn't exist" };
 		}
 
+		const plate: FullPlate = await response.json();
+
 		return {
-			props: { plate: props.plate, user: session.user }
+			props: { plate, user: session.user }
 		};
 	}
 </script>
@@ -14,9 +19,10 @@
 <script lang="ts">
 	import type { User } from '@prisma/client';
 	import { session } from '$app/stores';
+	import { goto, invalidate } from '$app/navigation';
 
 	import type { FullPlate } from '$lib/database/models';
-	import { reviewDescriptionInputName } from './_form';
+	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import Review from '$lib/components/Review.svelte';
@@ -26,15 +32,16 @@
 	export let user: User;
 
 	const editorialReview = plate.reviews.find((review) => review.user.id == 1);
-	const editorialScores = plate.scores.filter((score) => score.userId == 1);
+	// const editorialScores = plate.scores.filter((score) => score.userId == 1);
 
 	const emptyUserReview = {
+		id: null,
 		plateId: plate.id,
 		userId: user?.id,
 		description: ''
 	};
 
-	let userReview = plate.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
+	const userReview = plate.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
 	const userScores = plate.scores.filter((score) => score.userId == user?.id);
 
 	const submitReviewFormId = 'review';
@@ -42,15 +49,31 @@
 	const reviewTextareaId = 'editorial';
 
 	async function handleSubmitReview() {
-		let formData = new FormData();
+		const data = { description: userReview.description };
 
-		formData.append(reviewDescriptionInputName, userReview.description);
-		await fetch(`/plates/${plate.id}/reviews`, { method: 'put', body: formData });
+		let response;
+
+		if (userReview.id) {
+			response = await fetch(`/api/plates/${plate.id}/reviews/${userReview.id}`, {
+				method: 'put',
+				body: JSON.stringify(data)
+			});
+		} else {
+			response = await fetch(`/api/plates/${plate.id}/reviews`, {
+				method: 'post',
+				body: JSON.stringify(data)
+			});
+		}
+
+		invalidate(`/api/plates/${plate.id}`);
 	}
 
 	async function handleDeleteReview() {
-		await fetch(`/plates/${plate.id}/reviews`, { method: 'delete' });
-		userReview = emptyUserReview;
+		if (userReview.id) {
+			await fetch(`/api/plates/${plate.id}/reviews/${userReview.id}`, { method: 'delete' });
+		}
+
+		invalidate(`/api/plates/${plate.id}`);
 	}
 </script>
 
@@ -74,16 +97,12 @@
 
 <span class="section">user review</span>
 {#if $session.user}
-	<form id={submitReviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
-	<form
-		id={deleteReviewFormId}
-		action={`/plates/${plate.id}/reviews?_method=DELETE`}
-		method="post"
-	/>
+	<form id={submitReviewFormId} action={`/plates/${plate.id}/review`} method="post" />
+	<form id={deleteReviewFormId} action={`/plates/${plate.id}/review/delete`} method="post" />
 	<div class="user-review">
 		<ScoreSheet
 			scores={userScores}
-			scoreUrl={`/plates/${plate.id}/scores/`}
+			scoreUrl={`/api/plates/${plate.id}/scores/`}
 			tooltip={false}
 			graph={false}
 		/>
@@ -93,10 +112,12 @@
 			class="border inset shadow"
 			form={submitReviewFormId}
 			name={reviewDescriptionInputName}
+			required
 			type="text"
 			rows="8"
 			bind:value={userReview.description}
 		/>
+		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={userReview.id} />
 	</div>
 	<div>
 		<button
@@ -117,7 +138,13 @@
 		</button>
 	</div>
 {:else}
-	<button class="border inset shadow good no-select" action="/login" method="get">login</button>
+	<a
+		class="border inset shadow good no-select"
+		href="/login"
+		on:click|preventDefault={() => goto('/login')}
+	>
+		login
+	</a>
 {/if}
 
 <div class="divider horizontal" />

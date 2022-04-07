@@ -1,3 +1,18 @@
+<!-- /plates/index -->
+<script lang="ts" context="module">
+	/** @type {import('./plates/index').Load} */
+	export async function load({ fetch }) {
+		const response = await fetch('/api/plates');
+
+		const plates: FullPlate[] = await response.json();
+
+		return {
+			status: 200,
+			props: { plates }
+		};
+	}
+</script>
+
 <script lang="ts">
 	import type { FullPlate } from '$lib/database/models';
 

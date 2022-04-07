@@ -1,12 +1,21 @@
+<!-- plates/jurisdictions/[id]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./jurisdictions/[id]').Load} */
-	export async function load({ props }) {
-		if (!props.jurisdiction) {
+	/** @type {import('./plates/jurisdictions/[id]').Load} */
+	export async function load({ fetch, params }) {
+		const response = await fetch(`/api/jurisdictions/${params.id}`);
+
+		const jurisdiction: Jurisdiction & {
+			plates: FullPlate[];
+		} = await response.json();
+
+		console.log(jurisdiction);
+
+		if (!jurisdiction) {
 			return { status: 404, error: "jurisdiction doesn't exist" };
 		}
 
 		return {
-			props: { ...props }
+			props: { jurisdiction }
 		};
 	}
 </script>

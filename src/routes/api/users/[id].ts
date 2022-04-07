@@ -1,12 +1,12 @@
 import type { User } from '@prisma/client';
-import { getUserWithScores, updateUser, deleteUser } from '$lib/database/users';
+import { getUser, updateUser, deleteUser } from '$lib/database/users';
 
 /** @type {import('./users/[id]').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
-	const user = await getUserWithScores({ id: parseInt(params.id) });
+	const user = await getUser({ id: parseInt(params.id) });
 
 	return {
-		body: { user }
+		body: user
 	};
 }
 
@@ -20,15 +20,12 @@ export async function put({ locals, request, params }) {
 		};
 	}
 	if (locals.user?.id == params.id || locals.user?.isAdmin) {
-		const formData = await request.formData();
-
-		// const emailEntry = formData.get('email');
-		const serialEntry = formData.get('serial');
+		const json: { serial: string } = await request.json();
 
 		let user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'> = {
 			id: parseInt(params.id),
 			// ...(emailEntry && { email: emailEntry.toString() }),
-			...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
+			...(json.serial && { serial: json.serial.toUpperCase() })
 		};
 
 		try {
@@ -44,10 +41,8 @@ export async function put({ locals, request, params }) {
 
 		// redirect to the updated user
 		return {
-			status: 303,
-			headers: {
-				location: `/users/${user.id}`
-			}
+			status: 200,
+			body: user
 		};
 	} else {
 		// redirect to the updated user
@@ -64,9 +59,6 @@ export async function del({ params }: { params: { id: string } }) {
 
 	// redirect to the newly created user
 	return {
-		status: 303,
-		headers: {
-			location: `/`
-		}
+		status: 200
 	};
 }

@@ -1,14 +1,19 @@
+<!-- users/[id]/index.svelte -->
 <script lang="ts" context="module">
 	/** @type {import('./users/[id]').Load} */
-	export async function load({ props, session }) {
-		if (!props.user) {
+	export async function load({ session, fetch, params }) {
+		const response = await fetch(`/api/users/${params.id}`);
+
+		const user = response.json();
+
+		if (!user) {
 			return { status: 404, error: "user doesn't exist" };
 		}
-		const isUser = session.user && session.user.id == props.user.id;
+		const isUser = session.user && session.user.id == user.id;
 		const isAdmin = session.user && session.user.isAdmin;
 
 		return {
-			props: { ...props, isUser, isAdmin }
+			props: { user, isUser, isAdmin }
 		};
 	}
 </script>
@@ -38,7 +43,7 @@
 {/if}
 
 {#if isUser || isAdmin}
-	<form action="/users/{user.id}?_method=PUT" method="post">
+	<form action="/users/{user.id}" method="post">
 		<Card>
 			{#if isAdmin}
 				<span>#{user.id}</span>

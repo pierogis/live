@@ -1,3 +1,17 @@
+<!-- plates/jurisdictions/index.svelte -->
+<script lang="ts" context="module">
+	/** @type {import('./plates/jurisdictions/index').Load} */
+	export async function load({ session, fetch }) {
+		const request = await fetch('/api/plates?distinct=jurisdictionId');
+
+		const plates = await request.json();
+
+		return {
+			props: { plates }
+		};
+	}
+</script>
+
 <script lang="ts">
 	import CardsGrid from '$lib/components/CardsGrid.svelte';
 	import PlateCard from '$lib/components/PlateCard.svelte';

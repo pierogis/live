@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 
-	export let questions: { question: String; answer: String }[];
+	import questions from './_faq.json';
 </script>
 
 <svelte:head>

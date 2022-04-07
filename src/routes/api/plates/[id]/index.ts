@@ -1,18 +1,20 @@
+// api/plates/[id]/index.ts
+
 import type { Prisma } from '@prisma/client';
 import { updatePlate, deletePlate, getFullPlate } from '$lib/database/plates';
 
-/** @type {import('./plates/[id]').RequestHandler} */
+/** @type {import('./api/plates/[id]/index').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	const parsedParams = { ...params, id: parseInt(params.id) };
 	const plate = await getFullPlate(parsedParams);
 
 	return {
 		status: 200,
-		body: { plate }
+		body: plate
 	};
 }
 
-/** @type {import('./plates/[id]/index').RequestHandler} */
+/** @type {import('./api/plates/[id]/index').RequestHandler} */
 export async function put({ locals, request, params }) {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
@@ -43,10 +45,8 @@ export async function put({ locals, request, params }) {
 
 		// redirect to the updated plate
 		return {
-			status: 303,
-			headers: {
-				location: `/plates/${plate.id}`
-			}
+			status: 200,
+			body: plate
 		};
 	} else {
 		return {
@@ -56,16 +56,13 @@ export async function put({ locals, request, params }) {
 	}
 }
 
-/** @type {import('./plates/[id]/index').RequestHandler} */
+/** @type {import('./api/plates/[id]/index').RequestHandler} */
 export async function del({ locals, params }) {
 	if (locals.user?.isAdmin) {
 		await deletePlate(parseInt(params.id));
 
 		return {
-			status: 303,
-			headers: {
-				location: `/`
-			}
+			status: 200
 		};
 	} else {
 		return {

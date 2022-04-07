@@ -21,3 +21,29 @@ bugs
 
 - [x] goto not available on server on `/account`
   - [x] add redirect "fallback" to endpoint
+
+
+
+
+refactor
+
+- [x] plates
+
+  - [x] [id]
+    - [x] index
+    - [x] scores
+      - [x] [category]
+      - [x] index
+    - [x] reviews
+    - [x] edit
+  - [x] index
+  - [x] create
+  - [x] jurisdictions
+    - [x] index
+    - [x] [id]
+
+- [x] users
+
+  - [x] [id]
+
+  

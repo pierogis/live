@@ -23,11 +23,11 @@
 		>
 	{/if}
 
-	<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
+	<a class="link" href={'/plates/jurisdictions/' + plate.jurisdiction.id}
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
-	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : 'plates/' + plate.id)}>
+	<a href={'/plates' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : plate.id)}>
 		<div class="image-container">
 			{#if plate.images}
 				<img
@@ -57,7 +57,7 @@
 		>
 	{/if}
 	{#if showScores}
-		<ScoreSheet scores={plate.scores} scoreUrl={`/plates/${plate.id}/scores/`} />
+		<ScoreSheet scores={plate.scores} scoreUrl={`/api/plates/${plate.id}/scores/`} />
 	{/if}
 </Card>
 

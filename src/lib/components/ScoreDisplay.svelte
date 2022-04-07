@@ -44,11 +44,12 @@
 						userScore = 2 * params.i + 2;
 					}
 
-					let formData = new FormData();
-					formData.append('value', userScore.toString());
 					const res = fetch(categoryScoreUrl, {
 						method: 'PUT',
-						body: formData
+						body: JSON.stringify({ value: userScore }),
+						headers: {
+							'Content-Type': 'application/json'
+						}
 					});
 				}
 			}

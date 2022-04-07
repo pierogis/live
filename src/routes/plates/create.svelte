@@ -1,9 +1,17 @@
 <script lang="ts" context="module">
 	import { protect } from '$lib/helpers';
 
-	/** @type {import('./plates/[id]/index').Load} */
-	export async function load(event) {
-		return protect(event);
+	/** @type {import('./plates/create').Load} */
+	export async function load({ session, fetch }) {
+		async function handle() {
+			const jurisdictions = await fetch('/api/jurisdictions');
+
+			return {
+				body: { jurisdictions }
+			};
+		}
+
+		return protect(session, handle);
 	}
 </script>
 
@@ -15,6 +23,10 @@
 	export let jurisdictions: Jurisdiction[];
 </script>
 
-<form action="/plates" method="post">
+<svelte:head>
+	<title>create plate</title>
+</svelte:head>
+
+<form method="post">
 	<PlateTemplate {jurisdictions} />
 </form>
