@@ -34,7 +34,7 @@
 	<title>login</title>
 </svelte:head>
 
-<form id={loginFormId} action="/login" method="post" netlify />
+<form id={loginFormId} action="/login" method="post" />
 <Card>
 	<input type="hidden" name="generated" form={loginFormId} value={!generated} />
 	<label for="email">email</label>

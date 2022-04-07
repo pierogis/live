@@ -74,17 +74,11 @@
 
 <span class="section">user review</span>
 {#if $session.user}
-	<form
-		id={submitReviewFormId}
-		action={`/plates/${plate.id}/reviews?_method=PUT`}
-		method="post"
-		netlify
-	/>
+	<form id={submitReviewFormId} action={`/plates/${plate.id}/reviews?_method=PUT`} method="post" />
 	<form
 		id={deleteReviewFormId}
 		action={`/plates/${plate.id}/reviews?_method=DELETE`}
 		method="post"
-		netlify
 	/>
 	<div class="user-review">
 		<ScoreSheet

@@ -15,6 +15,6 @@
 	export let jurisdictions: Jurisdiction[];
 </script>
 
-<form action="/plates" method="post" netlify>
+<form action="/plates" method="post">
 	<PlateTemplate {jurisdictions} />
 </form>
