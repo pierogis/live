@@ -4,10 +4,12 @@
 	/** @type {import('./plates/create').Load} */
 	export async function load({ session, fetch }) {
 		async function handle() {
-			const jurisdictions = await fetch('/api/jurisdictions');
+			const response = await fetch('/api/jurisdictions');
+
+			const jurisdictions: Jurisdiction[] = await response.json();
 
 			return {
-				body: { jurisdictions }
+				props: { jurisdictions }
 			};
 		}
 

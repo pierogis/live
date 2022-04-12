@@ -1,6 +1,7 @@
+<!-- plates/[id=integer]/edit.svelte -->
 <script lang="ts" context="module">
 	import { protect } from '$lib/helpers';
-	/** @type {import('./plates/[id]/edit').Load} */
+	/** @type {import('./plates/[id=integer]/edit').Load} */
 	export async function load({ session, fetch, params }) {
 		async function handler() {
 			const plateResponse = await fetch(`/api/plates/${params.id}`);

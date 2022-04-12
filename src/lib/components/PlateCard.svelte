@@ -12,6 +12,8 @@
 	export let showScores = true;
 
 	export let small: boolean;
+
+	export let interactive = true;
 </script>
 
 <Card>
@@ -27,7 +29,7 @@
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
-	<a href={'/plates' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : plate.id)}>
+	<a href={'/plates/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : plate.id)}>
 		<div class="image-container">
 			{#if plate.images}
 				<img
@@ -43,7 +45,7 @@
 					class="image inset shadow"
 					class:small
 					src={'/karl.svg'}
-					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
 						plate.jurisdiction.abbreviation
 					} license plate`}
 				/>
@@ -57,7 +59,10 @@
 		>
 	{/if}
 	{#if showScores}
-		<ScoreSheet scores={plate.scores} scoreUrl={`/api/plates/${plate.id}/scores/`} />
+		<ScoreSheet
+			scores={plate.scores}
+			scoreUrl={interactive ? `/api/plates/${plate.id}/scores/` : null}
+		/>
 	{/if}
 </Card>
 

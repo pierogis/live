@@ -1,3 +1,4 @@
+import { variables } from '$lib/env';
 import type { Plate } from '@prisma/client';
 
 /** @type {import('./plates/create').RequestHandler} */
@@ -18,33 +19,35 @@ export async function post({ locals, request }) {
 		}
 
 		const data = {
-			jurisdiction: { connect: { abbreviation: jurisdictionEntry.toString() } },
+			jurisdiction: { abbreviation: jurisdictionEntry.toString() },
 			startYear: startYearEntry ? parseInt(startYearEntry.toString()) : null,
 			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null,
-			images: imageUrlEntry
-				? {
-						create: [{ url: imageUrlEntry.toString() }]
-				  }
-				: undefined
+			imageUrls: imageUrlEntry ? [imageUrlEntry.toString()] : []
 		};
 
-		const response = await fetch('/api/plates', {
+		const apiUrl = variables.apiBase + '/plates';
+
+		const response = await fetch(apiUrl, {
 			method: 'post',
-			headers: {
-				'Content-Type': 'application/json'
-			},
+			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') },
 			body: JSON.stringify(data)
 		});
 
-		const plate: Plate = await response.json();
+		if (response.status == 200) {
+			const plate: Plate = await response.json();
 
-		// redirect to the newly created plate
-		return {
-			status: 303,
-			headers: {
-				location: `/plates/${plate.id}/edit`
-			}
-		};
+			// redirect to the newly created plate
+			return {
+				status: 303,
+				headers: {
+					location: `/plates/${plate.id}`
+				}
+			};
+		} else {
+			return {
+				status: 500
+			};
+		}
 	} else {
 		return {
 			status: 403,

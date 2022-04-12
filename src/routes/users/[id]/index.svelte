@@ -1,10 +1,12 @@
-<!-- users/[id]/index.svelte -->
+<!-- users/[id=integer]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./users/[id]').Load} */
+	/** @type {import('./users/[id=integer]').Load} */
 	export async function load({ session, fetch, params }) {
 		const response = await fetch(`/api/users/${params.id}`);
 
-		const user = response.json();
+		const user = await response.json();
+
+		console.log(user);
 
 		if (!user) {
 			return { status: 404, error: "user doesn't exist" };

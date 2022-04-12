@@ -79,14 +79,14 @@ export async function getPlate(params: Partial<Plate>): Promise<Plate> {
 	return plate;
 }
 
-export async function createPlate(partial: Prisma.PlateCreateInput): Promise<Plate> {
-	const plate = await prisma.plate.create({ data: partial });
+export async function createPlate(data: Prisma.PlateCreateInput): Promise<Plate> {
+	const plate = await prisma.plate.create({ data });
 
 	return plate;
 }
 
-export async function updatePlate(id: number, partial: Prisma.PlateUpdateInput) {
-	return await prisma.plate.update({ where: { id }, data: partial });
+export async function updatePlate(id: number, data: Prisma.PlateUpdateInput) {
+	return await prisma.plate.update({ where: { id }, data });
 }
 
 export async function deletePlate(id: number): Promise<void> {

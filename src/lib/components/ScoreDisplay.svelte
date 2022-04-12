@@ -47,9 +47,7 @@
 					const res = fetch(categoryScoreUrl, {
 						method: 'PUT',
 						body: JSON.stringify({ value: userScore }),
-						headers: {
-							'Content-Type': 'application/json'
-						}
+						headers: { 'content-type': 'application/json' }
 					});
 				}
 			}

@@ -16,3 +16,7 @@ export async function createImage(data: Omit<Image, 'id'>): Promise<Image> {
 
 	return image;
 }
+
+export async function deleteImages(params: Partial<Image>) {
+	await prisma.image.deleteMany({ where: params });
+}

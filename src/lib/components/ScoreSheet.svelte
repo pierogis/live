@@ -15,8 +15,7 @@
 
 	let editorialScores: {
 		[category in Category]?: number;
-	};
-	$: editorialScores = scores
+	} = scores
 		.filter((score) => score.userId == 1)
 		.reduce((previous, score) => {
 			previous[score.category] = score.value;

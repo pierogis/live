@@ -1,6 +1,6 @@
-<!-- plates/[id]/index.svelte -->
+<!-- plates/[id=integer]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./plates/[id]/index').Load} */
+	/** @type {import('./plates/[id=integer]/index').Load} */
 	export async function load({ session, params, fetch }) {
 		const response = await fetch(`/api/plates/${params.id}`);
 
@@ -78,12 +78,12 @@
 </script>
 
 <svelte:head>
-	<title>{plate.jurisdiction.name} plate ({plate.startYear}-{plate.endYear || '?'})</title>
+	<title>{plate.jurisdiction.name} plate ({plate.startYear || '?'}-{plate.endYear || '?'})</title>
 </svelte:head>
 
 <div class="top">
 	<div class="plate">
-		<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
+		<PlateCard {plate} isAdmin={user?.isAdmin} small={false} interactive={false} />
 	</div>
 
 	{#if editorialReview}

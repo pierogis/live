@@ -9,6 +9,7 @@ export let variables: {
 	emailUser: string;
 	emailPass: string;
 	devPassphrase: string;
+	apiBase: string;
 };
 export function setupEnv(): void {
 	dotenv.config();
@@ -21,6 +22,7 @@ export function setupEnv(): void {
 		encryptionSecret: process.env.ENCRYPTION_SECRET,
 		emailUser: process.env.EMAIL_USER,
 		emailPass: process.env.EMAIL_PASS,
-		devPassphrase: process.env.DEV_PASSPHRASE
+		devPassphrase: process.env.DEV_PASSPHRASE,
+		apiBase: process.env.API_BASE
 	};
 }

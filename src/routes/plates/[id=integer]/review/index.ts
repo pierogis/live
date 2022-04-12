@@ -1,9 +1,9 @@
-// plates/[id]/review
+// plates/[id=integer]/review.ts
 
 import { upsertReview } from '$lib/database/reviews';
 import { reviewDescriptionInputName } from './_form';
 
-/** @type {import('./plates/[id]/review').RequestHandler} */
+/** @type {import('./plates/[id=integer]/review').RequestHandler} */
 export async function post({ locals, request, params }) {
 	if (locals.user) {
 		const formData: FormData = await request.formData();

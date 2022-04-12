@@ -1,8 +1,9 @@
-// users/[id]/edit.ts
+// users/[id=integer]/edit.ts
 
+import { variables } from '$lib/env';
 import type { User } from '@prisma/client';
 
-/** @type {import('./users/[id]').RequestHandler} */
+/** @type {import('./users/[id=integer]').RequestHandler} */
 export async function post({ locals, request, params }) {
 	if (!locals.user) {
 		return {
@@ -20,12 +21,12 @@ export async function post({ locals, request, params }) {
 			// ...(emailEntry && { email: emailEntry.toString() }),
 			...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 		};
-		const response = await fetch('/users/${params.id}', {
+
+		const apiUrl = `${variables.apiBase}/users/${params.id}`;
+		const response = await fetch(apiUrl, {
 			body: JSON.stringify(data),
 			method: 'put',
-			headers: {
-				'Content-Type': 'application/json'
-			}
+			headers: { 'content-type': 'application/json' }
 		});
 
 		if (response.status == 200) {

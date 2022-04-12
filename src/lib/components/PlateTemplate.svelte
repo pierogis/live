@@ -24,6 +24,7 @@
 
 <Card>
 	{#if plate}
+		<a class="back" href={`/plates/${plate.id}`}>🔙</a>
 		<form class="delete" action={`/plates/${plate.id}/delete`} method="post">
 			<input class="no-select" type="submit" value="❌" on:click|preventDefault={handleDelete} />
 		</form>
@@ -89,6 +90,15 @@
 		background-color: transparent;
 
 		right: 0.4rem;
+	}
+
+	.back {
+		position: absolute;
+		display: flex;
+
+		background-color: transparent;
+
+		left: 0.4rem;
 	}
 
 	input[type='text'].jurisdiction {

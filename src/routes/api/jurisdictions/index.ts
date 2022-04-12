@@ -3,10 +3,17 @@
 import { getJurisdictions } from '$lib/database/jurisdictions';
 
 /** @type {import('./api/jurisdictions/index').RequestHandler} */
-export async function get({ params }) {
-	const jurisdictions = await getJurisdictions({});
+export async function get() {
+	try {
+		const jurisdictions = await getJurisdictions({});
 
-	return {
-		body: jurisdictions
-	};
+		return {
+			body: jurisdictions
+		};
+	} catch (err) {
+		console.error(err);
+		return {
+			status: 500
+		};
+	}
 }
