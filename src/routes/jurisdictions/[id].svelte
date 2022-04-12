@@ -1,6 +1,6 @@
-<!-- plates/jurisdictions/[id=integer]/index.svelte -->
+<!-- jurisdictions/[id=integer]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./plates/jurisdictions/[id=integer]').Load} */
+	/** @type {import('./jurisdictions/[id=integer]').Load} */
 	export async function load({ fetch, params }) {
 		const response = await fetch(`/api/jurisdictions/${params.id}`);
 

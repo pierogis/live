@@ -25,11 +25,11 @@
 		>
 	{/if}
 
-	<a class="link" href={'/plates/jurisdictions/' + plate.jurisdiction.id}
+	<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
-	<a href={'/plates/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : plate.id)}>
+	<a href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.id}`}>
 		<div class="image-container">
 			{#if plate.images}
 				<img

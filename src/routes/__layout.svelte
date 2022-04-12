@@ -19,7 +19,7 @@
 </header>
 
 <nav>
-	<a href="/plates/jurisdictions"><h3 class="link-box border inset shadow">jurisdictions</h3></a>
+	<a href="/jurisdictions"><h3 class="link-box border inset shadow">jurisdictions</h3></a>
 	{#if user?.isAdmin}
 		<a href="/plates/create"><h3 class="link-box border inset shadow">create</h3></a>
 	{/if}
