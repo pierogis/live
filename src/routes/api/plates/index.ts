@@ -60,13 +60,22 @@ export async function post({ locals, request }) {
 				}
 			};
 
-			const plate = await createPlate(data);
+			try {
+				const plate = await createPlate(data);
 
-			// redirect to the newly created plate
-			return {
-				status: 200,
-				body: plate
-			};
+				// redirect to the newly created plate
+				return {
+					status: 200,
+					body: plate
+				};
+			} catch (error) {
+				if (error.code == 'P2002') {
+					return {
+						status: 400,
+						body: { error: `one of image urls (${json.imageUrls}) already exists` }
+					};
+				}
+			}
 		} else {
 			return {
 				status: 403,
