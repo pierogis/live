@@ -6,8 +6,6 @@
 
 		const user = await response.json();
 
-		console.log(user);
-
 		if (!user) {
 			return { status: 404, error: "user doesn't exist" };
 		}
@@ -45,7 +43,7 @@
 {/if}
 
 {#if isUser || isAdmin}
-	<form action="/users/{user.id}" method="post">
+	<form action="/users/{user.id}/edit" method="post">
 		<Card>
 			{#if isAdmin}
 				<span>#{user.id}</span>
@@ -69,19 +67,18 @@
 				placeholder={originalUser.email}
 			/>
 			<div class="buttons">
-				<button class="border inset shadow no-select" type="submit">update</button>
+				<button class="good border inset shadow no-select" type="submit">update</button>
 
 				{#if isUser}
 					<!-- svelte-ignore a11y-accesskey -->
-					<button
-						class="bad border inset shadow no-select"
-						type="submit"
-						form="logout"
-						accesskey="l"
-					>
+					<button class="border inset shadow no-select" type="submit" form="logout" accesskey="l">
 						logout
 					</button>
 				{/if}
+
+				<a href={`/users/${user.id}/delete`}>
+					<button class="bad border inset shadow no-select">delete</button>
+				</a>
 			</div>
 		</Card>
 	</form>

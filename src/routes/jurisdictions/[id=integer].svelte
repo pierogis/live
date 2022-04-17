@@ -8,8 +8,6 @@
 			plates: FullPlate[];
 		} = await response.json();
 
-		console.log(jurisdiction);
-
 		if (!jurisdiction) {
 			return { status: 404, error: "jurisdiction doesn't exist" };
 		}
