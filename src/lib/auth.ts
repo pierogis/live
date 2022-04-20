@@ -5,6 +5,7 @@ import { generatePhrase } from './words';
 
 export async function sendPassphraseEmail(email: string): Promise<string> {
 	const generatedPassphrase = generatePhrase();
+
 	// send email with generated passphrase
 	const transporter = nodemailer.createTransport({
 		host: 'smtp-relay.sendinblue.com',

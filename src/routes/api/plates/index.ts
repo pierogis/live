@@ -63,7 +63,6 @@ export async function post({ locals, request }) {
 			try {
 				const plate = await createPlate(data);
 
-				// redirect to the newly created plate
 				return {
 					status: 200,
 					body: plate

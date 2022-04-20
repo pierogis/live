@@ -1,4 +1,4 @@
-<!-- jurisdictions/[id=integer]/index.svelte -->
+<!-- jurisdictions/[id=integer].svelte -->
 <script lang="ts" context="module">
 	/** @type {import('./jurisdictions/[id=integer]').Load} */
 	export async function load({ fetch, params }) {

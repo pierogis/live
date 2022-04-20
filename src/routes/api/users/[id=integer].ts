@@ -8,13 +8,19 @@ export async function get({ params, locals }) {
 	try {
 		const user = await getUser({ id: parseInt(params.id) });
 
-		if (locals.user?.id != params.id && !locals.user?.isAdmin) {
-			user.email = null;
-		}
+		if (user) {
+			if (locals.user?.id != params.id && !locals.user?.isAdmin) {
+				user.email = null;
+			}
 
-		return {
-			body: user
-		};
+			return {
+				body: user
+			};
+		} else {
+			return {
+				status: 404
+			};
+		}
 	} catch (err) {
 		console.error(err);
 		return {

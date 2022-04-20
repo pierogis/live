@@ -7,7 +7,7 @@ export async function post() {
 		status: 301,
 		headers: { 'set-cookie': cookie, location: '/' },
 		body: {
-			message: 'Signed out'
+			message: 'signed out'
 		}
 	};
 }
