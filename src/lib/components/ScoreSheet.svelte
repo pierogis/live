@@ -1,142 +1,80 @@
 <script lang="ts">
-	import { type Score, Category } from '@prisma/client';
+	import type { Category, Score } from '@prisma/client';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
 	import { session } from '$app/stores';
 	import ScoreGraph from './ScoreGraph.svelte';
-	import { categoriesInfo } from '$lib/categoriesInfo';
-	import { goto } from '$app/navigation';
 
 	export let scores: Score[];
+	export let categories: Category[];
 	export let scoreUrl: string = null;
 
 	export let tooltip = true;
 	export let graph = true;
 
-	let editorialScores: {
-		[category in Category]?: number;
-	} = scores
+	export let handleChangeScore: (value: number, categoryId: number) => void = null;
+	export let handleClearScore: (categoryId: number) => void = null;
+
+	let overallCategory = categories.find((category) => category.name == 'overall');
+
+	let scoreSetReducer = (previous, score) => {
+		previous[score.categoryId] = score.value;
+		return previous;
+	};
+
+	let editorialScoresSet: { [categoryId: number]: number } = scores
 		.filter((score) => score.userId == 1)
-		.reduce((previous, score) => {
-			previous[score.category] = score.value;
-
-			return previous;
-		}, {});
-
-	let userScores: {
-		[category in Category]?: number;
-	} = scores
+		.reduce(scoreSetReducer, {});
+	let userScoresSet: { [categoryId: number]: number } = scores
 		.filter((score) => score.userId == $session.user?.id)
-		.reduce(
-			(previous, score) => {
-				previous[score.category] = score.value;
-
-				return previous;
-			},
-			{
-				overall: null,
-				identifiability: null,
-				colors: null,
-				symbols: null,
-				typeface: null,
-				clarity: null
-			}
-		);
-
-	const { overall, ...subCategoriesInfo } = categoriesInfo;
-
-	function clearScoreAction(element: HTMLElement, params: { category: string }) {
-		async function handleClick(event: PointerEvent) {
-			if (event.button == 0) {
-				if (!$session.user) {
-					goto('/login');
-				} else {
-					userScores[params.category] = null;
-					const res = fetch(scoreUrl + params.category, {
-						method: 'DELETE'
-					});
-				}
-			}
-		}
-
-		if (scoreUrl) {
-			element.addEventListener('pointerdown', handleClick);
-		}
-
-		return {
-			update(newParams: { category: Category }) {
-				params = newParams;
-			},
-			destroy() {
-				if (scoreUrl) {
-					element.removeEventListener('pointerdown', handleClick);
-				}
-			}
-		};
-	}
+		.reduce(scoreSetReducer, {});
 </script>
 
 <div style:position="relative" class="no-select">
 	{#if tooltip}
 		<div aria-describedby="score-summary" class="inner">
 			<ScoreDisplay
-				editorialScore={editorialScores['overall']}
-				bind:userScore={userScores['overall']}
-				categoryScoreUrl={scoreUrl ? scoreUrl + 'overall' : null}
+				editorialScore={editorialScoresSet[overallCategory.id]}
+				userScore={userScoresSet[overallCategory.id]}
+				handleChangeScore={handleChangeScore
+					? (value) => handleChangeScore(value, overallCategory.id)
+					: null}
 			/>
 		</div>
 	{/if}
 
 	<div role={tooltip ? 'tooltip' : ''} class="scoresheet border inset shadow" id="score-summary">
-		<div class="category">
-			<span class="category-emoji" title="overall">{overall.emoji}</span>
-			<ScoreDisplay
-				editorialScore={editorialScores['overall']}
-				bind:userScore={userScores['overall']}
-				categoryScoreUrl={scoreUrl ? scoreUrl + 'overall' : null}
-			/>
-			{#if graph}
-				<div class="graph">
-					<ScoreGraph scores={scores.filter((score) => score.category == 'overall')} />
-				</div>
-			{:else}
-				<input
-					class="clear"
-					type="submit"
-					action={scoreUrl + 'overall'}
-					method="delete"
-					use:clearScoreAction={{ category: Category.overall }}
-					value="❌"
-				/>
-			{/if}
-		</div>
-
-		<div class="overall-seperator" />
-
-		{#each Object.entries(subCategoriesInfo) as [category, meta]}
+		{#each categories as category}
 			<div class="category">
-				<span class="category-emoji" title={category}>{meta.emoji}</span>
+				<span class="category-emoji" title={category.name}>{category.symbol}</span>
 				<ScoreDisplay
-					editorialScore={editorialScores[category]}
-					bind:userScore={userScores[category]}
-					categoryScoreUrl={scoreUrl ? scoreUrl + category : null}
+					editorialScore={editorialScoresSet[category.id]}
+					userScore={userScoresSet[category.id]}
+					handleChangeScore={handleChangeScore
+						? (value) => handleChangeScore(value, category.id)
+						: null}
 				/>
 				{#if graph}
 					<div class="graph">
-						<ScoreGraph scores={scores.filter((score) => score.category == category)} />
+						<ScoreGraph scores={scores.filter((score) => score.categoryId == category.id)} />
 					</div>
 				{:else}
 					<input
 						class="clear"
 						type="submit"
-						action={scoreUrl + category}
-						method="delete"
-						use:clearScoreAction={{ category }}
+						action="{scoreUrl}/{category}/delete"
+						method="post"
+						on:submit|preventDefault={handleChangeScore
+							? () => handleClearScore(category.id)
+							: null}
 						value="❌"
 					/>
 				{/if}
 				<br />
 			</div>
+			{#if category.name == 'overall'}
+				<div class="overall-seperator" />
+			{/if}
 		{/each}
 	</div>
 </div>

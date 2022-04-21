@@ -1,31 +1,33 @@
-// plates/[id=integer]/review.ts
+// plates/[id=integer]/review/index.ts
 
-import { upsertReview } from '$lib/database/reviews';
-import { reviewDescriptionInputName } from './_form';
+import { updateReview } from '$lib/database/reviews';
+import { reviewDescriptionInputName, reviewIdInputName } from './_form';
 
-/** @type {import('./plates/[id=integer]/review').RequestHandler} */
+/** @type {import('./plates/[id=integer]/review/index').RequestHandler} */
 export async function post({ locals, request, params }) {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 
-		const plateId = parseInt(params.id);
+		const modelId = parseInt(params.id);
 		const userId: number = locals.user.id;
 
+		const reviewIdEntry = formData.get(reviewIdInputName);
 		const descriptionEntry = formData.get(reviewDescriptionInputName);
 
 		const review = {
-			plateId,
+			id: parseInt(reviewIdEntry.toString()),
+			modelId,
 			userId,
 			description: descriptionEntry ? descriptionEntry.toString() : undefined
 		};
 
-		await upsertReview(review);
+		await updateReview(review);
 
 		// redirect to the updated plate
 		return {
 			status: 303,
 			headers: {
-				location: `/plates/${plateId}`
+				location: `/plates/${modelId}`
 			}
 		};
 	} else {

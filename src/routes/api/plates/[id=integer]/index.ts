@@ -7,8 +7,7 @@ import { deleteImages } from '$lib/database/images';
 /** @type {import('./api/plates/[id=integer]/index').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
-		const parsedParams = { ...params, id: parseInt(params.id) };
-		const plate = await getFullPlate(parsedParams);
+		const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
 		if (plate) {
 			return {
@@ -39,24 +38,28 @@ export async function put({ locals, request, params }) {
 				imageUrls: string[];
 			} = await request.json();
 
-			const plateId: number = parseInt(params.id);
+			const modelId: number = parseInt(params.id);
 
-			await deleteImages({ plateId });
+			await deleteImages({ modelId });
 
 			const data: Prisma.PlateUpdateInput = {
 				jurisdiction: { connect: { ...json.jurisdiction } },
 				startYear: json.startYear,
 				endYear: json.endYear,
-				images: {
-					createMany: {
-						data: json.imageUrls.map((imageUrl) => {
-							return { url: imageUrl };
-						})
+				model: {
+					update: {
+						images: {
+							createMany: {
+								data: json.imageUrls.map((imageUrl) => {
+									return { url: imageUrl };
+								})
+							}
+						}
 					}
 				}
 			};
 
-			const plate = await updatePlate(plateId, data);
+			const plate = await updatePlate(modelId, data);
 
 			if (plate) {
 				return {

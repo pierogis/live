@@ -35,9 +35,9 @@
 </script>
 
 <svelte:head>
-	<title>plate: {plate.id} edit</title>
+	<title>plate: {plate.modelId} edit</title>
 </svelte:head>
 
-<form action="/plates/{plate.id}/edit" method="post">
+<form action="/plates/{plate.modelId}/edit" method="post">
 	<PlateTemplate {jurisdictions} {plate} />
 </form>

@@ -8,11 +8,11 @@ export async function post({ locals, request, params }) {
 		if (locals.user) {
 			const json: { description: string } = await request.json();
 
-			const plateId = parseInt(params.id);
+			const modelId = parseInt(params.id);
 			const userId: number = locals.user.id;
 
 			const data = {
-				plateId,
+				modelId,
 				userId,
 				description: json.description || undefined
 			};

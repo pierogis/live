@@ -1,22 +1,22 @@
-// api/plates/[id=integer]/scores/[category].ts
+// api/plates/[id=integer]/scores/[category=category].ts
 
 import { deleteScore, upsertScore } from '$lib/database/scores';
-import type { Category } from '@prisma/client';
 
-/** @type {import('./api/plates/[id=integer]/scores/[category]').RequestHandler} */
+/** @type {import('./api/plates/[id=integer]/scores/[categoryId=integer]').RequestHandler} */
 export async function put({ locals, params, request }) {
+	console.log('karl');
 	try {
 		if (locals.user) {
-			const plateId = parseInt(params.id);
+			const modelId = parseInt(params.id);
 			const userId: number = locals.user.id;
-			const category: Category = params.category;
+			const categoryId = parseInt(params.categoryId);
 
 			const body: { value: number } = await request.json();
 
 			const data = {
-				plateId,
+				modelId,
 				userId,
-				category,
+				categoryId,
 				value: body.value || undefined
 			};
 
@@ -41,18 +41,18 @@ export async function put({ locals, params, request }) {
 	}
 }
 
-/** @type {import('./api/plates/[id=integer]/scores/[category]').RequestHandler} */
+/** @type {import('./api/plates/[id=integer]/scores/[categoryId=integer]').RequestHandler} */
 export async function del({ locals, params }) {
 	try {
 		if (locals.user) {
-			const plateId = parseInt(params.id);
+			const modelId = parseInt(params.id);
 			const userId: number = locals.user.id;
-			const category: Category = params.category;
+			const categoryId = parseInt(params.categoryId);
 
 			const score = {
-				plateId,
+				modelId,
 				userId,
-				category
+				categoryId
 			};
 
 			await deleteScore(score);

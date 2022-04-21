@@ -40,7 +40,7 @@ export async function post({ locals, request }) {
 			return {
 				status: 303,
 				headers: {
-					location: `/plates/${plate.id}`
+					location: `/plates/${plate.modelId}`
 				}
 			};
 		} else {

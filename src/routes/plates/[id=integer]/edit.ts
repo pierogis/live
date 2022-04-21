@@ -1,6 +1,5 @@
 // plates/[id=integer]/edit.ts
 
-import type { Plate } from '@prisma/client';
 import { variables } from '$lib/env';
 
 /** @type {import('./plates/[id=integer]/edit').RequestHandler} */
@@ -28,7 +27,7 @@ export async function post({ locals, request, params }) {
 			body: JSON.stringify(data)
 		});
 
-		const plate: Plate = await response.json();
+		await response.json();
 
 		// redirect to the updated plate
 		return {

@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { session } from '$app/stores';
-
-	export let categoryScoreUrl: string = null;
 	export let editorialScore: number;
 	export let userScore: number = null;
 	let placeholderScore = 0;
 
-	$: interactive = categoryScoreUrl != null;
+	export let handleChangeScore: (value: number) => void = null;
+
+	$: interactive = handleChangeScore != null;
 	$: user = userScore != null;
 	$: placeholder = !user && editorialScore == null;
 	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
@@ -27,46 +25,18 @@
 		.concat(Array(halfScores).fill(PointStatus.half))
 		.concat(Array(emptyScores).fill(PointStatus.empty));
 
-	function changeScoreAction(
-		element: HTMLElement,
-		params: { pointStatus: PointStatus; i: number }
-	) {
-		async function handlePointerDown(event: PointerEvent) {
-			if (event.button == 0) {
-				if (!$session.user) {
-					goto('/login');
-				} else {
-					if (userScore == 2 * params.i + 2) {
-						userScore = 2 * params.i + 1;
-					} else if (userScore == 2 * params.i + 1) {
-						userScore = 2 * params.i;
-					} else {
-						userScore = 2 * params.i + 2;
-					}
-
-					const res = fetch(categoryScoreUrl, {
-						method: 'PUT',
-						body: JSON.stringify({ value: userScore }),
-						headers: { 'content-type': 'application/json' }
-					});
-				}
+	async function handlePointerDown(event: PointerEvent, i: number) {
+		if (event.button == 0) {
+			if (userScore == 2 * i + 2) {
+				userScore = 2 * i + 1;
+			} else if (userScore == 2 * i + 1) {
+				userScore = 2 * i;
+			} else {
+				userScore = 2 * i + 2;
 			}
-		}
 
-		if (categoryScoreUrl) {
-			element.addEventListener('pointerdown', handlePointerDown);
+			handleChangeScore(userScore);
 		}
-
-		return {
-			update(newParams: { pointStatus: PointStatus; i: number }) {
-				params = newParams;
-			},
-			destroy() {
-				if (categoryScoreUrl) {
-					element.removeEventListener('pointerdown', handlePointerDown);
-				}
-			}
-		};
 	}
 </script>
 
@@ -77,7 +47,7 @@
 			class:user
 			class:placeholder
 			class:interactive
-			use:changeScoreAction={{ pointStatus, i }}
+			on:pointerdown|preventDefault={(e) => handlePointerDown(e, i)}
 		>
 			{pointStatus}
 		</span>

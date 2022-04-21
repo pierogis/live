@@ -51,11 +51,16 @@ export async function post({ locals, request }) {
 				jurisdiction: { connect: { ...json.jurisdiction } },
 				startYear: json.startYear,
 				endYear: json.endYear,
-				images: {
-					createMany: {
-						data: json.imageUrls.map((imageUrl) => {
-							return { url: imageUrl };
-						})
+				model: {
+					create: {
+						ware: { connect: { name: 'plate' } },
+						images: {
+							createMany: {
+								data: json.imageUrls.map((imageUrl) => {
+									return { url: imageUrl };
+								})
+							}
+						}
 					}
 				}
 			};

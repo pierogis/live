@@ -17,7 +17,7 @@ export async function post({ locals, request, params }) {
 		// const emailEntry = formData.get('email');
 		const serialEntry = formData.get('serial');
 
-		let data: Pick<User, 'serial'> = {
+		const data: Pick<User, 'serial'> = {
 			// ...(emailEntry && { email: emailEntry.toString() }),
 			...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 		};

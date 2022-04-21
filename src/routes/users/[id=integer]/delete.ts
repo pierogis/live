@@ -1,7 +1,6 @@
 // users/[id=integer]/edit.ts
 
 import { variables } from '$lib/env';
-import type { User } from '@prisma/client';
 
 /** @type {import('./users/[id=integer]/edit').RequestHandler} */
 export async function post({ locals, request, params }) {

@@ -114,6 +114,7 @@
 	input[type='email'],
 	input[type='password'],
 	input[type='url'],
+	input[type='number'],
 	textarea {
 		background-color: var(--input-color);
 		padding: 0.1rem 0.2rem;
@@ -129,6 +130,7 @@
 	input[type='email']:disabled,
 	input[type='password']:disabled,
 	input[type='url']:disabled,
+	input[type='number']:disabled,
 	textarea:disabled {
 		background-color: var(--primary-color);
 		color: var(--text-color);
@@ -139,6 +141,8 @@
 	input[type='text'],
 	input[type='email'],
 	input[type='password'],
+	input[type='url'],
+	input[type='number'],
 	input[type='submit'],
 	button,
 	.link-box {

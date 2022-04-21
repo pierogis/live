@@ -1,7 +1,7 @@
 <!-- jurisdictions/index.svelte -->
 <script lang="ts" context="module">
 	/** @type {import('./jurisdictions/index').Load} */
-	export async function load({ session, fetch }) {
+	export async function load({ fetch }) {
 		const request = await fetch('/api/plates?distinct=jurisdictionId');
 
 		const plates = await request.json();
@@ -26,6 +26,6 @@
 
 <CardsGrid>
 	{#each plates as plate}
-		<PlateCard {plate} showYears={false} small={true} showScores={false} />
+		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

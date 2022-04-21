@@ -2,22 +2,24 @@
 <script lang="ts" context="module">
 	/** @type {import('./plates/[id=integer]/index').Load} */
 	export async function load({ session, params, fetch }) {
-		const response = await fetch(`/api/plates/${params.id}`);
+		const platesResponse = await fetch(`/api/plates/${params.id}`);
+		const categoriesResponse = await fetch(`/api/plates/categories`);
 
-		if (response.status == 404) {
+		if (platesResponse.status == 404) {
 			return { status: 404, error: "plate doesn't exist" };
 		}
 
-		const plate: FullPlate = await response.json();
+		const plate: FullPlate = await platesResponse.json();
+		const categories: Category[] = await categoriesResponse.json();
 
 		return {
-			props: { plate, user: session.user }
+			props: { categories, plate, user: session.user }
 		};
 	}
 </script>
 
 <script lang="ts">
-	import type { User } from '@prisma/client';
+	import type { Category, User } from '@prisma/client';
 	import { session } from '$app/stores';
 	import { goto, invalidate } from '$app/navigation';
 
@@ -28,52 +30,56 @@
 	import Review from '$lib/components/Review.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
+	import { handleChangeScore } from '$lib/api/scores';
+
+	export let categories: Category[];
 	export let plate: FullPlate;
 	export let user: User;
 
-	const editorialReview = plate.reviews.find((review) => review.user.id == 1);
+	const editorialReview = plate.model.reviews.find((review) => review.user.id == 1);
 	// const editorialScores = plate.scores.filter((score) => score.userId == 1);
 
 	const emptyUserReview = {
 		id: null,
-		plateId: plate.id,
+		modelId: plate.modelId,
 		userId: user?.id,
 		description: ''
 	};
 
-	const userReview = plate.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
-	const userScores = plate.scores.filter((score) => score.userId == user?.id);
+	const userReview =
+		plate.model.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
+	const userScores = plate.model.scores.filter((score) => score.userId == user?.id);
 
 	const submitReviewFormId = 'review';
 	const deleteReviewFormId = 'delete';
 	const reviewTextareaId = 'editorial';
 
+	const scoreUrl = `/plates/${plate.modelId}/scores/${$session.user.id}`;
+
 	async function handleSubmitReview() {
 		const data = { description: userReview.description };
 
-		let response;
-
 		if (userReview.id) {
-			response = await fetch(`/api/plates/${plate.id}/reviews/${userReview.id}`, {
+			await fetch(`/api/plates/${plate.modelId}/reviews/${userReview.id}`, {
 				method: 'put',
 				body: JSON.stringify(data)
 			});
 		} else {
-			response = await fetch(`/api/plates/${plate.id}/reviews`, {
+			await fetch(`/api/plates/${plate.modelId}/reviews`, {
 				method: 'post',
 				body: JSON.stringify(data)
 			});
 		}
 
-		invalidate(`/api/plates/${plate.id}`);
+		invalidate(`/api/plates/${plate.modelId}`);
 	}
 
 	async function handleDeleteReview() {
 		if (userReview.id) {
-			await fetch(`/api/plates/${plate.id}/reviews/${userReview.id}`, { method: 'delete' });
+			await fetch(`/api/plates/${plate.modelId}/reviews/${userReview.id}`, { method: 'delete' });
 		}
 
-		invalidate(`/api/plates/${plate.id}`);
+		invalidate(`/api/plates/${plate.modelId}`);
 	}
 </script>
 
@@ -83,7 +89,9 @@
 
 <div class="top">
 	<div class="plate">
-		<PlateCard {plate} isAdmin={user?.isAdmin} small={false} interactive={false} />
+		<PlateCard {plate} isAdmin={user?.isAdmin} small={false}>
+			<ScoreSheet {categories} scores={plate.model.scores} />
+		</PlateCard>
 	</div>
 
 	{#if editorialReview}
@@ -97,12 +105,15 @@
 
 <span class="section">user review</span>
 {#if $session.user}
-	<form id={submitReviewFormId} action={`/plates/${plate.id}/review`} method="post" />
-	<form id={deleteReviewFormId} action={`/plates/${plate.id}/review/delete`} method="post" />
+	<form id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
+	<form id={deleteReviewFormId} action={`/plates/${plate.modelId}/review/delete`} method="post" />
 	<div class="user-review">
 		<ScoreSheet
+			{categories}
 			scores={userScores}
-			scoreUrl={`/api/plates/${plate.id}/scores/`}
+			handleChangeScore={(value, categoryId) =>
+				handleChangeScore({ value, categoryId, userId: user.id, modelId: plate.modelId })}
+			{scoreUrl}
 			tooltip={false}
 			graph={false}
 		/>
@@ -151,7 +162,7 @@
 
 <span class="section">reviews</span>
 <div class="reviews">
-	{#each plate.reviews as review}
+	{#each plate.model.reviews as review}
 		<Review {review} scores={userScores} />
 	{/each}
 </div>

@@ -7,11 +7,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Ware {
+  id         Int        @id(map: "Ware_pkey") @default(autoincrement())
+  name       String     @unique(map: "Ware_name_unique") @db.VarChar(255)
+  models     Model[]
+  categories Category[]
+}
+
+model Model {
+  id      Int      @id(map: "Model_pkey") @default(autoincrement())
+  wareId  Int
+  ware    Ware     @relation(fields: [wareId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Model_wareId_fkey")
+  plate   Plate?
+  // park    Park?
+  images  Image[]
+  scores  Score[]
+  reviews Review[]
+}
+
+model Category {
+  id       Int     @id(map: "Category_pkey") @default(autoincrement())
+  name     String  @db.VarChar(255)
+  symbol   String  @db.VarChar(255)
+  wareName String  @db.VarChar(255)
+  ware     Ware    @relation(fields: [wareName], references: [name], onDelete: Cascade, onUpdate: NoAction, map: "Category_wareName_fkey")
+  scores   Score[]
+
+  @@unique([name, wareName], map: "Category_name_wareName_unique")
+}
+
+model Review {
+  id          Int    @id(map: "Review_pkey") @default(autoincrement())
+  modelId     Int
+  userId      Int
+  description String @db.VarChar(2047)
+  model       Model  @relation(fields: [modelId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_modelId_fkey")
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_userId_fkey")
+
+  @@unique([userId, modelId], name: "Review_userId_modelId_unique")
+}
+
+model Score {
+  modelId    Int
+  userId     Int
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Score_categoryId_fkey")
+  value      Int
+  model      Model    @relation(fields: [modelId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Score_modelId_fkey")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Score_userId_fkey")
+
+  @@id([modelId, userId, categoryId], map: "Score_pkey")
+}
+
 model Image {
   id      Int     @id(map: "Image_pkey") @default(autoincrement())
-  plateId Int
+  modelId Int
   url     String? @unique(map: "Image_url_unique") @db.VarChar(255)
-  plate   Plate   @relation(fields: [plateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Image_plateId_fkey")
+  model   Model   @relation(fields: [modelId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Image_modelId_fkey")
 }
 
 model Jurisdiction {
@@ -19,49 +71,26 @@ model Jurisdiction {
   abbreviation String  @unique(map: "Jurisdiction_abbreviation_unique") @db.VarChar(2)
   name         String  @db.VarChar(255)
   plates       Plate[]
+  // parks        Park[]
 }
 
 model Plate {
-  id             Int          @id(map: "Plate_pkey") @default(autoincrement())
+  modelId        Int          @id(map: "Plate_pkey")
   jurisdictionId Int
   startYear      Int?
   endYear        Int?
+  model          Model        @relation(fields: [modelId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Plate_modelId_fkey")
   jurisdiction   Jurisdiction @relation(fields: [jurisdictionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Plate_jurisdictionId_fkey")
-  images         Image[]
-  scores         Score[]
-  reviews        Review[]
 }
 
-enum Category {
-  overall
-  identifiability
-  colors
-  symbols
-  typeface
-  clarity
-}
-
-model Review {
-  id          Int    @id(map: "Review_pkey") @default(autoincrement())
-  plateId     Int
-  userId      Int
-  description String @db.VarChar(2047)
-  plate       Plate  @relation(fields: [plateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_plateId_fkey")
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Review_userId_fkey")
-
-  @@unique([plateId, userId], name: "Review_userId_plateId_unique")
-}
-
-model Score {
-  plateId  Int
-  userId   Int
-  category Category
-  value    Int?
-  plate    Plate    @relation(fields: [plateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Score_plateId_fkey")
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Score_userId_fkey")
-
-  @@id([plateId, userId, category], map: "Score_pkey")
-}
+// model Park {
+//   id             Int          @id(map: "Park_pkey") @default(autoincrement())
+//   modelId        Int          @unique
+//   jurisdictionId Int
+//   startYear      Int?
+//   jurisdiction   Jurisdiction @relation(fields: [jurisdictionId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Park_jurisdictionId_fkey")
+//   model          Model        @relation(fields: [modelId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Park_modelId_fkey")
+// }
 
 model User {
   id      Int      @id(map: "User_pkey") @default(autoincrement())

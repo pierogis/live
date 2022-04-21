@@ -1,9 +1,8 @@
-import crypto from 'crypto';
 import Iron from '@hapi/iron';
 
 import { variables } from './env';
 
-export async function encrypt(data: any): Promise<string> {
+export async function encrypt<T>(data: T): Promise<string> {
 	return data && Iron.seal(data, variables.encryptionSecret, Iron.defaults);
 }
 

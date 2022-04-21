@@ -5,11 +5,11 @@ import { getScores } from '$lib/database/scores';
 /** @type {import('./api/plates/[id=integer]/scores').RequestHandler} */
 export async function get({ params }: { params: { id: string } }) {
 	try {
-		const parsedParams = { plateId: parseInt(params.id) };
+		const parsedParams = { modelId: parseInt(params.id) };
 		const scores = await getScores(parsedParams);
 
 		return {
-			body: { scores }
+			body: scores
 		};
 	} catch (err) {
 		console.error(err);

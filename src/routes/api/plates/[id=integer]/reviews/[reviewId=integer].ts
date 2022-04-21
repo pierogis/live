@@ -8,13 +8,13 @@ export async function put({ locals, request, params }) {
 		if (locals.user) {
 			const json: { description: string } = await request.json();
 
-			const plateId = parseInt(params.id);
+			const modelId = parseInt(params.id);
 			const reviewId = parseInt(params.reviewId);
 			const userId: number = locals.user.id;
 
 			const data = {
 				id: reviewId,
-				plateId,
+				modelId,
 				userId,
 				description: json.description || undefined
 			};
@@ -44,11 +44,11 @@ export async function put({ locals, request, params }) {
 export async function del({ locals, params }) {
 	try {
 		if (locals.user) {
-			const plateId = parseInt(params.id);
+			const modelId = parseInt(params.id);
 			const userId: number = locals.user.id;
 
 			const reviewParams = {
-				plateId,
+				modelId,
 				userId
 			};
 

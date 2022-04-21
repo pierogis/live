@@ -2,7 +2,7 @@ import { prisma } from '.';
 import type { Score } from '@prisma/client';
 
 export async function getScores(
-	params: Partial<Omit<Score, 'explanation'>>,
+	params: Partial<Score>,
 	take: number = undefined,
 	skip = 0
 ): Promise<Score[]> {
@@ -12,21 +12,21 @@ export async function getScores(
 }
 
 export async function upsertScore(
-	params: Partial<Score> & Pick<Score, 'plateId' | 'userId' | 'category'>
+	params: Partial<Score> & Pick<Score, 'modelId' | 'userId' | 'categoryId'>
 ): Promise<Score> {
 	const score = await prisma.score.upsert({
 		where: {
-			plateId_userId_category: {
-				plateId: params.plateId,
+			modelId_userId_categoryId: {
+				modelId: params.modelId,
 				userId: params.userId,
-				category: params.category
+				categoryId: params.categoryId
 			}
 		},
 		update: { value: params.value },
 		create: {
-			plateId: params.plateId,
+			modelId: params.modelId,
 			userId: params.userId,
-			category: params.category,
+			categoryId: params.categoryId,
 			value: params.value
 		}
 	});
@@ -35,14 +35,14 @@ export async function upsertScore(
 }
 
 export async function deleteScore(
-	params: Pick<Score, 'plateId' | 'userId' | 'category'>
+	params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>
 ): Promise<void> {
 	await prisma.score.delete({
 		where: {
-			plateId_userId_category: {
-				plateId: params.plateId,
+			modelId_userId_categoryId: {
+				modelId: params.modelId,
 				userId: params.userId,
-				category: params.category
+				categoryId: params.categoryId
 			}
 		}
 	});
