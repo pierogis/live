@@ -1,17 +1,19 @@
 <script lang="ts">
-	export let editorialScore: number;
-	export let userScore: number = null;
-	let placeholderScore = 0;
+	import type { Readable, Writable } from 'svelte/store';
+	import type { Score } from '@prisma/client';
 
-	export let handleChangeScore: (value: number) => void = null;
+	export let editorialScore: Readable<Score> = null;
+	export let userScore: Writable<Score> = null;
+	const displayScore = userScore || editorialScore;
 
-	$: interactive = handleChangeScore != null;
-	$: user = userScore != null;
-	$: placeholder = !user && editorialScore == null;
-	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
+	const interactive = userScore != null;
+	const user = userScore != null;
+	$: placeholder = $displayScore?.value == null;
 
-	$: halfScores = displayScore % 2;
-	$: fullScores = (displayScore - halfScores) / 2;
+	$: displayValue = $displayScore?.value || 0;
+
+	$: halfScores = displayValue % 2;
+	$: fullScores = (displayValue - halfScores) / 2;
 	$: emptyScores = 5 - (fullScores + halfScores);
 
 	enum PointStatus {
@@ -25,17 +27,20 @@
 		.concat(Array(halfScores).fill(PointStatus.half))
 		.concat(Array(emptyScores).fill(PointStatus.empty));
 
-	async function handlePointerDown(event: PointerEvent, i: number) {
+	function handlePointerDown(event: PointerEvent, i: number) {
 		if (event.button == 0) {
-			if (userScore == 2 * i + 2) {
-				userScore = 2 * i + 1;
-			} else if (userScore == 2 * i + 1) {
-				userScore = 2 * i;
-			} else {
-				userScore = 2 * i + 2;
+			if (interactive) {
+				userScore.update((score) => {
+					if (score.value == 2 * i + 2) {
+						score.value = 2 * i + 1;
+					} else if (score.value == 2 * i + 1) {
+						score.value = 2 * i;
+					} else {
+						score.value = 2 * i + 2;
+					}
+					return score;
+				});
 			}
-
-			handleChangeScore(userScore);
 		}
 	}
 </script>

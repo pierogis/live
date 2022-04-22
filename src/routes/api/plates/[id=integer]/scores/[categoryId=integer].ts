@@ -1,10 +1,9 @@
-// api/plates/[id=integer]/scores/[category=category].ts
+// api/plates/[id=integer]/scores/[categoryId=integer].ts
 
 import { deleteScore, upsertScore } from '$lib/database/scores';
 
 /** @type {import('./api/plates/[id=integer]/scores/[categoryId=integer]').RequestHandler} */
 export async function put({ locals, params, request }) {
-	console.log('karl');
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);
@@ -12,6 +11,13 @@ export async function put({ locals, params, request }) {
 			const categoryId = parseInt(params.categoryId);
 
 			const body: { value: number } = await request.json();
+
+			if (body.value < 0 || body.value > 10) {
+				return {
+					status: 400,
+					body: { error: 'score value less than 0 or greater than 10' }
+				};
+			}
 
 			const data = {
 				modelId,

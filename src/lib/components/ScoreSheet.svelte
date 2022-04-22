@@ -1,44 +1,31 @@
 <script lang="ts">
 	import type { Category, Score } from '@prisma/client';
+	import type { Readable, Writable } from 'svelte/store';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
-	import { session } from '$app/stores';
 	import ScoreGraph from './ScoreGraph.svelte';
 
-	export let scores: Score[];
 	export let categories: Category[];
+
+	export let editorialScores: { [categoryId: number]: Readable<Score> } = null;
+	export let userScores: { [categoryId: number]: Writable<Score> } = null;
+	export let graphScores: { [categoryId: number]: Readable<Score>[] } = null;
+
 	export let scoreUrl: string = null;
 
 	export let tooltip = true;
-	export let graph = true;
 
-	export let handleChangeScore: (value: number, categoryId: number) => void = null;
-	export let handleClearScore: (categoryId: number) => void = null;
+	const interactive = userScores != null;
 
-	let overallCategory = categories.find((category) => category.name == 'overall');
-
-	let scoreSetReducer = (previous, score) => {
-		previous[score.categoryId] = score.value;
-		return previous;
-	};
-
-	let editorialScoresSet: { [categoryId: number]: number } = scores
-		.filter((score) => score.userId == 1)
-		.reduce(scoreSetReducer, {});
-	let userScoresSet: { [categoryId: number]: number } = scores
-		.filter((score) => score.userId == $session.user?.id)
-		.reduce(scoreSetReducer, {});
+	const overallCategory = categories.find((category) => category.name == 'overall');
 </script>
 
 <div style:position="relative" class="no-select">
 	{#if tooltip}
 		<div aria-describedby="score-summary" class="inner">
 			<ScoreDisplay
-				editorialScore={editorialScoresSet[overallCategory.id]}
-				userScore={userScoresSet[overallCategory.id]}
-				handleChangeScore={handleChangeScore
-					? (value) => handleChangeScore(value, overallCategory.id)
-					: null}
+				editorialScore={editorialScores ? editorialScores[overallCategory.id] : null}
+				userScore={userScores ? userScores[overallCategory.id] : null}
 			/>
 		</div>
 	{/if}
@@ -48,25 +35,25 @@
 			<div class="category">
 				<span class="category-emoji" title={category.name}>{category.symbol}</span>
 				<ScoreDisplay
-					editorialScore={editorialScoresSet[category.id]}
-					userScore={userScoresSet[category.id]}
-					handleChangeScore={handleChangeScore
-						? (value) => handleChangeScore(value, category.id)
-						: null}
+					editorialScore={editorialScores ? editorialScores[category.id] : null}
+					userScore={interactive ? userScores[category.id] : null}
 				/>
-				{#if graph}
+				{#if graphScores != null}
 					<div class="graph">
-						<ScoreGraph scores={scores.filter((score) => score.categoryId == category.id)} />
+						<ScoreGraph scoreStores={graphScores[category.id]} />
 					</div>
-				{:else}
+				{:else if interactive}
 					<input
 						class="clear"
 						type="submit"
 						action="{scoreUrl}/{category}/delete"
 						method="post"
-						on:submit|preventDefault={handleChangeScore
-							? () => handleClearScore(category.id)
-							: null}
+						on:click|preventDefault={() => {
+							userScores[category.id].update((score) => {
+								score.value = null;
+								return score;
+							});
+						}}
 						value="❌"
 					/>
 				{/if}

@@ -29,15 +29,13 @@
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import Review from '$lib/components/Review.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-
-	import { handleChangeScore } from '$lib/api/scores';
+	import { transformScores } from '$lib/api/scores';
 
 	export let categories: Category[];
 	export let plate: FullPlate;
 	export let user: User;
 
 	const editorialReview = plate.model.reviews.find((review) => review.user.id == 1);
-	// const editorialScores = plate.scores.filter((score) => score.userId == 1);
 
 	const emptyUserReview = {
 		id: null,
@@ -46,15 +44,21 @@
 		description: ''
 	};
 
+	const { userScores, editorialScores, graphScores } = transformScores(
+		plate.model.scores,
+		plate.modelId,
+		user?.id,
+		categories
+	);
+
 	const userReview =
 		plate.model.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
-	const userScores = plate.model.scores.filter((score) => score.userId == user?.id);
 
-	const submitReviewFormId = 'review';
+	const submitReviewFormId = 'userReview';
 	const deleteReviewFormId = 'delete';
-	const reviewTextareaId = 'editorial';
+	const reviewTextareaId = 'review';
 
-	const scoreUrl = `/plates/${plate.modelId}/scores/${$session.user.id}`;
+	const scoreUrl = `/plates/${plate.modelId}/scores/`;
 
 	async function handleSubmitReview() {
 		const data = { description: userReview.description };
@@ -90,7 +94,7 @@
 <div class="top">
 	<div class="plate">
 		<PlateCard {plate} isAdmin={user?.isAdmin} small={false}>
-			<ScoreSheet {categories} scores={plate.model.scores} />
+			<ScoreSheet {categories} {editorialScores} {graphScores} />
 		</PlateCard>
 	</div>
 
@@ -108,16 +112,8 @@
 	<form id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
 	<form id={deleteReviewFormId} action={`/plates/${plate.modelId}/review/delete`} method="post" />
 	<div class="user-review">
-		<ScoreSheet
-			{categories}
-			scores={userScores}
-			handleChangeScore={(value, categoryId) =>
-				handleChangeScore({ value, categoryId, userId: user.id, modelId: plate.modelId })}
-			{scoreUrl}
-			tooltip={false}
-			graph={false}
-		/>
-		<label hidden for={reviewTextareaId}>editorial</label>
+		<ScoreSheet {categories} {userScores} {scoreUrl} tooltip={false} />
+		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
 			id={reviewTextareaId}
 			class="border inset shadow"
@@ -163,7 +159,7 @@
 <span class="section">reviews</span>
 <div class="reviews">
 	{#each plate.model.reviews as review}
-		<Review {review} scores={userScores} />
+		<Review {review} scores={plate.model.scores.filter((score) => score.userId == review.userId)} />
 	{/each}
 </div>
 
