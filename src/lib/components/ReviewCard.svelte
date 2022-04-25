@@ -21,7 +21,9 @@
 </script>
 
 <Card>
-	<a class="link-box border inset shadow" href={`/users/${review.user.id}`}>{review.user.serial}</a>
+	<a class="link-box border inset shadow" href="/users/${review.user.serial}">
+		{review.user.serial}
+	</a>
 	<textarea readonly class="description border inset shadow" cols="40" rows="40"
 		>{review.description}</textarea
 	>
