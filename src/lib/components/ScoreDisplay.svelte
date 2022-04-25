@@ -61,7 +61,7 @@
 
 <style>
 	.score {
-		font-size: 1.2rem;
+		font-size: 1.4rem;
 
 		cursor: default;
 	}
@@ -83,6 +83,6 @@
 		justify-content: center;
 		align-items: center;
 		flex: 2;
-		gap: 0.6rem;
+		gap: 0.7rem;
 	}
 </style>

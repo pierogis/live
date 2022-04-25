@@ -54,6 +54,7 @@
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
+
 	<slot />
 </Card>
 

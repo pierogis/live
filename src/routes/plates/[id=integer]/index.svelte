@@ -92,30 +92,30 @@
 	<title>{plate.jurisdiction.name} plate ({plate.startYear || '?'}-{plate.endYear || '?'})</title>
 </svelte:head>
 
-<div class="top">
-	<div class="plate">
-		<PlateCard {plate} isAdmin={user?.isAdmin} small={false}>
-			<ScoreSheet {categories} {editorialScores} {graphScores} />
-		</PlateCard>
-	</div>
+<div class="top section">
+	<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
 
 	<br />
 
-	{#if editorialReview}
-		<div class="editorial border shadow inset">
-			{editorialReview?.description || ''}
-		</div>
-	{/if}
+	<div class="editorial">
+		<ScoreSheet {categories} {editorialScores} {graphScores} />
+
+		{#if editorialReview}
+			<textarea class="border shadow inset" readonly rows="16"
+				>{editorialReview?.description || ''}</textarea
+			>
+		{/if}
+	</div>
 </div>
 
 <div class="divider horizontal" />
 
-<span class="section">user review</span>
+<span class="section-title">user review</span>
 {#if $session.user}
 	<form id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
 	<form id={deleteReviewFormId} action={`/plates/${plate.modelId}/review/delete`} method="post" />
-	<div class="user-review">
-		<ScoreSheet {categories} {userScores} {scoreUrl} tooltip={false} />
+	<div class="user section">
+		<ScoreSheet {categories} {userScores} {scoreUrl} />
 		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
 			id={reviewTextareaId}
@@ -124,7 +124,7 @@
 			name={reviewDescriptionInputName}
 			required
 			type="text"
-			rows="8"
+			rows="10"
 			bind:value={userReview.description}
 		/>
 		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={userReview.id} />
@@ -159,18 +159,18 @@
 
 <div class="divider horizontal" />
 
-<span class="section">reviews</span>
+<span class="section-title">reviews</span>
 
-<CardsGrid>
-	{#each plate.model.reviews as review}
-		<Review {categories} {review} scores={graphScores} />
-	{/each}
-</CardsGrid>
+<div class="section">
+	<CardsGrid>
+		{#each plate.model.reviews as review}
+			<Review {categories} {review} scores={graphScores} />
+		{/each}
+	</CardsGrid>
+</div>
 
 <style>
 	.top {
-		width: 90%;
-
 		display: flex;
 		flex-direction: column;
 
@@ -178,29 +178,18 @@
 		align-items: center;
 	}
 
-	.plate {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.editorial {
-		width: 90%;
-		height: 90%;
+	.editorial,
+	.user {
+		width: 100%;
 		padding: 1rem;
 
-		max-width: 80rem;
-
-		margin: 1rem;
-
-		flex: 2;
 		display: flex;
+		flex-direction: row;
+
 		justify-content: center;
 		align-items: center;
 
-		white-space: pre-line;
-		line-height: 1.2;
+		gap: 2rem;
 	}
 
 	.divider.horizontal {
@@ -209,42 +198,27 @@
 		margin: 1rem;
 	}
 
-	.editorial,
 	textarea {
+		width: 90%;
+		max-width: 80rem;
+
 		font-family: 'Lora';
 		font-weight: normal;
 	}
 
-	.user-review {
-		width: 80%;
-
-		display: flex;
-		flex-direction: row;
-
-		gap: 1rem;
-
-		justify-content: center;
-		align-items: center;
-	}
-
-	textarea {
-		width: 100%;
-	}
-
 	@media only screen and (max-width: 70rem) {
-		.top {
-			flex-direction: column;
-		}
+		.top,
+		.user,
 		.editorial {
-			padding-top: 2rem;
-			padding-left: 0;
-		}
-		.user-review {
 			flex-direction: column;
 		}
 	}
 
 	.section {
+		width: 90%;
+	}
+
+	.section-title {
 		text-decoration: underline;
 		margin-bottom: 1rem;
 	}
