@@ -99,8 +99,10 @@
 		</PlateCard>
 	</div>
 
+	<br />
+
 	{#if editorialReview}
-		<div class="editorial">
+		<div class="editorial border shadow inset">
 			{editorialReview?.description || ''}
 		</div>
 	{/if}
@@ -167,15 +169,13 @@
 
 <style>
 	.top {
-		width: 75%;
+		width: 90%;
 
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 
 		justify-content: center;
 		align-items: center;
-
-		padding-bottom: 2rem;
 	}
 
 	.plate {
@@ -188,7 +188,11 @@
 	.editorial {
 		width: 90%;
 		height: 90%;
-		padding-left: 4rem;
+		padding: 1rem;
+
+		max-width: 80rem;
+
+		margin: 1rem;
 
 		flex: 2;
 		display: flex;
@@ -196,7 +200,7 @@
 		align-items: center;
 
 		white-space: pre-line;
-		line-height: 1.4;
+		line-height: 1.2;
 	}
 
 	.divider.horizontal {

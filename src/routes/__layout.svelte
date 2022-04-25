@@ -162,10 +162,10 @@
 	}
 
 	.border {
-		border-top: solid 0.4rem var(--secondary-color);
-		border-left: solid 0.4rem var(--secondary-color);
-		border-bottom: solid 0.4rem var(--accent-color);
-		border-right: solid 0.4rem var(--accent-color);
+		border-top: solid 0.3rem var(--secondary-color);
+		border-left: solid 0.3rem var(--secondary-color);
+		border-bottom: solid 0.3rem var(--accent-color);
+		border-right: solid 0.3rem var(--accent-color);
 		border-radius: 0.6rem;
 	}
 
