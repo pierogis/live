@@ -47,6 +47,10 @@
 	const deleteScoreFormId = 'deleteScore';
 </script>
 
+<svelte:head>
+	<title>user: {serial.toUpperCase()} plate ${plate.modelId} scores</title>
+</svelte:head>
+
 <PlateCard {plate} small={true} />
 
 <div class="grid">
