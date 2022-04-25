@@ -27,7 +27,7 @@
 	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import Review from '$lib/components/Review.svelte';
+	import Review from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 	import { transformScores } from '$lib/api/scores';
 
@@ -159,7 +159,7 @@
 <span class="section">reviews</span>
 <div class="reviews">
 	{#each plate.model.reviews as review}
-		<Review {review} scores={plate.model.scores.filter((score) => score.userId == review.userId)} />
+		<Review {categories} {review} scores={graphScores} />
 	{/each}
 </div>
 
