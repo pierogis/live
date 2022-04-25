@@ -9,6 +9,7 @@
 		justify-content: center;
 		flex-wrap: wrap;
 
-		gap: 4rem;
+		column-gap: 4rem;
+		row-gap: 2rem;
 	}
 </style>
