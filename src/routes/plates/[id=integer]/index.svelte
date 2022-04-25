@@ -30,6 +30,7 @@
 	import Review from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 	import { transformScores } from '$lib/api/scores';
+	import CardsGrid from '$lib/components/CardsGrid.svelte';
 
 	export let categories: Category[];
 	export let plate: FullPlate;
@@ -157,11 +158,12 @@
 <div class="divider horizontal" />
 
 <span class="section">reviews</span>
-<div class="reviews">
+
+<CardsGrid>
 	{#each plate.model.reviews as review}
 		<Review {categories} {review} scores={graphScores} />
 	{/each}
-</div>
+</CardsGrid>
 
 <style>
 	.top {
@@ -217,13 +219,6 @@
 
 		gap: 1rem;
 
-		justify-content: center;
-		align-items: center;
-	}
-
-	.reviews {
-		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 	}

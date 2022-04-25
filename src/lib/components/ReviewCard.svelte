@@ -20,17 +20,13 @@
 	export let categories: Category[];
 </script>
 
-<div class="review">
-	<Card>
-		<a class="link-box border inset shadow" href={`/users/${review.user.id}`}
-			>{review.user.serial}</a
-		>
-		<textarea readonly class="description border inset shadow" cols="40" rows="40"
-			>{review.description}</textarea
-		>
-		<ScoreSheet {categories} {editorialScores} graphScores={scores} />
-	</Card>
-</div>
+<Card>
+	<a class="link-box border inset shadow" href={`/users/${review.user.id}`}>{review.user.serial}</a>
+	<textarea readonly class="description border inset shadow" cols="40" rows="40"
+		>{review.description}</textarea
+	>
+	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
+</Card>
 
 <style>
 	.description {
