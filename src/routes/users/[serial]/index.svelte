@@ -1,12 +1,11 @@
-<!-- users/[id=integer]/index.svelte -->
+<!-- users/[serial]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./users/[id=integer]').Load} */
+	/** @type {import('./users/[serial]').Load} */
 	export async function load({ session, fetch, params }) {
-		const response = await fetch(`/api/users/${params.id}`);
+		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
+		const user: User = await userResponse.json();
 
-		const user = await response.json();
-
-		if (!user) {
+		if (userResponse.status == 404) {
 			return { status: 404, error: "user doesn't exist" };
 		}
 		const isUser = session.user && session.user.id == user.id;

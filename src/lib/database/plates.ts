@@ -60,7 +60,13 @@ export async function getFullPlate(params: Partial<Plate>): Promise<FullPlate> {
 		where: params,
 		include: {
 			jurisdiction: true,
-			model: { include: { scores: true, images: true, reviews: { include: { user: true } } } }
+			model: {
+				include: {
+					scores: true,
+					images: true,
+					reviews: { include: { user: true } }
+				}
+			}
 		}
 	});
 

@@ -10,8 +10,8 @@ export async function post({ locals, request, params }) {
 			body: { error: `not signed in` }
 		};
 	}
-	if (locals.user?.id == params.id || locals.user?.isAdmin) {
-		const apiUrl = `${variables.apiBase}/users/${params.id}`;
+	if (locals.user?.serial == params.serial || locals.user?.isAdmin) {
+		const apiUrl = `${variables.apiBase}/users/?serial=${params.serial}`;
 		const response = await fetch(apiUrl, {
 			method: 'delete',
 			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') }
@@ -37,7 +37,7 @@ export async function post({ locals, request, params }) {
 		// redirect to the updated user
 		return {
 			status: 403,
-			body: { error: `not user ${params.id} or admin` }
+			body: { error: `not user ${params.serial} or admin` }
 		};
 	}
 }

@@ -3,7 +3,7 @@
 	export async function load({ session }) {
 		let redirect = '/login';
 		if (session.user) {
-			redirect = `/users/${session.user.id}`;
+			redirect = `/users/${session.user.serial}`;
 		}
 		return {
 			status: 301,
@@ -18,7 +18,7 @@
 
 	let redirect = '/login';
 	if ($session.user) {
-		redirect = `/users/${$session.user.id}`;
+		redirect = `/users/${$session.user.serial}`;
 	}
 	goto(redirect);
 </script>

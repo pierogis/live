@@ -5,24 +5,33 @@
 		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
 		const user: User = await userResponse.json();
 
-		const scoresResponse = await fetch(`/api/plates/${params.id}/scores/${user.id}`);
+		const plateResponse = await fetch(`/api/plates/${params.id}`);
+		const plate: FullPlate = await plateResponse.json();
 
-		const scores: Score[] = await scoresResponse.json();
+		const scores = plate.model.scores.filter((score) => score.userId == user.id);
+
+		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const categories: Category[] = await categoriesResponse.json();
 
 		const isUser = session.user.serial == params.serial;
 
 		return {
-			props: { scores, serial: params.serial, isUser }
+			props: { plate, scores, serial: params.serial, isUser, categories }
 		};
 	}
 </script>
 
 <script lang="ts">
-	import Card from '$lib/components/Card.svelte';
-	import { valueEntryName } from './_form';
 	import type { Category, Score, User } from '@prisma/client';
+	import type { FullPlate } from '$lib/database/models';
+
+	import { valueEntryName } from './_form';
+
+	import Card from '$lib/components/Card.svelte';
+	import PlateCard from '$lib/components/PlateCard.svelte';
 
 	export let categories: Category[];
+	export let plate: FullPlate;
 	export let scores: Score[];
 
 	export let scoreSet: { [categoryId: number]: number } = scores.reduce((previous, score) => {
@@ -37,6 +46,8 @@
 	const submitScoreFormId = 'submitScore';
 	const deleteScoreFormId = 'deleteScore';
 </script>
+
+<PlateCard {plate} small={true} />
 
 <div class="grid">
 	{#each categories as category}
@@ -72,10 +83,11 @@
 
 <style>
 	.grid {
+		padding: 2rem;
 		display: flex;
 
 		justify-content: center;
-		gap: 1rem;
+		gap: 2rem;
 
 		flex-wrap: wrap;
 	}

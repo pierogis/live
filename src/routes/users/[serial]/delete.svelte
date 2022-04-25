@@ -2,8 +2,7 @@
 <script lang="ts" context="module">
 	/** @type {import('./users/[id=integer]').Load} */
 	export async function load({ session, fetch, params }) {
-		const response = await fetch(`/api/users/${params.id}`);
-
+		const response = await fetch(`/api/users/?serial=${params.serial}`);
 		const user = await response.json();
 
 		if (!user) {
