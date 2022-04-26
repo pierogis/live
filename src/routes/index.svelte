@@ -1,7 +1,3 @@
-<svelte:head>
-	<title>careers</title>
-</svelte:head>
-
 <div class="container">
 	<span>You think I make money doing this?</span>
 
