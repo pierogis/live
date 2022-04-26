@@ -1,6 +1,23 @@
 {
-	"name": "colors",
+	"name": "@pierogis/colors",
 	"version": "0.0.1",
+	"description": "a way to test your palette",
+	"repository": {
+	  "type": "git",
+	  "url": "git+https://github.com/pierogis/colors.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+	  "url": "https://github.com/pierogis/colors/issues"
+	},
+	"homepage": "https://colors.pierogis.live",
+	"keywords": [
+	  "svelte",
+	  "color",
+	  "colors",
+	  "palette",
+	  "website"
+	],
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
