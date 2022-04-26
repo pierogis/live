@@ -87,5 +87,9 @@
 	.clear {
 		font-size: 0.7rem;
 		padding: 0;
+
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
 	}
 </style>

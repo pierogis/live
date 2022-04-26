@@ -29,7 +29,7 @@ export async function sendPassphraseEmail(email: string): Promise<string> {
 			\n
 			${generatedPassphrase}
 			\n
-			it will be valid for 1 minute
+			it will be valid for 2 minute
 		`,
 		html: `hello <i>${email}</i>,
 			<br>
@@ -38,7 +38,7 @@ export async function sendPassphraseEmail(email: string): Promise<string> {
 			<br>
 			<b>${generatedPassphrase}</b>
 			<br>
-			it will be valid for 1 minute
+			it will be valid for 2 minutes
 		`
 	});
 

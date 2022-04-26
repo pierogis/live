@@ -4,9 +4,11 @@
 		const email = props.email || url.searchParams.get('email') || '';
 		const generated = props.generated || url.searchParams.get('generated') == 'true' || false;
 
+		const redirectUrl = props.redirectUrl || url.searchParams.get('redirectUrl');
+
 		return {
 			status: 200,
-			props: { ...props, email, generated }
+			props: { ...props, email, generated, redirectUrl }
 		};
 	}
 </script>
@@ -19,6 +21,7 @@
 
 	export let email: string;
 	export let generated: boolean;
+	export let redirectUrl: string;
 
 	export let sampleEmail: string;
 	export let samplePhrase: string;
@@ -37,6 +40,7 @@
 
 <form id={loginFormId} action="/login" method="post" />
 <Card>
+	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
 	<input type="hidden" name="generated" form={loginFormId} value={!generated} />
 	<label for="email">email</label>
 	<input
@@ -82,7 +86,7 @@
 			form={loginFormId}
 			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
-				goto(`/login?email=${email}`);
+				goto(`/login?email=${email}&redirectUrl=${redirectUrl}`);
 			}}
 			accesskey="g"
 		>
@@ -96,7 +100,7 @@
 			form={loginFormId}
 			class="border inset shadow no-select"
 			on:click|preventDefault={() => {
-				goto(`/login?email=${email}&generated=true`);
+				goto(`/login?email=${email}&generated=true&redirectUrl=${redirectUrl}`);
 			}}
 			accesskey="r"
 		>

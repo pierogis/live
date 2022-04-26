@@ -19,7 +19,7 @@ export const flowStatuses: { [code in FlowCode]: FlowStatus } = {
 		alertState: null,
 		emailState: null,
 		passphraseState: null,
-		message: 'generate a 1 minute passphrase'
+		message: 'generate a 2 minute passphrase'
 	},
 	1: {
 		alertState: false,
@@ -31,7 +31,7 @@ export const flowStatuses: { [code in FlowCode]: FlowStatus } = {
 		alertState: true,
 		emailState: true,
 		passphraseState: null,
-		message: `1 minute passphrase emailed`
+		message: `2 minute passphrase emailed`
 	},
 	3: {
 		alertState: false,

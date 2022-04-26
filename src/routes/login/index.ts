@@ -26,11 +26,14 @@ export async function get() {
 }
 
 /** @type {import('./login/index').RequestHandler} */
-export async function post({ request }: { request: Request }) {
+export async function post({ request }) {
 	const formData = await request.formData();
 
 	const emailEntry = formData.get('email');
 	const passphraseEntry = formData.get('passphrase');
+	const redirectUrlEntry = formData.get('redirectUrl');
+
+	const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : null;
 
 	if (passphraseEntry == null) {
 		const email = emailEntry.toString();
@@ -43,7 +46,8 @@ export async function post({ request }: { request: Request }) {
 			return {
 				status: 200,
 				body: {
-					email: email,
+					email,
+					redirectUrl,
 					generated: true,
 					flowCode: FlowCode.generated
 				}
@@ -52,6 +56,7 @@ export async function post({ request }: { request: Request }) {
 			return {
 				status: 400,
 				body: {
+					redirectUrl,
 					flowCode: FlowCode.noEmail
 				}
 			};
@@ -75,7 +80,7 @@ export async function post({ request }: { request: Request }) {
 					status: 303,
 					headers: {
 						'set-cookie': cookie,
-						location: '/plates'
+						location: redirectUrl || '/plates'
 					},
 					body: {
 						flowCode: FlowCode.signedIn
@@ -85,6 +90,7 @@ export async function post({ request }: { request: Request }) {
 				return {
 					status: 401,
 					body: {
+						redirectUrl,
 						flowCode: FlowCode.badPassphrase
 					}
 				};
@@ -93,6 +99,7 @@ export async function post({ request }: { request: Request }) {
 			return {
 				status: 401,
 				body: {
+					redirectUrl,
 					flowCode: FlowCode.badEmail
 				}
 			};

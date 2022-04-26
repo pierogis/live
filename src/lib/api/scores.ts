@@ -4,7 +4,7 @@ import { writable, type Writable } from 'svelte/store';
 
 async function handleChangeScore(score: Score) {
 	if (!score.userId) {
-		goto('/login');
+		goto(`/login?redirectUrl=/plates/${score.modelId}`);
 	} else {
 		if (score.value) {
 			const data = { value: score.value };
