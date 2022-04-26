@@ -1,6 +1,21 @@
 {
-  "name": "careers",
+  "name": "@pierogis/careers",
   "version": "0.0.1",
+	"description": "a starting point for working with pierogis",
+	"repository": {
+	  "type": "git",
+	  "url": "git+https://github.com/pierogis/careers.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+	  "url": "https://github.com/pierogis/careers/issues"
+	},
+	"homepage": "https://careers.pierogis.live",
+	"keywords": [
+	  "svelte",
+	  "careers",
+	  "website"
+	],
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
