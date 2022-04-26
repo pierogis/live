@@ -1,11 +1,14 @@
 import { dev } from '$app/env';
 import { variables } from '$lib/env';
 
+import type { User } from '@prisma/client';
 import { createUser, getUser } from '$lib/database/users';
+
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/words';
 import { sendPassphraseEmail } from '$lib/auth';
 import { createSessionCookie } from '$lib/session';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
+
 import { FlowCode } from './_flow';
 
 /** @type {import('./login/index').RequestHandler} */
@@ -61,7 +64,7 @@ export async function post({ request }: { request: Request }) {
 
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
-				let user = await getUser({ email });
+				let user: User = await getUser({ email });
 				if (!user) {
 					user = await createUser({ email, serial: generateSerial().toUpperCase() });
 				}

@@ -1,5 +1,5 @@
 /** @type {import('@sveltejs/kit').Load} */
-export function protect({ session, props }) {
+export async function protect<T>(session: App.Session, callback: () => Promise<T>) {
 	if (!session.user) {
 		return {
 			status: 401,
@@ -11,8 +11,6 @@ export function protect({ session, props }) {
 			error: 'not admin'
 		};
 	} else {
-		return {
-			props
-		};
+		return await callback();
 	}
 }

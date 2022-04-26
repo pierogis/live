@@ -11,19 +11,19 @@ export async function getReviews(
 	return reviews;
 }
 
-export async function upsertReview(
-	params: Partial<Review> & Pick<Review, 'plateId' | 'userId'>
+export async function insertReview(
+	params: Partial<Review> & Pick<Review, 'modelId' | 'userId'>
 ): Promise<Review> {
 	const review = await prisma.review.upsert({
 		where: {
-			Review_userId_plateId_unique: {
-				plateId: params.plateId,
+			Review_userId_modelId_unique: {
+				modelId: params.modelId,
 				userId: params.userId
 			}
 		},
 		update: { description: params.description },
 		create: {
-			plateId: params.plateId,
+			modelId: params.modelId,
 			userId: params.userId,
 			description: params.description
 		}
@@ -32,11 +32,22 @@ export async function upsertReview(
 	return review;
 }
 
-export async function deleteReview(params: Pick<Review, 'plateId' | 'userId'>): Promise<void> {
+export async function updateReview(params: Review): Promise<Review> {
+	const review = await prisma.review.update({
+		where: {
+			id: params.id
+		},
+		data: { description: params.description }
+	});
+
+	return review;
+}
+
+export async function deleteReview(params: Pick<Review, 'modelId' | 'userId'>): Promise<void> {
 	await prisma.review.delete({
 		where: {
-			Review_userId_plateId_unique: {
-				plateId: params.plateId,
+			Review_userId_modelId_unique: {
+				modelId: params.modelId,
 				userId: params.userId
 			}
 		}

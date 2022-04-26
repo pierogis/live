@@ -114,9 +114,14 @@
 	input[type='email'],
 	input[type='password'],
 	input[type='url'],
+	input[type='number'],
 	textarea {
 		background-color: var(--input-color);
 		padding: 0.1rem 0.2rem;
+	}
+
+	textarea[readonly] {
+		background-color: transparent;
 	}
 
 	input[type='submit'],
@@ -129,6 +134,7 @@
 	input[type='email']:disabled,
 	input[type='password']:disabled,
 	input[type='url']:disabled,
+	input[type='number']:disabled,
 	textarea:disabled {
 		background-color: var(--primary-color);
 		color: var(--text-color);
@@ -139,6 +145,8 @@
 	input[type='text'],
 	input[type='email'],
 	input[type='password'],
+	input[type='url'],
+	input[type='number'],
 	input[type='submit'],
 	button,
 	.link-box {
@@ -158,15 +166,15 @@
 	}
 
 	.border {
-		border-top: solid 0.4rem var(--secondary-color);
-		border-left: solid 0.4rem var(--secondary-color);
-		border-bottom: solid 0.4rem var(--accent-color);
-		border-right: solid 0.4rem var(--accent-color);
+		border-top: solid 0.3rem var(--secondary-color);
+		border-left: solid 0.3rem var(--secondary-color);
+		border-bottom: solid 0.3rem var(--accent-color);
+		border-right: solid 0.3rem var(--accent-color);
 		border-radius: 0.6rem;
 	}
 
 	.inset {
-		--inset: inset 0rem 0rem 0rem 0.1rem var(--text-color-st);
+		--inset: inset 0rem 0rem 0rem 2px var(--text-color-st);
 		box-shadow: var(--inset);
 	}
 
@@ -220,7 +228,6 @@
 	}
 
 	textarea {
-		margin: 1rem;
 		padding: 0.5rem;
 		padding-top: 0.2rem;
 		padding-bottom: 0.2rem;

@@ -13,18 +13,19 @@
 	// let imageInputElement: HTMLInputElement;
 
 	// function handleImageSubmit() {
-	// 	createImage(plate.id, imageInputElement.files && imageInputElement.files[0]);
+	// 	createImage(plate.modelId, imageInputElement.files && imageInputElement.files[0]);
 	// }
 
-	async function handleDelete(event: MouseEvent) {
-		await fetch(`/plates/${plate.id}`, { method: 'delete' });
+	async function handleDelete(_event: MouseEvent) {
+		await fetch(`/api/plates/${plate.modelId}`, { method: 'delete' });
 		goto('/plates');
 	}
 </script>
 
 <Card>
 	{#if plate}
-		<form class="delete" action={`/plates/${plate.id}?_method=DELETE`} method="post">
+		<a class="back" href={`/plates/${plate.modelId}`}>🔙</a>
+		<form class="delete" action={`/plates/${plate.modelId}/delete`} method="post">
 			<input class="no-select" type="submit" value="❌" on:click|preventDefault={handleDelete} />
 		</form>
 	{/if}
@@ -57,7 +58,7 @@
 		type="url"
 		class="border inset shadow"
 		name="imageUrl"
-		value={plate?.images ? plate.images[0]?.url || '' : ''}
+		value={plate?.model.images ? plate.model.images[0]?.url || '' : ''}
 		placeholder="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
 	/>
 
@@ -91,6 +92,15 @@
 		right: 0.4rem;
 	}
 
+	.back {
+		position: absolute;
+		display: flex;
+
+		background-color: transparent;
+
+		left: 0.4rem;
+	}
+
 	input[type='text'].jurisdiction {
 		width: 2em;
 	}
@@ -100,10 +110,10 @@
 	input[type='url'] {
 		width: 20em;
 	}
-	.image-input {
+	/* .image-input {
 		max-height: 196px;
 
 		display: flex;
 		justify-content: center;
-	}
+	} */
 </style>

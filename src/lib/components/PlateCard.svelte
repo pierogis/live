@@ -3,13 +3,11 @@
 	import type { FullPlate } from '$lib/database/models';
 
 	import Card from './Card.svelte';
-	import ScoreSheet from './ScoreSheet.svelte';
 
 	export let plate: FullPlate;
 
-	export let isAdmin: boolean = false;
+	export let isAdmin = false;
 	export let showYears = true;
-	export let showScores = true;
 
 	export let small: boolean;
 </script>
@@ -18,8 +16,8 @@
 	{#if isAdmin}
 		<a
 			class="edit no-select"
-			href={`/plates/${plate.id}/edit`}
-			on:click|preventDefault={() => goto(`/plates/${plate.id}/edit`)}>✎</a
+			href={`/plates/${plate.modelId}/edit`}
+			on:click|preventDefault={() => goto(`/plates/${plate.modelId}/edit`)}>✎</a
 		>
 	{/if}
 
@@ -27,13 +25,13 @@
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
-	<a href={'/' + (!showYears ? 'jurisdictions/' + plate.jurisdiction.id : 'plates/' + plate.id)}>
+	<a href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}>
 		<div class="image-container">
-			{#if plate.images}
+			{#if plate.model.images}
 				<img
 					class="image inset shadow"
 					class:small
-					src={plate.images[0]?.url || ''}
+					src={plate.model.images[0]?.url || ''}
 					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
 						plate.jurisdiction.abbreviation
 					} license plate`}
@@ -43,7 +41,7 @@
 					class="image inset shadow"
 					class:small
 					src={'/karl.svg'}
-					alt={`${plate.startYear || ''}-${plate.endYear || ''} ${
+					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
 						plate.jurisdiction.abbreviation
 					} license plate`}
 				/>
@@ -52,13 +50,12 @@
 	</a>
 
 	{#if showYears}
-		<a class="link" href={'/plates/' + plate.id}
+		<a class="link" href={'/plates/' + plate.modelId}
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
-	{#if showScores}
-		<ScoreSheet scores={plate.scores} scoreUrl={`/plates/${plate.id}/scores/`} />
-	{/if}
+
+	<slot />
 </Card>
 
 <style>

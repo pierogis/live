@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { session } from '$app/stores';
+	import type { Readable, Writable } from 'svelte/store';
+	import type { Score } from '@prisma/client';
 
-	export let categoryScoreUrl: string = null;
-	export let editorialScore: number;
-	export let userScore: number = null;
-	let placeholderScore = 0;
+	export let editorialScore: Readable<Score> = null;
+	export let userScore: Writable<Score> = null;
+	const displayScore = userScore || editorialScore;
 
-	$: interactive = categoryScoreUrl != null;
-	$: user = userScore != null;
-	$: placeholder = !user && editorialScore == null;
-	$: displayScore = user ? userScore : editorialScore ? editorialScore : placeholderScore;
+	const interactive = userScore != null;
+	const user = userScore != null;
+	$: placeholder = $displayScore?.value == null;
 
-	$: halfScores = displayScore % 2;
-	$: fullScores = (displayScore - halfScores) / 2;
+	$: displayValue = $displayScore?.value || 0;
+
+	$: halfScores = displayValue % 2;
+	$: fullScores = (displayValue - halfScores) / 2;
 	$: emptyScores = 5 - (fullScores + halfScores);
 
 	enum PointStatus {
@@ -27,47 +27,21 @@
 		.concat(Array(halfScores).fill(PointStatus.half))
 		.concat(Array(emptyScores).fill(PointStatus.empty));
 
-	function changeScoreAction(
-		element: HTMLElement,
-		params: { pointStatus: PointStatus; i: number }
-	) {
-		async function handlePointerDown(event: PointerEvent) {
-			if (event.button == 0) {
-				if (!$session.user) {
-					goto('/login');
-				} else {
-					if (userScore == 2 * params.i + 2) {
-						userScore = 2 * params.i + 1;
-					} else if (userScore == 2 * params.i + 1) {
-						userScore = 2 * params.i;
+	function handlePointerDown(event: PointerEvent, i: number) {
+		if (event.button == 0) {
+			if (interactive) {
+				userScore.update((score) => {
+					if (score.value == 2 * i + 2) {
+						score.value = 2 * i + 1;
+					} else if (score.value == 2 * i + 1) {
+						score.value = 2 * i;
 					} else {
-						userScore = 2 * params.i + 2;
+						score.value = 2 * i + 2;
 					}
-
-					let formData = new FormData();
-					formData.append('value', userScore.toString());
-					const res = fetch(categoryScoreUrl, {
-						method: 'PUT',
-						body: formData
-					});
-				}
+					return score;
+				});
 			}
 		}
-
-		if (categoryScoreUrl) {
-			element.addEventListener('pointerdown', handlePointerDown);
-		}
-
-		return {
-			update(newParams: { pointStatus: PointStatus; i: number }) {
-				params = newParams;
-			},
-			destroy() {
-				if (categoryScoreUrl) {
-					element.removeEventListener('pointerdown', handlePointerDown);
-				}
-			}
-		};
 	}
 </script>
 
@@ -78,7 +52,7 @@
 			class:user
 			class:placeholder
 			class:interactive
-			use:changeScoreAction={{ pointStatus, i }}
+			on:pointerdown|preventDefault={(e) => handlePointerDown(e, i)}
 		>
 			{pointStatus}
 		</span>
@@ -87,7 +61,7 @@
 
 <style>
 	.score {
-		font-size: 1.2rem;
+		font-size: 1.4rem;
 
 		cursor: default;
 	}
@@ -109,6 +83,6 @@
 		justify-content: center;
 		align-items: center;
 		flex: 2;
-		gap: 0.6rem;
+		gap: 0.7rem;
 	}
 </style>

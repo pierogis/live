@@ -16,7 +16,7 @@ export async function getPlates(
 		where: params,
 		take,
 		skip,
-		orderBy: [{ id: 'desc' }]
+		orderBy: [{ modelId: 'desc' }]
 	});
 
 	return plates;
@@ -33,9 +33,7 @@ export async function getPlatePerJurisdiction(
 		distinct: ['jurisdictionId'],
 		include: {
 			jurisdiction: true,
-			scores: true,
-			images: true,
-			reviews: { include: { user: true } }
+			model: { include: { scores: true, images: true, reviews: { include: { user: true } } } }
 		},
 		orderBy: [{ jurisdiction: { abbreviation: 'asc' } }]
 	});
@@ -49,11 +47,9 @@ export async function getFullPlates(take: number = undefined, skip = 0): Promise
 		skip,
 		include: {
 			jurisdiction: true,
-			scores: true,
-			images: true,
-			reviews: { include: { user: true } }
+			model: { include: { scores: true, images: true, reviews: { include: { user: true } } } }
 		},
-		orderBy: [{ id: 'desc' }]
+		orderBy: [{ modelId: 'desc' }]
 	});
 
 	return plates;
@@ -64,9 +60,13 @@ export async function getFullPlate(params: Partial<Plate>): Promise<FullPlate> {
 		where: params,
 		include: {
 			jurisdiction: true,
-			scores: true,
-			images: true,
-			reviews: { include: { user: true } }
+			model: {
+				include: {
+					scores: true,
+					images: true,
+					reviews: { include: { user: true } }
+				}
+			}
 		}
 	});
 
@@ -79,16 +79,16 @@ export async function getPlate(params: Partial<Plate>): Promise<Plate> {
 	return plate;
 }
 
-export async function createPlate(partial: Prisma.PlateCreateInput): Promise<Plate> {
-	const plate = await prisma.plate.create({ data: partial });
+export async function createPlate(data: Prisma.PlateCreateInput): Promise<Plate> {
+	const plate = await prisma.plate.create({ data });
 
 	return plate;
 }
 
-export async function updatePlate(id: number, partial: Prisma.PlateUpdateInput) {
-	return await prisma.plate.update({ where: { id }, data: partial });
+export async function updatePlate(modelId: number, data: Prisma.PlateUpdateInput) {
+	return await prisma.plate.update({ where: { modelId }, data });
 }
 
-export async function deletePlate(id: number): Promise<void> {
-	await prisma.plate.delete({ where: { id } });
+export async function deletePlate(modelId: number): Promise<void> {
+	await prisma.plate.delete({ where: { modelId } });
 }

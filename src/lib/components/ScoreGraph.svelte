@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Score } from '@prisma/client';
+	import { derived, type Readable } from 'svelte/store';
 
-	export let scores: Score[];
+	export let scoreStores: Readable<Score>[];
 
 	// maximum is 10
 	// minimum is 0
@@ -12,7 +13,11 @@
 	// 7, 8
 	// 9, 10
 
-	$: quotients = scores.reduce(
+	const scores = derived(scoreStores, (scores) => {
+		return scores;
+	});
+
+	$: quotients = $scores.reduce(
 		(prev, next) => {
 			prev[Math.floor((next.value - 1) / 2)]++;
 
@@ -35,8 +40,8 @@
 	{#each Object.values(quotients) as count, i}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect
-				height={1 + (count / scores.length || 0) * 12}
-				y={19 - (count / scores.length || 0) * 12}
+				height={1 + (count / $scores.length || 0) * 12}
+				y={19 - (count / $scores.length || 0) * 12}
 				width={barWidth}
 			/>
 		</g>
@@ -54,5 +59,8 @@
 	}
 	.divider {
 		fill: transparent;
+	}
+	svg {
+		padding-top: 2px;
 	}
 </style>

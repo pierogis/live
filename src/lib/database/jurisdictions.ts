@@ -32,9 +32,7 @@ export async function getJurisidictionWithPlates(
 			plates: {
 				include: {
 					jurisdiction: true,
-					images: true,
-					scores: true,
-					reviews: { include: { user: true } }
+					model: { include: { images: true, scores: true, reviews: { include: { user: true } } } }
 				}
 			}
 		}

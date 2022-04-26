@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 
-	export let questions: { question: String; answer: String }[];
+	import questions from './_faq.json';
 </script>
 
 <svelte:head>
@@ -28,6 +28,8 @@
 		justify-content: center;
 
 		gap: 2rem;
+
+		width: 90%;
 	}
 
 	.question {
@@ -38,11 +40,13 @@
 	}
 
 	.answer {
-		font-weight: normal;
+		max-width: 40rem;
 
 		text-align: left;
 
 		white-space: pre-line;
+
 		font-family: 'Lora';
+		font-weight: normal;
 	}
 </style>

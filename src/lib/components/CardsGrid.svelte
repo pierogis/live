@@ -8,8 +8,8 @@
 
 		justify-content: center;
 		flex-wrap: wrap;
-	}
-	:global(.grid > *) {
-		margin: 1rem 2rem 1rem 2rem;
+
+		column-gap: 4rem;
+		row-gap: 2rem;
 	}
 </style>

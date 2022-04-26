@@ -1,143 +1,54 @@
 <script lang="ts">
-	import { type Score, Category } from '@prisma/client';
+	import type { Category, Score } from '@prisma/client';
+	import type { Readable, Writable } from 'svelte/store';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';
-	import { session } from '$app/stores';
 	import ScoreGraph from './ScoreGraph.svelte';
-	import { categoriesInfo } from '$lib/categoriesInfo';
-	import { goto } from '$app/navigation';
 
-	export let scores: Score[];
+	export let categories: Category[];
+
+	export let editorialScores: { [categoryId: number]: Readable<Score> } = null;
+	export let userScores: { [categoryId: number]: Writable<Score> } = null;
+	export let graphScores: { [categoryId: number]: Readable<Score>[] } = null;
+
 	export let scoreUrl: string = null;
 
-	export let tooltip = true;
-	export let graph = true;
-
-	let editorialScores: {
-		[category in Category]?: number;
-	};
-	$: editorialScores = scores
-		.filter((score) => score.userId == 1)
-		.reduce((previous, score) => {
-			previous[score.category] = score.value;
-
-			return previous;
-		}, {});
-
-	let userScores: {
-		[category in Category]?: number;
-	} = scores
-		.filter((score) => score.userId == $session.user?.id)
-		.reduce(
-			(previous, score) => {
-				previous[score.category] = score.value;
-
-				return previous;
-			},
-			{
-				overall: null,
-				identifiability: null,
-				colors: null,
-				symbols: null,
-				typeface: null,
-				clarity: null
-			}
-		);
-
-	const { overall, ...subCategoriesInfo } = categoriesInfo;
-
-	function clearScoreAction(element: HTMLElement, params: { category: string }) {
-		async function handleClick(event: PointerEvent) {
-			if (event.button == 0) {
-				if (!$session.user) {
-					goto('/login');
-				} else {
-					userScores[params.category] = null;
-					const res = fetch(scoreUrl + params.category, {
-						method: 'DELETE'
-					});
-				}
-			}
-		}
-
-		if (scoreUrl) {
-			element.addEventListener('pointerdown', handleClick);
-		}
-
-		return {
-			update(newParams: { category: Category }) {
-				params = newParams;
-			},
-			destroy() {
-				if (scoreUrl) {
-					element.removeEventListener('pointerdown', handleClick);
-				}
-			}
-		};
-	}
+	const interactive = userScores != null;
 </script>
 
 <div style:position="relative" class="no-select">
-	{#if tooltip}
-		<div aria-describedby="score-summary" class="inner">
-			<ScoreDisplay
-				editorialScore={editorialScores['overall']}
-				bind:userScore={userScores['overall']}
-				categoryScoreUrl={scoreUrl ? scoreUrl + 'overall' : null}
-			/>
-		</div>
-	{/if}
-
-	<div role={tooltip ? 'tooltip' : ''} class="scoresheet border inset shadow" id="score-summary">
-		<div class="category">
-			<span class="category-emoji" title="overall">{overall.emoji}</span>
-			<ScoreDisplay
-				editorialScore={editorialScores['overall']}
-				bind:userScore={userScores['overall']}
-				categoryScoreUrl={scoreUrl ? scoreUrl + 'overall' : null}
-			/>
-			{#if graph}
-				<div class="graph">
-					<ScoreGraph scores={scores.filter((score) => score.category == 'overall')} />
-				</div>
-			{:else}
-				<input
-					class="clear"
-					type="submit"
-					action={scoreUrl + 'overall'}
-					method="delete"
-					use:clearScoreAction={{ category: Category.overall }}
-					value="❌"
-				/>
-			{/if}
-		</div>
-
-		<div class="overall-seperator" />
-
-		{#each Object.entries(subCategoriesInfo) as [category, meta]}
+	<div class="inner">
+		{#each categories as category}
 			<div class="category">
-				<span class="category-emoji" title={category}>{meta.emoji}</span>
+				<span class="category-emoji" title={category.name}>{category.symbol}</span>
 				<ScoreDisplay
-					editorialScore={editorialScores[category]}
-					bind:userScore={userScores[category]}
-					categoryScoreUrl={scoreUrl ? scoreUrl + category : null}
+					editorialScore={editorialScores ? editorialScores[category.id] : null}
+					userScore={interactive ? userScores[category.id] : null}
 				/>
-				{#if graph}
+				{#if graphScores != null}
 					<div class="graph">
-						<ScoreGraph scores={scores.filter((score) => score.category == category)} />
+						<ScoreGraph scoreStores={graphScores[category.id]} />
 					</div>
-				{:else}
+				{:else if interactive}
 					<input
 						class="clear"
 						type="submit"
-						action={scoreUrl + category}
-						method="delete"
-						use:clearScoreAction={{ category }}
+						action="{scoreUrl}/{category}/delete"
+						method="post"
+						on:click|preventDefault={() => {
+							userScores[category.id].update((score) => {
+								score.value = null;
+								return score;
+							});
+						}}
 						value="❌"
 					/>
 				{/if}
 				<br />
 			</div>
+			{#if category.name == 'overall'}
+				<div class="overall-seperator" />
+			{/if}
 		{/each}
 	</div>
 </div>
@@ -147,56 +58,19 @@
 		display: flex;
 	}
 
-	[role='tooltip'] {
-		visibility: hidden;
-		position: absolute;
-		z-index: 1;
-
-		text-align: center;
-
-		top: 0%;
-		left: 50%;
-
-		margin-top: -0.45rem;
-		margin-left: -6.09rem;
-	}
-
-	.scoresheet {
-		padding: 0.2rem;
-		width: 11rem;
-
-		background-color: var(--primary-color);
-	}
-
 	.inner {
-		padding-bottom: 0.1rem;
-		padding-right: 0.4rem;
-		padding-left: 0.4rem;
+		width: 12rem;
+		padding-left: 0.2rem;
+		padding-right: 0.2rem;
+		padding-top: 0.4rem;
+		padding-bottom: 0.4rem;
 
-		/* [0] */
-		border-top: dotted 0.2rem var(--text-color-st);
-		border-left: dotted 0.2rem var(--text-color-st);
-		border-bottom: dotted 0.2rem var(--text-color-st);
-		border-right: dotted 0.2rem var(--text-color-st);
+		border: dotted 0.2rem var(--text-color-st);
 		border-radius: 0.8rem;
-	}
-
-	@media (hover: hover) and (pointer: fine) {
-		[aria-describedby]:hover,
-		[aria-describedby]:focus {
-			position: relative;
-		}
-		[aria-describedby]:hover + [role='tooltip'],
-		[aria-describedby]:focus + [role='tooltip'],
-		[role='tooltip']:hover,
-		[role='tooltip']:focus {
-			visibility: visible;
-		}
 	}
 	.overall-seperator {
 		height: 2px;
-		border-bottom: 0.2rem double var(--text-color-st);
-		margin-bottom: 2px;
+		border-bottom: 0.1rem solid var(--text-color-st);
 	}
 
 	.category-emoji {
