@@ -174,7 +174,7 @@
 	}
 
 	.inset {
-		--inset: inset 0rem 0rem 0rem 0.1rem var(--text-color-st);
+		--inset: inset 0rem 0rem 0rem 2px var(--text-color-st);
 		box-shadow: var(--inset);
 	}
 

@@ -101,9 +101,7 @@
 		<ScoreSheet {categories} {editorialScores} {graphScores} />
 
 		{#if editorialReview}
-			<textarea class="border shadow inset" readonly rows="16"
-				>{editorialReview?.description || ''}</textarea
-			>
+			<textarea class="inset" readonly rows="16">{editorialReview?.description || ''}</textarea>
 		{/if}
 	</div>
 </div>
@@ -119,7 +117,7 @@
 		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
 			id={reviewTextareaId}
-			class="border inset shadow"
+			class="inset"
 			form={submitReviewFormId}
 			name={reviewDescriptionInputName}
 			required

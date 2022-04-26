@@ -60,4 +60,7 @@
 	.divider {
 		fill: transparent;
 	}
+	svg {
+		padding-top: 2px;
+	}
 </style>
