@@ -3,7 +3,7 @@
 
 	import type { Category, Review, Score, User } from '@prisma/client';
 
-	import Card from './Card.svelte';
+	import Card from '@pierogis/utensils/Card.svelte';
 	import ScoreSheet from './ScoreSheet.svelte';
 
 	export let review: Review & { user: User };

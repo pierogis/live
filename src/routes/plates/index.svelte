@@ -24,7 +24,7 @@
 	import { transformScores } from '$lib/api/scores';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import CardsGrid from '$lib/components/CardsGrid.svelte';
+	import CardsGrid from '@pierogis/utensils/CardsGrid.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
 	export let categories: Category[];

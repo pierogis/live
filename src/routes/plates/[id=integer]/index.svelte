@@ -30,7 +30,7 @@
 	import Review from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 	import { transformScores } from '$lib/api/scores';
-	import CardsGrid from '$lib/components/CardsGrid.svelte';
+	import CardsGrid from '@pierogis/utensils/CardsGrid.svelte';
 
 	export let categories: Category[];
 	export let plate: FullPlate;

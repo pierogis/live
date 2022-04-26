@@ -13,7 +13,7 @@
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Card from '$lib/components/Card.svelte';
+	import Card from '@pierogis/utensils/Card.svelte';
 	import { FlowCode, flowStatuses } from './_flow';
 
 	export let email: string;

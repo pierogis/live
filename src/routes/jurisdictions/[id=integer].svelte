@@ -25,8 +25,9 @@
 	import type { Category, Jurisdiction } from '@prisma/client';
 	import type { FullPlate } from '$lib/database/models';
 
+	import CardsGrid from '@pierogis/utensils/CardsGrid.svelte';
+
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import CardsGrid from '$lib/components/CardsGrid.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
 	import { transformScores } from '$lib/api/scores';

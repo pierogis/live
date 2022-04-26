@@ -19,7 +19,7 @@
 
 <script lang="ts">
 	import type { User } from '@prisma/client';
-	import Card from '$lib/components/Card.svelte';
+	import Card from '@pierogis/utensils/Card.svelte';
 
 	export let user: User;
 	export let isUser: boolean;

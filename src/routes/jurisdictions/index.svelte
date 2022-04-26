@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-	import CardsGrid from '$lib/components/CardsGrid.svelte';
+	import CardsGrid from '@pierogis/utensils/CardsGrid.svelte';
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import type { FullPlate } from '$lib/database/models';
 
