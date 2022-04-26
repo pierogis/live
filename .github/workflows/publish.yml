@@ -6,15 +6,14 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
           node-version: 16
-      - run: npm install
+      - run: npm ci
       - run: npm run package
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./package/package.json
-          access: public
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
