@@ -2,7 +2,7 @@
 	import { session } from '$app/stores';
 	import type { User } from '@prisma/client';
 
-	import Layout from '@pierogis/utensils/Layout.svelte';
+	import { Layout } from '@pierogis/utensils';
 
 	let user: User = $session.user;
 </script>

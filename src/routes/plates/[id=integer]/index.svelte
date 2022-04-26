@@ -26,11 +26,13 @@
 	import type { FullPlate } from '$lib/database/models';
 	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
 
+	import { transformScores } from '$lib/api/scores';
+
+	import { CardsGrid } from '@pierogis/utensils';
+
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import Review from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-	import { transformScores } from '$lib/api/scores';
-	import CardsGrid from '@pierogis/utensils/CardsGrid.svelte';
 
 	export let categories: Category[];
 	export let plate: FullPlate;

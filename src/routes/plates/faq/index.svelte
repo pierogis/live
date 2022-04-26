@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Card from '@pierogis/utensils/Card.svelte';
+	import { Card } from '@pierogis/utensils';
 
 	import questions from './_faq.json';
 </script>

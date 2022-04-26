@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 
-	import Card from '@pierogis/utensils/Card.svelte';
+	import { Card } from '@pierogis/utensils';
 	// import DropZone from '$lib/components/DropZone.svelte';
 	import type { FullPlate } from '$lib/database/models';
 	import type { Jurisdiction } from '@prisma/client';

@@ -26,7 +26,7 @@ export function transformScores(
 	userId: number,
 	categories: Category[]
 ) {
-	let userScores: { [categoryId: number]: Writable<Score> } = categories.reduce(
+	const userScores: { [categoryId: number]: Writable<Score> } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = writable({
 				modelId: modelId,
@@ -51,7 +51,7 @@ export function transformScores(
 		},
 		{}
 	);
-	let graphScores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
+	const graphScores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = [];
 			return previous;

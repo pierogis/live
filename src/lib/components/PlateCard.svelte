@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import type { FullPlate } from '$lib/database/models';
 
-	import Card from '@pierogis/utensils/Card.svelte';
+	import { Card } from '@pierogis/utensils';
 
 	export let plate: FullPlate;
 

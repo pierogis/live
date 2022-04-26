@@ -27,7 +27,8 @@
 
 	import { valueEntryName } from './_form';
 
-	import Card from '@pierogis/utensils/Card.svelte';
+	import { Card } from '@pierogis/utensils';
+
 	import PlateCard from '$lib/components/PlateCard.svelte';
 
 	export let categories: Category[];

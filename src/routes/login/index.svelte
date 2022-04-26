@@ -13,8 +13,9 @@
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import Card from '@pierogis/utensils/Card.svelte';
+
 	import { FlowCode, flowStatuses } from './_flow';
+	import { Card } from '@pierogis/utensils';
 
 	export let email: string;
 	export let generated: boolean;

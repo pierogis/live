@@ -14,11 +14,11 @@ declare namespace App {
 		user: UserCookie;
 	}
 
-	interface Platform {}
+	// interface Platform {}
 
 	interface Session {
 		user?: UserCookie;
 	}
 
-	interface Stuff {}
+	// interface Stuff {}
 }
