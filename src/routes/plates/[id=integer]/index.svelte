@@ -149,9 +149,9 @@
 	</div>
 {:else}
 	<a
-		class="border inset shadow good no-select"
+		class="border inset shadow good no-select link-box"
 		href="/login"
-		on:click|preventDefault={() => goto('/login')}
+		on:click|preventDefault={() => goto(`/login?redirectUrl=/plates/${plate.modelId}`)}
 	>
 		login
 	</a>
