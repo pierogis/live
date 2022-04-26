@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Layout from '$lib/Layout.svelte';
-	import Card from '$lib/Card.svelte';
+	import { Card, Layout } from '$lib';
 </script>
 
 <Layout title={'utensils'}>
