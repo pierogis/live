@@ -19,12 +19,11 @@
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
-		"vercel-build": "prisma generate && prisma migrate deploy && svelte-kit build && cp node_modules/@prisma/engines/*query* .vercel_build_output/functions/node/render/ && cp prisma/schema.prisma .vercel_build_output/functions/node/render/",
 		"postinstall": "prisma generate",
 		"prepare": "svelte-kit sync",
 		"package": "svelte-kit package",
 		"preview": "svelte-kit preview",
-		"db:migrate": "prisma migrate",
+		"db:migrate": "prisma migrate dev",
 		"db:seed": "prisma db seed",
 		"db:reset": "prisma migrate reset",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
