@@ -22,7 +22,7 @@
 </script>
 
 <Card>
-	<a class="link-box border inset shadow" href="/users/${review.user.serial}">
+	<a class="link-box border inset shadow" href="/users/{review.user.serial}">
 		{review.user.serial}
 	</a>
 	<textarea readonly class="description inset" cols="40" rows="40">{review.description}</textarea>

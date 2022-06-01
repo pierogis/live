@@ -1,4 +1,4 @@
-import pkg from '@prisma/client';
+import * as pkg from '@prisma/client';
 const { PrismaClient } = pkg;
 
 import { jurisdictions } from './jurisdictions';
