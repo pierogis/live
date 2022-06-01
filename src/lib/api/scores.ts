@@ -79,12 +79,16 @@ export function transformScores(
 
 	Object.entries(userScores).forEach(([_categoryId, scoreStore]) => {
 		let fired = false;
+		let previousValue: number;
 		scoreStore.subscribe(async (score) => {
 			if (!fired) {
 				fired = true;
 			} else {
-				await handleChangeScore(score);
+				if (score.value != previousValue) {
+					await handleChangeScore(score);
+				}
 			}
+			previousValue = score.value;
 		});
 	});
 

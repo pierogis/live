@@ -1,10 +1,8 @@
-# plates
+# emporium
 
-words from:
+*a place for plates*
 
-- https://github.com/hugsy/stuff/random-word
-- https://github.com/janester/mad_libs
-- https://github.com/dominictarr/random-name
+Simple reviews and scores for license plates
 
 ### development
 
@@ -12,13 +10,18 @@ words from:
 - install dependencies
   - `cd emporium`
   - `npm install`
-- install redis
-- install postgres
+  - redis
 - set config variables
   - copy `.env.example` as `.env` and change values
 - update database
   - `npm run db:migrate` to get the latest database scheme
   - `npm run db:seed` to create initial data in the database
-  - `npm run db:reset` to clear all database schema/data (not necessary)
+  - `npm run db:reset` to clear all database schema/data (not necessary) and reseed
 - run server
   - `npm run dev`
+
+words from:
+
+- https://github.com/hugsy/stuff/random-word
+- https://github.com/janester/mad_libs
+- https://github.com/dominictarr/random-name
