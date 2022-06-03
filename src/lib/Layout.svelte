@@ -130,9 +130,6 @@
 	section {
 		display: block;
 	}
-	body {
-		line-height: 1;
-	}
 	ol,
 	ul {
 		list-style: none;
@@ -303,20 +300,6 @@
 	.no-select {
 		-webkit-user-select: none;
 		user-select: none;
-	}
-
-	.divider {
-		width: var(--divider-size);
-		border-radius: 4px;
-
-		background-color: var(--accent-color);
-	}
-
-	@media only screen and (max-width: 40rem) {
-		.divider {
-			height: var(--divider-size);
-			width: 100%;
-		}
 	}
 
 	.link-box {
