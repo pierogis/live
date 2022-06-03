@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { FullPlate } from '$lib/database/models';
+	import ImageDisplay from '$lib/components/ImageDisplay.svelte';
 
 	import { Card } from '@pierogis/utensils';
 
@@ -10,6 +11,10 @@
 	export let showYears = true;
 
 	export let small: boolean;
+
+	const alt = `${plate.startYear || '?'}-${plate.endYear || '?'} ${
+		plate.jurisdiction.abbreviation
+	} license plate`;
 </script>
 
 <Card>
@@ -26,27 +31,7 @@
 	>
 
 	<a href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}>
-		<div class="image-container">
-			{#if plate.model.images}
-				<img
-					class="image inset shadow"
-					class:small
-					src={plate.model.images[0]?.url || ''}
-					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
-						plate.jurisdiction.abbreviation
-					} license plate`}
-				/>
-			{:else}
-				<img
-					class="image inset shadow"
-					class:small
-					src={'/karl.svg'}
-					alt={`${plate.startYear || '?'}-${plate.endYear || '?'} ${
-						plate.jurisdiction.abbreviation
-					} license plate`}
-				/>
-			{/if}
-		</div>
+		<ImageDisplay {alt} {small} images={plate.model.images} />
 	</a>
 
 	{#if showYears}
@@ -66,31 +51,6 @@
 		background-color: transparent;
 
 		left: 0.4rem;
-	}
-
-	.image {
-		object-fit: contain;
-
-		border-top: solid 0.2rem var(--text-color);
-		border-left: solid 0.2rem var(--text-color);
-		border-bottom: solid 0.2rem var(--text-color);
-		border-right: solid 0.2rem var(--text-color);
-		border-radius: 0.6rem;
-
-		width: 100%;
-
-		max-width: 400px;
-		max-height: 200px;
-	}
-
-	.image.small {
-		max-width: 200px;
-		max-height: 100px;
-	}
-
-	.image-container {
-		display: flex;
-		justify-content: center;
 	}
 
 	.link {

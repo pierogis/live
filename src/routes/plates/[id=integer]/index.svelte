@@ -28,10 +28,10 @@
 
 	import { transformScores } from '$lib/api/scores';
 
-	import { CardsGrid } from '@pierogis/utensils';
+	import { CardsGrid, Divider, Section } from '@pierogis/utensils';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
-	import Review from '$lib/components/ReviewCard.svelte';
+	import ReviewCard from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
 	export let categories: Category[];
@@ -94,28 +94,32 @@
 	<title>{plate.jurisdiction.name} plate ({plate.startYear || '?'}-{plate.endYear || '?'})</title>
 </svelte:head>
 
-<div class="top section">
+<Section>
 	<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
 
-	<br />
+	<ScoreSheet {categories} {editorialScores} {graphScores} />
 
-	<div class="editorial">
-		<ScoreSheet {categories} {editorialScores} {graphScores} />
-
-		{#if editorialReview}
+	{#if editorialReview}
+		<div class="break-container">
 			<textarea class="inset" readonly rows="16">{editorialReview?.description || ''}</textarea>
-		{/if}
-	</div>
-</div>
+		</div>
+	{/if}
+</Section>
 
-<div class="divider horizontal" />
+<Divider horizontal={true} />
 
-<span class="section-title">user review</span>
-{#if $session.user}
-	<form id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
-	<form id={deleteReviewFormId} action={`/plates/${plate.modelId}/review/delete`} method="post" />
-	<div class="user section">
+<Section title="user review">
+	{#if $session.user}
+		<form hidden id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
+		<form
+			hidden
+			id={deleteReviewFormId}
+			action={`/plates/${plate.modelId}/review/delete`}
+			method="post"
+		/>
+
 		<ScoreSheet {categories} {userScores} {scoreUrl} />
+
 		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
 			id={reviewTextareaId}
@@ -127,99 +131,62 @@
 			rows="10"
 			bind:value={userReview.description}
 		/>
+
 		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={userReview.id} />
-	</div>
-	<div>
-		<button
-			class="border inset shadow good no-select"
-			type="submit"
-			form={submitReviewFormId}
-			on:click|preventDefault={handleSubmitReview}
+		<div class="break-container">
+			<button
+				class="border inset shadow good no-select"
+				type="submit"
+				form={submitReviewFormId}
+				on:click|preventDefault={handleSubmitReview}
+			>
+				submit
+			</button>
+			<button
+				class="border inset shadow bad no-select"
+				type="submit"
+				form={deleteReviewFormId}
+				on:click|preventDefault={handleDeleteReview}
+			>
+				delete
+			</button>
+		</div>
+	{:else}
+		<a
+			class="border inset shadow good no-select link-box"
+			href="/login"
+			on:click|preventDefault={() => goto(`/login?redirectUrl=/plates/${plate.modelId}`)}
 		>
-			submit
-		</button>
-		<button
-			class="border inset shadow bad no-select"
-			type="submit"
-			form={deleteReviewFormId}
-			on:click|preventDefault={handleDeleteReview}
-		>
-			delete
-		</button>
-	</div>
-{:else}
-	<a
-		class="border inset shadow good no-select link-box"
-		href="/login"
-		on:click|preventDefault={() => goto(`/login?redirectUrl=/plates/${plate.modelId}`)}
-	>
-		login
-	</a>
-{/if}
+			login
+		</a>
+	{/if}
+</Section>
 
-<div class="divider horizontal" />
+<Divider horizontal={true} />
 
-<span class="section-title">reviews</span>
-
-<div class="section">
+<Section title="reviews">
 	<CardsGrid>
 		{#each plate.model.reviews as review}
-			<Review {categories} {review} scores={graphScores} />
+			<ReviewCard {categories} {review} scores={graphScores} />
 		{/each}
 	</CardsGrid>
-</div>
+</Section>
 
 <style>
-	.top {
-		display: flex;
-		flex-direction: column;
-
-		justify-content: center;
-		align-items: center;
-	}
-
-	.editorial,
-	.user {
+	.break-container {
 		width: 100%;
-		padding: 1rem;
-
+		flex-basis: 100%;
 		display: flex;
-		flex-direction: row;
-
 		justify-content: center;
-		align-items: center;
-
-		gap: 2rem;
 	}
-
-	.divider.horizontal {
-		height: var(--divider-size);
-		width: 90vw;
-		margin: 1rem;
-	}
-
 	textarea {
 		width: 90%;
 		max-width: 80rem;
+		resize: none;
+
+		border-radius: 0.6rem;
 
 		font-family: 'Lora';
 		font-weight: normal;
-	}
-
-	@media only screen and (max-width: 70rem) {
-		.top,
-		.user,
-		.editorial {
-			flex-direction: column;
-		}
-	}
-
-	.section {
-		width: 90%;
-	}
-
-	.section-title {
-		text-decoration: underline;
-		margin-bottom: 1rem;
 	}
 </style>

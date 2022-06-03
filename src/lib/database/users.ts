@@ -14,7 +14,19 @@ export async function getUsers(
 export async function getUser(params: Partial<Omit<User, 'isAdmin'>>) {
 	const user = await prisma.user.findUnique({
 		where: params,
-		include: { scores: true, reviews: true }
+		include: {
+			scores: true,
+			reviews: {
+				include: {
+					model: {
+						include: {
+							scores: true,
+							images: true
+						}
+					}
+				}
+			}
+		}
 	});
 
 	return user;

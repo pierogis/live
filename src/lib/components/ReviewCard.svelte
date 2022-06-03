@@ -25,6 +25,7 @@
 	<a class="link-box border inset shadow" href="/users/{review.user.serial}">
 		{review.user.serial}
 	</a>
+	<slot />
 	<textarea readonly class="description inset" cols="40" rows="40">{review.description}</textarea>
 	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
 </Card>
@@ -40,5 +41,10 @@
 
 		max-width: 90%;
 		max-height: 10rem;
+	}
+
+	textarea {
+		resize: none;
+		border-radius: 0.6rem;
 	}
 </style>

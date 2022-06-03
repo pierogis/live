@@ -1,4 +1,4 @@
-import type { Score, Plate, Review, User } from '@prisma/client';
+import type { Score, Plate, Review, User, Jurisdiction, Image } from '@prisma/client';
 
 export type FullPlate = Plate & {
 	jurisdiction: Jurisdiction;

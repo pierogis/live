@@ -1,0 +1,43 @@
+<script lang="ts">
+	import type { Image } from '@prisma/client';
+
+	export let small: boolean;
+
+	export let images: Image[];
+	export let alt: string;
+</script>
+
+<div class="image-container">
+	{#if images}
+		<img class="image inset shadow" class:small src={images[0]?.url || ''} {alt} />
+	{:else}
+		<img class="image inset shadow" class:small src={'/karl.svg'} {alt} />
+	{/if}
+</div>
+
+<style>
+	.image {
+		object-fit: contain;
+
+		border-top: solid 0.2rem var(--text-color);
+		border-left: solid 0.2rem var(--text-color);
+		border-bottom: solid 0.2rem var(--text-color);
+		border-right: solid 0.2rem var(--text-color);
+		border-radius: 0.6rem;
+
+		width: 100%;
+
+		max-width: 400px;
+		max-height: 200px;
+	}
+
+	.image.small {
+		max-width: 200px;
+		max-height: 100px;
+	}
+
+	.image-container {
+		display: flex;
+		justify-content: center;
+	}
+</style>

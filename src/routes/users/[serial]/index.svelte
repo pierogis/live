@@ -1,9 +1,19 @@
 <!-- users/[serial]/index.svelte -->
 <script lang="ts" context="module">
+	import type { Category, Model, Review, Score, User, Image } from '@prisma/client';
+
 	/** @type {import('./users/[serial]').Load} */
 	export async function load({ session, fetch, params }) {
 		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
-		const user: User = await userResponse.json();
+		const user: User & {
+			scores: Score[];
+			reviews: (Review & {
+				model: Model & {
+					scores: Score[];
+					images: Image[];
+				};
+			})[];
+		} = await userResponse.json();
 
 		if (userResponse.status == 404) {
 			return { status: 404, error: "user doesn't exist" };
@@ -11,22 +21,38 @@
 		const isUser = session.user && session.user.id == user.id;
 		const isAdmin = session.user && session.user.isAdmin;
 
+		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const categories: Category[] = await categoriesResponse.json();
+
 		return {
-			props: { user, isUser, isAdmin }
+			props: { user, isUser, isAdmin, categories }
 		};
 	}
 </script>
 
 <script lang="ts">
-	import type { User } from '@prisma/client';
+	import { Card, CardsGrid, Divider, Section } from '@pierogis/utensils';
 
-	import { Card } from '@pierogis/utensils';
+	import ReviewCard from '$lib/components/ReviewCard.svelte';
+	import ImageDisplay from '$lib/components/ImageDisplay.svelte';
+	import { transformScores } from '$lib/api/scores';
 
-	export let user: User;
+	export let user: User & {
+		scores: Score[];
+		reviews: (Review & {
+			model: Model & {
+				scores: Score[];
+				images: Image[];
+			};
+		})[];
+	};
 	export let isUser: boolean;
 	export let isAdmin: boolean;
 
-	const originalUser: User = user;
+	export let categories: Category[];
+
+	const originalSerial: string = user.serial;
+	const originalEmail: string = user.email;
 </script>
 
 <svelte:head>
@@ -53,7 +79,7 @@
 				type="text"
 				name="serial"
 				bind:value={user.serial}
-				placeholder={originalUser.serial}
+				placeholder={originalSerial}
 				maxlength="7"
 				autocomplete="off"
 				autocapitalize="characters"
@@ -64,7 +90,7 @@
 				name="email"
 				disabled
 				bind:value={user.email}
-				placeholder={originalUser.email}
+				placeholder={originalEmail}
 			/>
 			<div class="buttons">
 				<button class="good border inset shadow no-select" type="submit">update</button>
@@ -85,6 +111,25 @@
 {/if}
 
 <form id="logout" action="/logout" method="post" />
+
+<Divider horizontal={true} />
+
+<Section title="reviews">
+	<CardsGrid>
+		{#each user.reviews as review}
+			<ReviewCard
+				{categories}
+				review={{ ...review, user: user }}
+				scores={transformScores(review.model.scores, review.modelId, user?.id, categories)
+					.graphScores}
+			>
+				<a href="/plates/{review.modelId}">
+					<ImageDisplay alt="model {review.modelId}" images={review.model.images} small={true} />
+				</a>
+			</ReviewCard>
+		{/each}
+	</CardsGrid>
+</Section>
 
 <style>
 	form {
