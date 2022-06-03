@@ -51,7 +51,7 @@ export function transformScores(
 		},
 		{}
 	);
-	const graphScores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
+	const allScores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = [];
 			return previous;
@@ -70,7 +70,7 @@ export function transformScores(
 			editorialScores[score.categoryId] = scoreStore;
 		}
 
-		graphScores[score.categoryId].push(scoreStore);
+		allScores[score.categoryId].push(scoreStore);
 	});
 
 	if (userId == 1) {
@@ -92,5 +92,5 @@ export function transformScores(
 		});
 	});
 
-	return { userScores, editorialScores, graphScores };
+	return { userScores, editorialScores, allScores };
 }

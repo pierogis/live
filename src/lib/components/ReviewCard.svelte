@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get, type Readable } from 'svelte/store';
+	import { get, type Readable, type Writable } from 'svelte/store';
 
 	import type { Category, Review, Score, User } from '@prisma/client';
 
@@ -7,12 +7,14 @@
 
 	import ScoreSheet from './ScoreSheet.svelte';
 
-	export let review: Review & { user: User };
+	export let reviewStore: Writable<Review & { user: User }>;
 	export let scores: { [categoryId: number]: Readable<Score>[] };
 
 	const editorialScores = Object.entries(scores).reduce(
 		(previous, [categoryId, categoryScores]) => {
-			previous[categoryId] = categoryScores.find((score) => get(score).userId == review.userId);
+			previous[categoryId] = categoryScores.find(
+				(score) => get(score).userId == $reviewStore.userId
+			);
 			return previous;
 		},
 		{}
@@ -22,11 +24,13 @@
 </script>
 
 <Card>
-	<a class="link-box border inset shadow" href="/users/{review.user.serial}">
-		{review.user.serial}
+	<a class="link-box border inset shadow" href="/users/{$reviewStore.user.serial}">
+		{$reviewStore.user.serial}
 	</a>
 	<slot />
-	<textarea readonly class="description inset" cols="40" rows="40">{review.description}</textarea>
+	<textarea readonly class="description inset" cols="40" rows="40"
+		>{$reviewStore.description}</textarea
+	>
 	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
 </Card>
 

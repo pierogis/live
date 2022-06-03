@@ -19,7 +19,7 @@
 </script>
 
 <script lang="ts">
-	import type { Category, User } from '@prisma/client';
+	import type { Category, Review, User } from '@prisma/client';
 	import { session } from '$app/stores';
 	import { goto, invalidate } from '$app/navigation';
 
@@ -27,35 +27,32 @@
 	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
 
 	import { transformScores } from '$lib/api/scores';
+	import { transformReviews, handleDeleteReview, handleSubmitReview } from '$lib/api/reviews';
 
 	import { CardsGrid, Divider, Section } from '@pierogis/utensils';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
+	import { get, type Writable } from 'svelte/store';
+	import { onMount } from 'svelte';
 
 	export let categories: Category[];
 	export let plate: FullPlate;
 	export let user: User;
 
-	const editorialReview = plate.model.reviews.find((review) => review.user.id == 1);
+	let { userReview, editorialReview, allReviews } = transformReviews(
+		plate.model.reviews,
+		plate.modelId,
+		user?.id
+	);
 
-	const emptyUserReview = {
-		id: null,
-		modelId: plate.modelId,
-		userId: user?.id,
-		description: ''
-	};
-
-	const { userScores, editorialScores, graphScores } = transformScores(
+	let { userScores, editorialScores, allScores } = transformScores(
 		plate.model.scores,
 		plate.modelId,
 		user?.id,
 		categories
 	);
-
-	const userReview =
-		plate.model.reviews.find((review) => review.user.id == user?.id) || emptyUserReview;
 
 	const submitReviewFormId = 'userReview';
 	const deleteReviewFormId = 'delete';
@@ -63,31 +60,7 @@
 
 	const scoreUrl = `/plates/${plate.modelId}/scores/`;
 
-	async function handleSubmitReview() {
-		const data = { description: userReview.description };
-
-		if (userReview.id) {
-			await fetch(`/api/plates/${plate.modelId}/reviews/${userReview.id}`, {
-				method: 'put',
-				body: JSON.stringify(data)
-			});
-		} else {
-			await fetch(`/api/plates/${plate.modelId}/reviews`, {
-				method: 'post',
-				body: JSON.stringify(data)
-			});
-		}
-
-		invalidate(`/api/plates/${plate.modelId}`);
-	}
-
-	async function handleDeleteReview() {
-		if (userReview.id) {
-			await fetch(`/api/plates/${plate.modelId}/reviews/${userReview.id}`, { method: 'delete' });
-		}
-
-		invalidate(`/api/plates/${plate.modelId}`);
-	}
+	let description: string = get(userReview).description;
 </script>
 
 <svelte:head>
@@ -97,11 +70,11 @@
 <Section>
 	<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} {editorialScores} {graphScores} />
+	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
 
 	{#if editorialReview}
 		<div class="break-container">
-			<textarea class="inset" readonly rows="16">{editorialReview?.description || ''}</textarea>
+			<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
 		</div>
 	{/if}
 </Section>
@@ -129,16 +102,19 @@
 			required
 			type="text"
 			rows="10"
-			bind:value={userReview.description}
+			bind:value={description}
 		/>
 
-		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={userReview.id} />
+		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={$userReview.id} />
 		<div class="break-container">
 			<button
 				class="border inset shadow good no-select"
 				type="submit"
 				form={submitReviewFormId}
-				on:click|preventDefault={handleSubmitReview}
+				on:click|preventDefault={async () => {
+					const invalidateUrl = await handleSubmitReview(description, userReview, plate.modelId);
+					invalidate(invalidateUrl);
+				}}
 			>
 				submit
 			</button>
@@ -146,7 +122,10 @@
 				class="border inset shadow bad no-select"
 				type="submit"
 				form={deleteReviewFormId}
-				on:click|preventDefault={handleDeleteReview}
+				on:click|preventDefault={async () => {
+					const invalidateUrl = await handleDeleteReview(userReview, plate.modelId);
+					invalidate(invalidateUrl);
+				}}
 			>
 				delete
 			</button>
@@ -166,8 +145,8 @@
 
 <Section title="reviews">
 	<CardsGrid>
-		{#each plate.model.reviews as review}
-			<ReviewCard {categories} {review} scores={graphScores} />
+		{#each allReviews as reviewStore}
+			<ReviewCard {categories} {reviewStore} scores={allScores} />
 		{/each}
 	</CardsGrid>
 </Section>
@@ -178,6 +157,8 @@
 		flex-basis: 100%;
 		display: flex;
 		justify-content: center;
+
+		gap: 1rem;
 	}
 	textarea {
 		width: 90%;
