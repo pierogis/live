@@ -3,7 +3,7 @@
 import { variables } from '$lib/env';
 import type { User } from '@prisma/client';
 
-/** @type {import('./users/[serial]/edit').RequestHandler} */
+/** @type {import('./users/[id=integer]/edit').RequestHandler} */
 export async function post({ locals, request, params }) {
 	if (!locals.user) {
 		return {
@@ -11,7 +11,7 @@ export async function post({ locals, request, params }) {
 			body: { error: `not signed in` }
 		};
 	}
-	if (locals.user?.serial == params.serial || locals.user?.isAdmin) {
+	if (locals.user?.id == params.id || locals.user?.isAdmin) {
 		const formData = await request.formData();
 
 		// const emailEntry = formData.get('email');
@@ -22,7 +22,7 @@ export async function post({ locals, request, params }) {
 			...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 		};
 
-		const apiUrl = `${variables.apiBase}/users/?serial=${params.serial}`;
+		const apiUrl = `${variables.apiBase}/users/${params.id}`;
 		const response = await fetch(apiUrl, {
 			body: JSON.stringify(data),
 			method: 'put',
@@ -36,7 +36,7 @@ export async function post({ locals, request, params }) {
 			return {
 				status: 303,
 				headers: {
-					location: `/users/${user.id}`
+					location: `/users/${user.serial}`
 				}
 			};
 		} else {
@@ -51,7 +51,7 @@ export async function post({ locals, request, params }) {
 		// redirect to the updated user
 		return {
 			status: 403,
-			body: { error: `not user ${params.serial} or admin` }
+			body: { error: `not user ${params.id} or admin` }
 		};
 	}
 }

@@ -1,8 +1,8 @@
-<!-- users/[id=integer]/index.svelte -->
+<!-- users/[id=integer]/delete.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./users/[id=integer]').Load} */
+	/** @type {import('./users/[id=integer]/delete').Load} */
 	export async function load({ session, fetch, params }) {
-		const response = await fetch(`/api/users/?serial=${params.serial}`);
+		const response = await fetch(`/api/users/${params.id}`);
 		const user = await response.json();
 
 		if (!user) {
