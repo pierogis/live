@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { get, type Readable, type Writable } from 'svelte/store';
+	import { get, type Readable } from 'svelte/store';
 
 	import type { Category, Review, Score, User } from '@prisma/client';
 
@@ -7,14 +7,14 @@
 
 	import ScoreSheet from './ScoreSheet.svelte';
 
-	export let reviewStore: Writable<Review & { user: User }>;
+	export let review: Review;
 	export let scores: { [categoryId: number]: Readable<Score>[] };
+
+	export let user: User | null = null;
 
 	const editorialScores = Object.entries(scores).reduce(
 		(previous, [categoryId, categoryScores]) => {
-			previous[categoryId] = categoryScores.find(
-				(score) => get(score).userId == $reviewStore.userId
-			);
+			previous[categoryId] = categoryScores.find((score) => get(score).userId == review.userId);
 			return previous;
 		},
 		{}
@@ -24,13 +24,13 @@
 </script>
 
 <Card>
-	<a class="link-box border inset shadow" href="/users/{$reviewStore.user.serial}">
-		{$reviewStore.user.serial}
-	</a>
+	{#if user}
+		<a class="link-box border inset shadow" href="/users/{user.serial}">
+			{user.serial}
+		</a>
+	{/if}
 	<slot />
-	<textarea readonly class="description inset" cols="40" rows="40"
-		>{$reviewStore.description}</textarea
-	>
+	<textarea readonly class="description inset" cols="40" rows="8">{review.description}</textarea>
 	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
 </Card>
 
@@ -44,7 +44,6 @@
 		resize: none;
 
 		max-width: 90%;
-		max-height: 10rem;
 	}
 
 	textarea {

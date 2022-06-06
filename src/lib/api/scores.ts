@@ -20,13 +20,13 @@ async function handleChangeScore(score: Score) {
 	}
 }
 
-export function transformScores(
+export function storeScores(
 	scores: Score[],
 	modelId: number,
 	userId: number,
 	categories: Category[]
 ) {
-	const userScores: { [categoryId: number]: Writable<Score> } = categories.reduce(
+	const userScoreStores: { [categoryId: number]: Writable<Score> } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = writable({
 				modelId: modelId,
@@ -39,7 +39,7 @@ export function transformScores(
 		{}
 	);
 
-	let editorialScores: { [categoryId: number]: Writable<Score> } = categories.reduce(
+	let editorialScoreStores: { [categoryId: number]: Writable<Score> } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = writable({
 				modelId: modelId,
@@ -51,7 +51,7 @@ export function transformScores(
 		},
 		{}
 	);
-	const allScores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
+	const allScoreStores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
 		(previous, category) => {
 			previous[category.id] = [];
 			return previous;
@@ -63,21 +63,21 @@ export function transformScores(
 		const scoreStore = writable(score);
 
 		if (score.userId == userId) {
-			userScores[score.categoryId] = scoreStore;
+			userScoreStores[score.categoryId] = scoreStore;
 		}
 
 		if (score.userId == 1) {
-			editorialScores[score.categoryId] = scoreStore;
+			editorialScoreStores[score.categoryId] = scoreStore;
 		}
 
-		allScores[score.categoryId].push(scoreStore);
+		allScoreStores[score.categoryId].push(scoreStore);
 	});
 
 	if (userId == 1) {
-		editorialScores = userScores;
+		editorialScoreStores = userScoreStores;
 	}
 
-	Object.entries(userScores).forEach(([_categoryId, scoreStore]) => {
+	Object.entries(userScoreStores).forEach(([_categoryId, scoreStore]) => {
 		let fired = false;
 		let previousValue: number;
 		scoreStore.subscribe(async (score) => {
@@ -92,5 +92,5 @@ export function transformScores(
 		});
 	});
 
-	return { userScores, editorialScores, allScores };
+	return { userScoreStores, editorialScoreStores, allScoreStores };
 }

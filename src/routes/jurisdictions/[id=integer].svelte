@@ -30,7 +30,7 @@
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
-	import { transformScores } from '$lib/api/scores';
+	import { storeScores } from '$lib/api/scores';
 	import { session } from '$app/stores';
 
 	export let jurisdiction: Jurisdiction & {
@@ -39,14 +39,14 @@
 	export let categories: Category[];
 
 	const platesInfo = jurisdiction.plates.map((plate) => {
-		const { userScores, editorialScores, graphScores } = transformScores(
+		const { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
 			plate.model.scores,
 			plate.modelId,
 			$session.user?.id,
 			categories
 		);
 
-		return { plate, userScores, editorialScores, graphScores };
+		return { plate, userScoreStores, editorialScoreStores, allScoreStores };
 	});
 </script>
 
@@ -60,9 +60,9 @@
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
 					{categories}
-					userScores={info.userScores}
-					editorialScores={info.editorialScores}
-					graphScores={info.graphScores}
+					userScores={info.userScoreStores}
+					editorialScores={info.editorialScoreStores}
+					graphScores={info.allScoreStores}
 				/>
 			</PlateCard>
 		{/each}

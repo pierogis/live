@@ -1,7 +1,7 @@
 <!-- /plates/index -->
 <script lang="ts" context="module">
 	/** @type {import('./plates/index').Load} */
-	export async function load({ fetch, session }) {
+	export async function load({ fetch }) {
 		const platesResponse = await fetch('/api/plates');
 		const categoriesResponse = await fetch('/api/plates/categories');
 
@@ -21,7 +21,7 @@
 	import type { Category } from '@prisma/client';
 	import type { FullPlate } from '$lib/database/models';
 
-	import { transformScores } from '$lib/api/scores';
+	import { storeScores } from '$lib/api/scores';
 
 	import { CardsGrid } from '@pierogis/utensils';
 
@@ -32,14 +32,14 @@
 	export let plates: FullPlate[];
 
 	const platesInfo = plates.map((plate) => {
-		const { userScores, editorialScores, graphScores } = transformScores(
+		const { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
 			plate.model.scores,
 			plate.modelId,
 			$session.user?.id,
 			categories
 		);
 
-		return { plate, userScores, editorialScores, graphScores };
+		return { plate, userScoreStores, editorialScoreStores, allScoreStores };
 	});
 </script>
 
@@ -52,9 +52,9 @@
 		<PlateCard plate={info.plate} small={true}>
 			<ScoreSheet
 				{categories}
-				userScores={info.userScores}
-				editorialScores={info.editorialScores}
-				graphScores={info.graphScores}
+				userScores={info.userScoreStores}
+				editorialScores={info.editorialScoreStores}
+				graphScores={info.allScoreStores}
 			/>
 		</PlateCard>
 	{/each}

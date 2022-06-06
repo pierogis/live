@@ -19,35 +19,34 @@
 </script>
 
 <script lang="ts">
-	import type { Category, Review, User } from '@prisma/client';
+	import type { Category, User } from '@prisma/client';
 	import { session } from '$app/stores';
 	import { goto, invalidate } from '$app/navigation';
 
 	import type { FullPlate } from '$lib/database/models';
 	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
 
-	import { transformScores } from '$lib/api/scores';
-	import { transformReviews, handleDeleteReview, handleSubmitReview } from '$lib/api/reviews';
+	import { storeScores } from '$lib/api/scores';
+	import { storeReviews, handleDeleteReview, handleSubmitReview } from '$lib/api/reviews';
 
 	import { CardsGrid, Divider, Section } from '@pierogis/utensils';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-	import { get, type Writable } from 'svelte/store';
-	import { onMount } from 'svelte';
+	import { derived, get } from 'svelte/store';
 
 	export let categories: Category[];
 	export let plate: FullPlate;
 	export let user: User;
 
-	let { userReview, editorialReview, allReviews } = transformReviews(
+	let { userReviewStore, editorialReviewStore, allReviewStores } = storeReviews(
 		plate.model.reviews,
 		plate.modelId,
 		user?.id
 	);
 
-	let { userScores, editorialScores, allScores } = transformScores(
+	let { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
 		plate.model.scores,
 		plate.modelId,
 		user?.id,
@@ -60,7 +59,11 @@
 
 	const scoreUrl = `/plates/${plate.modelId}/scores/`;
 
-	let description: string = get(userReview).description;
+	let description: string = get(userReviewStore).description;
+
+	const allReviewsStore = derived(allReviewStores, (reviews) => {
+		return reviews;
+	});
 </script>
 
 <svelte:head>
@@ -70,11 +73,11 @@
 <Section>
 	<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
+	<ScoreSheet {categories} editorialScores={editorialScoreStores} graphScores={allScoreStores} />
 
-	{#if editorialReview}
+	{#if $editorialReviewStore.description}
 		<div class="break-container">
-			<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
+			<textarea class="inset" readonly rows="16">{$editorialReviewStore.description}</textarea>
 		</div>
 	{/if}
 </Section>
@@ -91,7 +94,7 @@
 			method="post"
 		/>
 
-		<ScoreSheet {categories} {userScores} {scoreUrl} />
+		<ScoreSheet {categories} userScores={userScoreStores} {scoreUrl} />
 
 		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
@@ -105,14 +108,18 @@
 			bind:value={description}
 		/>
 
-		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={$userReview.id} />
+		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={$userReviewStore.id} />
 		<div class="break-container">
 			<button
 				class="border inset shadow good no-select"
 				type="submit"
 				form={submitReviewFormId}
 				on:click|preventDefault={async () => {
-					const invalidateUrl = await handleSubmitReview(description, userReview, plate.modelId);
+					const invalidateUrl = await handleSubmitReview(
+						description,
+						userReviewStore,
+						plate.modelId
+					);
 					invalidate(invalidateUrl);
 				}}
 			>
@@ -123,7 +130,7 @@
 				type="submit"
 				form={deleteReviewFormId}
 				on:click|preventDefault={async () => {
-					const invalidateUrl = await handleDeleteReview(userReview, plate.modelId);
+					const invalidateUrl = await handleDeleteReview(userReviewStore, plate.modelId);
 					invalidate(invalidateUrl);
 				}}
 			>
@@ -145,8 +152,8 @@
 
 <Section title="reviews">
 	<CardsGrid>
-		{#each allReviews as reviewStore}
-			<ReviewCard {categories} {reviewStore} scores={allScores} />
+		{#each $allReviewsStore as review}
+			<ReviewCard user={review.user} {categories} {review} scores={allScoreStores} />
 		{/each}
 	</CardsGrid>
 </Section>

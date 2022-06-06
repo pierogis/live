@@ -44,44 +44,44 @@ export async function handleDeleteReview(
 	return `/api/plates/${modelId}`;
 }
 
-export function transformReviews(
+export function storeReviews(
 	reviews: (Review & { user: User })[],
 	modelId: number,
 	userId: number
 ) {
-	let userReview: Writable<Review> = writable({
+	let userReviewStore: Writable<Review> = writable({
 		id: null,
 		modelId: modelId,
 		userId: userId,
 		description: ''
 	});
 
-	let editorialReview: Writable<Review> = writable({
+	let editorialReviewStore: Writable<Review> = writable({
 		id: null,
 		modelId: modelId,
 		userId: 1,
 		description: ''
 	});
 
-	let allReviews: Writable<Review & { user: User }>[] = [];
+	let allReviewStores: Writable<Review & { user: User }>[] = [];
 
 	reviews.forEach((review) => {
 		const reviewStore = writable(review);
 
 		if (review.userId == userId) {
-			userReview = reviewStore;
+			userReviewStore = reviewStore;
 		}
 
 		if (review.userId == 1) {
-			editorialReview = reviewStore;
+			editorialReviewStore = reviewStore;
 		}
 
-		allReviews.push(reviewStore);
+		allReviewStores.push(reviewStore);
 	});
 
 	if (userId == 1) {
-		editorialReview = userReview;
+		editorialReviewStore = userReviewStore;
 	}
 
-	return { userReview, editorialReview, allReviews };
+	return { userReviewStore, editorialReviewStore, allReviewStores };
 }

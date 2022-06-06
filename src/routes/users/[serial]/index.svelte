@@ -35,7 +35,7 @@
 
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
 	import ImageDisplay from '$lib/components/ImageDisplay.svelte';
-	import { transformScores } from '$lib/api/scores';
+	import { storeScores } from '$lib/api/scores';
 
 	export let user: User & {
 		scores: Score[];
@@ -119,9 +119,9 @@
 		{#each user.reviews as review}
 			<ReviewCard
 				{categories}
-				review={{ ...review, user: user }}
-				scores={transformScores(review.model.scores, review.modelId, user?.id, categories)
-					.graphScores}
+				{review}
+				scores={storeScores(review.model.scores, review.modelId, user?.id, categories)
+					.allScoreStores}
 			>
 				<a href="/plates/{review.modelId}">
 					<ImageDisplay alt="model {review.modelId}" images={review.model.images} small={true} />
