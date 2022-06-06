@@ -1,3 +1,3 @@
 # utensils
 
-a set of svelte ui components
+a set of svelte components
