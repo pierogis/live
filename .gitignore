@@ -1,19 +1,8 @@
-# generated
-__pycache__
-*.egg-info
-*.egg
-/dist/
-/build/
-
-# venv
-venv
-
-# editor
-.vscode
-
-# env
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
 .env
-.flaskenv
-
-# sass
-**/static/css/
+.env.*
+!.env.example
