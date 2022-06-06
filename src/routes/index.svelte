@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { Card, Layout } from '$lib';
-	import ImageDisplay from '$lib/ImageDisplay.svelte';
+	import { Card, ImageDisplay, Layout } from '$lib';
 </script>
 
-<Layout title={'utensils'}>
+<Layout title="utensils">
 	<nav slot="nav" />
 
 	<Card>
