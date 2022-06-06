@@ -2,8 +2,8 @@
 
 import { insertReview } from '$lib/database/reviews';
 
-/** @type {import('./api/plates/[id=integer]/reviews').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const json: { description: string } = await request.json();
@@ -36,4 +36,4 @@ export async function post({ locals, request, params }) {
 			status: 500
 		};
 	}
-}
+};

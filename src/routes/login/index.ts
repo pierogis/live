@@ -11,8 +11,8 @@ import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
 
 import { FlowCode } from './_flow';
 
-/** @type {import('./login/index').RequestHandler} */
-export async function get() {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async () => {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
 
@@ -24,10 +24,9 @@ export async function get() {
 			flowCode: FlowCode.default
 		}
 	};
-}
+};
 
-/** @type {import('./login/index').RequestHandler} */
-export async function post({ request }) {
+export const post: RequestHandler = async ({ request }) => {
 	const formData = await request.formData();
 
 	const emailEntry = formData.get('email');
@@ -106,4 +105,4 @@ export async function post({ request }) {
 			};
 		}
 	}
-}
+};

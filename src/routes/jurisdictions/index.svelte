@@ -1,7 +1,7 @@
 <!-- jurisdictions/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./jurisdictions/index').Load} */
-	export async function load({ fetch }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ fetch }) => {
 		const request = await fetch('/api/plates?distinct=jurisdictionId');
 
 		const plates = await request.json();
@@ -9,7 +9,7 @@
 		return {
 			props: { plates }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

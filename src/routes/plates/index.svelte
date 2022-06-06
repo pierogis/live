@@ -1,7 +1,7 @@
 <!-- /plates/index -->
 <script lang="ts" context="module">
-	/** @type {import('./plates/index').Load} */
-	export async function load({ fetch }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ fetch }) => {
 		const platesResponse = await fetch('/api/plates');
 		const categoriesResponse = await fetch('/api/plates/categories');
 
@@ -12,7 +12,7 @@
 			status: 200,
 			props: { plates, categories }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

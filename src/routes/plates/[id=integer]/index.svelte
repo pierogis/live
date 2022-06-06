@@ -1,7 +1,7 @@
 <!-- plates/[id=integer]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./plates/[id=integer]/index').Load} */
-	export async function load({ session, params, fetch }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ session, fetch, params }) => {
 		const platesResponse = await fetch(`/api/plates/${params.id}`);
 		const categoriesResponse = await fetch(`/api/plates/categories`);
 
@@ -15,7 +15,7 @@
 		return {
 			props: { categories, plate, user: session.user }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

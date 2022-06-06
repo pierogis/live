@@ -1,17 +1,17 @@
-// users/[serial]/edit.ts
+// users/[id=integer]/edit.ts
 
 import { variables } from '$lib/env';
 import type { User } from '@prisma/client';
 
-/** @type {import('./users/[id=integer]/edit').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types/edit';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (!locals.user) {
 		return {
 			status: 401,
 			body: { error: `not signed in` }
 		};
 	}
-	if (locals.user?.id == params.id || locals.user?.isAdmin) {
+	if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
 		const formData = await request.formData();
 
 		// const emailEntry = formData.get('email');
@@ -26,7 +26,10 @@ export async function post({ locals, request, params }) {
 		const response = await fetch(apiUrl, {
 			body: JSON.stringify(data),
 			method: 'put',
-			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') }
+			headers: {
+				'content-type': 'application/json',
+				cookie: request.headers.get('cookie')
+			}
 		});
 
 		if (response.status == 200) {
@@ -54,4 +57,4 @@ export async function post({ locals, request, params }) {
 			body: { error: `not user ${params.id} or admin` }
 		};
 	}
-}
+};

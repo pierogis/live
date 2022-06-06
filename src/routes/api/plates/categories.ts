@@ -1,7 +1,7 @@
 import { getCategories } from '$lib/database/categories';
 
-/** @type {import('./api/plates/categories').RequestHandler} */
-export async function get() {
+import type { RequestHandler } from './__types/categories';
+export const get: RequestHandler = async () => {
 	try {
 		const categories = await getCategories({ wareName: 'plate' });
 
@@ -18,4 +18,4 @@ export async function get() {
 			status: 500
 		};
 	}
-}
+};

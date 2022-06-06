@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
 	import { dev } from '$app/env';
 
-	/** @type {import('./__error').Load} */
-	export function load({ error, status, session }) {
+	import type { Load } from './__types/__error';
+	export const load: Load = async ({ session, error, status }) => {
 		const message = `${status}${dev || session.user?.isAdmin ? `: ${error.message}` : ''}`;
 		dev && console.error(message);
 		return {
@@ -10,7 +10,7 @@
 				message
 			}
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

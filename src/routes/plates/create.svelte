@@ -1,8 +1,8 @@
 <script lang="ts" context="module">
 	import { protect } from '$lib/helpers';
 
-	/** @type {import('./plates/create').Load} */
-	export async function load({ session, fetch }) {
+	import type { Load } from './__types/create';
+	export const load: Load = async ({ session, fetch }) => {
 		async function handle() {
 			const response = await fetch('/api/jurisdictions');
 
@@ -14,7 +14,7 @@
 		}
 
 		return protect(session, handle);
-	}
+	};
 </script>
 
 <script lang="ts">

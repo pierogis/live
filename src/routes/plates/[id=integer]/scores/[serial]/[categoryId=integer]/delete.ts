@@ -2,8 +2,8 @@
 
 import { variables } from '$lib/env';
 
-/** @type {import('./plates/[id=integer]/scores/[serial]/[categoryId=integer]/delete').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types/delete';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.serial == params.serial) {
 		const apiUrl = `${variables.apiBase}/plates/${params.id}/scores/${params.categoryId}`;
 
@@ -24,4 +24,4 @@ export async function post({ locals, request, params }) {
 			body: { error: `not user` }
 		};
 	}
-}
+};

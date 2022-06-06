@@ -2,8 +2,8 @@
 
 import { reviewIdInputName } from './_form';
 
-/** @type {import('./plates/[id=integer]/review/delete').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types/delete';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 
@@ -27,4 +27,4 @@ export async function post({ locals, request, params }) {
 			}
 		};
 	}
-}
+};

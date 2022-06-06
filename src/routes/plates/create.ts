@@ -1,8 +1,8 @@
 import { variables } from '$lib/env';
 import type { Plate } from '@prisma/client';
 
-/** @type {import('./plates/create').RequestHandler} */
-export async function post({ locals, request }) {
+import type { RequestHandler } from './__types/create';
+export const post: RequestHandler = async ({ locals, request }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -54,4 +54,4 @@ export async function post({ locals, request }) {
 			body: { error: `not admin` }
 		};
 	}
-}
+};

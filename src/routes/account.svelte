@@ -1,6 +1,6 @@
-<script context="module">
-	/** @type {import('./account').Load} */
-	export async function load({ session }) {
+<script context="module" lang="ts">
+	import type { Load } from './__types/account';
+	export const load: Load = async ({ session }) => {
 		let redirect = '/login';
 		if (session.user) {
 			redirect = `/users/${session.user.serial}`;
@@ -9,10 +9,10 @@
 			status: 301,
 			redirect
 		};
-	}
+	};
 </script>
 
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { session } from '$app/stores';
 

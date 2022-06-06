@@ -1,7 +1,7 @@
 <!-- jurisdictions/[id=integer].svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./jurisdictions/[id=integer]').Load} */
-	export async function load({ fetch, params }) {
+	import type { Load } from './__types/[id=integer]';
+	export const load: Load = async ({ params, fetch }) => {
 		const jurisdictionResponse = await fetch(`/api/jurisdictions/${params.id}`);
 		const categoriesResponse = await fetch(`/api/plates/categories`);
 
@@ -18,7 +18,7 @@
 		return {
 			props: { jurisdiction, categories }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

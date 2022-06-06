@@ -2,8 +2,8 @@
 
 import { getUser } from '$lib/database/users';
 
-/** @type {import('./api/users/index').RequestHandler} */
-export async function get({ params, locals, url }) {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async ({ locals, url }) => {
 	try {
 		const serial = url.searchParams.get('serial');
 		if (!serial) {
@@ -14,7 +14,7 @@ export async function get({ params, locals, url }) {
 		const user = await getUser({ serial });
 
 		if (user) {
-			if (locals.user?.id != params.id && !locals.user?.isAdmin) {
+			if (!locals.user?.isAdmin) {
 				user.email = null;
 			}
 
@@ -35,4 +35,4 @@ export async function get({ params, locals, url }) {
 			status: 500
 		};
 	}
-}
+};

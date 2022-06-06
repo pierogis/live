@@ -8,11 +8,7 @@
 </script>
 
 <div class="image-container">
-	{#if images}
-		<img class="image inset shadow" class:small src={images[0]?.url || ''} {alt} />
-	{:else}
-		<img class="image inset shadow" class:small src={'/karl.svg'} {alt} />
-	{/if}
+	<img class="image inset shadow" class:small src={images[0]?.url || ''} {alt} />
 </div>
 
 <style>

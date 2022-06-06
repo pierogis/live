@@ -4,8 +4,8 @@ import type { Jurisdiction, Prisma } from '@prisma/client';
 import { updatePlate, deletePlate, getFullPlate } from '$lib/database/plates';
 import { deleteImages } from '$lib/database/images';
 
-/** @type {import('./api/plates/[id=integer]/index').RequestHandler} */
-export async function get({ params }: { params: { id: string } }) {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async ({ params }) => {
 	try {
 		const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
@@ -28,10 +28,9 @@ export async function get({ params }: { params: { id: string } }) {
 			status: 500
 		};
 	}
-}
+};
 
-/** @type {import('./api/plates/[id=integer]/index').RequestHandler} */
-export async function put({ locals, request, params }) {
+export const put: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user?.isAdmin) {
 			const json: {
@@ -86,10 +85,9 @@ export async function put({ locals, request, params }) {
 			status: 500
 		};
 	}
-}
+};
 
-/** @type {import('./api/plates/[id=integer]/index').RequestHandler} */
-export async function del({ locals, params }) {
+export const del: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user?.isAdmin) {
 			await deletePlate(parseInt(params.id));
@@ -109,4 +107,4 @@ export async function del({ locals, params }) {
 			status: 500
 		};
 	}
-}
+};

@@ -48,7 +48,7 @@ CREATE TABLE "Score" (
 CREATE TABLE "Image" (
     "id" SERIAL NOT NULL,
     "modelId" INTEGER NOT NULL,
-    "url" VARCHAR(255),
+    "url" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "Image_pkey" PRIMARY KEY ("id")
 );

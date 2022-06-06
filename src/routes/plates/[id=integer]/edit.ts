@@ -2,8 +2,8 @@
 
 import { variables } from '$lib/env';
 
-/** @type {import('./plates/[id=integer]/edit').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types/edit';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -42,4 +42,4 @@ export async function post({ locals, request, params }) {
 			body: { error: `not admin` }
 		};
 	}
-}
+};

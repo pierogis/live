@@ -1,7 +1,7 @@
 import { expireSessionCookie } from '$lib/session';
 
-/** @type {import('./logout').RequestHandler} */
-export async function post() {
+import type { RequestHandler } from './__types/logout';
+export const post: RequestHandler = async () => {
 	const cookie = expireSessionCookie();
 	return {
 		status: 301,
@@ -10,4 +10,4 @@ export async function post() {
 			message: 'signed out'
 		}
 	};
-}
+};

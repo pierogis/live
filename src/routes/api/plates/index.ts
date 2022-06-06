@@ -4,8 +4,8 @@ import type { FullPlate } from '$lib/database/models';
 import { getFullPlates, createPlate, getPlatePerJurisdiction } from '$lib/database/plates';
 import type { Jurisdiction, Prisma } from '@prisma/client';
 
-/** @type {import('./api/plates/index').RequestHandler} */
-export async function get({ url }) {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async ({ url }) => {
 	try {
 		const distinct = url.searchParams.get('distinct');
 
@@ -30,7 +30,7 @@ export async function get({ url }) {
 			status: 500
 		};
 	}
-}
+};
 
 /** @type {import('./api/plates/index').RequestHandler} */
 export async function post({ locals, request }) {

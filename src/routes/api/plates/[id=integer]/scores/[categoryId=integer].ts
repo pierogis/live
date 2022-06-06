@@ -2,8 +2,8 @@
 
 import { deleteScore, upsertScore } from '$lib/database/scores';
 
-/** @type {import('./api/plates/[id=integer]/scores/[categoryId=integer]').RequestHandler} */
-export async function put({ locals, params, request }) {
+import type { RequestHandler } from './__types/[categoryId=integer]';
+export const put: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);
@@ -45,10 +45,9 @@ export async function put({ locals, params, request }) {
 			status: 500
 		};
 	}
-}
+};
 
-/** @type {import('./api/plates/[id=integer]/scores/[categoryId=integer]').RequestHandler} */
-export async function del({ locals, params }) {
+export const del: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);
@@ -79,4 +78,4 @@ export async function del({ locals, params }) {
 			status: 500
 		};
 	}
-}
+};

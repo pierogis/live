@@ -3,8 +3,8 @@
 import { updateReview } from '$lib/database/reviews';
 import { reviewDescriptionInputName, reviewIdInputName } from './_form';
 
-/** @type {import('./plates/[id=integer]/review/index').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 
@@ -38,4 +38,4 @@ export async function post({ locals, request, params }) {
 			}
 		};
 	}
-}
+};

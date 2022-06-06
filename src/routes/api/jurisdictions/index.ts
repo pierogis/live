@@ -2,8 +2,8 @@
 
 import { getJurisdictions } from '$lib/database/jurisdictions';
 
-/** @type {import('./api/jurisdictions/index').RequestHandler} */
-export async function get() {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async () => {
 	try {
 		const jurisdictions = await getJurisdictions({});
 
@@ -20,4 +20,4 @@ export async function get() {
 			status: 500
 		};
 	}
-}
+};

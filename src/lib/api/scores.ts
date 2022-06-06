@@ -26,38 +26,35 @@ export function storeScores(
 	userId: number,
 	categories: Category[]
 ) {
-	const userScoreStores: { [categoryId: number]: Writable<Score> } = categories.reduce(
-		(previous, category) => {
-			previous[category.id] = writable({
-				modelId: modelId,
-				userId: userId,
-				categoryId: category.id,
-				value: null
-			});
-			return previous;
-		},
-		{}
-	);
+	const userScoreStores = categories.reduce<{
+		[categoryId: number]: Writable<Score>;
+	}>((previous, category) => {
+		previous[category.id] = writable({
+			modelId: modelId,
+			userId: userId,
+			categoryId: category.id,
+			value: null
+		});
+		return previous;
+	}, {});
 
-	let editorialScoreStores: { [categoryId: number]: Writable<Score> } = categories.reduce(
-		(previous, category) => {
-			previous[category.id] = writable({
-				modelId: modelId,
-				userId: 1,
-				categoryId: category.id,
-				value: null
-			});
-			return previous;
-		},
-		{}
-	);
-	const allScoreStores: { [categoryId: number]: Writable<Score>[] } = categories.reduce(
-		(previous, category) => {
-			previous[category.id] = [];
-			return previous;
-		},
-		{}
-	);
+	let editorialScoreStores = categories.reduce<{
+		[categoryId: number]: Writable<Score>;
+	}>((previous, category) => {
+		previous[category.id] = writable({
+			modelId: modelId,
+			userId: 1,
+			categoryId: category.id,
+			value: null
+		});
+		return previous;
+	}, {});
+	const allScoreStores = categories.reduce<{
+		[categoryId: number]: Writable<Score>[];
+	}>((previous, category) => {
+		previous[category.id] = [];
+		return previous;
+	}, {});
 
 	scores.forEach((score) => {
 		const scoreStore = writable(score);

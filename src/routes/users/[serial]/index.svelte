@@ -2,8 +2,8 @@
 <script lang="ts" context="module">
 	import type { Category, Model, Review, Score, User, Image } from '@prisma/client';
 
-	/** @type {import('./users/[serial]').Load} */
-	export async function load({ session, fetch, params }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ session, fetch, params }) => {
 		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
 		const user: User & {
 			scores: Score[];
@@ -27,14 +27,13 @@
 		return {
 			props: { user, isUser, isAdmin, categories }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">
-	import { Card, CardsGrid, Divider, Section } from '@pierogis/utensils';
+	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
 
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
-	import ImageDisplay from '$lib/components/ImageDisplay.svelte';
 	import { storeScores } from '$lib/api/scores';
 
 	export let user: User & {
@@ -124,7 +123,11 @@
 					.allScoreStores}
 			>
 				<a href="/plates/{review.modelId}">
-					<ImageDisplay alt="model {review.modelId}" images={review.model.images} small={true} />
+					<ImageDisplay
+						alt="model {review.modelId}"
+						urls={review.model.images.map((image) => image.url)}
+						small={true}
+					/>
 				</a>
 			</ReviewCard>
 		{/each}

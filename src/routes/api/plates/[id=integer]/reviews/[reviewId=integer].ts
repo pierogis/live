@@ -2,8 +2,8 @@
 
 import { deleteReview, updateReview } from '$lib/database/reviews';
 
-/** @type {import('./api/plates/[id=integer]/reviews/[reviewId=integer]').RequestHandler} */
-export async function put({ locals, request, params }) {
+import type { RequestHandler } from './__types/[reviewId=integer]';
+export const put: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const json: { description: string } = await request.json();
@@ -38,10 +38,9 @@ export async function put({ locals, request, params }) {
 			status: 500
 		};
 	}
-}
+};
 
-/** @type {import('./api/plates/[id=integer]/reviews/[reviewId=integer]').RequestHandler} */
-export async function del({ locals, params }) {
+export const del: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);
@@ -70,4 +69,4 @@ export async function del({ locals, params }) {
 			status: 500
 		};
 	}
-}
+};

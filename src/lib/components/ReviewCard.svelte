@@ -10,11 +10,13 @@
 	export let review: Review;
 	export let scores: { [categoryId: number]: Readable<Score>[] };
 
-	export let user: User | null = null;
+	export let user: User = null;
 
-	const editorialScores = Object.entries(scores).reduce(
+	const editorialScores = Object.entries(scores).reduce<{ [categoryId: number]: Readable<Score> }>(
 		(previous, [categoryId, categoryScores]) => {
-			previous[categoryId] = categoryScores.find((score) => get(score).userId == review.userId);
+			previous[parseInt(categoryId)] = categoryScores.find(
+				(score) => get(score).userId == review.userId
+			);
 			return previous;
 		},
 		{}

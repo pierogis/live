@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
-	/** @type {import('./login').Load} */
-	export async function load({ url, props }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ url, props }) => {
 		const email = props.email || url.searchParams.get('email') || '';
 		const generated = props.generated || url.searchParams.get('generated') == 'true' || false;
 
@@ -10,7 +10,7 @@
 			status: 200,
 			props: { ...props, email, generated, redirectUrl }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

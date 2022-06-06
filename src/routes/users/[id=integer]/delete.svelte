@@ -1,7 +1,7 @@
 <!-- users/[id=integer]/delete.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./users/[id=integer]/delete').Load} */
-	export async function load({ session, fetch, params }) {
+	import type { Load } from './__types/delete';
+	export const load: Load = async ({ session, fetch, params }) => {
 		const response = await fetch(`/api/users/${params.id}`);
 		const user = await response.json();
 
@@ -14,7 +14,7 @@
 		return {
 			props: { user, isUser, isAdmin }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">

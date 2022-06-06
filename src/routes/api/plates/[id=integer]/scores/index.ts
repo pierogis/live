@@ -2,12 +2,12 @@
 
 import { getScores } from '$lib/database/scores';
 
-/** @type {import('./api/plates/[id=integer]/scores/index').RequestHandler} */
-export async function get({ params, locals, url }) {
+import type { RequestHandler } from './__types';
+export const get: RequestHandler = async ({ locals, url, params }) => {
 	try {
-		const userId = locals.user?.id || url.searchParams.get('userId');
+		const userId = locals.user?.id || parseInt(url.searchParams.get('userId'));
 		if (userId) {
-			const parsedParams = { modelId: parseInt(params.id), userId: parseInt(userId) };
+			const parsedParams = { modelId: parseInt(params.id), userId: userId };
 			const scores = await getScores(parsedParams);
 
 			return {
@@ -26,4 +26,4 @@ export async function get({ params, locals, url }) {
 			status: 500
 		};
 	}
-}
+};

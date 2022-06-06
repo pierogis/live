@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { FullPlate } from '$lib/database/models';
-	import ImageDisplay from '$lib/components/ImageDisplay.svelte';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, ImageDisplay } from '@pierogis/utensils';
 
 	export let plate: FullPlate;
 
@@ -31,7 +30,7 @@
 	>
 
 	<a href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}>
-		<ImageDisplay {alt} {small} images={plate.model.images} />
+		<ImageDisplay {alt} {small} urls={plate.model.images.map((image) => image.url)} />
 	</a>
 
 	{#if showYears}

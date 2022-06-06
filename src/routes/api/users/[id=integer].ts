@@ -3,13 +3,13 @@
 import type { User } from '@prisma/client';
 import { getUser, updateUser, deleteUser } from '$lib/database/users';
 
-/** @type {import('./api/users/[id=integer]').RequestHandler} */
-export async function get({ params, locals }) {
+import type { RequestHandler } from './__types/[id=integer]';
+export const get: RequestHandler = async ({ locals, params }) => {
 	try {
 		const user = await getUser({ id: parseInt(params.id) });
 
 		if (user) {
-			if (locals.user?.id != params.id && !locals.user?.isAdmin) {
+			if (locals.user?.id != parseInt(params.id) && !locals.user?.isAdmin) {
 				user.email = null;
 			}
 
@@ -31,7 +31,7 @@ export async function get({ params, locals }) {
 			status: 500
 		};
 	}
-}
+};
 
 /** @type {import('./api/users/[id=integer]').RequestHandler} */
 export async function put({ locals, request, params }) {

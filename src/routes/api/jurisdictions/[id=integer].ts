@@ -2,8 +2,8 @@
 
 import { getJurisidictionWithPlates } from '$lib/database/jurisdictions';
 
-/** @type {import('./api/jurisdictions/[id=integer]').RequestHandler} */
-export async function get({ params }) {
+import type { RequestHandler } from './__types/[id=integer]';
+export const get: RequestHandler = async ({ params }) => {
 	try {
 		const jurisdiction = await getJurisidictionWithPlates({ id: parseInt(params.id) });
 
@@ -20,4 +20,4 @@ export async function get({ params }) {
 			status: 500
 		};
 	}
-}
+};

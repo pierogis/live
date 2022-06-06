@@ -1,7 +1,7 @@
 <!-- plates/[id=integer]/scores/[serial]/index.svelte -->
 <script lang="ts" context="module">
-	/** @type {import('./plates/[id=integer]/scores/[serial]/index').Load} */
-	export async function load({ session, params, fetch }) {
+	import type { Load } from './__types';
+	export const load: Load = async ({ session, params, fetch }) => {
 		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
 		const user: User = await userResponse.json();
 
@@ -13,12 +13,12 @@
 		const categoriesResponse = await fetch(`/api/plates/categories`);
 		const categories: Category[] = await categoriesResponse.json();
 
-		const isUser = session.user.serial == params.serial;
+		const isUser = session.user?.serial == params.serial;
 
 		return {
 			props: { plate, scores, serial: params.serial, isUser, categories }
 		};
-	}
+	};
 </script>
 
 <script lang="ts">
@@ -35,7 +35,7 @@
 	export let plate: FullPlate;
 	export let scores: Score[];
 
-	export let scoreSet: { [categoryId: number]: number } = scores.reduce((previous, score) => {
+	export let scoreSet = scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
 		previous[score.categoryId] = score.value;
 		return previous;
 	}, {});

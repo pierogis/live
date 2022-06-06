@@ -3,8 +3,8 @@
 import { variables } from '$lib/env';
 import { valueEntryName } from '../_form';
 
-/** @type {import('./plates/[id=integer]/scores/[serial]/[categoryId=integer]/index').RequestHandler} */
-export async function post({ locals, request, params }) {
+import type { RequestHandler } from './__types';
+export const post: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -24,11 +24,11 @@ export async function post({ locals, request, params }) {
 
 		await response.json();
 
-		// redirect to the updated plate
+		// redirect to the updated scoresheet
 		return {
 			status: 303,
 			headers: {
-				location: `/plates/${params.id}/scores/${params.userId}`
+				location: `/plates/${params.id}/scores/${params.serial}`
 			}
 		};
 	} else {
@@ -37,4 +37,4 @@ export async function post({ locals, request, params }) {
 			body: { error: `not admin` }
 		};
 	}
-}
+};
