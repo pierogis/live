@@ -325,8 +325,6 @@
 
 	textarea {
 		padding: 0.5rem;
-		padding-top: 0.2rem;
-		padding-bottom: 0.2rem;
 		line-height: 1.4;
 
 		text-align: left;
@@ -375,7 +373,7 @@
 		justify-content: center;
 		flex-wrap: wrap;
 
-		padding-bottom: 10rem;
+		padding-bottom: 6rem;
 		padding-top: 0;
 	}
 
