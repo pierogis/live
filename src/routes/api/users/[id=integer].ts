@@ -14,6 +14,10 @@ export async function get({ params, locals }) {
 			}
 
 			return {
+				status: 200,
+				headers: {
+					'cache-control': 'no-cache, max-age=3600'
+				},
 				body: user
 			};
 		} else {

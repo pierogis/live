@@ -12,6 +12,9 @@ export async function get({ params }: { params: { id: string } }) {
 		if (plate) {
 			return {
 				status: 200,
+				headers: {
+					'cache-control': 'no-cache, max-age=3600'
+				},
 				body: plate
 			};
 		} else {

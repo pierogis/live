@@ -7,6 +7,9 @@ export async function get() {
 
 		return {
 			status: 200,
+			headers: {
+				'cache-control': 'public, max-age=3600'
+			},
 			body: categories
 		};
 	} catch (err) {

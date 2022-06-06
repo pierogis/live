@@ -1,6 +1,6 @@
 # emporium
 
-*a place for plates*
+_a place for plates_
 
 Simple reviews and scores for license plates
 

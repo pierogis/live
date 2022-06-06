@@ -8,6 +8,10 @@ export async function get() {
 		const jurisdictions = await getJurisdictions({});
 
 		return {
+			status: 200,
+			headers: {
+				'cache-control': 'public, max-age=3600'
+			},
 			body: jurisdictions
 		};
 	} catch (err) {

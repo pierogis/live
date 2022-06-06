@@ -8,6 +8,10 @@ export async function get({ params }) {
 		const jurisdiction = await getJurisidictionWithPlates({ id: parseInt(params.id) });
 
 		return {
+			status: 200,
+			headers: {
+				'cache-control': 'no-cache'
+			},
 			body: jurisdiction
 		};
 	} catch (err) {

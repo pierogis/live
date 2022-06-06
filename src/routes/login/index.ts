@@ -17,6 +17,7 @@ export async function get() {
 	const sampleEmail = generateEmailAddress();
 
 	return {
+		status: 200,
 		body: {
 			samplePhrase,
 			sampleEmail,

@@ -16,7 +16,7 @@ export async function createSessionCookie(data: { userId: number }): Promise<str
 	});
 }
 
-export function expireSessionCookie(): Promise<string> {
+export function expireSessionCookie(): string {
 	return serialize(variables.sessionName, '', {
 		expires: new Date(0),
 		httpOnly: true,

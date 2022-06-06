@@ -11,6 +11,7 @@ export async function get({ params, locals, url }) {
 			const scores = await getScores(parsedParams);
 
 			return {
+				status: 200,
 				body: scores
 			};
 		} else {

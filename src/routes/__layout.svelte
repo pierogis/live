@@ -32,12 +32,12 @@
 	<slot />
 
 	<footer slot="footer">
+		<a class="border shadow inset link-box" href="/plates/faq">faq</a>
+		<a class="border shadow inset link-box" href="https://careers.pierogis.live">careers</a>
+		<a class="border shadow inset link-box" href="https://github.com/pierogis/emporium">github</a>
 		<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
 			@pierogis_live
 		</a>
-		<a class="border shadow inset link-box" href="https://careers.pierogis.live">careers</a>
-		<a class="border shadow inset link-box" href="/plates/faq">faq</a>
-		<a class="border shadow inset link-box" href="https://github.com/pierogis/emporium">github</a>
 	</footer>
 </Layout>
 

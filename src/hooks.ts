@@ -1,5 +1,7 @@
 import { parse } from 'cookie';
 
+import type { RequestEvent } from '@sveltejs/kit';
+
 import { variables, setupEnv } from '$lib/env';
 import { cache, setupCache } from '$lib/cache';
 import { expireSessionCookie, getUserSession } from '$lib/session';
@@ -43,6 +45,6 @@ export async function handle({ event, resolve }) {
 }
 
 /** @type {import('@sveltejs/kit').GetSession} */
-export function getSession(event): App.Session {
+export function getSession(event: RequestEvent): App.Session {
 	return { user: event.locals.user };
 }
