@@ -13,7 +13,7 @@
 
 <style>
 	.container {
-		padding-top: 12rem;
+		padding-top: 30vh;
 
 		display: flex;
 		flex-direction: column;
@@ -21,6 +21,8 @@
 		gap: 1rem;
 
 		align-items: center;
+		justify-content: center;
+		text-align: center;
 	}
 
 	.container > span {
@@ -35,5 +37,6 @@
 
 		align-items: center;
 		justify-content: center;
+		flex-wrap: wrap;
 	}
 </style>
