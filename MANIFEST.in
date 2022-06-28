@@ -1,4 +1,0 @@
-global-include *.css
-global-include *.js
-global-include *.html
-global-exclude *.pyc
