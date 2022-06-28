@@ -5,18 +5,34 @@
 <Layout title="pierogis">
 	<nav slot="nav" />
 
+	<p>pierogis live multimedia experiences</p>
+	<br />
 	<CardsGrid>
 		<Card>
-			<a href="https://emporium.pierogis.live/logo.svg">
-				<ImageDisplay small={false} urls={[]} alt="emporium" />
+			<a href="https://emporium.pierogis.live">
+				<ImageDisplay
+					small={false}
+					urls={['https://emporium.pierogis.live/logo.svg']}
+					alt="emporium"
+				/>
 			</a>
-			<span>emporium</span>
+			<a href="https://emporium.pierogis.live">emporium</a>
 		</Card>
 		<Card>
-			<a href="https://kitchen.pierogis.live/logo.svg">
-				<ImageDisplay small={false} urls={[]} alt="kitchen" />
+			<a href="https://kitchen.pierogis.live">
+				<ImageDisplay
+					small={false}
+					urls={['https://kitchen.pierogis.live/logo.svg']}
+					alt="kitchen"
+				/>
 			</a>
-			<span>kitchen</span>
+			<a href="https://kitchen.pierogis.live">kitchen</a>
+		</Card>
+		<Card>
+			<a href="https://colors.pierogis.live">
+				<ImageDisplay small={false} urls={['https://colors.pierogis.live/logo.svg']} alt="colors" />
+			</a>
+			<a href="https://colors.pierogis.live">colors</a>
 		</Card>
 	</CardsGrid>
 
