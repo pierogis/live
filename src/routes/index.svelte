@@ -9,30 +9,16 @@
 	<br />
 	<CardsGrid>
 		<Card>
-			<a href="https://emporium.pierogis.live">
-				<ImageDisplay
-					small={false}
-					urls={['https://emporium.pierogis.live/logo.svg']}
-					alt="emporium"
-				/>
-			</a>
-			<a href="https://emporium.pierogis.live">emporium</a>
+			<iframe title="emporium" src="https://emporium.pierogis.live" />
+			<a class="border shadow inset link-box" href="https://emporium.pierogis.live">emporium</a>
 		</Card>
 		<Card>
-			<a href="https://kitchen.pierogis.live">
-				<ImageDisplay
-					small={false}
-					urls={['https://kitchen.pierogis.live/logo.svg']}
-					alt="kitchen"
-				/>
-			</a>
-			<a href="https://kitchen.pierogis.live">kitchen</a>
+			<iframe title="kitchen" src="https://kitchen.pierogis.live" />
+			<a class="border shadow inset link-box" href="https://kitchen.pierogis.live">kitchen</a>
 		</Card>
 		<Card>
-			<a href="https://colors.pierogis.live">
-				<ImageDisplay small={false} urls={['https://colors.pierogis.live/logo.svg']} alt="colors" />
-			</a>
-			<a href="https://colors.pierogis.live">colors</a>
+			<iframe title="colors" src="https://colors.pierogis.live" />
+			<a class="border shadow inset link-box" href="https://colors.pierogis.live">colors</a>
 		</Card>
 	</CardsGrid>
 
