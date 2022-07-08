@@ -30,3 +30,11 @@
 		</a>
 	</footer>
 </Layout>
+
+<style>
+	iframe {
+		max-width: 90vw;
+		width: 800px;
+		height: 400px;
+	}
+</style>
