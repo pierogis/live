@@ -1,10 +1,11 @@
 <!-- users/[serial]/index.svelte -->
 <script lang="ts" context="module">
 	import type { Category, Model, Review, Score, User, Image } from '@prisma/client';
+	import { PUBLIC_API_BASE } from '$env/static/public';
 
 	import type { Load } from './__types';
 	export const load: Load = async ({ session, fetch, params }) => {
-		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
+		const userResponse = await fetch(`${PUBLIC_API_BASE}/users?serial=${params.serial}`);
 		const user: User & {
 			scores: Score[];
 			reviews: (Review & {
@@ -21,7 +22,7 @@
 		const isUser = session.user && session.user.id == user.id;
 		const isAdmin = session.user && session.user.isAdmin;
 
-		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 		const categories: Category[] = await categoriesResponse.json();
 
 		return {
@@ -119,8 +120,7 @@
 			<ReviewCard
 				{categories}
 				{review}
-				scores={storeScores(review.model.scores, review.modelId, user?.id, categories)
-					.allScoreStores}
+				scores={storeScores(review.model.scores, review.modelId, user?.id, categories).allScores}
 			>
 				<a href="/plates/{review.modelId}">
 					<ImageDisplay

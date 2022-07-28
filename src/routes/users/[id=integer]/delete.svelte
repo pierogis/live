@@ -1,8 +1,10 @@
 <!-- users/[id=integer]/delete.svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types/delete';
 	export const load: Load = async ({ session, fetch, params }) => {
-		const response = await fetch(`/api/users/${params.id}`);
+		const response = await fetch(`${PUBLIC_API_BASE}/users/${params.id}`);
 		const user = await response.json();
 
 		if (!user) {

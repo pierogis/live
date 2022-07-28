@@ -1,10 +1,10 @@
 // plates/[id=integer]/scores/[serial]/[categoryId=integer]/index.ts
 
-import { variables } from '$lib/env';
+import { PUBLIC_API_BASE } from '$env/static/public';
 import { valueEntryName } from '../_form';
 
 import type { RequestHandler } from './__types';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -14,7 +14,7 @@ export const post: RequestHandler = async ({ locals, request, params }) => {
 			value: parseInt(valueEntry.toString())
 		};
 
-		const apiUrl = `${variables.apiBase}/plates/${params.id}/scores/${params.categoryId}`;
+		const apiUrl = `${PUBLIC_API_BASE}/plates/${params.id}/scores/${params.categoryId}`;
 
 		const response = await fetch(apiUrl, {
 			method: 'put',

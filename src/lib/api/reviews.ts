@@ -1,5 +1,8 @@
-import type { Review, User } from '@prisma/client';
 import { get, writable, type Writable } from 'svelte/store';
+
+import type { Review, User } from '@prisma/client';
+
+import { PUBLIC_API_BASE } from '$env/static/public';
 
 export async function handleSubmitReview(
 	description: string,
@@ -17,18 +20,18 @@ export async function handleSubmitReview(
 	const reviewUserId = get(userReview).id;
 
 	if (reviewUserId) {
-		await fetch(`/api/plates/${modelId}/reviews/${reviewUserId}`, {
+		await fetch(`${PUBLIC_API_BASE}/plates/${modelId}/reviews/${reviewUserId}`, {
 			method: 'put',
 			body: JSON.stringify(data)
 		});
 	} else {
-		await fetch(`/api/plates/${modelId}/reviews`, {
+		await fetch(`${PUBLIC_API_BASE}/plates/${modelId}/reviews`, {
 			method: 'post',
 			body: JSON.stringify(data)
 		});
 	}
 
-	return `/api/plates/${modelId}`;
+	return `${PUBLIC_API_BASE}/plates/${modelId}`;
 }
 
 export async function handleDeleteReview(
@@ -38,10 +41,12 @@ export async function handleDeleteReview(
 	const reviewUserId = get(userReview).id;
 
 	if (reviewUserId) {
-		await fetch(`/api/plates/${modelId}/reviews/${reviewUserId}`, { method: 'delete' });
+		await fetch(`${PUBLIC_API_BASE}/plates/${modelId}/reviews/${reviewUserId}`, {
+			method: 'delete'
+		});
 	}
 
-	return `/api/plates/${modelId}`;
+	return `${PUBLIC_API_BASE}/plates/${modelId}`;
 }
 
 export function storeReviews(
@@ -49,39 +54,39 @@ export function storeReviews(
 	modelId: number,
 	userId: number
 ) {
-	let userReviewStore: Writable<Review> = writable({
+	let userReview: Writable<Review> = writable({
 		id: null,
 		modelId: modelId,
 		userId: userId,
 		description: ''
 	});
 
-	let editorialReviewStore: Writable<Review> = writable({
+	let editorialReview: Writable<Review> = writable({
 		id: null,
 		modelId: modelId,
 		userId: 1,
 		description: ''
 	});
 
-	let allReviewStores: Writable<Review & { user: User }>[] = [];
+	let allReviews: Writable<Review & { user: User }>[] = [];
 
 	reviews.forEach((review) => {
 		const reviewStore = writable(review);
 
 		if (review.userId == userId) {
-			userReviewStore = reviewStore;
+			userReview = reviewStore;
 		}
 
 		if (review.userId == 1) {
-			editorialReviewStore = reviewStore;
+			editorialReview = reviewStore;
 		}
 
-		allReviewStores.push(reviewStore);
+		allReviews.push(reviewStore);
 	});
 
 	if (userId == 1) {
-		editorialReviewStore = userReviewStore;
+		editorialReview = userReview;
 	}
 
-	return { userReviewStore, editorialReviewStore, allReviewStores };
+	return { userReview, editorialReview, allReviews };
 }

@@ -4,7 +4,7 @@ import type { User } from '@prisma/client';
 import { getUser, updateUser, deleteUser } from '$lib/database/users';
 
 import type { RequestHandler } from './__types/[id=integer]';
-export const get: RequestHandler = async ({ locals, params }) => {
+export const GET: RequestHandler = async ({ locals, params }) => {
 	try {
 		const user = await getUser({ id: parseInt(params.id) });
 
@@ -33,8 +33,7 @@ export const get: RequestHandler = async ({ locals, params }) => {
 	}
 };
 
-/** @type {import('./api/users/[id=integer]').RequestHandler} */
-export async function put({ locals, request, params }) {
+export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (!locals.user) {
 			// redirect to the updated user
@@ -43,7 +42,7 @@ export async function put({ locals, request, params }) {
 				body: { error: `not signed in` }
 			};
 		}
-		if (locals.user?.id == params.id || locals.user?.isAdmin) {
+		if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
 			const json: { serial: string } = await request.json();
 
 			let user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'> = {
@@ -81,10 +80,9 @@ export async function put({ locals, request, params }) {
 			status: 500
 		};
 	}
-}
+};
 
-/** @type {import('./api/users/[id=integer]').RequestHandler} */
-export async function del({ locals, params }) {
+export const DELETE: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (!locals.user) {
 			// redirect to the updated user
@@ -93,7 +91,7 @@ export async function del({ locals, params }) {
 				body: { error: `not signed in` }
 			};
 		}
-		if (locals.user?.id == params.id || locals.user?.isAdmin) {
+		if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
 			await deleteUser(parseInt(params.id));
 
 			return {
@@ -112,4 +110,4 @@ export async function del({ locals, params }) {
 			status: 500
 		};
 	}
-}
+};

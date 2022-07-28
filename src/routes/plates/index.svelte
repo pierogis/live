@@ -1,9 +1,11 @@
 <!-- /plates/index -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types';
 	export const load: Load = async ({ fetch }) => {
-		const platesResponse = await fetch('/api/plates');
-		const categoriesResponse = await fetch('/api/plates/categories');
+		const platesResponse = await fetch(`${PUBLIC_API_BASE}/plates`);
+		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 
 		const plates: FullPlate[] = await platesResponse.json();
 		const categories: Category[] = await categoriesResponse.json();
@@ -32,14 +34,14 @@
 	export let plates: FullPlate[];
 
 	const platesInfo = plates.map((plate) => {
-		const { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
+		const { userScores, editorialScores, allScores } = storeScores(
 			plate.model.scores,
 			plate.modelId,
 			$session.user?.id,
 			categories
 		);
 
-		return { plate, userScoreStores, editorialScoreStores, allScoreStores };
+		return { plate, userScores, editorialScores, allScores };
 	});
 </script>
 
@@ -52,9 +54,9 @@
 		<PlateCard plate={info.plate} small={true}>
 			<ScoreSheet
 				{categories}
-				userScores={info.userScoreStores}
-				editorialScores={info.editorialScoreStores}
-				graphScores={info.allScoreStores}
+				userScores={info.userScores}
+				editorialScores={info.editorialScores}
+				graphScores={info.allScores}
 			/>
 		</PlateCard>
 	{/each}

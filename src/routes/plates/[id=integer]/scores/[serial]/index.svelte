@@ -1,16 +1,18 @@
 <!-- plates/[id=integer]/scores/[serial]/index.svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types';
 	export const load: Load = async ({ session, params, fetch }) => {
-		const userResponse = await fetch(`/api/users?serial=${params.serial}`);
+		const userResponse = await fetch(`${PUBLIC_API_BASE}/users?serial=${params.serial}`);
 		const user: User = await userResponse.json();
 
-		const plateResponse = await fetch(`/api/plates/${params.id}`);
+		const plateResponse = await fetch(`${PUBLIC_API_BASE}/plates/${params.id}`);
 		const plate: FullPlate = await plateResponse.json();
 
 		const scores = plate.model.scores.filter((score) => score.userId == user.id);
 
-		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 		const categories: Category[] = await categoriesResponse.json();
 
 		const isUser = session.user?.serial == params.serial;

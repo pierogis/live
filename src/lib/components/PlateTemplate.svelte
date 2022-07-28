@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { PUBLIC_API_BASE } from '$env/static/public';
 
 	import { Card } from '@pierogis/utensils';
 	// import DropZone from '$lib/components/DropZone.svelte';
@@ -17,7 +18,7 @@
 	// }
 
 	async function handleDelete(_event: MouseEvent) {
-		await fetch(`/api/plates/${plate.modelId}`, { method: 'delete' });
+		await fetch(`${PUBLIC_API_BASE}/plates/${plate.modelId}`, { method: 'delete' });
 		goto('/plates');
 	}
 </script>

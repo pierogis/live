@@ -1,9 +1,11 @@
 <!-- jurisdictions/[id=integer].svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types/[id=integer]';
 	export const load: Load = async ({ params, fetch }) => {
-		const jurisdictionResponse = await fetch(`/api/jurisdictions/${params.id}`);
-		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const jurisdictionResponse = await fetch(`${PUBLIC_API_BASE}/jurisdictions/${params.id}`);
+		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 
 		const jurisdiction: Jurisdiction & {
 			plates: FullPlate[];
@@ -39,14 +41,14 @@
 	export let categories: Category[];
 
 	const platesInfo = jurisdiction.plates.map((plate) => {
-		const { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
+		const { userScores, editorialScores, allScores } = storeScores(
 			plate.model.scores,
 			plate.modelId,
 			$session.user?.id,
 			categories
 		);
 
-		return { plate, userScoreStores, editorialScoreStores, allScoreStores };
+		return { plate, userScores, editorialScores, allScores };
 	});
 </script>
 
@@ -60,9 +62,9 @@
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
 					{categories}
-					userScores={info.userScoreStores}
-					editorialScores={info.editorialScoreStores}
-					graphScores={info.allScoreStores}
+					userScores={info.userScores}
+					editorialScores={info.editorialScores}
+					graphScores={info.allScores}
 				/>
 			</PlateCard>
 		{/each}

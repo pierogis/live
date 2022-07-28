@@ -3,7 +3,7 @@
 import { getScores } from '$lib/database/scores';
 
 import type { RequestHandler } from './__types';
-export const get: RequestHandler = async ({ locals, url, params }) => {
+export const GET: RequestHandler = async ({ locals, url, params }) => {
 	try {
 		const userId = locals.user?.id || parseInt(url.searchParams.get('userId'));
 		if (userId) {

@@ -3,7 +3,7 @@
 import { getUser } from '$lib/database/users';
 
 import type { RequestHandler } from './__types';
-export const get: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals, url }) => {
 	try {
 		const serial = url.searchParams.get('serial');
 		if (!serial) {

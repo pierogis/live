@@ -4,7 +4,7 @@ import { updateReview } from '$lib/database/reviews';
 import { reviewDescriptionInputName, reviewIdInputName } from './_form';
 
 import type { RequestHandler } from './__types';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 

@@ -1,9 +1,11 @@
 // plates/[id=integer]/review/delete.ts
 
+import { PUBLIC_API_BASE } from '$env/static/public';
+
 import { reviewIdInputName } from './_form';
 
 import type { RequestHandler } from './__types/delete';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
 
@@ -11,7 +13,9 @@ export const post: RequestHandler = async ({ locals, request, params }) => {
 
 		const reviewIdEntry = formData.get(reviewIdInputName);
 
-		await fetch(`/api/plates/${modelId}/reviews/${reviewIdEntry.toString()}`, { method: 'delete' });
+		await fetch(`${PUBLIC_API_BASE}/plates/${modelId}/reviews/${reviewIdEntry.toString()}`, {
+			method: 'delete'
+		});
 
 		return {
 			status: 303,

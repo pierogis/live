@@ -3,7 +3,7 @@
 import { insertReview } from '$lib/database/reviews';
 
 import type { RequestHandler } from './__types';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const json: { description: string } = await request.json();

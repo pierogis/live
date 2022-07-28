@@ -3,7 +3,7 @@
 import { deleteReview, updateReview } from '$lib/database/reviews';
 
 import type { RequestHandler } from './__types/[reviewId=integer]';
-export const put: RequestHandler = async ({ locals, request, params }) => {
+export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const json: { description: string } = await request.json();
@@ -40,7 +40,7 @@ export const put: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const del: RequestHandler = async ({ locals, params }) => {
+export const DELETE: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);

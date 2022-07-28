@@ -1,11 +1,11 @@
 // plates/[id=integer]/scores/[serial]/[categoryId=integer]/delete.ts
 
-import { variables } from '$lib/env';
+import { PUBLIC_API_BASE } from '$env/static/public';
 
 import type { RequestHandler } from './__types/delete';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.serial == params.serial) {
-		const apiUrl = `${variables.apiBase}/plates/${params.id}/scores/${params.categoryId}`;
+		const apiUrl = `${PUBLIC_API_BASE}/plates/${params.id}/scores/${params.categoryId}`;
 
 		await fetch(apiUrl, {
 			method: 'delete',

@@ -1,5 +1,5 @@
 [build]
-  command = "prisma generate && prisma migrate deploy && svelte-kit build"
+  command = "prisma generate && prisma migrate deploy && vite build"
   publish = "public/"
 
 [functions]

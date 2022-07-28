@@ -3,7 +3,7 @@
 import { deleteScore, upsertScore } from '$lib/database/scores';
 
 import type { RequestHandler } from './__types/[categoryId=integer]';
-export const put: RequestHandler = async ({ locals, request, params }) => {
+export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);
@@ -47,7 +47,7 @@ export const put: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const del: RequestHandler = async ({ locals, params }) => {
+export const DELETE: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user) {
 			const modelId = parseInt(params.id);

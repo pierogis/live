@@ -1,11 +1,12 @@
 <!-- plates/[id=integer]/edit.svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
 	import { protect } from '$lib/helpers';
 
 	import type { Load } from './__types/edit';
 	export const load: Load = async ({ session, params, fetch }) => {
 		async function handler() {
-			const plateResponse = await fetch(`/api/plates/${params.id}`);
+			const plateResponse = await fetch(`${PUBLIC_API_BASE}/plates/${params.id}`);
 
 			if (plateResponse.status == 404) {
 				return { status: 404, error: "plate doesn't exist" };
@@ -13,7 +14,7 @@
 
 			const plate: FullPlate = await plateResponse.json();
 
-			const jurisdictionsResponse = await fetch(`/api/jurisdictions`);
+			const jurisdictionsResponse = await fetch(`${PUBLIC_API_BASE}/jurisdictions`);
 			const jurisdictions: FullPlate = await jurisdictionsResponse.json();
 
 			return {

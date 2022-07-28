@@ -1,8 +1,10 @@
 <!-- jurisdictions/index.svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types';
 	export const load: Load = async ({ fetch }) => {
-		const request = await fetch('/api/plates?distinct=jurisdictionId');
+		const request = await fetch(`${PUBLIC_API_BASE}/plates?distinct=jurisdictionId`);
 
 		const plates = await request.json();
 

@@ -1,9 +1,9 @@
 // plates/[id=integer]/edit.ts
 
-import { variables } from '$lib/env';
+import { PUBLIC_API_BASE } from '$env/static/public';
 
 import type { RequestHandler } from './__types/edit';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -19,7 +19,7 @@ export const post: RequestHandler = async ({ locals, request, params }) => {
 			imageUrls: imageUrlEntry != '' ? [imageUrlEntry.toString()] : []
 		};
 
-		const apiUrl = `${variables.apiBase}/plates/${parseInt(params.id)}`;
+		const apiUrl = `${PUBLIC_API_BASE}/plates/${parseInt(params.id)}`;
 
 		const response = await fetch(apiUrl, {
 			method: 'put',

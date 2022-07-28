@@ -5,7 +5,7 @@ import { getFullPlates, createPlate, getPlatePerJurisdiction } from '$lib/databa
 import type { Jurisdiction, Prisma } from '@prisma/client';
 
 import type { RequestHandler } from './__types';
-export const get: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const distinct = url.searchParams.get('distinct');
 
@@ -32,8 +32,7 @@ export const get: RequestHandler = async ({ url }) => {
 	}
 };
 
-/** @type {import('./api/plates/index').RequestHandler} */
-export async function post({ locals, request }) {
+export const POST: RequestHandler = async ({ locals, request }) => {
 	try {
 		if (locals.user?.isAdmin) {
 			const json: {
@@ -95,4 +94,4 @@ export async function post({ locals, request }) {
 			status: 500
 		};
 	}
-}
+};

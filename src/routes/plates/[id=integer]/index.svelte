@@ -1,9 +1,11 @@
 <!-- plates/[id=integer]/index.svelte -->
 <script lang="ts" context="module">
+	import { PUBLIC_API_BASE } from '$env/static/public';
+
 	import type { Load } from './__types';
 	export const load: Load = async ({ session, fetch, params }) => {
-		const platesResponse = await fetch(`/api/plates/${params.id}`);
-		const categoriesResponse = await fetch(`/api/plates/categories`);
+		const platesResponse = await fetch(`${PUBLIC_API_BASE}/plates/${params.id}`);
+		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 
 		if (platesResponse.status == 404) {
 			return { status: 404, error: "plate doesn't exist" };
@@ -12,14 +14,41 @@
 		const plate: FullPlate = await platesResponse.json();
 		const categories: Category[] = await categoriesResponse.json();
 
+		const reviewStores = storeReviews(plate.model.reviews, plate.modelId, session.user?.id);
+
+		const userReview = reviewStores.userReview;
+		const editorialReview = reviewStores.editorialReview;
+		const allReviews = reviewStores.allReviews;
+
+		const scoreStores = storeScores(
+			plate.model.scores,
+			plate.modelId,
+			session.user?.id,
+			categories
+		);
+		const userScores = scoreStores.userScores;
+		const editorialScores = scoreStores.editorialScores;
+		const allScores = scoreStores.allScores;
+
 		return {
-			props: { categories, plate, user: session.user }
+			props: {
+				categories,
+				plate,
+				user: session.user,
+				userReview,
+				editorialReview,
+				allReviews,
+				userScores,
+				editorialScores,
+				allScores
+			}
 		};
 	};
 </script>
 
 <script lang="ts">
-	import type { Category, User } from '@prisma/client';
+	import { derived, get, type Writable } from 'svelte/store';
+	import type { Category, Review, Score, User } from '@prisma/client';
 	import { session } from '$app/stores';
 	import { goto, invalidate } from '$app/navigation';
 
@@ -34,24 +63,28 @@
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-	import { derived, get } from 'svelte/store';
 
 	export let categories: Category[];
 	export let plate: FullPlate;
 	export let user: User;
 
-	let { userReviewStore, editorialReviewStore, allReviewStores } = storeReviews(
-		plate.model.reviews,
-		plate.modelId,
-		user?.id
-	);
+	export let userReview: Writable<Review>;
+	export let editorialReview: Writable<Review>;
+	export let allReviews: Writable<
+		Review & {
+			user: User;
+		}
+	>[];
 
-	let { userScoreStores, editorialScoreStores, allScoreStores } = storeScores(
-		plate.model.scores,
-		plate.modelId,
-		user?.id,
-		categories
-	);
+	export let userScores: {
+		[categoryId: number]: Writable<Score>;
+	};
+	export let editorialScores: {
+		[categoryId: number]: Writable<Score>;
+	};
+	export let allScores: {
+		[categoryId: number]: Writable<Score>[];
+	};
 
 	const submitReviewFormId = 'userReview';
 	const deleteReviewFormId = 'delete';
@@ -59,11 +92,11 @@
 
 	const scoreUrl = `/plates/${plate.modelId}/scores/`;
 
-	let description: string = get(userReviewStore).description;
+	let description: string = get(userReview).description;
 
-	const allReviewsStore = derived(allReviewStores, (reviews) => {
-		return reviews;
-	});
+	$: submitMessage = $userReview.id ? 'update' : 'submit';
+
+	$: allReviewsStores = allReviews.map((review) => get(review));
 </script>
 
 <svelte:head>
@@ -73,11 +106,11 @@
 <Section>
 	<PlateCard {plate} isAdmin={user?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} editorialScores={editorialScoreStores} graphScores={allScoreStores} />
+	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
 
-	{#if $editorialReviewStore.description}
+	{#if $editorialReview.description}
 		<div class="break-container">
-			<textarea class="inset" readonly rows="16">{$editorialReviewStore.description}</textarea>
+			<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
 		</div>
 	{/if}
 </Section>
@@ -94,7 +127,7 @@
 			method="post"
 		/>
 
-		<ScoreSheet {categories} userScores={userScoreStores} {scoreUrl} />
+		<ScoreSheet {categories} {userScores} {scoreUrl} />
 
 		<label hidden for={reviewTextareaId}>review</label>
 		<textarea
@@ -108,29 +141,25 @@
 			bind:value={description}
 		/>
 
-		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={$userReviewStore.id} />
+		<input hidden form={deleteReviewFormId} name={reviewIdInputName} value={$userReview.id} />
 		<div class="break-container">
 			<button
 				class="border inset shadow good no-select"
 				type="submit"
 				form={submitReviewFormId}
 				on:click|preventDefault={async () => {
-					const invalidateUrl = await handleSubmitReview(
-						description,
-						userReviewStore,
-						plate.modelId
-					);
+					const invalidateUrl = await handleSubmitReview(description, userReview, plate.modelId);
 					invalidate(invalidateUrl);
 				}}
 			>
-				submit
+				{submitMessage}
 			</button>
 			<button
 				class="border inset shadow bad no-select"
 				type="submit"
 				form={deleteReviewFormId}
 				on:click|preventDefault={async () => {
-					const invalidateUrl = await handleDeleteReview(userReviewStore, plate.modelId);
+					const invalidateUrl = await handleDeleteReview(userReview, plate.modelId);
 					invalidate(invalidateUrl);
 				}}
 			>
@@ -152,8 +181,8 @@
 
 <Section title="reviews">
 	<CardsGrid>
-		{#each $allReviewsStore as review}
-			<ReviewCard user={review.user} {categories} {review} scores={allScoreStores} />
+		{#each allReviewsStores as review}
+			<ReviewCard user={review.user} {categories} {review} scores={allScores} />
 		{/each}
 	</CardsGrid>
 </Section>

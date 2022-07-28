@@ -12,7 +12,7 @@ import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
 import { FlowCode } from './_flow';
 
 import type { RequestHandler } from './__types';
-export const get: RequestHandler = async () => {
+export const GET: RequestHandler = async () => {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
 
@@ -26,7 +26,7 @@ export const get: RequestHandler = async () => {
 	};
 };
 
-export const post: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request }) => {
 	const formData = await request.formData();
 
 	const emailEntry = formData.get('email');

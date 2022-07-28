@@ -1,4 +1,5 @@
 import { goto } from '$app/navigation';
+import { PUBLIC_API_BASE } from '$env/static/public';
 import type { Category, Score } from '@prisma/client';
 import { writable, type Writable } from 'svelte/store';
 
@@ -8,12 +9,12 @@ async function handleChangeScore(score: Score) {
 	} else {
 		if (score.value) {
 			const data = { value: score.value };
-			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
+			await fetch(`${PUBLIC_API_BASE}/plates/${score.modelId}/scores/${score.categoryId}`, {
 				method: 'put',
 				body: JSON.stringify(data)
 			});
 		} else {
-			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
+			await fetch(`${PUBLIC_API_BASE}/plates/${score.modelId}/scores/${score.categoryId}`, {
 				method: 'delete'
 			});
 		}
@@ -26,7 +27,7 @@ export function storeScores(
 	userId: number,
 	categories: Category[]
 ) {
-	const userScoreStores = categories.reduce<{
+	const userScores = categories.reduce<{
 		[categoryId: number]: Writable<Score>;
 	}>((previous, category) => {
 		previous[category.id] = writable({
@@ -38,7 +39,7 @@ export function storeScores(
 		return previous;
 	}, {});
 
-	let editorialScoreStores = categories.reduce<{
+	let editorialScores = categories.reduce<{
 		[categoryId: number]: Writable<Score>;
 	}>((previous, category) => {
 		previous[category.id] = writable({
@@ -49,7 +50,7 @@ export function storeScores(
 		});
 		return previous;
 	}, {});
-	const allScoreStores = categories.reduce<{
+	const allScores = categories.reduce<{
 		[categoryId: number]: Writable<Score>[];
 	}>((previous, category) => {
 		previous[category.id] = [];
@@ -60,21 +61,21 @@ export function storeScores(
 		const scoreStore = writable(score);
 
 		if (score.userId == userId) {
-			userScoreStores[score.categoryId] = scoreStore;
+			userScores[score.categoryId] = scoreStore;
 		}
 
 		if (score.userId == 1) {
-			editorialScoreStores[score.categoryId] = scoreStore;
+			editorialScores[score.categoryId] = scoreStore;
 		}
 
-		allScoreStores[score.categoryId].push(scoreStore);
+		allScores[score.categoryId].push(scoreStore);
 	});
 
 	if (userId == 1) {
-		editorialScoreStores = userScoreStores;
+		editorialScores = userScores;
 	}
 
-	Object.entries(userScoreStores).forEach(([_categoryId, scoreStore]) => {
+	Object.entries(userScores).forEach(([_categoryId, scoreStore]) => {
 		let fired = false;
 		let previousValue: number;
 		scoreStore.subscribe(async (score) => {
@@ -89,5 +90,5 @@ export function storeScores(
 		});
 	});
 
-	return { userScoreStores, editorialScoreStores, allScoreStores };
+	return { userScores, editorialScores, allScores };
 }

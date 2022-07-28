@@ -1,10 +1,10 @@
 // users/[id=integer]/edit.ts
 
-import { variables } from '$lib/env';
+import { PUBLIC_API_BASE } from '$env/static/public';
 import type { User } from '@prisma/client';
 
 import type { RequestHandler } from './__types/edit';
-export const post: RequestHandler = async ({ locals, request, params }) => {
+export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (!locals.user) {
 		return {
 			status: 401,
@@ -22,7 +22,7 @@ export const post: RequestHandler = async ({ locals, request, params }) => {
 			...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 		};
 
-		const apiUrl = `${variables.apiBase}/users/${params.id}`;
+		const apiUrl = `${PUBLIC_API_BASE}/users/${params.id}`;
 		const response = await fetch(apiUrl, {
 			body: JSON.stringify(data),
 			method: 'put',

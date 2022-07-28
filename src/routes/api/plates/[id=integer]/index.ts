@@ -5,7 +5,7 @@ import { updatePlate, deletePlate, getFullPlate } from '$lib/database/plates';
 import { deleteImages } from '$lib/database/images';
 
 import type { RequestHandler } from './__types';
-export const get: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params }) => {
 	try {
 		const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
@@ -30,7 +30,7 @@ export const get: RequestHandler = async ({ params }) => {
 	}
 };
 
-export const put: RequestHandler = async ({ locals, request, params }) => {
+export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	try {
 		if (locals.user?.isAdmin) {
 			const json: {
@@ -87,7 +87,7 @@ export const put: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const del: RequestHandler = async ({ locals, params }) => {
+export const DELETE: RequestHandler = async ({ locals, params }) => {
 	try {
 		if (locals.user?.isAdmin) {
 			await deletePlate(parseInt(params.id));

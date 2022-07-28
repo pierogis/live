@@ -1,8 +1,8 @@
-import { variables } from '$lib/env';
+import { PUBLIC_API_BASE } from '$env/static/public';
 import type { Plate } from '@prisma/client';
 
 import type { RequestHandler } from './__types/create';
-export const post: RequestHandler = async ({ locals, request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
 	if (locals.user?.isAdmin) {
 		const formData: FormData = await request.formData();
 
@@ -25,7 +25,7 @@ export const post: RequestHandler = async ({ locals, request }) => {
 			imageUrls: imageUrlEntry ? [imageUrlEntry.toString()] : []
 		};
 
-		const apiUrl = variables.apiBase + '/plates';
+		const apiUrl = PUBLIC_API_BASE + '/plates';
 
 		const response = await fetch(apiUrl, {
 			method: 'post',

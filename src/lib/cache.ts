@@ -1,5 +1,4 @@
-import { createClient } from 'redis';
-import type { RedisClientType } from '@node-redis/client';
+import { createClient, type RedisClientType } from 'redis';
 
 import { variables } from '$lib/env';
 import { encrypt, decrypt } from './encryption';
