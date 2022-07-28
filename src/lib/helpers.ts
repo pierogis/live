@@ -1,4 +1,3 @@
-/** @type {import('@sveltejs/kit').Load} */
 export async function protect<T>(session: App.Session, callback: () => Promise<T>) {
 	if (!session.user) {
 		return {

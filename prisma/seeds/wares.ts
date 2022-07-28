@@ -1,2 +1,3 @@
-/** @type {Omit<import('@prisma/client').Ware, 'id'>[]} */
-export const wares = [{ name: 'plate' }];
+import { Ware } from '@prisma/client';
+
+export const wares: Omit<Ware, 'id'>[] = [{ name: 'plate' }];

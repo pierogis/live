@@ -1,6 +1,6 @@
 import { parse } from 'cookie';
 
-import type { RequestEvent } from '@sveltejs/kit';
+import type { GetSession, Handle, RequestEvent } from '@sveltejs/kit';
 
 import { variables } from '$lib/env';
 import { cache, setupCache } from '$lib/cache';
@@ -8,8 +8,7 @@ import { expireSessionCookie, getUserSession } from '$lib/session';
 
 import { getUser } from '$lib/database/users';
 
-/** @type {import('@sveltejs/kit').Handle} */
-export async function handle({ event, resolve }) {
+export const handle: Handle = async ({ event, resolve }) => {
 	if (!cache) setupCache();
 
 	const cookies = parse(event.request.headers.get('cookie') || '');
@@ -41,9 +40,8 @@ export async function handle({ event, resolve }) {
 	}
 
 	return response;
-}
+};
 
-/** @type {import('@sveltejs/kit').GetSession} */
-export function getSession(event: RequestEvent): App.Session {
+export const getSession: GetSession = (event: RequestEvent): App.Session => {
 	return { user: event.locals.user };
-}
+};
