@@ -2,7 +2,7 @@ import { parse } from 'cookie';
 
 import type { RequestEvent } from '@sveltejs/kit';
 
-import { variables, setupEnv } from '$lib/env';
+import { variables } from '$lib/env';
 import { cache, setupCache } from '$lib/cache';
 import { expireSessionCookie, getUserSession } from '$lib/session';
 
@@ -10,7 +10,6 @@ import { getUser } from '$lib/database/users';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
-	if (!variables) setupEnv();
 	if (!cache) setupCache();
 
 	const cookies = parse(event.request.headers.get('cookie') || '');
