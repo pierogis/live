@@ -7,7 +7,7 @@
 		const response = await fetch(`${PUBLIC_API_BASE}/users/${params.id}`);
 		const user = await response.json();
 
-		if (!user) {
+		if (!user.id) {
 			return { status: 404, error: "user doesn't exist" };
 		}
 		const isUser = session.user && session.user.id == user.id;
