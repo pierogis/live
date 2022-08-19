@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 			body: { error: `not signed in` }
 		};
 	}
-	if (locals.user?.serial == params.id || locals.user?.isAdmin) {
+	if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
 		const apiUrl = `${PUBLIC_API_BASE}/users/${params.id}`;
 		const response = await fetch(apiUrl, {
 			method: 'delete',
