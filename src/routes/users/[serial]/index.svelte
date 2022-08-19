@@ -22,6 +22,8 @@
 		const isUser = session.user && session.user.id == user.id;
 		const isAdmin = session.user && session.user.isAdmin;
 
+		if (isUser) user.email = session.user.email;
+
 		const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
 		const categories: Category[] = await categoriesResponse.json();
 
@@ -115,23 +117,25 @@
 <Divider horizontal={true} />
 
 <Section title="reviews">
-	<CardsGrid>
-		{#each user.reviews as review}
-			<ReviewCard
-				{categories}
-				{review}
-				scores={storeScores(review.model.scores, review.modelId, user?.id, categories).allScores}
-			>
-				<a href="/plates/{review.modelId}">
-					<ImageDisplay
-						alt="model {review.modelId}"
-						urls={review.model.images.map((image) => image.url)}
-						small={true}
-					/>
-				</a>
-			</ReviewCard>
-		{/each}
-	</CardsGrid>
+	{#if user.reviews.length > 0}
+		<CardsGrid>
+			{#each user.reviews as review}
+				<ReviewCard
+					{categories}
+					{review}
+					scores={storeScores(review.model.scores, review.modelId, user?.id, categories).allScores}
+				>
+					<a href="/plates/{review.modelId}">
+						<ImageDisplay
+							alt="model {review.modelId}"
+							urls={review.model.images.map((image) => image.url)}
+							small={true}
+						/>
+					</a>
+				</ReviewCard>
+			{/each}
+		</CardsGrid>
+	{/if}
 </Section>
 
 <style>
