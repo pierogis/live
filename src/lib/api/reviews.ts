@@ -68,7 +68,7 @@ export function storeReviews(
 		description: ''
 	});
 
-	let allReviews: Writable<Review & { user: User }>[] = [];
+	const allReviews: Writable<Review & { user: User }>[] = [];
 
 	reviews.forEach((review) => {
 		const reviewStore = writable(review);

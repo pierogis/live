@@ -1,6 +1,6 @@
 import { parse } from 'cookie';
 
-import type { GetSession, Handle, RequestEvent } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 
 import { variables } from '$lib/env';
 import { cache, setupCache } from '$lib/cache';
@@ -40,8 +40,4 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	return response;
-};
-
-export const getSession: GetSession = (event: RequestEvent): App.Session => {
-	return { user: event.locals.user };
 };
