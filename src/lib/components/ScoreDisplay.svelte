@@ -4,10 +4,10 @@
 
 	export let editorialScore: Readable<Score> = null;
 	export let userScore: Writable<Score> = null;
-	const displayScore = userScore || editorialScore;
+	$: displayScore = userScore || editorialScore;
 
-	const interactive = userScore != null;
-	const user = userScore != null;
+	$: interactive = userScore != null;
+	$: user = userScore != null;
 	$: placeholder = $displayScore?.value == null;
 
 	$: displayValue = $displayScore?.value || 0;

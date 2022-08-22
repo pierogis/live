@@ -1,10 +1,10 @@
 export enum FlowCode {
-	default = 0,
-	noEmail = 1,
-	generated = 2,
-	badPassphrase = 3,
-	badEmail = 4,
-	signedIn = 5
+	Default = 0,
+	NoEmail = 1,
+	Generated = 2,
+	BadPassphrase = 3,
+	BadEmail = 4,
+	SignedIn = 5
 }
 
 export interface FlowStatus {

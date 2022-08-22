@@ -19,15 +19,15 @@
 <div style:position="relative" class="no-select">
 	<div class="inner">
 		{#each categories as category}
+			{@const categoryEditorialScore = editorialScores ? editorialScores[category.id] : null}
+			{@const categoryUserScore = interactive ? userScores[category.id] : null}
 			<div class="category">
 				<span class="category-emoji" title={category.name}>{category.symbol}</span>
-				<ScoreDisplay
-					editorialScore={editorialScores ? editorialScores[category.id] : null}
-					userScore={interactive ? userScores[category.id] : null}
-				/>
+				<ScoreDisplay editorialScore={categoryEditorialScore} userScore={categoryUserScore} />
 				{#if graphScores != null}
+					{@const categoryAllScores = graphScores[category.id]}
 					<div class="graph">
-						<ScoreGraph scoreStores={graphScores[category.id]} />
+						<ScoreGraph scoreStores={categoryAllScores} />
 					</div>
 				{:else if interactive}
 					<input
@@ -36,7 +36,7 @@
 						action="{scoreUrl}/{category}/delete"
 						method="post"
 						on:click|preventDefault={() => {
-							userScores[category.id].update((score) => {
+							categoryUserScore.update((score) => {
 								score.value = null;
 								return score;
 							});
