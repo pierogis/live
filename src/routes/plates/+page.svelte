@@ -10,13 +10,13 @@
 
 	import type { PageData } from './$types';
 	export let data: PageData;
-	$: ({ categories, plates } = data);
+	$: ({ categories, plates, user } = data);
 
 	$: platesInfo = plates.map((plate) => {
 		const { userScores, editorialScores, allScores } = storeScores(
 			plate.model.scores,
 			plate.modelId,
-			$page.data.user?.id,
+			user?.id,
 			categories
 		);
 

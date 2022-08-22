@@ -9,7 +9,7 @@ export const load: PageLoad = async ({ parent }) => {
 
 	const { user } = await parent();
 	if (user) {
-		location = `users/${user.serial}`;
+		location = `/users/${user.serial}`;
 	}
 
 	// TODO: temporary workaround https://github.com/sveltejs/kit/issues/5952

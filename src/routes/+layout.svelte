@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import { Layout } from '@pierogis/utensils';
 
-	$: user = $page.data.user;
+	import type { LayoutData } from './$types';
+	export let data: LayoutData;
+	$: ({ user } = data);
 </script>
 
 <Layout title="karl's plate emporium">
@@ -30,6 +30,8 @@
 		</a>
 	</footer>
 </Layout>
+
+<div id="data-netlify" hidden />
 
 <style global>
 	/* default styles */

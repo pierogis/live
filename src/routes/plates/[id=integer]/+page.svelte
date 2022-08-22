@@ -60,7 +60,7 @@
 <Divider horizontal={true} />
 
 <Section title="user review">
-	{#if $page.data.user}
+	{#if user}
 		<form hidden id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
 		<form
 			hidden
