@@ -31,8 +31,6 @@
 	</footer>
 </Layout>
 
-<div id="data-netlify" hidden />
-
 <style global>
 	/* default styles */
 	:root {
