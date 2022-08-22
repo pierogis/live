@@ -6,7 +6,7 @@
 			// prevent file from being opened
 			event.preventDefault();
 
-			if (event.dataTransfer.files.length > 0) {
+			if (event.dataTransfer && event.dataTransfer.files.length > 0) {
 				inputElement.files = event.dataTransfer.files;
 			}
 		};
@@ -26,26 +26,24 @@
 	}
 	let thumbnailSrc = '#';
 
-	function changeThumbnail(event) {
-		let image = event.target.files[0];
-		const reader = new FileReader();
+	let files: FileList;
+
+	const reader = new FileReader();
+	reader.onload = (e) => {
+		if (e.target?.result) {
+			thumbnailSrc = e.target.result.toString();
+		}
+	};
+
+	$: {
+		let image = files[0];
 
 		reader.readAsDataURL(image);
-
-		reader.onload = (e) => {
-			thumbnailSrc = e.target.result.toString();
-		};
 	}
 </script>
 
 <div class="zone inset shadow" use:dropAction>
-	<input
-		bind:this={inputElement}
-		type="file"
-		name="image"
-		accept="image/*"
-		on:change={changeThumbnail}
-	/>
+	<input bind:this={inputElement} type="file" name="image" accept="image/*" bind:files />
 	<img class="image" src={thumbnailSrc} alt="upload" />
 </div>
 
