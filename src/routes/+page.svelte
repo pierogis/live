@@ -3,8 +3,7 @@
 </script>
 
 <Layout title="utensils">
-	<nav slot="nav" />
-
+	<br slot="nav" />
 	<Card>
 		<span>Hi!</span>
 
@@ -26,6 +25,7 @@
 		<textarea class="inset">npm i --save-dev @pierogis/utensils</textarea>
 	</Card>
 
+	<br />
 	<footer slot="footer">
 		<a class="border shadow inset link-box" href="https://emporium.pierogis.live">emporium</a>
 		<a class="border shadow inset link-box" href="https://careers.pierogis.live">careers</a>
@@ -37,6 +37,6 @@
 
 <style>
 	textarea {
-		width: 24rem;
+		max-width: 24rem;
 	}
 </style>

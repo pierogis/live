@@ -6,11 +6,11 @@
 </script>
 
 <div class="image-container">
-	<img class="image inset shadow" class:small src={urls[0] || ''} {alt} />
+	<img class="inset shadow" class:small src={urls[0] || ''} {alt} />
 </div>
 
 <style>
-	.image {
+	img {
 		object-fit: contain;
 
 		border-top: solid 0.2rem var(--text-color);
@@ -19,13 +19,13 @@
 		border-right: solid 0.2rem var(--text-color);
 		border-radius: 0.6rem;
 
-		max-width: 400px;
-		max-height: 200px;
+		max-width: min(100%, 400px);
+		max-height: min(100%, 200px);
 	}
 
-	.image.small {
-		max-width: 200px;
-		max-height: 100px;
+	img.small {
+		max-width: min(100%, 200px);
+		max-height: min(100%, 100px);
 	}
 
 	.image-container {

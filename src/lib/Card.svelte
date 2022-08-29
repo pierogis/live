@@ -17,5 +17,8 @@
 
 	:global(.card > *) {
 		margin: 0.4rem;
+
+		max-width: 90%;
+		max-height: 90%;
 	}
 </style>
