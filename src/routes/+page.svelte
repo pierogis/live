@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, ImageDisplay, Layout } from '$lib';
+	import { Card, ImageDisplay, Layout, ThemeToggle } from '$lib';
 </script>
 
 <Layout title="utensils">
@@ -32,6 +32,8 @@
 		<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
 			@pierogis_live
 		</a>
+		<br />
+		<ThemeToggle />
 	</footer>
 </Layout>
 
