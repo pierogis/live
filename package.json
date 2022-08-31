@@ -10,7 +10,7 @@
 	"bugs": {
 		"url": "https://github.com/pierogis/live/issues"
 	},
-	"homepage": "https://utensils.pierogis.live",
+	"homepage": "https://pierogis.live",
 	"scripts": {
 		"dev": "vite dev --port 3000",
 		"build": "vite build",
@@ -23,7 +23,7 @@
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.2.0",
+		"@pierogis/utensils": "^0.2.1",
 		"@playwright/test": "^1.25.1",
 		"@sveltejs/adapter-auto": "^1.0.0-next.70",
 		"@sveltejs/kit": "1.0.0-next.456",
