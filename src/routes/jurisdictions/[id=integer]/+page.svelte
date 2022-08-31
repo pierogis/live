@@ -5,7 +5,6 @@
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
 	import { storeScores } from '$lib/api/scores';
-	import { page } from '$app/stores';
 
 	import type { PageData } from './$types';
 

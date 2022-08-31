@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import { storeScores } from '$lib/api/scores';
 
 	import { CardsGrid } from '@pierogis/utensils';

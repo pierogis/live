@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { get } from 'svelte/store';
-	import { page } from '$app/stores';
 	import { goto, invalidate } from '$app/navigation';
 
 	import { reviewDescriptionInputName, reviewIdInputName } from './review/_form';
@@ -57,9 +56,9 @@
 	{/if}
 </Section>
 
-<Divider horizontal={true} />
+<Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="user review">
+<Section title="user review" column>
 	{#if user}
 		<form hidden id={submitReviewFormId} action={`/plates/${plate.modelId}/review`} method="post" />
 		<form
@@ -119,9 +118,9 @@
 	{/if}
 </Section>
 
-<Divider horizontal={true} />
+<Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="reviews">
+<Section title="reviews" column>
 	<CardsGrid>
 		{#each allReviewsStores as review}
 			<ReviewCard user={review.user} {categories} {review} scores={allScores} />
@@ -145,7 +144,7 @@
 
 		border-radius: 0.6rem;
 
-		font-family: 'Lora';
-		font-weight: normal;
+		font-size: 16px;
+		font-weight: 400;
 	}
 </style>

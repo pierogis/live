@@ -32,24 +32,21 @@
 		</a>
 	{/if}
 	<slot />
-	<textarea readonly class="description inset" cols="40" rows="8">{review.description}</textarea>
+	<textarea readonly class="inset" cols="40" rows="8">{review.description}</textarea>
 	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
 </Card>
 
 <style>
-	.description {
-		font-family: 'Lora';
-		font-weight: normal;
+	textarea {
+		max-width: 90%;
+		resize: none;
 
 		text-align: left;
 
-		resize: none;
-
-		max-width: 90%;
-	}
-
-	textarea {
-		resize: none;
 		border-radius: 0.6rem;
+
+		font-size: 16px;
+		font-weight: 400;
+		font-weight: normal;
 	}
 </style>
