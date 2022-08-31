@@ -25,16 +25,24 @@
 		>
 	{/if}
 
-	<a class="link" href={'/jurisdictions/' + plate.jurisdiction.id}
+	<a class="jurisdiction-link" href={'/jurisdictions/' + plate.jurisdiction.id}
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
-	<a href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}>
-		<ImageDisplay {alt} {small} urls={plate.model.images.map((image) => image.url)} />
+	<a
+		class="image-link"
+		href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}
+	>
+		<ImageDisplay
+			{alt}
+			urls={plate.model.images.map((image) => image.url)}
+			width={small ? '200px' : '400px'}
+			height={small ? '100px' : '200px'}
+		/>
 	</a>
 
 	{#if showYears}
-		<a class="link" href={'/plates/' + plate.modelId}
+		<a class="plate-link" href={'/plates/' + plate.modelId}
 			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
 		>
 	{/if}
@@ -52,7 +60,17 @@
 		left: 0.4rem;
 	}
 
-	.link {
+	.jurisdiction-link {
+		text-decoration: underline;
+	}
+
+	.jurisdiction-link,
+	.plate-link {
 		color: var(--text-color);
+	}
+
+	.image-link {
+		display: flex;
+		justify-content: center;
 	}
 </style>

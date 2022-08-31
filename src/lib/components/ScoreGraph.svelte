@@ -56,6 +56,7 @@
 <style>
 	.bar {
 		fill: var(--text-color);
+		transition: fill 400ms;
 	}
 	.divider {
 		fill: transparent;

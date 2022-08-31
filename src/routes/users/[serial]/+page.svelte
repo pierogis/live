@@ -69,7 +69,7 @@
 
 <form id="logout" action="/logout" method="post" />
 
-<Divider horizontal={true} />
+<Divider horizontal={true} size={'0.4rem'} />
 
 <Section title="reviews">
 	{#if user.reviews.length > 0}
@@ -84,7 +84,8 @@
 						<ImageDisplay
 							alt="model {review.modelId}"
 							urls={review.model.images.map((image) => image.url)}
-							small={true}
+							width={'200px'}
+							height={'100px'}
 						/>
 					</a>
 				</ReviewCard>
