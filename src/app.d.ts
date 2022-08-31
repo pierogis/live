@@ -7,18 +7,10 @@ interface UserCookie {
 	isAdmin: boolean;
 }
 
-// See https://kit.svelte.dev/docs/typescript
-// for information about these interfaces
 declare namespace App {
 	interface Locals {
 		user: UserCookie;
 	}
-
+	// interface PageData {}
 	// interface Platform {}
-
-	interface Session {
-		user?: UserCookie;
-	}
-
-	// interface Stuff {}
 }

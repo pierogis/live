@@ -61,6 +61,7 @@
 
 <style>
 	.score {
+		font-family: Courier, monospace;
 		font-size: 1.4rem;
 
 		cursor: default;

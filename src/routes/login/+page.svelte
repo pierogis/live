@@ -115,13 +115,6 @@
 		text-decoration: underline;
 	}
 
-	label,
-	input,
-	button {
-		font-family: Courier, monospace;
-		font-size: 16px;
-	}
-
 	input {
 		width: 20rem;
 		max-width: 90%;

@@ -31,3 +31,12 @@
 		<ThemeToggle />
 	</footer>
 </Layout>
+
+<style global>
+	label,
+	input,
+	button {
+		font-family: Courier, monospace;
+		font-size: 16px;
+	}
+</style>
