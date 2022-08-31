@@ -22,6 +22,13 @@
 
 <svelte:head>
 	<title>{title}</title>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
+		rel="stylesheet"
+	/>
 </svelte:head>
 
 <svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />
@@ -80,18 +87,6 @@
 		--text-color-t: rgba(255, 240, 220, 0);
 	}
 
-	@font-face {
-		font-family: 'Lora';
-		font-style: normal;
-		font-weight: 400;
-		src: url('/fonts/lora/Lora-Regular.ttf') format('truetype'),
-			url('/fonts/lora/Lora-Italic.ttf') format('truetype'),
-			url('/fonts/lora/Lora-Medium.ttf') format('truetype'),
-			url('/fonts/lora/Lora-MediumItalic.ttf') format('truetype');
-		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
-			U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-	}
-
 	* {
 		margin: 0;
 		padding: 0;
@@ -100,7 +95,7 @@
 
 		vertical-align: baseline;
 
-		font-family: 'Lora', monospace;
+		font-family: 'Lora';
 		font-style: normal;
 		color: var(--text-color);
 
