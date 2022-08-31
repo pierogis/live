@@ -1,6 +1,16 @@
 {
 	"name": "live",
 	"version": "0.0.1",
+	"description": "a basecamp for pierogis",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pierogis/live.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/pierogis/live/issues"
+	},
+	"homepage": "https://utensils.pierogis.live",
 	"scripts": {
 		"dev": "vite dev --port 3000",
 		"build": "vite build",
