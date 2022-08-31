@@ -1,13 +1,33 @@
 <script lang="ts">
+	import { setContext } from 'svelte';
+	import { writable, derived, type Writable } from 'svelte/store';
+
+	import { storedThemeContextKey, syncThemeAction, Theme } from './theme';
+
 	export let title: string;
+
+	const storedTheme: Writable<Theme | null> = writable();
+	const osTheme: Writable<Theme> = writable(Theme.Light);
+
+	const theme = derived([storedTheme, osTheme], ([$storedTheme, $osTheme]) => {
+		if ($storedTheme) {
+			return $storedTheme;
+		} else {
+			return $osTheme;
+		}
+	});
+
+	setContext(storedThemeContextKey, storedTheme);
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
 
+<svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />
+
 <header>
-	<a href="/"><h3 class="link-box border inset shadow">{title}</h3></a>
+	<a href="/"><h4 class="link-box border inset shadow">{title}</h4></a>
 </header>
 
 <slot name="nav" />
@@ -60,6 +80,18 @@
 		--text-color-t: rgba(255, 240, 220, 0);
 	}
 
+	@font-face {
+		font-family: 'Lora';
+		font-style: normal;
+		font-weight: 400;
+		src: url('/fonts/lora/Lora-Regular.ttf') format('truetype'),
+			url('/fonts/lora/Lora-Italic.ttf') format('truetype'),
+			url('/fonts/lora/Lora-Medium.ttf') format('truetype'),
+			url('/fonts/lora/Lora-MediumItalic.ttf') format('truetype');
+		unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+			U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	}
+
 	* {
 		margin: 0;
 		padding: 0;
@@ -68,13 +100,24 @@
 
 		vertical-align: baseline;
 
-		font-family: 'Courier', monospace;
-		font-weight: 600;
+		font-family: 'Lora', monospace;
 		font-style: normal;
-		font-size: 16px;
 		color: var(--text-color);
 
 		background: transparent;
+
+		transition: color 400ms, background-color 400ms, border-color 400ms, outline-color 400ms;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	code,
+	.link-box {
+		font-family: 'Courier', monospace;
 	}
 
 	@media only screen and (max-width: 320px) {

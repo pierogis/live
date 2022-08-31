@@ -9,7 +9,9 @@
 
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		place-items: center;
+		place-content: center;
+
 		position: relative;
 
 		background-color: var(--primary-color);

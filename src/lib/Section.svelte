@@ -5,16 +5,15 @@
 	export let column = false;
 </script>
 
-{#if title}
-	<span class="section-title">{title}</span>
-{/if}
-
-<div class="section" class:column style:--row-gap={rowGap} style:--column-gap={columnGap}>
+<section class:column style:--row-gap={rowGap} style:--column-gap={columnGap}>
+	{#if title}
+		<h3 class="section-title">{title}</h3>
+	{/if}
 	<slot />
-</div>
+</section>
 
 <style>
-	.section {
+	section {
 		width: 90%;
 
 		display: flex;
@@ -26,12 +25,12 @@
 		row-gap: var(--row-gap);
 	}
 
-	.section.column {
+	section.column {
 		flex-direction: column;
 	}
 
 	@media only screen and (min-width: 70rem) {
-		.section {
+		section {
 			flex-direction: row;
 		}
 	}

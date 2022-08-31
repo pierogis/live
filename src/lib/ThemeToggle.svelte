@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { derived, writable, type Writable } from 'svelte/store';
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
 
-	enum Theme {
-		Light = 'Light',
-		Dark = 'Dark'
-	}
+	import { Theme, storedThemeContextKey } from './theme';
+
+	const storedTheme: Writable<Theme | null> = getContext(storedThemeContextKey);
 
 	function toggleTheme(theme: Theme) {
 		$storedTheme = theme;
@@ -13,44 +13,7 @@
 	function removeTheme() {
 		$storedTheme = null;
 	}
-
-	const storedTheme: Writable<Theme | null> = writable();
-	const osTheme: Writable<Theme> = writable(Theme.Light);
-
-	const theme = derived([storedTheme, osTheme], ([$storedTheme, $osTheme]) => {
-		if ($storedTheme) {
-			return $storedTheme;
-		} else {
-			return $osTheme;
-		}
-	});
-
-	function syncTheme(window: Window) {
-		$storedTheme = localStorage.getItem('theme') as Theme;
-
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-			if (event.matches) {
-				$osTheme = Theme.Dark;
-			} else {
-				$osTheme = Theme.Light;
-			}
-		});
-
-		storedTheme.subscribe(($storedTheme) => {
-			if ($storedTheme) {
-				window.localStorage.setItem('theme', $storedTheme);
-			} else {
-				window.localStorage.removeItem('theme');
-			}
-		});
-
-		theme.subscribe(($currentTheme) => {
-			document.documentElement.setAttribute('data-theme', $currentTheme);
-		});
-	}
 </script>
-
-<svelte:window use:syncTheme />
 
 <div class="link-box">
 	<div class="holder">

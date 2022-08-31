@@ -1,13 +1,20 @@
 <script lang="ts">
-	export let small: boolean;
+	export let width: string;
+	export let height: string;
 
 	export let urls: string[];
 	export let alt: string;
 </script>
 
-<div class="image-container">
-	<img class="inset shadow" class:small src={urls[0] || ''} {alt} />
-</div>
+<img
+	class="inset shadow"
+	style:--width={width}
+	style:--height={height}
+	src={urls[0] || ''}
+	{width}
+	{height}
+	{alt}
+/>
 
 <style>
 	img {
@@ -19,17 +26,7 @@
 		border-right: solid 0.2rem var(--text-color);
 		border-radius: 0.6rem;
 
-		max-width: min(100%, 400px);
-		max-height: min(100%, 200px);
-	}
-
-	img.small {
-		max-width: min(100%, 200px);
-		max-height: min(100%, 100px);
-	}
-
-	.image-container {
-		display: flex;
-		justify-content: center;
+		width: var(--width);
+		height: var(--height);
 	}
 </style>
