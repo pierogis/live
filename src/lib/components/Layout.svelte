@@ -99,8 +99,6 @@
 		font-style: normal;
 		color: var(--text-color);
 
-		background: transparent;
-
 		transition: color 400ms, background-color 400ms, border-color 400ms, outline-color 400ms;
 	}
 
@@ -109,9 +107,7 @@
 	h3,
 	h4,
 	h5,
-	h6,
-	code,
-	.link-box {
+	h6 {
 		font-family: 'Courier', monospace;
 	}
 
@@ -128,14 +124,12 @@
 	/* end default styles */
 
 	/* global css class/element style */
-	input[type='text'],
-	input[type='email'],
-	input[type='password'],
-	input[type='url'],
-	input[type='number'],
+	input,
 	textarea {
 		background-color: var(--input-color);
 		padding: 0.1rem 0.2rem;
+
+		font-size: 16px;
 	}
 
 	textarea[readonly] {
@@ -143,21 +137,15 @@
 	}
 
 	input[type='submit'],
-	button {
+	button,
+	.link-box,
+	code {
 		background-color: var(--primary-color);
 		cursor: pointer;
-	}
 
-	input[type='text']:disabled,
-	input[type='email']:disabled,
-	input[type='password']:disabled,
-	input[type='url']:disabled,
-	input[type='number']:disabled,
-	textarea:disabled {
-		background-color: var(--primary-color);
-		color: var(--text-color);
-		text-align: center;
-		text-decoration: none;
+		font-family: 'Courier', monospace;
+		font-size: 16px;
+		font-weight: 600;
 	}
 
 	input[type='text'],
@@ -170,6 +158,18 @@
 	.link-box {
 		font-weight: bold;
 		padding: 0.2rem 0.4rem;
+	}
+
+	input[type='text']:disabled,
+	input[type='email']:disabled,
+	input[type='password']:disabled,
+	input[type='url']:disabled,
+	input[type='number']:disabled,
+	textarea:disabled {
+		background-color: var(--primary-color);
+		color: var(--text-color);
+		text-align: center;
+		text-decoration: none;
 	}
 
 	a {

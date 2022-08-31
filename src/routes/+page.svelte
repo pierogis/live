@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { Card, CardsGrid, Divider, ImageDisplay, Section, ThemeToggle } from '$lib';
+	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '$lib';
+	import {
+		CardDemo,
+		CardsGridDemo,
+		DividerDemo,
+		ImageDisplayDemo,
+		SectionDemo,
+		ThemeToggleDemo
+	} from '$lib/demo';
 </script>
 
 <Card>
@@ -28,84 +36,80 @@
 <Section title="components">
 	<CardsGrid>
 		<Card>
-			<Card>
-				<span>a <code>Card</code> within a <code>Card</code>!</span>
-			</Card>
+			<CardDemo />
 		</Card>
+
 		<Card>
-			<CardsGrid>
-				<Card>
-					<span>a <code>CardsGrid</code></span>
-				</Card>
-				<Card>
-					<span>within a <code>Card</code></span>
-				</Card>
-				<Card>
-					<span>within a <code>CardsGrid</code>!</span>
-				</Card>
-			</CardsGrid>
+			<CardsGridDemo />
 		</Card>
+
 		<Card>
-			<span>a <code>Divider</code></span>
-			<Divider size={'4px'} horizontal />
-			<div class="horizontal-divider-flexbox">
-				<span>can separate horizontally</span>
-				<br />
-				<Divider size={'4px'} />
-				<br />
-				<span>or vertically</span>
-			</div>
+			<DividerDemo />
 		</Card>
+
 		<Card>
-			<span>a <code>Section</code></span>
-			<Section title="section title">
-				<span>doesn't really do much</span>
-			</Section>
+			<SectionDemo />
 		</Card>
+
 		<Card>
-			<span>an <code>ImageDisplay</code></span>
-			<ImageDisplay
-				width={'200px'}
-				height={'100px'}
-				urls={[
-					'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Emoji_u1f44b.svg/2048px-Emoji_u1f44b.svg.png'
-				]}
-				alt="hello!"
-			/>
-			<span>can definitely display an image wrapped in a border</span>
+			<ImageDisplayDemo />
 		</Card>
+
 		<Card>
-			<span>a <code>ThemeToggle</code></span>
-			<ThemeToggle />
-			<span>can force light or dark mode</span>
-			<span>(and defaults to the os setting)</span>
+			<ThemeToggleDemo />
 		</Card>
 	</CardsGrid>
 </Section>
 
-<style>
+<Divider horizontal size={'4px'} />
+<Section title="styles">
+	<CardsGrid>
+		<Card>
+			<h4>.border</h4>
+			<div class="border">wraps anything with this cheesy two tone border</div>
+		</Card>
+		<Card>
+			<h4>.inset</h4>
+			<div class="inset">applies an inner box shadow</div>
+		</Card>
+		<Card>
+			<h4>.shadow</h4>
+			<div class="shadow">applies an outer box shadow with some blur</div>
+		</Card>
+		<Card>
+			<h4>.link-box</h4>
+			<div>
+				<div class="link-box">
+					useful for making normal text (<code>span</code>, <code>a</code>)
+				</div>
+				<div class="link-box">appear like button/link box</div>
+			</div>
+		</Card>
+		<Card>
+			<h4>.border.inset.shadow.link-box</h4>
+			<div class="link-box border inset shadow">
+				<div>they work well when used together</div>
+				<br />
+				<div>in whatever combination</div>
+			</div>
+		</Card>
+		<Card>
+			<h4>.good / .bad</h4>
+			<div class="good">used for affirmative</div>
+			<div class="bad">and negative signals</div>
+		</Card>
+	</CardsGrid>
+</Section>
+
+<br />
+
+<style global>
 	span {
 		text-align: center;
-		font-family: 'Lora';
-	}
-
-	code {
-		font-weight: 600;
 	}
 
 	textarea {
 		width: min(90%, 24rem);
 		font-family: 'Courier', monospace;
-		font-size: 16px;
-	}
-
-	.horizontal-divider-flexbox {
-		height: 2rem;
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-	}
-	.horizontal-divider-flexbox > * {
-		flex: 1 1 0px;
 	}
 </style>
