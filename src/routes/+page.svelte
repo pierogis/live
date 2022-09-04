@@ -12,24 +12,24 @@
 	<br />
 	<CardsGrid>
 		<Card>
-			<iframe title="emporium" src="https://emporium.pierogis.live" />
-			<span>a place for plates</span>
 			<a class="border shadow inset link-box" href="https://emporium.pierogis.live">emporium</a>
+			<span>a place for plates</span>
+			<iframe title="emporium" src="https://emporium.pierogis.live" />
 		</Card>
 		<Card>
-			<iframe title="kitchen" src="https://kitchen.pierogis.live" />
-			<span>work on a recipe</span>
 			<a class="border shadow inset link-box" href="https://kitchen.pierogis.live">kitchen</a>
+			<span>work on a recipe</span>
+			<iframe title="kitchen" src="https://kitchen.pierogis.live" />
 		</Card>
 		<Card>
-			<iframe title="colors" src="https://colors.pierogis.live" />
-			<span>refine your palette</span>
 			<a class="border shadow inset link-box" href="https://colors.pierogis.live">colors</a>
+			<span>refine your palette</span>
+			<iframe title="colors" src="https://colors.pierogis.live" />
 		</Card>
 		<Card>
-			<iframe title="utensils" src="https://utensils.pierogis.live" />
-			<span>some implements to aid consumption</span>
 			<a class="border shadow inset link-box" href="https://utensils.pierogis.live">utensils</a>
+			<span>some implements to aid consumption</span>
+			<iframe title="utensils" src="https://utensils.pierogis.live" />
 		</Card>
 	</CardsGrid>
 
@@ -50,8 +50,8 @@
 	}
 	iframe {
 		max-width: 90%;
-		width: 800px;
-		height: 400px;
+		width: 60rem;
+		height: 30rem;
 
 		padding: 0.4rem;
 
