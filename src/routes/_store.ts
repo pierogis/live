@@ -1,5 +1,5 @@
 import { writable, type Writable } from 'svelte/store';
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 
 export const paletteStore: Writable<string> = writable(
 	browser ? localStorage.getItem('palette') || '' : ''

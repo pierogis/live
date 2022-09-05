@@ -69,11 +69,15 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+
+		gap: 1rem;
 	}
 	.color {
 		position: relative;
 		height: 4rem;
 		width: 4rem;
+
+		border-radius: 8px;
 	}
 	.color-input {
 		width: 3rem;
