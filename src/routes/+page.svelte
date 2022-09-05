@@ -28,11 +28,13 @@
 			href="https://github.com/pierogis/utensils">utensils</a
 		></span
 	>
-	<textarea class="inset">npm i --save-dev @pierogis/utensils</textarea>
+	<textarea class="inset"> npm i --save-dev @pierogis/utensils </textarea>
 </Card>
 
 <br />
+
 <Divider horizontal size={'4px'} />
+
 <Section title="components">
 	<CardsGrid>
 		<Card>
@@ -61,7 +63,10 @@
 	</CardsGrid>
 </Section>
 
+<br />
+
 <Divider horizontal size={'4px'} />
+
 <Section title="styles">
 	<CardsGrid>
 		<Card>
@@ -87,11 +92,7 @@
 		</Card>
 		<Card>
 			<h4>.border.inset.shadow.link-box</h4>
-			<div class="link-box border inset shadow">
-				<div>they work well when used together</div>
-				<br />
-				<div>in whatever combination</div>
-			</div>
+			<div class="link-box border inset shadow">they work well when combined</div>
 		</Card>
 		<Card>
 			<h4>.good / .bad</h4>
@@ -111,5 +112,6 @@
 	textarea {
 		width: min(90%, 24rem);
 		font-family: 'Courier', monospace;
+		font-weight: bold;
 	}
 </style>
