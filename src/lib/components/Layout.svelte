@@ -172,6 +172,13 @@
 		text-decoration: none;
 	}
 
+	label,
+	input,
+	button {
+		font-family: Courier, monospace;
+		font-size: 16px;
+	}
+
 	a {
 		text-decoration: none;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -236,6 +243,11 @@
 		line-height: 1.4;
 
 		text-align: left;
+
+		border-radius: 0.6rem;
+
+		font-size: 16px;
+		font-weight: 400;
 	}
 	/* end global css class/element style */
 
