@@ -141,10 +141,5 @@
 		width: 90%;
 		max-width: 80rem;
 		resize: none;
-
-		border-radius: 0.6rem;
-
-		font-size: 16px;
-		font-weight: 400;
 	}
 </style>
