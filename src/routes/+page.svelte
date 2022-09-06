@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { colorsStore, paletteStore } from './_store';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	function handleImport() {
 		$colorsStore = $paletteStore.split(' ');
@@ -17,45 +18,77 @@
 	function handleExport() {
 		$paletteStore = $colorsStore.join(' ');
 	}
+
+	const colorsStore = writable([]);
+	const paletteStore = writable('');
+
+	onMount(() => {
+		const defaultColors = ['e18c96', '8ccde1'];
+		const defaultPalette = defaultColors.join(' ');
+
+		$paletteStore = localStorage.getItem('palette') || defaultPalette;
+
+		const storedColors = localStorage.getItem('colors');
+		$colorsStore = storedColors ? JSON.parse(storedColors) : defaultColors;
+
+		paletteStore.subscribe((palette) => {
+			localStorage.setItem('palette', palette);
+		});
+		colorsStore.subscribe((colors) => {
+			localStorage.setItem('colors', JSON.stringify(colors));
+		});
+	});
 </script>
 
-<div class="content">
-	<form>
-		<textarea type="text" bind:value={$paletteStore} />
-		<button type="submit" on:click|preventDefault={handleImport}>import</button>
-	</form>
+<br />
+
+<form>
+	<textarea class="inset" type="text" rows="6" bind:value={$paletteStore} />
 	<br />
-	<div class="colors">
-		{#each $colorsStore as color, i}
-			<div class="color-container">
-				<div class="color" style:background-color="#{color}">
-					<span class="remove" on:click|preventDefault={() => handleRemoveColor(i)}>x</span>
-				</div>
-				<input class="color-input" bind:value={color} />
+	<div class="import-export">
+		<button
+			class="border inset shadow link-box"
+			type="submit"
+			on:click|preventDefault={handleImport}>import</button
+		>
+
+		{#if $colorsStore.length > 0}
+			<button
+				class="border inset shadow link-box"
+				type="submit"
+				on:click|preventDefault={handleExport}
+			>
+				export
+			</button>
+		{/if}
+	</div>
+</form>
+
+<br />
+
+<div class="colors">
+	{#each $colorsStore as color, i}
+		<div class="color-container">
+			<div class="color" style:background-color="#{color}">
+				<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}
+					>x</button
+				>
 			</div>
-		{/each}
-	</div>
-
-	<br />
-	<div class="color-container">
-		<button type="submit" on:click|preventDefault={handleAddColor}>+</button>
-	</div>
-
-	<br />
-	{#if $colorsStore.length > 0}
-		<button type="submit" on:click|preventDefault={handleExport}>export</button>
-	{/if}
+			<input class="color-input inset" type="text" bind:value={color} />
+		</div>
+	{/each}
 </div>
 
-<style>
-	.content {
-		padding: 4rem;
+<br />
+<button
+	class="border inset shadow link-box good"
+	type="submit"
+	on:click|preventDefault={handleAddColor}
+>
+	+
+</button>
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
+<style>
 	.colors {
 		display: flex;
 		flex-direction: row;
@@ -63,6 +96,8 @@
 		justify-content: center;
 		align-items: center;
 		gap: 1rem;
+
+		max-width: 90vw;
 	}
 	.color-container {
 		display: flex;
@@ -77,17 +112,34 @@
 		height: 4rem;
 		width: 4rem;
 
+		border: 2px dotted var(--text-color);
 		border-radius: 8px;
 	}
 	.color-input {
-		width: 3rem;
+		width: 4rem;
+		text-align: center;
+	}
+	.import-export {
+		display: flex;
+		flex-direction: row;
+
+		gap: 1rem;
+	}
+	.import-export > * {
+		flex: 1 1 0px;
 	}
 	.remove {
 		position: absolute;
-		top: 0.4rem;
+		top: 0.3rem;
 		right: 0.4rem;
 
+		background-color: transparent;
 		color: white;
 		cursor: pointer;
+	}
+
+	form {
+		display: flex;
+		flex-direction: column;
 	}
 </style>
