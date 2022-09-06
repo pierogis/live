@@ -11,15 +11,15 @@
 
 	<CardsGrid>
 		<Card>
-			<a class="border shadow inset link-box" href="https://emporium.pierogis.live">emporium</a>
-			<span>a place for plates</span>
-			<iframe title="emporium" src="https://emporium.pierogis.live" />
-			<br />
-		</Card>
-		<Card>
 			<a class="border shadow inset link-box" href="https://kitchen.pierogis.live">kitchen</a>
 			<span>work on a recipe</span>
 			<iframe title="kitchen" src="https://kitchen.pierogis.live" />
+			<br />
+		</Card>
+		<Card>
+			<a class="border shadow inset link-box" href="https://emporium.pierogis.live">emporium</a>
+			<span>a place for plates</span>
+			<iframe title="emporium" src="https://emporium.pierogis.live" />
 			<br />
 		</Card>
 		<Card>
