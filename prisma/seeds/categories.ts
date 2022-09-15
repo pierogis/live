@@ -1,4 +1,4 @@
-import { Category } from '@prisma/client';
+import type { Category } from '@prisma/client';
 
 export const categories: Omit<Category, 'id' | 'wareId'>[] = [
 	{ name: 'overall', symbol: '🌡️', wareName: 'plate' },

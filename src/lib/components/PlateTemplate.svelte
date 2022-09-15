@@ -1,21 +1,15 @@
 <script lang="ts">
+	import type { Jurisdiction } from '@prisma/client';
+
 	import { goto } from '$app/navigation';
 	import { PUBLIC_API_BASE } from '$env/static/public';
 
+	import type { FullPlate } from '$lib/models';
+
 	import { Card } from '@pierogis/utensils';
-	// import DropZone from '$lib/components/DropZone.svelte';
-	import type { FullPlate } from '$lib/database/models';
-	import type { Jurisdiction } from '@prisma/client';
 
 	export let jurisdictions: Jurisdiction[];
 	export let plate: FullPlate = null;
-	// export let showImageInput = false;
-
-	// let imageInputElement: HTMLInputElement;
-
-	// function handleImageSubmit() {
-	// 	createImage(plate.modelId, imageInputElement.files && imageInputElement.files[0]);
-	// }
 
 	async function handleDelete(_event: MouseEvent) {
 		await fetch(`${PUBLIC_API_BASE}/plates/${plate.modelId}`, { method: 'delete' });
@@ -90,6 +84,7 @@
 
 		background-color: transparent;
 
+		top: 0;
 		right: 0.4rem;
 	}
 
@@ -99,6 +94,7 @@
 
 		background-color: transparent;
 
+		top: 0;
 		left: 0.4rem;
 	}
 
@@ -111,10 +107,4 @@
 	input[type='url'] {
 		width: 20em;
 	}
-	/* .image-input {
-		max-height: 196px;
-
-		display: flex;
-		justify-content: center;
-	} */
 </style>

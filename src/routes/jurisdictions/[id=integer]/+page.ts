@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { PUBLIC_API_BASE } from '$env/static/public';
 
 import type { Category, Jurisdiction } from '@prisma/client';
-import type { FullPlate } from '$lib/database/models';
+import type { FullPlate } from '$lib/models';
 
 import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ params, fetch }) => {

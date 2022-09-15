@@ -1,7 +1,8 @@
-import { updateReview } from '$lib/database/reviews';
+import { updateReview } from '$lib/server/database/reviews';
 import { reviewDescriptionInputName, reviewIdInputName } from './_form';
 
 import type { RequestHandler } from './$types';
+import { redirect } from '@sveltejs/kit';
 export const POST: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.user) {
 		const formData: FormData = await request.formData();
@@ -21,18 +22,8 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 
 		await updateReview(review);
 
-		return new Response(undefined, {
-			status: 303,
-			headers: {
-				location: `/plates/${modelId}`
-			}
-		});
+		throw redirect(303, `/plates/${modelId}`);
 	} else {
-		return new Response(undefined, {
-			status: 301,
-			headers: {
-				location: `/login`
-			}
-		});
+		throw redirect(301, `/login`);
 	}
 };

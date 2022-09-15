@@ -31,3 +31,9 @@
 		<ThemeToggle />
 	</footer>
 </Layout>
+
+<style global>
+	.alert {
+		padding: 1rem;
+	}
+</style>

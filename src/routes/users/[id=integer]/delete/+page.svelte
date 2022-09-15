@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Card } from '@pierogis/utensils';
 
-	import type { PageData } from './$types';
+	import type { PageData, ActionData } from './$types';
 	export let data: PageData;
 	$: ({ user, isUser, isAdmin } = data);
+
+	export let form: ActionData;
 </script>
 
 <svelte:head>
@@ -12,8 +14,8 @@
 
 {#if isUser || isAdmin}
 	<Card>
-		<span>are you sure you want to delete this account?</span>
-		<span>-> {user.email}</span>
+		<span>Are you sure you want to delete this account?</span>
+		<b>{user.email}</b>
 		<div class="buttons">
 			<a href={`/users/${user.id}`}>
 				<button class="border inset shadow no-select">cancel</button>
@@ -24,9 +26,22 @@
 	</Card>
 {/if}
 
+{#if form?.message}
+	<div class="border inset shadow no-select bad alert">
+		{form?.message}
+	</div>
+{/if}
+
 <form id="delete" method="post" />
 
 <style>
+	span {
+		text-align: center;
+	}
+	b {
+		font-family: Courier, monospace;
+		text-decoration: underline;
+	}
 	form {
 		display: flex;
 		flex-direction: column;

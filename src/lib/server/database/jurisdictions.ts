@@ -1,6 +1,6 @@
 import { prisma } from '.';
 import type { Jurisdiction } from '@prisma/client';
-import type { FullPlate } from './models';
+import type { FullPlate } from '../../models';
 
 export async function listJurisdictions(): Promise<Jurisdiction[]> {
 	const jurisdictions = await prisma.jurisdiction.findMany();

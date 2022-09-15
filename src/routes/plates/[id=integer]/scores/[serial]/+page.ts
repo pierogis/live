@@ -1,5 +1,5 @@
 import { PUBLIC_API_BASE } from '$env/static/public';
-import type { FullPlate } from '$lib/database/models';
+import type { FullPlate } from '$lib/models';
 import type { User, Category } from '@prisma/client';
 
 import type { PageLoad } from './$types';

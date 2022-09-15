@@ -1,58 +1,60 @@
-import { dev } from '$app/env';
-import { variables } from '$lib/env';
+import { invalid, redirect } from '@sveltejs/kit';
 
 import type { User } from '@prisma/client';
-import { createUser, getUser } from '$lib/database/users';
 
-import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/words';
-import { sendPassphraseEmail } from '$lib/auth';
-import { createSessionCookie } from '$lib/session';
-import { getEmailPassphrase, setEmailPassphrase } from '$lib/cache';
+import { dev } from '$app/environment';
+
+import { createUser, getUser } from '$lib/server/database/users';
+import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
+import { sendPassphraseEmail } from '$lib/server/auth';
+import { setSessionCookie } from '$lib/server/session';
+import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
 
 import { FlowCode } from './_flow';
 
-import type { Action } from './$types';
-export const load = async () => {
+import type { Actions, PageServerLoad } from './$types';
+import { DEV_PASSPHRASE } from '$env/static/private';
+
+export const load: PageServerLoad = async () => {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
 
 	return {
 		samplePhrase,
-		sampleEmail,
-		flowCode: FlowCode.Default
+		sampleEmail
 	};
 };
 
-export const POST: Action = async ({ request, setHeaders }) => {
-	const formData = await request.formData();
+export const actions: Actions = {
+	generate: async (event) => {
+		const formData = await event.request.formData();
 
-	const emailEntry = formData.get('email');
-	const passphraseEntry = formData.get('passphrase');
-	const redirectUrlEntry = formData.get('redirectUrl');
-
-	const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
-
-	if (passphraseEntry == null) {
-		const email = emailEntry.toString();
+		const emailEntry = formData.get('email');
 
 		if (emailEntry) {
-			const generatedPassphrase = dev ? variables.devPassphrase : await sendPassphraseEmail(email);
+			const originalEmail = emailEntry.toString();
+			const generatedPassphrase = dev ? DEV_PASSPHRASE : await sendPassphraseEmail(originalEmail);
 
-			await setEmailPassphrase(email, generatedPassphrase);
+			await setEmailPassphrase(originalEmail, generatedPassphrase);
 
 			return {
-				location: `?email=${email}&redirectUrl=${redirectUrl}&generated=${true}&flowCode=${
-					FlowCode.Generated
-				}`
+				originalEmail,
+				generated: true,
+				flowCode: FlowCode.Generated
 			};
 		} else {
-			return {
-				location: `?redirectUrl=${redirectUrl}&flowCode=${FlowCode.NoEmail}`
-			};
+			return invalid(400, {
+				originalEmail: '',
+				generated: false,
+				flowCode: FlowCode.NoEmail
+			});
 		}
-	} else {
-		const email = emailEntry.toString();
-		const passphrase = passphraseEntry.toString();
+	},
+	login: async (event) => {
+		const formData = await event.request.formData();
+
+		const email = formData.get('email').toString();
+		const passphrase = formData.get('passphrase').toString();
 
 		const correctPassphrase = await getEmailPassphrase(email);
 
@@ -63,24 +65,49 @@ export const POST: Action = async ({ request, setHeaders }) => {
 					user = await createUser({ email, serial: generateSerial().toUpperCase() });
 				}
 
-				const cookie = await createSessionCookie({ userId: user.id });
+				await setSessionCookie(event.cookies, { userId: user.id });
 
-				setHeaders({
-					'set-cookie': cookie
-				});
+				const redirectUrlEntry = formData.get('redirectUrl');
+				const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
 
-				return {
-					location: redirectUrl
-				};
+				throw redirect(300, redirectUrl);
 			} else {
-				return {
-					location: `?redirectUrl=${redirectUrl}&flowCode=${FlowCode.BadPassphrase}`
-				};
+				return invalid(400, {
+					originalEmail: email,
+					generated: false,
+					flowCode: FlowCode.BadPassphrase
+				});
 			}
 		} else {
-			return {
-				location: `?redirectUrl=${redirectUrl}&flowCode=${FlowCode.BadEmail}`
-			};
+			return invalid(400, {
+				originalEmail: email,
+				generated: true,
+				flowCode: FlowCode.BadEmail
+			});
 		}
+	},
+	need: async (event) => {
+		const formData = await event.request.formData();
+
+		const originalEmail = formData.get('email').toString();
+
+		return {
+			flowCode: undefined,
+			generated: false,
+			originalEmail
+		};
+	},
+	already: async (event) => {
+		const formData = await event.request.formData();
+
+		const emailEntry = formData.get('email');
+
+		const originalEmail = emailEntry.toString();
+
+		return {
+			flowCode: undefined,
+			generated: true,
+			originalEmail
+		};
 	}
 };

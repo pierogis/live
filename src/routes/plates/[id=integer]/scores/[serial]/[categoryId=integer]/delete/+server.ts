@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { redirect, error } from '@sveltejs/kit';
 
 import { PUBLIC_API_BASE } from '$env/static/public';
 
@@ -12,18 +12,8 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') }
 		});
 
-		return new Response(undefined, {
-			status: 303,
-			headers: {
-				location: `/plates/${params.id}/scores/${params.serial}`
-			}
-		});
+		throw redirect(303, `/plates/${params.id}/scores/${params.serial}`);
 	} else {
-		return json(
-			{ error: `not user` },
-			{
-				status: 403
-			}
-		);
+		throw error(403, 'not user');
 	}
 };

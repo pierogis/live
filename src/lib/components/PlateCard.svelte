@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { FullPlate } from '$lib/database/models';
+	import type { FullPlate } from '$lib/models';
 
 	import { Card, ImageDisplay } from '@pierogis/utensils';
 
@@ -57,6 +57,7 @@
 
 		background-color: transparent;
 
+		top: 0;
 		left: 0.4rem;
 	}
 

@@ -36,8 +36,8 @@ export async function upsertScore(
 
 export async function deleteScore(
 	params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>
-): Promise<void> {
-	await prisma.score.delete({
+): Promise<Score> {
+	return await prisma.score.delete({
 		where: {
 			modelId_userId_categoryId: {
 				modelId: params.modelId,

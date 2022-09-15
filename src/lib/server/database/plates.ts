@@ -1,6 +1,6 @@
 import { prisma } from '.';
 import type { Plate, Prisma } from '@prisma/client';
-import type { FullPlate } from './models';
+import type { FullPlate } from '../../models';
 
 export async function listPlates(): Promise<Plate[]> {
 	const plates = await prisma.plate.findMany();
@@ -89,6 +89,6 @@ export async function updatePlate(modelId: number, data: Prisma.PlateUpdateInput
 	return await prisma.plate.update({ where: { modelId }, data });
 }
 
-export async function deletePlate(modelId: number): Promise<void> {
-	await prisma.plate.delete({ where: { modelId } });
+export async function deletePlate(modelId: number): Promise<Plate> {
+	return await prisma.plate.delete({ where: { modelId } });
 }

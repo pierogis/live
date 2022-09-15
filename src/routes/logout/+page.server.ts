@@ -1,13 +1,13 @@
-import { expireSessionCookie } from '$lib/session';
+import { redirect } from '@sveltejs/kit';
 
-import type { PageServerLoad } from './$types';
-export const POST: PageServerLoad = async ({ setHeaders }) => {
-	const cookie = expireSessionCookie();
+import { expireSessionCookie } from '$lib/server/session';
 
-	setHeaders({ 'set-cookie': cookie });
+import type { Actions } from './$types';
 
-	return {
-		status: 301,
-		location: '/'
-	};
+export const actions: Actions = {
+	default: (event) => {
+		expireSessionCookie(event.cookies);
+
+		throw redirect(301, '/');
+	}
 };

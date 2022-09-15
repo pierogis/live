@@ -1,15 +1,23 @@
 <script lang="ts">
 	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
 	$: ({ plate, jurisdictions } = data);
+
+	export let form: ActionData;
 </script>
 
 <svelte:head>
-	<title>plate: {plate.modelId} edit</title>
+	<title>{plate.jurisdiction.abbreviation} plate: ({plate.modelId}) edit</title>
 </svelte:head>
 
 <form action="/plates/{plate.modelId}/edit" method="post">
 	<PlateTemplate {jurisdictions} {plate} />
 </form>
+
+{#if form?.message}
+	<div class="border inset shadow no-select bad alert">
+		{form?.message}
+	</div>
+{/if}

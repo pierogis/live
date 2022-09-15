@@ -1,6 +1,7 @@
 import { createClient, type RedisClientType } from 'redis';
 
-import { variables } from '$lib/env';
+import { CACHE_URL } from '$env/static/private';
+
 import { encrypt, decrypt } from './encryption';
 
 export let cache: RedisClientType;
@@ -9,7 +10,7 @@ const keyPrefix = 'emporium:';
 
 export async function setupCache() {
 	cache = createClient({
-		url: variables.cacheUrl
+		url: CACHE_URL
 	});
 
 	cache.on('error', (err) => console.error(err));
@@ -27,8 +28,12 @@ export async function setEmailPassphrase(email: string, passphrase: string) {
 	await cache.multi().set(key, value).expire(key, 120).exec();
 }
 
-export async function getEmailPassphrase(email: string): Promise<string> {
+export async function getEmailPassphrase(email: string): Promise<string | undefined> {
 	const key = getPassphraseKey(email);
 	const value = await cache.getDel(key);
-	return await decrypt(value);
+	if (value != null) {
+		return await decrypt(value);
+	} else {
+		return undefined;
+	}
 }

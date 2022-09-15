@@ -1,4 +1,5 @@
 import { PUBLIC_API_BASE } from '$env/static/public';
+import { redirect } from '@sveltejs/kit';
 
 import { reviewIdInputName } from '../_form';
 
@@ -15,18 +16,8 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 			method: 'delete'
 		});
 
-		return new Response(undefined, {
-			status: 303,
-			headers: {
-				location: `/plates/${modelId}`
-			}
-		});
+		throw redirect(303, `/plates/${modelId}`);
 	} else {
-		return new Response(undefined, {
-			status: 301,
-			headers: {
-				location: `/login`
-			}
-		});
+		throw redirect(301, `/login`);
 	}
 };

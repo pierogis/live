@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-import { variables } from '$lib/env';
+import { EMAIL_PASS, EMAIL_USER } from '$env/static/private';
 import { generatePhrase } from './words';
 
 export async function sendPassphraseEmail(email: string): Promise<string> {
@@ -12,8 +12,8 @@ export async function sendPassphraseEmail(email: string): Promise<string> {
 		port: 587,
 		secure: false, // true for 465, false for other ports
 		auth: {
-			user: variables.emailUser,
-			pass: variables.emailPass
+			user: EMAIL_USER,
+			pass: EMAIL_PASS
 		}
 	});
 

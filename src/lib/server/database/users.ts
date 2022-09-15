@@ -45,6 +45,6 @@ export async function updateUser(
 	return await prisma.user.update({ where: { id }, data });
 }
 
-export async function deleteUser(id: number): Promise<void> {
-	await prisma.user.delete({ where: { id } });
+export async function deleteUser(id: number): Promise<User> {
+	return await prisma.user.delete({ where: { id } });
 }

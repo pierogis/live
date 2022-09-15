@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 import { PUBLIC_API_BASE } from '$env/static/public';
 import { valueEntryName } from '../_form';
@@ -24,18 +24,8 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 
 		await response.json();
 
-		return new Response(undefined, {
-			status: 303,
-			headers: {
-				location: `/plates/${params.id}/scores/${params.serial}`
-			}
-		});
+		throw redirect(303, `/plates/${params.id}/scores/${params.serial}`);
 	} else {
-		return json(
-			{ error: `not admin` },
-			{
-				status: 403
-			}
-		);
+		throw error(403, 'not admin');
 	}
 };

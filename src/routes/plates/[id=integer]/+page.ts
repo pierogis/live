@@ -4,7 +4,7 @@ import { PUBLIC_API_BASE } from '$env/static/public';
 import { storeScores } from '$lib/api/scores';
 import { storeReviews } from '$lib/api/reviews';
 
-import type { FullPlate } from '$lib/database/models';
+import type { FullPlate } from '$lib/models';
 import type { Category } from '@prisma/client';
 
 import type { PageLoad } from './$types';

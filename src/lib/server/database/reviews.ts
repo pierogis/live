@@ -1,6 +1,12 @@
 import { prisma } from '.';
 import type { Review } from '@prisma/client';
 
+export async function getReview(params: Partial<Omit<Review, 'explanation'>>): Promise<Review> {
+	const review = await prisma.review.findUniqueOrThrow({ where: params });
+
+	return review;
+}
+
 export async function getReviews(
 	params: Partial<Omit<Review, 'explanation'>>,
 	take: number = undefined,
@@ -43,8 +49,8 @@ export async function updateReview(params: Review): Promise<Review> {
 	return review;
 }
 
-export async function deleteReview(params: Pick<Review, 'modelId' | 'userId'>): Promise<void> {
-	await prisma.review.delete({
+export async function deleteReview(params: Pick<Review, 'modelId' | 'userId'>): Promise<Review> {
+	return await prisma.review.delete({
 		where: {
 			Review_userId_modelId_unique: {
 				modelId: params.modelId,

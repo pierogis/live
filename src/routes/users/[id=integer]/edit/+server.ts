@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { error, json, redirect } from '@sveltejs/kit';
 
 import { PUBLIC_API_BASE } from '$env/static/public';
 import type { User } from '@prisma/client';
@@ -38,25 +38,13 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 			const user: User = await response.json();
 
 			// redirect to the updated user
-			return new Response(undefined, {
-				status: 303,
-				headers: {
-					location: `/users/${user.serial}`
-				}
-			});
+			throw redirect(303, `/users/${user.serial}`);
 		} else {
-			const error = await response.json();
+			const err = await response.json();
 
-			return json(error, {
-				status: 400
-			});
+			throw error(400, err);
 		}
 	} else {
-		return json(
-			{ error: `not user ${params.id} or admin` },
-			{
-				status: 403
-			}
-		);
+		throw error(403, `not user ${params.id} or admin`);
 	}
 };
