@@ -1,6 +1,6 @@
 [build]
-  command = "prisma generate && prisma migrate deploy && vite build"
-  publish = "public/"
+  command = "prisma generate && npm run build"
+  publish = "public"
 
 [functions]
   external_node_modules = ["@prisma/client"]
