@@ -2,8 +2,25 @@ import { error, invalid, redirect } from '@sveltejs/kit';
 
 import type { Plate } from '@prisma/client';
 
+import { protect } from '$lib/helpers';
+import { getJurisdictions } from '$lib/server/database/jurisdictions';
+
 import { PUBLIC_API_BASE } from '$env/static/public';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ parent }) => {
+	async function handle() {
+		const jurisdictions = await getJurisdictions({});
+
+		return {
+			jurisdictions
+		};
+	}
+
+	const { user } = await parent();
+
+	return protect(user, handle);
+};
 
 export const actions: Actions = {
 	default: async ({ locals, request }) => {

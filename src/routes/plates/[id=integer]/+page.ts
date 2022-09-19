@@ -1,25 +1,11 @@
-import { error } from '@sveltejs/kit';
-import { PUBLIC_API_BASE } from '$env/static/public';
-
 import { storeScores } from '$lib/api/scores';
 import { storeReviews } from '$lib/api/reviews';
 
-import type { FullPlate } from '$lib/models';
-import type { Category } from '@prisma/client';
-
 import type { PageLoad } from './$types';
-export const load: PageLoad = async ({ parent, fetch, params }) => {
-	const platesResponse = await fetch(`${PUBLIC_API_BASE}/plates/${params.id}`);
-	const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
-
-	if (platesResponse.status == 404) {
-		throw error(404, "plate doesn't exist");
-	}
-
-	const plate: FullPlate = await platesResponse.json();
-	const categories: Category[] = await categoriesResponse.json();
-
+export const load: PageLoad = async ({ parent, data }) => {
 	const session = await parent();
+	const plate = data.plate;
+	const categories = data.categories;
 
 	const reviewStores = storeReviews(plate.model.reviews, plate.modelId, session.user?.id);
 
