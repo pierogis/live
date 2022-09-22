@@ -1,6 +1,6 @@
 /// <reference types="@sveltejs/kit" />
 
-interface UserCookie {
+interface SessionUser {
 	id: number;
 	email: string;
 	serial: string;
@@ -9,7 +9,7 @@ interface UserCookie {
 
 declare namespace App {
 	interface Locals {
-		user: UserCookie;
+		sessionUser: SessionUser;
 	}
 	// interface PageData {}
 	// interface Platform {}

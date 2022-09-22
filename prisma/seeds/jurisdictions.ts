@@ -1,4 +1,4 @@
-import { Jurisdiction } from '@prisma/client';
+import type { Jurisdiction } from '@prisma/client';
 
 export const jurisdictions: Omit<Jurisdiction, 'id' | 'wareId'>[] = [
 	{ abbreviation: 'al', name: 'alabama' },

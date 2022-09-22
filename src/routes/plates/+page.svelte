@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { storeScores } from '$lib/api/scores';
-
 	import { CardsGrid } from '@pierogis/utensils';
 
 	import PlateCard from '$lib/components/PlateCard.svelte';
@@ -8,18 +6,7 @@
 
 	import type { PageData } from './$types';
 	export let data: PageData;
-	$: ({ categories, plates, user } = data);
-
-	$: platesInfo = plates.map((plate) => {
-		const { userScores, editorialScores, allScores } = storeScores(
-			plate.model.scores,
-			plate.modelId,
-			user?.id,
-			categories
-		);
-
-		return { plate, userScores, editorialScores, allScores };
-	});
+	$: ({ categories, platesInfo } = data);
 </script>
 
 <svelte:head>

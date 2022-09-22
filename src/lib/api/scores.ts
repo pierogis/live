@@ -1,20 +1,22 @@
-import { goto } from '$app/navigation';
-import { PUBLIC_API_BASE } from '$env/static/public';
-import type { Category, Score } from '@prisma/client';
 import { writable, type Writable } from 'svelte/store';
+import { goto } from '$app/navigation';
+import type { Category, Score } from '@prisma/client';
 
-async function handleChangeScore(score: Score) {
+async function handleChangeScore(
+	fetch: (info: RequestInfo, init?: RequestInit) => Promise<Response>,
+	score: Score
+) {
 	if (!score.userId) {
 		goto(`/login?redirectUrl=/plates/${score.modelId}`);
 	} else {
 		if (score.value) {
 			const data = { value: score.value };
-			await fetch(`${PUBLIC_API_BASE}/plates/${score.modelId}/scores/${score.categoryId}`, {
+			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
 				method: 'put',
 				body: JSON.stringify(data)
 			});
 		} else {
-			await fetch(`${PUBLIC_API_BASE}/plates/${score.modelId}/scores/${score.categoryId}`, {
+			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
 				method: 'delete'
 			});
 		}
@@ -25,7 +27,8 @@ export function storeScores(
 	scores: Score[],
 	modelId: number,
 	userId: number,
-	categories: Category[]
+	categories: Category[],
+	fetch: (info: RequestInfo, init?: RequestInit) => Promise<Response>
 ) {
 	const userScores = categories.reduce<{
 		[categoryId: number]: Writable<Score>;
@@ -83,7 +86,7 @@ export function storeScores(
 				fired = true;
 			} else {
 				if (score.value != previousValue) {
-					await handleChangeScore(score);
+					await handleChangeScore(fetch, score);
 				}
 			}
 			previousValue = score.value;

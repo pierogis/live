@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { valueEntryName } from './_form';
+	import { enhance } from '$app/forms';
+
+	import { valueInputName, categoryIdInputName } from './_form';
 
 	import { Card } from '@pierogis/utensils';
 
@@ -14,12 +16,14 @@
 		return previous;
 	}, {});
 
-	const submitScoreFormId = 'submitScore';
-	const deleteScoreFormId = 'deleteScore';
+	const scoreFormId = 'scoreForm';
 </script>
 
 <svelte:head>
-	<title>user: {serial.toUpperCase()} plate ${plate.modelId} scores</title>
+	<title>
+		user: {serial.toUpperCase()}
+		{plate.jurisdiction.abbreviation} plate ({plate.modelId}) scores
+	</title>
 </svelte:head>
 
 <PlateCard {plate} small={true} />
@@ -27,10 +31,11 @@
 <div class="grid">
 	{#each categories as category}
 		<Card>
-			<div><u>{category.name}</u> <span>{category.symbol}</span></div>
+			<span><u>{category.name}</u> {category.symbol}</span>
 			{#if isUser}
-				<form hidden action="{serial}/{category.id}" method="post" id={submitScoreFormId} />
-				<form hidden action="{serial}/{category.id}/delete" method="post" id={deleteScoreFormId} />
+				<form hidden method="post" id={scoreFormId} use:enhance />
+
+				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />
 
 				<input
 					class="border inset shadow"
@@ -38,25 +43,34 @@
 					min="0"
 					max="10"
 					required
-					form={submitScoreFormId}
-					name={valueEntryName}
+					form={scoreFormId}
+					name={valueInputName}
 					value={scoreSet[category.id] || ''}
 				/>
 
 				<div>
-					<button class="border inset shadow good" type="submit" form={submitScoreFormId}>
+					<button
+						class="border inset shadow good"
+						type="submit"
+						form={scoreFormId}
+						formaction={'?/update'}
+					>
 						submit
 					</button>
-					<button type="submit" form={deleteScoreFormId}>❌</button>
+					<button type="submit" form={scoreFormId} formaction={'?/delete'}>❌</button>
 				</div>
 			{:else}
-				{scoreSet[category.id]}
+				<b>{scoreSet[category.id] || '_'}</b>
 			{/if}
 		</Card>
 	{/each}
 </div>
 
 <style>
+	span {
+		width: 10rem;
+		text-align: center;
+	}
 	.grid {
 		padding: 2rem;
 		display: flex;

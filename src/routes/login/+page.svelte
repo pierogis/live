@@ -1,81 +1,83 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import { flowStatuses } from './_flow';
+	import { FlowCode, flowStatuses } from './_flow';
+
+	import type { PageData, ActionData } from './$types';
+
 	import { Card } from '@pierogis/utensils';
 
-	import type { PageData } from './$types';
 	export let data: PageData;
-	$: ({ sampleEmail, samplePhrase, flowCode } = data);
+	$: ({ sampleEmail, samplePhrase } = data);
 
-	$: originalEmail = $page.url.searchParams.get('email') || '';
-	$: generated = $page.url.searchParams.get('generated') == 'true' || false;
+	export let form: ActionData;
 
-	$: redirectUrl = $page.url.searchParams.get('redirectUrl');
+	$: redirectUrl = form?.redirectUrl || $page.url.searchParams.get('redirectUrl');
 
-	$: email = originalEmail;
-
+	let email = form?.originalEmail;
 	let passphrase = '';
-	const flowStatus = flowStatuses[flowCode];
+
+	const flowStatus = flowStatuses[form?.flowCode || FlowCode.Default];
 
 	const loginFormId = 'login';
+	$: actionName = form?.generated ? 'login' : 'generate';
 </script>
 
 <svelte:head>
 	<title>login</title>
 </svelte:head>
 
-<form id={loginFormId} action="/login" method="post" />
+<form id={loginFormId} action="/login?/{actionName}" method="post" />
 <Card>
 	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
-	<input type="hidden" name="generated" form={loginFormId} value={!generated} />
-	<label for="email">email</label>
-	<input
-		readonly={generated && flowStatus && flowStatus.emailState}
-		class="border inset shadow"
-		class:good={flowStatus && flowStatus.emailState === true}
-		class:bad={flowStatus && flowStatus.emailState === false}
-		id="email"
-		type="email"
-		name="email"
-		form={loginFormId}
-		placeholder={sampleEmail}
-		bind:value={email}
-	/>
-	{#if generated}
-		<label for="passphrase">temporary passphrase</label>
+	<input type="hidden" name="generated" form={loginFormId} value={!form?.generated} />
+	<label>
+		<span>email</span>
 		<input
+			readonly={form?.generated && flowStatus && flowStatus.emailState}
 			class="border inset shadow"
-			class:good={flowStatus && flowStatus.passphraseState === true}
-			class:bad={flowStatus && flowStatus.passphraseState === false}
-			id="passphrase"
-			type="text"
-			name="passphrase"
+			class:good={flowStatus && flowStatus.emailState === true}
+			class:bad={flowStatus && flowStatus.emailState === false}
+			type="email"
+			name="email"
 			form={loginFormId}
-			placeholder={samplePhrase}
-			bind:value={passphrase}
+			placeholder={sampleEmail}
+			bind:value={email}
 		/>
+	</label>
+
+	{#if form?.generated}
+		<label>
+			<span>temporary passphrase</span>
+			<input
+				class="border inset shadow"
+				class:good={flowStatus && flowStatus.passphraseState === true}
+				class:bad={flowStatus && flowStatus.passphraseState === false}
+				type="text"
+				name="passphrase"
+				form={loginFormId}
+				placeholder={samplePhrase}
+				bind:value={passphrase}
+			/>
+		</label>
 	{/if}
 
 	<button
 		class="border inset shadow good no-select"
 		type="submit"
 		form={loginFormId}
-		title={generated ? '' : 'email a temporary passphrase'}
-		>{generated ? 'login' : 'generate'}
+		title={form?.generated ? '' : 'email a temporary passphrase'}
+	>
+		{form?.generated ? 'login' : 'generate'}
 	</button>
 
-	{#if generated}
+	{#if form?.generated}
 		<!-- svelte-ignore a11y-accesskey -->
 		<button
 			type="submit"
-			formmethod="get"
 			form={loginFormId}
+			formaction={'/login?/need'}
 			class="border inset shadow no-select"
-			on:click|preventDefault={async () => {
-				await goto(`/login?email=${email}&redirectUrl=${redirectUrl}`);
-			}}
 			accesskey="g"
 		>
 			need a new passphrase?
@@ -84,12 +86,9 @@
 		<!-- svelte-ignore a11y-accesskey -->
 		<button
 			type="submit"
-			formmethod="get"
 			form={loginFormId}
+			formaction={'/login?/already'}
 			class="border inset shadow no-select"
-			on:click|preventDefault={async () => {
-				await goto(`/login?email=${email}&generated=true&redirectUrl=${redirectUrl}`);
-			}}
 			accesskey="r"
 		>
 			already have a passphrase?
@@ -109,18 +108,20 @@
 
 <style>
 	label {
-		display: block;
-		margin-bottom: 0.25rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+	}
 
+	label > span {
 		text-decoration: underline;
 	}
 
 	input {
 		width: 20rem;
 		max-width: 90%;
-	}
 
-	.alert {
-		padding: 1rem;
+		text-decoration: none;
 	}
 </style>

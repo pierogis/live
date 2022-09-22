@@ -7,15 +7,17 @@
 
 	import ScoreSheet from './ScoreSheet.svelte';
 
-	export let review: Review;
+	export let review: Readable<
+		Review & {
+			user: User;
+		}
+	>;
 	export let scores: { [categoryId: number]: Readable<Score>[] };
-
-	export let user: User = null;
 
 	const editorialScores = Object.entries(scores).reduce<{ [categoryId: number]: Readable<Score> }>(
 		(previous, [categoryId, categoryScores]) => {
 			previous[parseInt(categoryId)] = categoryScores.find(
-				(score) => get(score).userId == review.userId
+				(score) => get(score).userId == $review.userId
 			);
 			return previous;
 		},
@@ -26,13 +28,13 @@
 </script>
 
 <Card>
-	{#if user}
-		<a class="link-box border inset shadow" href="/users/{user.serial}">
-			{user.serial}
+	{#if $review.user}
+		<a class="link-box border inset shadow" href="/users/{$review.user.serial}">
+			{$review.user.serial}
 		</a>
 	{/if}
 	<slot />
-	<textarea readonly class="inset" cols="40" rows="8">{review.description}</textarea>
+	<textarea readonly class="inset" cols="40" rows="8">{$review.description}</textarea>
 	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
 </Card>
 

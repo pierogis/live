@@ -1,23 +1,21 @@
-import { error } from '@sveltejs/kit';
-import { PUBLIC_API_BASE } from '$env/static/public';
-
-import type { Category, Jurisdiction } from '@prisma/client';
-import type { FullPlate } from '$lib/database/models';
+import { storeScores } from '$lib/api/scores';
 
 import type { PageLoad } from './$types';
-export const load: PageLoad = async ({ params, fetch }) => {
-	const jurisdictionResponse = await fetch(`${PUBLIC_API_BASE}/jurisdictions/${params.id}`);
-	const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
+export const load: PageLoad = async ({ parent, fetch, data }) => {
+	const { sessionUser } = await parent();
+	const { jurisdiction, categories } = data;
 
-	const jurisdiction: Jurisdiction & {
-		plates: FullPlate[];
-	} = await jurisdictionResponse.json();
+	const platesInfo = jurisdiction.plates.map((plate) => {
+		const { userScores, editorialScores, allScores } = storeScores(
+			plate.model.scores,
+			plate.modelId,
+			sessionUser?.id,
+			categories,
+			fetch
+		);
 
-	const categories: Category[] = await categoriesResponse.json();
+		return { plate, userScores, editorialScores, allScores };
+	});
 
-	if (!jurisdiction) {
-		throw error(404, "jurisdiction doesn't exist");
-	}
-
-	return { jurisdiction, categories };
+	return { jurisdiction, categories, platesInfo };
 };

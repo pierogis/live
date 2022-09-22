@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { FullPlate } from '$lib/database/models';
+	import type { FullPlate } from '$lib/models';
 
 	import { Card, ImageDisplay } from '@pierogis/utensils';
 
@@ -25,7 +25,7 @@
 		>
 	{/if}
 
-	<a class="jurisdiction-link" href={'/jurisdictions/' + plate.jurisdiction.id}
+	<a class="link-box border inset shadow" href={'/jurisdictions/' + plate.jurisdiction.id}
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
@@ -57,14 +57,10 @@
 
 		background-color: transparent;
 
+		top: 0;
 		left: 0.4rem;
 	}
 
-	.jurisdiction-link {
-		text-decoration: underline;
-	}
-
-	.jurisdiction-link,
 	.plate-link {
 		color: var(--text-color);
 	}

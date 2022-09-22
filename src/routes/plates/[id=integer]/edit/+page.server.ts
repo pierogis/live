@@ -1,40 +1,39 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
-import { PUBLIC_API_BASE } from '$env/static/public';
+import type { Actions } from './$types';
 
-import type { Action } from './$types';
-export const POST: Action = async ({ locals, request, params }) => {
-	if (locals.user?.isAdmin) {
-		const formData: FormData = await request.formData();
+import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
 
-		const jurisdictionEntry = formData.get('jurisdiction');
-		const startYearEntry = formData.get('startYear');
-		const endYearEntry = formData.get('endYear');
-		const imageUrlEntry = formData.get('imageUrl');
+export const actions: Actions = {
+	update: async ({ locals, request, params }) => {
+		if (locals.sessionUser?.isAdmin) {
+			const formData: FormData = await request.formData();
 
-		const data = {
-			jurisdiction: { abbreviation: jurisdictionEntry.toString() },
-			startYear: startYearEntry != '' ? parseInt(startYearEntry.toString()) : null,
-			endYear: endYearEntry != '' ? parseInt(endYearEntry.toString()) : null,
-			imageUrls: imageUrlEntry != '' ? [imageUrlEntry.toString()] : []
-		};
+			const jurisdictionEntry = formData.get('jurisdiction');
+			const startYearEntry = formData.get('startYear');
+			const endYearEntry = formData.get('endYear');
+			const imageUrlEntry = formData.get('imageUrl');
 
-		const apiUrl = `${PUBLIC_API_BASE}/plates/${parseInt(params.id)}`;
+			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
+			const startYear = startYearEntry != '' ? parseInt(startYearEntry.toString()) : null;
+			const endYear = endYearEntry != '' ? parseInt(endYearEntry.toString()) : null;
+			const imageUrls = imageUrlEntry != '' ? [imageUrlEntry.toString()] : [];
 
-		const response = await fetch(apiUrl, {
-			method: 'put',
-			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') },
-			body: JSON.stringify(data)
-		});
+			await helpUpdatePlate(parseInt(params.id), jurisdiction, startYear, endYear, imageUrls);
 
-		if (response.status == 200) {
-			return {
-				location: `/plates/${params.id}/edit`
-			};
+			throw redirect(300, `/plates/${params.id}/edit`);
 		} else {
-			throw error(400, `edit failed`);
+			return error(403, { message: `not admin` });
 		}
-	} else {
-		throw error(403, `not admin`);
+	},
+	delete: async ({ locals, params }) => {
+		if (locals.sessionUser?.isAdmin) {
+			const modelId = parseInt(params.id);
+			await deletePlate(modelId);
+
+			throw redirect(300, `/plates`);
+		} else {
+			throw error(403, 'not admin');
+		}
 	}
 };

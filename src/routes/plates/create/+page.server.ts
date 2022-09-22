@@ -1,47 +1,51 @@
-import { error } from '@sveltejs/kit';
+import { invalid, redirect } from '@sveltejs/kit';
 
-import { PUBLIC_API_BASE } from '$env/static/public';
 import type { Plate } from '@prisma/client';
 
-import type { Action } from './$types';
-export const POST: Action = async ({ locals, request }) => {
-	if (locals.user?.isAdmin) {
-		const formData: FormData = await request.formData();
+import { protect } from '$lib/helpers';
+import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
-		const jurisdictionEntry = formData.get('jurisdiction');
-		const startYearEntry = formData.get('startYear');
-		const endYearEntry = formData.get('endYear');
-		const imageUrlEntry = formData.get('imageUrl');
+import type { Actions, PageServerLoad } from './$types';
+import { helpCreatePlate } from '$lib/server/database/plates';
 
-		if (!jurisdictionEntry) {
-			throw error(400, `jurisdiction not provided`);
-		}
+export const load: PageServerLoad = async ({ parent }) => {
+	async function handle() {
+		const jurisdictions = await getJurisdictions({});
 
-		const data = {
-			jurisdiction: { abbreviation: jurisdictionEntry.toString() },
-			startYear: startYearEntry ? parseInt(startYearEntry.toString()) : null,
-			endYear: endYearEntry ? parseInt(endYearEntry.toString()) : null,
-			imageUrls: imageUrlEntry ? [imageUrlEntry.toString()] : []
+		return {
+			jurisdictions
 		};
+	}
 
-		const apiUrl = PUBLIC_API_BASE + '/plates';
+	const { sessionUser } = await parent();
 
-		const response = await fetch(apiUrl, {
-			method: 'post',
-			headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') },
-			body: JSON.stringify(data)
-		});
+	return protect(sessionUser, handle);
+};
 
-		if (response.status == 200) {
-			const plate: Plate = await response.json();
+export const actions: Actions = {
+	default: async ({ locals, request }) => {
+		if (locals.sessionUser?.isAdmin) {
+			const formData: FormData = await request.formData();
 
-			return {
-				location: `/plates/${plate.modelId}`
-			};
+			const jurisdictionEntry = formData.get('jurisdiction');
+			const startYearEntry = formData.get('startYear');
+			const endYearEntry = formData.get('endYear');
+			const imageUrlEntry = formData.get('imageUrl');
+
+			if (!jurisdictionEntry) {
+				return invalid(400, { message: `jurisdiction not provided` });
+			}
+
+			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
+			const startYear = startYearEntry ? parseInt(startYearEntry.toString()) : undefined;
+			const endYear = endYearEntry ? parseInt(endYearEntry.toString()) : undefined;
+			const imageUrls = imageUrlEntry ? [imageUrlEntry.toString()] : [];
+
+			const plate: Plate = await helpCreatePlate(jurisdiction, startYear, endYear, imageUrls);
+
+			throw redirect(300, `/plates/${plate.modelId}`);
 		} else {
-			throw error(500);
+			return invalid(403, { message: `not admin` });
 		}
-	} else {
-		throw error(403, `not admin`);
 	}
 };

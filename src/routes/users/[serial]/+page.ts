@@ -1,32 +1,35 @@
-import { error } from '@sveltejs/kit';
-import type { Category, Model, Review, Score, User, Image } from '@prisma/client';
-import { PUBLIC_API_BASE } from '$env/static/public';
+import type { Writable } from 'svelte/store';
+
+import type { Score } from '@prisma/client';
+import { storeScores } from '$lib/api/scores';
 
 import type { PageLoad } from './$types';
-export const load: PageLoad = async ({ parent, fetch, params }) => {
-	const userResponse = await fetch(`${PUBLIC_API_BASE}/users?serial=${params.serial}`);
-	const user: User & {
-		scores: Score[];
-		reviews: (Review & {
-			model: Model & {
-				scores: Score[];
-				images: Image[];
-			};
-		})[];
-	} = await userResponse.json();
+export const load: PageLoad = async ({ parent, data, fetch }) => {
+	const { user, categories } = data;
 
-	if (userResponse.status == 404) {
-		throw error(404, "user doesn't exist");
-	}
+	const { sessionUser } = await parent();
+	const isUser = sessionUser && sessionUser.id == user.id;
+	const isAdmin = sessionUser && sessionUser.isAdmin;
 
-	const session = await parent();
-	const isUser = session.user && session.user.id == user.id;
-	const isAdmin = session.user && session.user.isAdmin;
+	if (isUser) user.email = sessionUser.email;
 
-	if (isUser) user.email = session.user.email;
+	const reviewsScores = user.reviews.reduce<{
+		[reviewId: number]: {
+			[categoryId: number]: Writable<Score>[];
+		};
+	}>((previous, review) => {
+		const reviewScores = storeScores(
+			review.model.scores,
+			review.modelId,
+			user?.id,
+			categories,
+			fetch
+		);
 
-	const categoriesResponse = await fetch(`${PUBLIC_API_BASE}/plates/categories`);
-	const categories: Category[] = await categoriesResponse.json();
+		previous[review.id] = reviewScores.allScores;
 
-	return { user, isUser, isAdmin, categories };
+		return previous;
+	}, {});
+
+	return { user, isUser, isAdmin, categories, reviewsScores };
 };

@@ -1,76 +1,51 @@
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
-import { deleteScore, upsertScore } from '$lib/database/scores';
+import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	try {
-		if (locals.user) {
-			const modelId = parseInt(params.id);
-			const userId: number = locals.user.id;
-			const categoryId = parseInt(params.categoryId);
+	if (locals.sessionUser) {
+		const modelId = parseInt(params.id);
+		const userId: number = locals.sessionUser.id;
+		const categoryId = parseInt(params.categoryId);
 
-			const body: { value: number } = await request.json();
+		const body: { value: number } = await request.json();
 
-			if (body.value < 0 || body.value > 10) {
-				return json(
-					{ error: 'score value less than 0 or greater than 10' },
-					{
-						status: 400
-					}
-				);
-			}
-
-			const data = {
-				modelId,
-				userId,
-				categoryId,
-				value: body.value || undefined
-			};
-
-			const score = await upsertScore(data);
-
-			return json(score);
-		} else {
-			return json(
-				{ error: `not signed in` },
-				{
-					status: 401
-				}
-			);
+		if (body.value < 0 || body.value > 10) {
+			throw error(400, 'score value less than 0 or greater than 10');
 		}
-	} catch (err) {
-		console.error(err);
-		return new Response(undefined, { status: 500 });
+
+		const data = {
+			modelId,
+			userId,
+			categoryId,
+			value: body.value || undefined
+		};
+
+		const score = await upsertScore(data);
+
+		return json(score);
+	} else {
+		throw error(401, 'not signed in');
 	}
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	try {
-		if (locals.user) {
-			const modelId = parseInt(params.id);
-			const userId: number = locals.user.id;
-			const categoryId = parseInt(params.categoryId);
+	if (locals.sessionUser) {
+		const modelId = parseInt(params.id);
+		const userId: number = locals.sessionUser.id;
+		const categoryId = parseInt(params.categoryId);
 
-			const score = {
-				modelId,
-				userId,
-				categoryId
-			};
+		const scoreParams = {
+			modelId,
+			userId,
+			categoryId
+		};
 
-			await deleteScore(score);
+		const score = await deleteScore(scoreParams);
 
-			return new Response(undefined);
-		} else {
-			return json(
-				{ error: `not signed in` },
-				{
-					status: 401
-				}
-			);
-		}
-	} catch (err) {
-		console.error(err);
-		return new Response(undefined, { status: 500 });
+		return json(score);
+	} else {
+		throw error(401, 'not signed in');
 	}
 };

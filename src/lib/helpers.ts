@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-export async function protect<T>(user: UserCookie, callback: () => Promise<T>) {
+export async function protect<T>(user: SessionUser, callback: () => Promise<T>) {
 	if (!user) {
 		throw error(401, 'not signed in');
 	} else if (!user.isAdmin) {

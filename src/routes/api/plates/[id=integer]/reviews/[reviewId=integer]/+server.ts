@@ -1,65 +1,45 @@
-import { json } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 
-import { deleteReview, updateReview } from '$lib/database/reviews';
+import { deleteReview, updateReview } from '$lib/server/database/reviews';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	try {
-		if (locals.user) {
-			const { description }: { description: string } = await request.json();
+	if (locals.sessionUser) {
+		const { description }: { description: string } = await request.json();
 
-			const modelId = parseInt(params.id);
-			const reviewId = parseInt(params.reviewId);
-			const userId: number = locals.user.id;
+		const modelId = parseInt(params.id);
+		const reviewId = parseInt(params.reviewId);
+		const userId: number = locals.sessionUser.id;
 
-			const data = {
-				id: reviewId,
-				modelId,
-				userId,
-				description: description || undefined
-			};
+		const data = {
+			id: reviewId,
+			modelId,
+			userId,
+			description: description || undefined
+		};
 
-			const review = await updateReview(data);
+		const review = await updateReview(data);
 
-			return json(review);
-		} else {
-			return json(
-				{ error: `not signed in` },
-				{
-					status: 401
-				}
-			);
-		}
-	} catch (err) {
-		console.error(err);
-		return new Response(undefined, { status: 500 });
+		return json(review);
+	} else {
+		throw error(401, 'not signed in');
 	}
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	try {
-		if (locals.user) {
-			const modelId = parseInt(params.id);
-			const userId: number = locals.user.id;
+	if (locals.sessionUser) {
+		const modelId = parseInt(params.id);
+		const userId: number = locals.sessionUser.id;
 
-			const reviewParams = {
-				modelId,
-				userId
-			};
+		const reviewParams = {
+			modelId,
+			userId
+		};
 
-			await deleteReview(reviewParams);
+		const review = await deleteReview(reviewParams);
 
-			return new Response(undefined);
-		} else {
-			return json(
-				{ error: `not signed in` },
-				{
-					status: 401
-				}
-			);
-		}
-	} catch (err) {
-		console.error(err);
-		return new Response(undefined, { status: 500 });
+		return json(review);
+	} else {
+		throw error(401, 'not signed in');
 	}
 };
