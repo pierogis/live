@@ -1,8 +1,12 @@
 import { error, json } from '@sveltejs/kit';
 
 import type { FullPlate } from '$lib/models';
-import { getFullPlates, createPlate, getPlatePerJurisdiction } from '$lib/server/database/plates';
-import type { Jurisdiction, Prisma } from '@prisma/client';
+import {
+	getFullPlates,
+	helpCreatePlate,
+	getPlatePerJurisdiction
+} from '$lib/server/database/plates';
+import type { Jurisdiction } from '@prisma/client';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ url, setHeaders }) => {
@@ -24,7 +28,7 @@ export const GET: RequestHandler = async ({ url, setHeaders }) => {
 };
 
 export const POST: RequestHandler = async ({ locals, request }) => {
-	if (locals.user?.isAdmin) {
+	if (locals.sessionUser?.isAdmin) {
 		const {
 			jurisdiction,
 			startYear,
@@ -41,26 +45,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'jurisdiction not provided');
 		}
 
-		const data: Prisma.PlateCreateInput = {
-			jurisdiction: { connect: { ...jurisdiction } },
-			startYear: startYear,
-			endYear: endYear,
-			model: {
-				create: {
-					ware: { connect: { name: 'plate' } },
-					images: {
-						createMany: {
-							data: imageUrls.map((imageUrl) => {
-								return { url: imageUrl };
-							})
-						}
-					}
-				}
-			}
-		};
-
 		try {
-			const plate = await createPlate(data);
+			const plate = await helpCreatePlate(jurisdiction, startYear, endYear, imageUrls);
 
 			return json(plate);
 		} catch (err) {

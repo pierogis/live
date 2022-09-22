@@ -12,7 +12,7 @@
 	<title>{plate.jurisdiction.abbreviation} plate: ({plate.modelId}) edit</title>
 </svelte:head>
 
-<form action="/plates/{plate.modelId}/edit" method="post">
+<form action="/plates/{plate.modelId}/edit?/update" method="post">
 	<PlateTemplate {jurisdictions} {plate} />
 </form>
 

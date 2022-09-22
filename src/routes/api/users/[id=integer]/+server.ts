@@ -1,14 +1,14 @@
 import { error, json } from '@sveltejs/kit';
 
 import type { User } from '@prisma/client';
-import { getUser, updateUser, deleteUser } from '$lib/server/database/users';
+import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
 	const user = await getUser({ id: parseInt(params.id) });
 
 	if (user) {
-		if (locals.user?.id != parseInt(params.id) && !locals.user?.isAdmin) {
+		if (locals.sessionUser?.id != parseInt(params.id) && !locals.sessionUser?.isAdmin) {
 			user.email = null;
 		}
 
@@ -23,37 +23,36 @@ export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
 };
 
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (!locals.user) {
+	if (!locals.sessionUser) {
 		throw error(401, `not signed in`);
 	}
-	if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
+	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {
 		const { serial }: { serial: string } = await request.json();
 
-		let user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'> = {
-			id: parseInt(params.id),
+		let data: Partial<Omit<User, 'isAdmin' | 'id'>> = {
 			// ...(emailEntry && { email: emailEntry.toString() }),
 			...(serial && { serial: serial.toUpperCase() })
 		};
 
 		try {
-			user = await updateUser(user);
+			const user = await updateUserById(parseInt(params.id), data);
+
+			return json(user);
 		} catch (err) {
 			if (err.code == 23505) {
-				throw error(400, `serial ${user.serial} already exists`);
+				throw error(400, `user with serial ${serial.toUpperCase()} already exists`);
 			} else throw err;
 		}
-
-		return json(user);
 	} else {
-		throw error(401, `not user ${params.id} or admin`);
+		throw error(403, `not user ${params.id} or admin`);
 	}
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (!locals.user) {
+	if (!locals.sessionUser) {
 		throw error(401, `not signed in`);
 	}
-	if (locals.user?.id == parseInt(params.id) || locals.user?.isAdmin) {
+	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {
 		const user = await deleteUser(parseInt(params.id));
 
 		return json(user);

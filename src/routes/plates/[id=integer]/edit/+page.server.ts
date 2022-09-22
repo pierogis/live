@@ -1,12 +1,12 @@
 import { error, invalid, redirect } from '@sveltejs/kit';
 
-import { PUBLIC_API_BASE } from '$env/static/public';
-
 import type { Actions } from './$types';
 
+import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
+
 export const actions: Actions = {
-	default: async ({ locals, request, params }) => {
-		if (locals.user?.isAdmin) {
+	update: async ({ locals, request, params }) => {
+		if (locals.sessionUser?.isAdmin) {
 			const formData: FormData = await request.formData();
 
 			const jurisdictionEntry = formData.get('jurisdiction');
@@ -14,28 +14,26 @@ export const actions: Actions = {
 			const endYearEntry = formData.get('endYear');
 			const imageUrlEntry = formData.get('imageUrl');
 
-			const data = {
-				jurisdiction: { abbreviation: jurisdictionEntry.toString() },
-				startYear: startYearEntry != '' ? parseInt(startYearEntry.toString()) : null,
-				endYear: endYearEntry != '' ? parseInt(endYearEntry.toString()) : null,
-				imageUrls: imageUrlEntry != '' ? [imageUrlEntry.toString()] : []
-			};
+			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
+			const startYear = startYearEntry != '' ? parseInt(startYearEntry.toString()) : null;
+			const endYear = endYearEntry != '' ? parseInt(endYearEntry.toString()) : null;
+			const imageUrls = imageUrlEntry != '' ? [imageUrlEntry.toString()] : [];
 
-			const apiUrl = `${PUBLIC_API_BASE}/plates/${parseInt(params.id)}`;
+			await helpUpdatePlate(parseInt(params.id), jurisdiction, startYear, endYear, imageUrls);
 
-			const response = await fetch(apiUrl, {
-				method: 'put',
-				headers: { 'content-type': 'application/json', cookie: request.headers.get('cookie') },
-				body: JSON.stringify(data)
-			});
-
-			if (response.status == 200) {
-				throw redirect(300, `/plates/${params.id}/edit`);
-			} else {
-				throw error(400, await response.json());
-			}
+			throw redirect(300, `/plates/${params.id}/edit`);
 		} else {
-			return invalid(403, { message: `not admin` });
+			return error(403, { message: `not admin` });
+		}
+	},
+	delete: async ({ locals, params }) => {
+		if (locals.sessionUser?.isAdmin) {
+			const modelId = parseInt(params.id);
+			await deletePlate(modelId);
+
+			throw redirect(300, `/plates`);
+		} else {
+			throw error(403, 'not admin');
 		}
 	}
 };

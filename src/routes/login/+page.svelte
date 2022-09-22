@@ -12,7 +12,7 @@
 
 	export let form: ActionData;
 
-	$: redirectUrl = $page.url.searchParams.get('redirectUrl');
+	$: redirectUrl = form?.redirectUrl || $page.url.searchParams.get('redirectUrl');
 
 	let email = form?.originalEmail;
 	let passphrase = '';
@@ -27,7 +27,7 @@
 	<title>login</title>
 </svelte:head>
 
-<form id={loginFormId} action={'/login?/' + actionName} method="post" />
+<form id={loginFormId} action="/login?/{actionName}" method="post" />
 <Card>
 	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
 	<input type="hidden" name="generated" form={loginFormId} value={!form?.generated} />

@@ -4,23 +4,10 @@
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
-	import { storeScores } from '$lib/api/scores';
-
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: ({ jurisdiction, categories, user } = data);
-
-	$: platesInfo = jurisdiction.plates.map((plate) => {
-		const { userScores, editorialScores, allScores } = storeScores(
-			plate.model.scores,
-			plate.modelId,
-			user?.id,
-			categories
-		);
-
-		return { plate, userScores, editorialScores, allScores };
-	});
+	$: ({ jurisdiction, categories, platesInfo } = data);
 </script>
 
 <svelte:head>

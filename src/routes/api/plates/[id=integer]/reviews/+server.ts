@@ -1,14 +1,14 @@
 import { error, json } from '@sveltejs/kit';
 
-import { insertReview } from '$lib/server/database/reviews';
+import { upsertReview } from '$lib/server/database/reviews';
 
 import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ locals, request, params }) => {
-	if (locals.user) {
+	if (locals.sessionUser) {
 		const { description }: { description: string } = await request.json();
 
 		const modelId = parseInt(params.id);
-		const userId: number = locals.user.id;
+		const userId: number = locals.sessionUser.id;
 
 		const data = {
 			modelId,
@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ locals, request, params }) => {
 			description: description || undefined
 		};
 
-		const review = await insertReview(data);
+		const review = await upsertReview(data);
 
 		return json(review);
 	} else {

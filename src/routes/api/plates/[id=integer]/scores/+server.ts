@@ -4,7 +4,7 @@ import { getScores } from '$lib/server/database/scores';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, url, params }) => {
-	const userId = locals.user?.id || parseInt(url.searchParams.get('userId'));
+	const userId = locals.sessionUser?.id || parseInt(url.searchParams.get('userId'));
 	if (userId) {
 		const parsedParams = { modelId: parseInt(params.id), userId: userId };
 		const scores = await getScores(parsedParams);

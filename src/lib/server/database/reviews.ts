@@ -2,7 +2,12 @@ import { prisma } from '.';
 import type { Review } from '@prisma/client';
 
 export async function getReview(params: Partial<Omit<Review, 'explanation'>>): Promise<Review> {
-	const review = await prisma.review.findUniqueOrThrow({ where: params });
+	const review = await prisma.review.findUnique({
+		where: {
+			id: params.id,
+			Review_userId_modelId_unique: { userId: params.userId, modelId: params.modelId }
+		}
+	});
 
 	return review;
 }
@@ -17,7 +22,7 @@ export async function getReviews(
 	return reviews;
 }
 
-export async function insertReview(
+export async function upsertReview(
 	params: Partial<Review> & Pick<Review, 'modelId' | 'userId'>
 ): Promise<Review> {
 	const review = await prisma.review.upsert({

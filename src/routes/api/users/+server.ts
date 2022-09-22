@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 	const user = await getUser({ serial });
 
 	if (user) {
-		if (!locals.user?.isAdmin) {
+		if (!locals.sessionUser?.isAdmin) {
 			user.email = null;
 		}
 

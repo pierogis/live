@@ -24,7 +24,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				if (!user) {
 					throw 'cookie user not in database';
 				}
-				event.locals.user = user;
+				event.locals.sessionUser = user;
 			}
 		} catch {
 			deleteCookie = true;

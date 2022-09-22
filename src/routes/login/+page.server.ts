@@ -31,6 +31,9 @@ export const actions: Actions = {
 
 		const emailEntry = formData.get('email');
 
+		const redirectUrlEntry = formData.get('redirectUrl');
+		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
+
 		if (emailEntry) {
 			const originalEmail = emailEntry.toString();
 			const generatedPassphrase = dev ? DEV_PASSPHRASE : await sendPassphraseEmail(originalEmail);
@@ -38,12 +41,14 @@ export const actions: Actions = {
 			await setEmailPassphrase(originalEmail, generatedPassphrase);
 
 			return {
+				redirectUrl,
 				originalEmail,
 				generated: true,
 				flowCode: FlowCode.Generated
 			};
 		} else {
 			return invalid(400, {
+				redirectUrl,
 				originalEmail: '',
 				generated: false,
 				flowCode: FlowCode.NoEmail
@@ -58,6 +63,9 @@ export const actions: Actions = {
 
 		const correctPassphrase = await getEmailPassphrase(email);
 
+		const redirectUrlEntry = formData.get('redirectUrl');
+		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
+
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
 				let user: User = await getUser({ email });
@@ -67,12 +75,10 @@ export const actions: Actions = {
 
 				await setSessionCookie(event.cookies, { userId: user.id });
 
-				const redirectUrlEntry = formData.get('redirectUrl');
-				const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
-
 				throw redirect(300, redirectUrl);
 			} else {
 				return invalid(400, {
+					redirectUrl,
 					originalEmail: email,
 					generated: false,
 					flowCode: FlowCode.BadPassphrase
@@ -80,6 +86,7 @@ export const actions: Actions = {
 			}
 		} else {
 			return invalid(400, {
+				redirectUrl,
 				originalEmail: email,
 				generated: true,
 				flowCode: FlowCode.BadEmail
@@ -91,7 +98,11 @@ export const actions: Actions = {
 
 		const originalEmail = formData.get('email').toString();
 
+		const redirectUrlEntry = formData.get('redirectUrl');
+		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
+
 		return {
+			redirectUrl,
 			flowCode: undefined,
 			generated: false,
 			originalEmail
@@ -104,7 +115,11 @@ export const actions: Actions = {
 
 		const originalEmail = emailEntry.toString();
 
+		const redirectUrlEntry = formData.get('redirectUrl');
+		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
+
 		return {
+			redirectUrl,
 			flowCode: undefined,
 			generated: true,
 			originalEmail

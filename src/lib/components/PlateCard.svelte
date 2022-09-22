@@ -25,7 +25,7 @@
 		>
 	{/if}
 
-	<a class="jurisdiction-link" href={'/jurisdictions/' + plate.jurisdiction.id}
+	<a class="link-box border inset shadow" href={'/jurisdictions/' + plate.jurisdiction.id}
 		>{plate.jurisdiction.abbreviation}</a
 	>
 
@@ -61,11 +61,6 @@
 		left: 0.4rem;
 	}
 
-	.jurisdiction-link {
-		text-decoration: underline;
-	}
-
-	.jurisdiction-link,
 	.plate-link {
 		color: var(--text-color);
 	}

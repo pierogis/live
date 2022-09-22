@@ -24,7 +24,7 @@ function getPassphraseKey(email: string) {
 
 export async function setEmailPassphrase(email: string, passphrase: string) {
 	const key = getPassphraseKey(email);
-	const value = await encrypt(passphrase);
+	const value = encrypt(passphrase);
 	await cache.multi().set(key, value).expire(key, 120).exec();
 }
 

@@ -38,11 +38,18 @@ export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>) {
 	return user;
 }
 
-export async function updateUser(
-	user: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'id'>
+export async function updateUserById(
+	id: number,
+	data: Partial<Omit<User, 'isAdmin' | 'id'>>
 ): Promise<User> {
-	const { id, ...data } = user;
 	return await prisma.user.update({ where: { id }, data });
+}
+
+export async function updateUserBySerial(
+	serial: string,
+	data: Partial<Omit<User, 'isAdmin' | 'id'>>
+): Promise<User> {
+	return await prisma.user.update({ where: { serial }, data });
 }
 
 export async function deleteUser(id: number): Promise<User> {

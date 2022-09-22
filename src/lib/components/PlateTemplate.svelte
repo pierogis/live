@@ -1,28 +1,23 @@
 <script lang="ts">
 	import type { Jurisdiction } from '@prisma/client';
 
-	import { goto } from '$app/navigation';
-	import { PUBLIC_API_BASE } from '$env/static/public';
-
 	import type { FullPlate } from '$lib/models';
 
 	import { Card } from '@pierogis/utensils';
 
 	export let jurisdictions: Jurisdiction[];
 	export let plate: FullPlate = null;
-
-	async function handleDelete(_event: MouseEvent) {
-		await fetch(`${PUBLIC_API_BASE}/plates/${plate.modelId}`, { method: 'delete' });
-		goto('/plates');
-	}
 </script>
 
 <Card>
 	{#if plate}
 		<a class="back" href={`/plates/${plate.modelId}`}>🔙</a>
-		<form class="delete" action={`/plates/${plate.modelId}/delete`} method="post">
-			<input class="no-select" type="submit" value="❌" on:click|preventDefault={handleDelete} />
-		</form>
+		<input
+			class="delete no-select"
+			type="submit"
+			formaction={`/plates/${plate.modelId}/edit?/delete`}
+			value="❌"
+		/>
 	{/if}
 
 	<input

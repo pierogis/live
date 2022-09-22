@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
+	import { writable } from 'svelte/store';
 
+	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
 	import ReviewCard from '$lib/components/ReviewCard.svelte';
-	import { storeScores } from '$lib/api/scores';
 
 	import type { PageData } from './$types';
 	export let data: PageData;
-	$: ({ user, isUser, isAdmin, categories } = data);
+	$: ({ user, isUser, isAdmin, categories, reviewsScores } = data);
 
 	$: originalSerial = user.serial;
 	$: originalEmail = user.email;
@@ -21,12 +21,12 @@
 		{#if isAdmin}
 			<span>#{user.id}</span>
 		{/if}
-		<span>{user.serial}</span>
+		<span class="link-box">{user.serial}</span>
 	</Card>
 {/if}
 
 {#if isUser || isAdmin}
-	<form action="/users/{user.id}/edit" method="post">
+	<form method="post">
 		<Card>
 			{#if isAdmin}
 				<span>#{user.id}</span>
@@ -59,7 +59,7 @@
 					</button>
 				{/if}
 
-				<a href={`/users/${user.id}/delete`}>
+				<a href={`/users/${user.serial}/delete`}>
 					<button class="bad border inset shadow no-select">delete</button>
 				</a>
 			</div>
@@ -71,14 +71,14 @@
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="reviews">
+<Section title="reviews" column>
 	{#if user.reviews.length > 0}
 		<CardsGrid>
 			{#each user.reviews as review}
 				<ReviewCard
 					{categories}
-					{review}
-					scores={storeScores(review.model.scores, review.modelId, user?.id, categories).allScores}
+					review={writable({ ...review, user })}
+					scores={reviewsScores[review.id]}
 				>
 					<a href="/plates/{review.modelId}">
 						<ImageDisplay

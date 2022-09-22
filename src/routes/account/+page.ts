@@ -4,9 +4,9 @@ import type { PageLoad } from './$types';
 export const load: PageLoad = async ({ parent }) => {
 	let location = '/login';
 
-	const { user } = await parent();
-	if (user) {
-		location = `/users/${user.serial}`;
+	const { sessionUser } = await parent();
+	if (sessionUser) {
+		location = `/users/${sessionUser.serial}`;
 	}
 
 	throw redirect(301, location);

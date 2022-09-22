@@ -1,1 +1,2 @@
-export const valueEntryName = 'value';
+export const valueInputName = 'value';
+export const categoryIdInputName = 'id';

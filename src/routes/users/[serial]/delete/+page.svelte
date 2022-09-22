@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { userIdInputName } from '$lib/forms/user';
+
 	import { Card } from '@pierogis/utensils';
 
 	import type { PageData, ActionData } from './$types';
@@ -17,7 +19,7 @@
 		<span>Are you sure you want to delete this account?</span>
 		<b>{user.email}</b>
 		<div class="buttons">
-			<a href={`/users/${user.id}`}>
+			<a href={`/users/${user.serial}`}>
 				<button class="border inset shadow no-select">cancel</button>
 			</a>
 
@@ -32,7 +34,9 @@
 	</div>
 {/if}
 
-<form id="delete" method="post" />
+<form id="delete" method="post">
+	<input hidden name={userIdInputName} value={user.id} />
+</form>
 
 <style>
 	span {
