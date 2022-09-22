@@ -30,8 +30,6 @@ export const actions: Actions = {
 				...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
 			};
 
-			console.log(data);
-
 			const user = await updateUserBySerial(params.serial, data);
 
 			// redirect to the updated user
