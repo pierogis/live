@@ -15,8 +15,6 @@
 		position: relative;
 
 		background-color: var(--primary-color);
-
-		overflow: scroll;
 	}
 
 	:global(.card > *) {
