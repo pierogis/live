@@ -38,7 +38,6 @@
 		"eslint": "^8.36.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-svelte3": "^4.0.0",
-		"micromatch": "^4.0.5",
 		"prettier": "^2.8.6",
 		"prettier-plugin-svelte": "^2.10.0",
 		"svelte": "^3.57.0",
@@ -47,5 +46,19 @@
 		"tslib": "^2.5.0",
 		"typescript": "~5.0.2"
 	},
-	"type": "module"
+	"dependencies": {
+		"svelte": "^3.57.0"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"svelte": "./dist/index.js"
 }
