@@ -43,7 +43,7 @@
 <br />
 
 <form>
-	<textarea class="inset" type="text" rows="6" bind:value={$paletteStore} />
+	<textarea class="inset" rows="6" bind:value={$paletteStore} />
 	<br />
 	<div class="import-export">
 		<button
