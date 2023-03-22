@@ -1,4 +1,4 @@
-import { invalid, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 import type { Plate } from '@prisma/client';
 
@@ -33,7 +33,7 @@ export const actions: Actions = {
 			const imageUrlEntry = formData.get('imageUrl');
 
 			if (!jurisdictionEntry) {
-				return invalid(400, { message: `jurisdiction not provided` });
+				return fail(400, { message: `jurisdiction not provided` });
 			}
 
 			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
@@ -45,7 +45,7 @@ export const actions: Actions = {
 
 			throw redirect(300, `/plates/${plate.modelId}`);
 		} else {
-			return invalid(403, { message: `not admin` });
+			return fail(403, { message: `not admin` });
 		}
 	}
 };

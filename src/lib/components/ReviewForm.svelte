@@ -31,7 +31,6 @@
 	form={reviewFormId}
 	name={reviewDescriptionInputName}
 	required
-	type="text"
 	rows="10"
 	bind:value={description}
 />

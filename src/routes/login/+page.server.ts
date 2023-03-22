@@ -1,4 +1,4 @@
-import { invalid, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 import type { User } from '@prisma/client';
 
@@ -47,7 +47,7 @@ export const actions: Actions = {
 				flowCode: FlowCode.Generated
 			};
 		} else {
-			return invalid(400, {
+			return fail(400, {
 				redirectUrl,
 				originalEmail: '',
 				generated: false,
@@ -77,7 +77,7 @@ export const actions: Actions = {
 
 				throw redirect(300, redirectUrl);
 			} else {
-				return invalid(400, {
+				return fail(400, {
 					redirectUrl,
 					originalEmail: email,
 					generated: false,
@@ -85,7 +85,7 @@ export const actions: Actions = {
 				});
 			}
 		} else {
-			return invalid(400, {
+			return fail(400, {
 				redirectUrl,
 				originalEmail: email,
 				generated: true,

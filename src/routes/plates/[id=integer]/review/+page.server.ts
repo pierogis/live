@@ -5,7 +5,7 @@ import {
 	reviewUserIdInputName
 } from '$lib/forms/review';
 
-import { invalid, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ parent, params }) => {
@@ -72,7 +72,7 @@ export const actions: Actions = {
 			const userId: number = locals.sessionUser.id;
 
 			if (userId != reviewUserId && !locals.sessionUser.isAdmin) {
-				return invalid(401, { message: 'not user' });
+				return fail(401, { message: 'not user' });
 			}
 
 			const reviewParams = {

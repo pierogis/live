@@ -1,4 +1,4 @@
-import { error, invalid } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 import { getUser } from '$lib/server/database/users';
 
@@ -23,13 +23,13 @@ export const actions: Actions = {
 
 			const valueEntry = formData.get(valueInputName);
 			if (!valueEntry) {
-				return invalid(400, { message: 'no value provided' });
+				return fail(400, { message: 'no value provided' });
 			}
 			const value = parseInt(valueEntry.toString());
 
 			const categoryIdEntry = formData.get(categoryIdInputName);
 			if (!categoryIdEntry) {
-				return invalid(400, { message: 'no categoryId provided' });
+				return fail(400, { message: 'no categoryId provided' });
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 
@@ -37,7 +37,7 @@ export const actions: Actions = {
 			const userId: number = locals.sessionUser.id;
 
 			if (value < 0 || value > 10) {
-				return invalid(400, { message: 'score value less than 0 or greater than 10' });
+				return fail(400, { message: 'score value less than 0 or greater than 10' });
 			}
 
 			const data = {
@@ -60,7 +60,7 @@ export const actions: Actions = {
 
 			const categoryIdEntry = formData.get(categoryIdInputName);
 			if (!categoryIdEntry) {
-				return invalid(400, { message: 'no categoryId provided' });
+				return fail(400, { message: 'no categoryId provided' });
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 

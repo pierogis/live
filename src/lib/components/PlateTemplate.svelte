@@ -69,7 +69,7 @@
 			maxlength="4"
 		/>
 	</span>
-	<input class="border inset shadow no-select" type="submit" method="post" value="submit" />
+	<input class="border inset shadow no-select" type="submit" formmethod="post" value="submit" />
 </Card>
 
 <style>

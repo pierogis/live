@@ -33,8 +33,8 @@
 					<input
 						class="clear"
 						type="submit"
-						action="{scoreUrl}?/delete"
-						method="post"
+						formaction="{scoreUrl}?/delete"
+						formmethod="post"
 						on:click|preventDefault={() => {
 							categoryUserScore.update((score) => {
 								score.value = null;

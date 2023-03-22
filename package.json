@@ -25,8 +25,9 @@
 		"db:migrate": "prisma migrate dev",
 		"db:seed": "prisma db seed",
 		"db:reset": "prisma migrate reset",
-		"check": "svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "playwright test",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. . && prisma format",
 		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
 		"lint:fix": "eslint --fix --ignore-path .gitignore ."
@@ -35,7 +36,7 @@
 		"seed": "node --experimental-specifier-resolution=node --loader ts-node/esm prisma/seeds/index.ts"
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.3.1",
+		"@pierogis/utensils": "^0.3.2",
 		"@sveltejs/adapter-auto": "2.0.0",
 		"@sveltejs/kit": "^1.13.0",
 		"@types/nodemailer": "^6.4.7",

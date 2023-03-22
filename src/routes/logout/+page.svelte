@@ -1,1 +1,1 @@
-<button class="border inset shadow link-box" type="submit" action="/">logout</button>
+<button class="border inset shadow link-box" type="submit" formaction="/">logout</button>
