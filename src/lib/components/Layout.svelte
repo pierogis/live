@@ -2,6 +2,7 @@
 	import { setContext } from 'svelte';
 	import { writable, derived, type Writable } from 'svelte/store';
 
+	import { localStorageThemeKey } from "$lib/components/theme";
 	import { storedThemeContextKey, syncThemeAction, Theme } from './theme';
 
 	export let title: string;
@@ -29,6 +30,14 @@
 		href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap"
 		rel="stylesheet"
 	/>
+
+	{@html `
+		<script>
+			let theme = localStorage.getItem('${localStorageThemeKey}')
+
+			document.documentElement.setAttribute('data-theme', theme)
+		</script>
+	`}
 </svelte:head>
 
 <svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />

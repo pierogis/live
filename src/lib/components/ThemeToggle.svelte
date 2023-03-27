@@ -43,6 +43,11 @@
 </div>
 
 <style>
+	/* little hack to prevent display before dark mode is ready in local storage */
+	:global(body[data-no-js]) button {
+		display: none;
+	}
+
 	.link-box {
 		display: flex;
 		place-items: center;

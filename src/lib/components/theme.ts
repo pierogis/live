@@ -6,6 +6,7 @@ export enum Theme {
 }
 
 export const storedThemeContextKey = 'storedTheme';
+export const localStorageThemeKey = 'theme';
 
 export function syncThemeAction(
 	window: Window,
@@ -13,7 +14,7 @@ export function syncThemeAction(
 ) {
 	const { storedTheme, osTheme, theme } = params;
 
-	storedTheme.set(localStorage.getItem('theme') as Theme);
+	storedTheme.set(localStorage.getItem(localStorageThemeKey) as Theme);
 
 	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
 		if (event.matches) {
@@ -25,9 +26,9 @@ export function syncThemeAction(
 
 	storedTheme.subscribe(($storedTheme) => {
 		if ($storedTheme) {
-			window.localStorage.setItem('theme', $storedTheme);
+			window.localStorage.setItem(localStorageThemeKey, $storedTheme);
 		} else {
-			window.localStorage.removeItem('theme');
+			window.localStorage.removeItem(localStorageThemeKey);
 		}
 	});
 
