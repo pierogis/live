@@ -17,7 +17,7 @@
 		"website"
 	],
 	"scripts": {
-		"dev": "vite dev --port 3000",
+		"dev": "vite dev",
 		"build": "vite build",
 		"postinstall": "prisma generate",
 		"package": "svelte-package",
@@ -36,7 +36,7 @@
 		"seed": "node --experimental-specifier-resolution=node --loader ts-node/esm prisma/seeds/index.ts"
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.3.2",
+		"@pierogis/utensils": "^0.3.3",
 		"@sveltejs/adapter-auto": "2.0.0",
 		"@sveltejs/kit": "^1.13.0",
 		"@types/nodemailer": "^6.4.7",
