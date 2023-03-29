@@ -43,7 +43,7 @@ export const actions: Actions = {
 
 			const plate: Plate = await helpCreatePlate(jurisdiction, startYear, endYear, imageUrls);
 
-			throw redirect(300, `/plates/${plate.modelId}`);
+			throw redirect(303, `/plates/${plate.modelId}`);
 		} else {
 			return fail(403, { message: `not admin` });
 		}

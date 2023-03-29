@@ -41,7 +41,7 @@ export const actions: Actions = {
 
 				await deleteReview({ modelId, userId: reviewUserId });
 
-				throw redirect(300, `/plates/${modelId}`);
+				throw redirect(303, `/plates/${modelId}`);
 			} else {
 				const reviewId = parseInt(reviewIdEntry.toString());
 
@@ -54,7 +54,7 @@ export const actions: Actions = {
 
 				await upsertReview(data);
 
-				throw redirect(300, `/plates/${modelId}`);
+				throw redirect(303, `/plates/${modelId}`);
 			}
 		} else {
 			throw redirect(302, `/login`);
@@ -81,7 +81,7 @@ export const actions: Actions = {
 			};
 
 			await deleteReview(reviewParams);
-			throw redirect(300, `/plates/${modelId}`);
+			throw redirect(303, `/plates/${modelId}`);
 		} else {
 			throw redirect(302, `/login`);
 		}

@@ -21,7 +21,7 @@ export const actions: Actions = {
 
 			await helpUpdatePlate(parseInt(params.id), jurisdiction, startYear, endYear, imageUrls);
 
-			throw redirect(300, `/plates/${params.id}/edit`);
+			throw redirect(303, `/plates/${params.id}/edit`);
 		} else {
 			return error(403, { message: `not admin` });
 		}
@@ -31,7 +31,7 @@ export const actions: Actions = {
 			const modelId = parseInt(params.id);
 			await deletePlate(modelId);
 
-			throw redirect(300, `/plates`);
+			throw redirect(303, `/plates`);
 		} else {
 			throw error(403, 'not admin');
 		}
