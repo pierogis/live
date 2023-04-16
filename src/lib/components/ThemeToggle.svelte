@@ -1,10 +1,18 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
+	import { writable, derived, type Writable } from 'svelte/store';
 
-	import { Theme, storedThemeContextKey } from './theme';
+	import { localStorageThemeKey, syncThemeAction, Theme } from './theme';
 
-	const storedTheme: Writable<Theme | null> = getContext(storedThemeContextKey);
+	const storedTheme: Writable<Theme | null> = writable();
+	const osTheme: Writable<Theme> = writable(Theme.Light);
+
+	const theme = derived([storedTheme, osTheme], ([$storedTheme, $osTheme]) => {
+		if ($storedTheme) {
+			return $storedTheme;
+		} else {
+			return $osTheme;
+		}
+	});
 
 	function toggleTheme(theme: Theme) {
 		$storedTheme = theme;
@@ -14,6 +22,16 @@
 		$storedTheme = null;
 	}
 </script>
+
+<svelte:head>
+	{@html `
+		<script>
+			document.documentElement.setAttribute('data-theme', localStorage.getItem('${localStorageThemeKey}'))
+		</script>
+	`}
+</svelte:head>
+
+<svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />
 
 <div class="link-box">
 	<div class="holder">
@@ -43,7 +61,7 @@
 </div>
 
 <style>
-	/* little hack to prevent display before dark mode is ready in local storage */
+	/* little hack to prevent display if no js */
 	:global(body[data-no-js]) button {
 		display: none;
 	}

@@ -1,11 +1,10 @@
 import type { Readable, Writable } from 'svelte/store';
 
 export enum Theme {
-	Light = 'Light',
-	Dark = 'Dark'
+	Light = 'light',
+	Dark = 'dark'
 }
 
-export const storedThemeContextKey = 'storedTheme';
 export const localStorageThemeKey = 'theme';
 
 export function syncThemeAction(

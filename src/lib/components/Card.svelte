@@ -6,6 +6,7 @@
 	.card {
 		padding: 0.4rem;
 		max-width: 80vw;
+		height: 100%;
 
 		display: flex;
 		flex-direction: column;

@@ -6,27 +6,19 @@
 	export let alt: string;
 </script>
 
-<img
-	class="inset shadow"
-	style:--width={width}
-	style:--height={height}
-	src={urls[0] || ''}
-	{width}
-	{height}
-	{alt}
-/>
+<img class="inset shadow" style:--width={width} style:--height={height} src={urls[0] || ''} {alt} />
 
 <style>
 	img {
 		object-fit: contain;
 
-		border-top: solid 0.2rem var(--text-color);
-		border-left: solid 0.2rem var(--text-color);
-		border-bottom: solid 0.2rem var(--text-color);
-		border-right: solid 0.2rem var(--text-color);
+		border: solid 0.2rem var(--text-color);
 		border-radius: 0.6rem;
 
-		width: var(--width);
-		height: var(--height);
+		max-width: var(--width);
+		max-height: var(--height);
+
+		width: 100%;
+		height: 100%;
 	}
 </style>

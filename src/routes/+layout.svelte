@@ -17,6 +17,3 @@
 		<ThemeToggle />
 	</footer>
 </Layout>
-
-<style>
-</style>

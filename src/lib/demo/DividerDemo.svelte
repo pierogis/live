@@ -6,9 +6,9 @@
 <Divider size={'4px'} horizontal />
 <div class="horizontal-divider-flexbox">
 	<span>can separate horizontally</span>
-	<br />
+
 	<Divider size={'4px'} />
-	<br />
+
 	<span>or vertically</span>
 </div>
 
@@ -21,5 +21,8 @@
 	}
 	.horizontal-divider-flexbox > span {
 		flex: 1 1 0px;
+		width: 100%;
+		text-align: center;
+		overflow: scroll;
 	}
 </style>

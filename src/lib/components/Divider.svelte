@@ -13,16 +13,8 @@
 		background-color: var(--accent-color);
 	}
 
-	@media only screen and (max-width: 40rem) {
-		.divider {
-			height: var(--size);
-			width: 100%;
-		}
-	}
-
 	.divider.horizontal {
 		height: var(--size);
-		width: 90vw;
-		margin: 1rem;
+		width: 90%;
 	}
 </style>

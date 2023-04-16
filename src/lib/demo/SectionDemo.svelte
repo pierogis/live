@@ -27,45 +27,45 @@
 			</label>
 		</div>
 
-		<div>
+		<div class="size-group">
 			<label>
 				columnGap
 				<input class="inset" type="number" bind:value={columnGap} />
 			</label>
 
-			<br />
+			<div class="radio-group">
+				<label>
+					<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="rem" />
+					rem
+				</label>
 
-			<label>
-				<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="rem" />
-				rem
-			</label>
-
-			<label>
-				<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="px" />
-				px
-			</label>
+				<label>
+					<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="px" />
+					px
+				</label>
+			</div>
 		</div>
 
-		<div>
+		<div class="size-group">
 			<label>
 				rowGap
 				<input class="inset" type="number" bind:value={rowGap} />
 			</label>
 
-			<br />
+			<div class="radio-group">
+				<label>
+					<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="rem" />
+					rem
+				</label>
 
-			<label>
-				<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="rem" />
-				rem
-			</label>
-
-			<label>
-				<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="px" />
-				px
-			</label>
+				<label>
+					<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="px" />
+					px
+				</label>
+			</div>
 		</div>
 
-		<div>
+		<div class="radio-group">
 			<label>
 				<input type="radio" bind:group={sectionColumn} name="column" value={true} />
 				column
@@ -94,5 +94,23 @@
 
 	input[type='number'] {
 		width: 2rem;
+	}
+	label:has(input[type='number']) {
+		display: flex;
+		justify-content: right;
+		align-items: center;
+		gap: 10px;
+	}
+	.size-group {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 4px;
+	}
+	.radio-group {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
 	}
 </style>

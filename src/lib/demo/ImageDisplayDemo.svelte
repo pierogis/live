@@ -18,44 +18,55 @@
 />
 <span>can definitely display an image wrapped in a border</span>
 
-<div>
+<div class="input-group">
 	<label>
 		width
 		<input class="inset" type="number" bind:value={width} />
 	</label>
-	<br />
 
-	<label>
-		<input type="radio" bind:group={widthUnit} name="widthUnit" value={'rem'} />
-		rem
-	</label>
+	<div class="radio-group">
+		<label>
+			<input type="radio" bind:group={widthUnit} name="widthUnit" value={'rem'} />
+			rem
+		</label>
 
-	<label>
-		<input type="radio" bind:group={widthUnit} name="widthUnit" value={'px'} />
-		px
-	</label>
+		<label>
+			<input type="radio" bind:group={widthUnit} name="widthUnit" value={'px'} />
+			px
+		</label>
+	</div>
 </div>
-<div>
+<div class="input-group">
 	<label>
 		height
 
 		<input class="inset" type="number" bind:value={height} />
 	</label>
-	<br />
 
-	<label>
-		<input type="radio" bind:group={heightUnit} name="heightUnit" value={'rem'} />
-		rem
-	</label>
+	<div class="radio-group">
+		<label>
+			<input type="radio" bind:group={heightUnit} name="heightUnit" value={'rem'} />
+			rem
+		</label>
 
-	<label>
-		<input type="radio" bind:group={heightUnit} name="heightUnit" value={'px'} />
-		px
-	</label>
+		<label>
+			<input type="radio" bind:group={heightUnit} name="heightUnit" value={'px'} />
+			px
+		</label>
+	</div>
 </div>
 
 <style>
 	input[type='number'] {
 		width: 4rem;
+	}
+	.input-group {
+		display: flex;
+		flex-direction: column;
+	}
+	.radio-group {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
 	}
 </style>
