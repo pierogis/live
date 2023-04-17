@@ -3,38 +3,50 @@
 
 	import { CardsGrid, Divider, Section } from '@pierogis/utensils';
 
-	import PlateCard from '$lib/components/PlateCard.svelte';
-	import ReviewCard from '$lib/components/ReviewCard.svelte';
-	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
-	import ReviewForm from '$lib/components/ReviewForm.svelte';
+	import { storeScores } from '$lib/api/scores';
+	import { storeReviews } from '$lib/api/reviews';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
-	$: ({
-		categories,
-		plate,
-		sessionUser,
-		userReview,
-		editorialReview,
-		allReviews,
-		userScores,
-		editorialScores,
-		allScores
-	} = data);
+	import { PlateCard, ReviewCard, ScoreSheet, ReviewForm } from '$lib/components';
 
-	$: scoreUrl = `/plates/${plate.modelId}/scores/`;
+	export let data;
+
+	const reviewStores = storeReviews(
+		data.plate.model.reviews,
+		data.plate.modelId,
+		data.sessionUser?.id
+	);
+
+	const userReview = reviewStores.userReview;
+	const editorialReview = reviewStores.editorialReview;
+	const allReviews = reviewStores.allReviews;
+
+	const scoreStores = storeScores(
+		data.plate.model.scores,
+		data.plate.modelId,
+		data.sessionUser?.id,
+		data.categories,
+		fetch
+	);
+
+	const userScores = scoreStores.userScores;
+	const editorialScores = scoreStores.editorialScores;
+	const allScores = scoreStores.allScores;
+
+	$: scoreUrl = `/plates/${data.plate.modelId}/scores/`;
 
 	$: allReviewsStores = allReviews.map((review) => review);
 </script>
 
 <svelte:head>
-	<title>{plate.jurisdiction.name} plate ({plate.startYear || '?'}-{plate.endYear || '?'})</title>
+	<title>
+		{data.plate.jurisdiction.name} plate ({data.plate.startYear || '?'}-{data.plate.endYear || '?'})
+	</title>
 </svelte:head>
 
 <Section>
-	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
+	<PlateCard plate={data.plate} isAdmin={data.sessionUser?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
+	<ScoreSheet categories={data.categories} {editorialScores} graphScores={allScores} />
 
 	{#if $editorialReview.description}
 		<div class="break-container">
@@ -45,12 +57,12 @@
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="user review" column>
-	{#if sessionUser}
-		<ScoreSheet {categories} {userScores} {scoreUrl} />
-		<ReviewForm {plate} review={userReview} />
+<Section title="user review" column rowGap={'0.5rem'}>
+	{#if data.sessionUser}
+		<ScoreSheet categories={data.categories} {userScores} {scoreUrl} />
+		<ReviewForm plate={data.plate} review={userReview} />
 	{:else}
-		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
+		{@const loginUrl = `/login?redirectUrl=/plates/${data.plate.modelId}`}
 		<a
 			class="border inset shadow good no-select link-box"
 			href={loginUrl}
@@ -66,7 +78,7 @@
 <Section title="reviews" column>
 	<CardsGrid>
 		{#each allReviewsStores as review}
-			<ReviewCard {categories} {review} scores={allScores} />
+			<ReviewCard categories={data.categories} {review} scores={allScores} />
 		{/each}
 	</CardsGrid>
 </Section>

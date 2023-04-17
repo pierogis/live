@@ -1,5 +1,4 @@
-import type { PageLoad } from './$types';
-export const load: PageLoad = async ({ parent, params, data }) => {
+export const load = async ({ parent, params, data }) => {
 	const { user, plate, categories } = data;
 
 	const { sessionUser } = await parent();

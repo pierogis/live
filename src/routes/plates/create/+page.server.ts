@@ -5,10 +5,9 @@ import type { Plate } from '@prisma/client';
 import { protect } from '$lib/helpers';
 import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
-import type { Actions, PageServerLoad } from './$types';
 import { helpCreatePlate } from '$lib/server/database/plates';
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load = async ({ parent }) => {
 	async function handle() {
 		const jurisdictions = await getJurisdictions({});
 
@@ -22,7 +21,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 	return protect(sessionUser, handle);
 };
 
-export const actions: Actions = {
+export const actions = {
 	default: async ({ locals, request }) => {
 		if (locals.sessionUser?.isAdmin) {
 			const formData: FormData = await request.formData();

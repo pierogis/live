@@ -4,14 +4,13 @@ import { deleteUser } from '$lib/server/database/users';
 
 import { userIdInputName } from '$lib/forms/user';
 
-import type { Actions, PageServerLoad } from './$types';
-export const load: PageServerLoad = async ({ parent }) => {
+export const load = async ({ parent }) => {
 	const { user } = await parent();
 
 	return { user };
 };
 
-export const actions: Actions = {
+export const actions = {
 	default: async ({ locals, params, request }) => {
 		if (!locals.sessionUser) {
 			return fail(401, { message: `not signed in` });

@@ -5,10 +5,9 @@
 
 	import { Card } from '@pierogis/utensils';
 
-	import PlateCard from '$lib/components/PlateCard.svelte';
+	import { PlateCard } from '$lib/components';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
+	export let data;
 	$: ({ categories, plate, scores, serial, isUser } = data);
 
 	$: scoreSet = scores.reduce<{ [categoryId: number]: number }>((previous, score) => {

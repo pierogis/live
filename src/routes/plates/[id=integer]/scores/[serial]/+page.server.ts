@@ -6,8 +6,7 @@ import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import { valueInputName, categoryIdInputName } from './_form';
 
-import type { PageServerLoad } from './$types';
-export const load: PageServerLoad = async ({ parent, params }) => {
+export const load = async ({ parent, params }) => {
 	const { plate, categories } = await parent();
 
 	const user = await getUser({ serial: params.serial });
@@ -15,8 +14,7 @@ export const load: PageServerLoad = async ({ parent, params }) => {
 	return { user, plate, categories };
 };
 
-import type { Actions } from './$types';
-export const actions: Actions = {
+export const actions = {
 	update: async ({ locals, request, params }) => {
 		if (locals.sessionUser) {
 			const formData: FormData = await request.formData();

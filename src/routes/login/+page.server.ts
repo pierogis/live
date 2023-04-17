@@ -12,10 +12,9 @@ import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
 
 import { FlowCode } from './_flow';
 
-import type { Actions, PageServerLoad } from './$types';
 import { DEV_PASSPHRASE } from '$env/static/private';
 
-export const load: PageServerLoad = async () => {
+export const load = async () => {
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
 
@@ -25,7 +24,7 @@ export const load: PageServerLoad = async () => {
 	};
 };
 
-export const actions: Actions = {
+export const actions = {
 	generate: async (event) => {
 		const formData = await event.request.formData();
 

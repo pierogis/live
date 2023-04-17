@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { CardsGrid } from '@pierogis/utensils';
 
-	import PlateCard from '$lib/components/PlateCard.svelte';
+	import { PlateCard } from '$lib/components';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
-	$: ({ plates } = data);
+	export let data;
 </script>
 
 <svelte:head>
@@ -13,7 +11,7 @@
 </svelte:head>
 
 <CardsGrid>
-	{#each plates as plate}
+	{#each data.plates as plate}
 		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

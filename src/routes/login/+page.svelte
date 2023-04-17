@@ -3,14 +3,12 @@
 
 	import { FlowCode, flowStatuses } from './_flow';
 
-	import type { PageData, ActionData } from './$types';
-
 	import { Card } from '@pierogis/utensils';
 
-	export let data: PageData;
+	export let data;
 	$: ({ sampleEmail, samplePhrase } = data);
 
-	export let form: ActionData;
+	export let form;
 
 	$: redirectUrl = form?.redirectUrl || $page.url.searchParams.get('redirectUrl');
 

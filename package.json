@@ -36,7 +36,7 @@
 		"seed": "node --experimental-specifier-resolution=node --loader ts-node/esm prisma/seeds/index.ts"
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.4.1",
+		"@pierogis/utensils": "^0.4.2",
 		"@sveltejs/adapter-auto": "2.0.0",
 		"@sveltejs/kit": "^1.13.0",
 		"@types/nodemailer": "^6.4.7",

@@ -3,10 +3,10 @@
 
 	import ReviewForm from '$lib/components/ReviewForm.svelte';
 
-	import type { PageData } from './$types';
 	import { Section } from '@pierogis/utensils';
-	import PlateCard from '$lib/components/PlateCard.svelte';
-	export let data: PageData;
+	import { PlateCard } from '$lib/components';
+
+	export let data;
 
 	$: ({ plate, review } = data);
 </script>

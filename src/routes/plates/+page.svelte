@@ -4,8 +4,7 @@
 	import PlateCard from '$lib/components/PlateCard.svelte';
 	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
+	export let data;
 	$: ({ categories, platesInfo } = data);
 </script>
 

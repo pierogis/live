@@ -1,11 +1,10 @@
 <script lang="ts">
-	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
+	import { PlateTemplate } from '$lib/components';
 
-	import type { PageData, ActionData } from './$types';
-	export let data: PageData;
+	export let data;
 	$: ({ jurisdictions } = data);
 
-	export let form: ActionData;
+	export let form;
 </script>
 
 <svelte:head>

@@ -4,9 +4,7 @@ import type { Category, User } from '@prisma/client';
 import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
 
-import type { Actions, PageServerLoad } from './$types';
-
-export const load: PageServerLoad = async ({ parent }) => {
+export const load = async ({ parent }) => {
 	const { user } = await parent();
 
 	const categories: Category[] = await getCategories({ wareName: 'plate' });
@@ -14,7 +12,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 	return { user, categories };
 };
 
-export const actions: Actions = {
+export const actions = {
 	default: async ({ locals, request, params }) => {
 		if (!locals.sessionUser) {
 			throw error(401, `not signed in`);

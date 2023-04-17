@@ -1,3 +1,5 @@
+import { fail, redirect } from '@sveltejs/kit';
+
 import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
 import {
 	reviewDescriptionInputName,
@@ -5,10 +7,7 @@ import {
 	reviewUserIdInputName
 } from '$lib/forms/review';
 
-import { fail, redirect } from '@sveltejs/kit';
-
-import type { Actions, PageServerLoad } from './$types';
-export const load: PageServerLoad = async ({ parent, params }) => {
+export const load = async ({ parent, params }) => {
 	const { plate, sessionUser } = await parent();
 
 	const review = (await getReview({ modelId: parseInt(params.id), userId: sessionUser.id })) || {
@@ -21,7 +20,7 @@ export const load: PageServerLoad = async ({ parent, params }) => {
 	return { review, plate };
 };
 
-export const actions: Actions = {
+export const actions = {
 	update: async ({ locals, request, params }) => {
 		if (locals.sessionUser) {
 			const formData: FormData = await request.formData();

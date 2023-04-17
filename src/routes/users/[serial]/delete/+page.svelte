@@ -3,11 +3,10 @@
 
 	import { Card } from '@pierogis/utensils';
 
-	import type { PageData, ActionData } from './$types';
-	export let data: PageData;
+	export let data;
 	$: ({ user, isUser, isAdmin } = data);
 
-	export let form: ActionData;
+	export let form;
 </script>
 
 <svelte:head>

@@ -1,7 +1,6 @@
 import { storeScores } from '$lib/api/scores';
 
-import type { PageLoad } from './$types';
-export const load: PageLoad = async ({ parent, fetch, data }) => {
+export const load = async ({ parent, fetch, data }) => {
 	const { sessionUser } = await parent();
 	const { jurisdiction, categories } = data;
 

@@ -1,41 +1,61 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
+
+	import type { Score } from '@prisma/client';
+
+	import { storeScores } from '$lib/api/scores';
 
 	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
-	import ReviewCard from '$lib/components/ReviewCard.svelte';
+	import { ReviewCard } from '$lib/components';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
-	$: ({ user, isUser, isAdmin, categories, reviewsScores } = data);
+	export let data;
 
-	$: originalSerial = user.serial;
-	$: originalEmail = user.email;
+	const reviewsScores = data.user.reviews.reduce<{
+		[reviewId: number]: {
+			[categoryId: number]: Writable<Score>[];
+		};
+	}>((previous, review) => {
+		const reviewScores = storeScores(
+			review.model.scores,
+			review.modelId,
+			data.user?.id,
+			data.categories,
+			fetch
+		);
+
+		previous[review.id] = reviewScores.allScores;
+
+		return previous;
+	}, {});
+
+	$: originalSerial = data.user.serial;
+	$: originalEmail = data.user.email;
 </script>
 
 <svelte:head>
-	<title>{'user: ' + user.serial.toUpperCase()}</title>
+	<title>{'user: ' + data.user.serial.toUpperCase()}</title>
 </svelte:head>
 
-{#if !isUser}
+{#if !data.isUser}
 	<Card>
-		{#if isAdmin}
-			<span>#{user.id}</span>
+		{#if data.isAdmin}
+			<span>#{data.user.id}</span>
 		{/if}
-		<span class="link-box">{user.serial}</span>
+		<span class="link-box">{data.user.serial}</span>
 	</Card>
 {/if}
 
-{#if isUser || isAdmin}
+{#if data.isUser || data.isAdmin}
 	<form method="post">
 		<Card>
-			{#if isAdmin}
-				<span>#{user.id}</span>
+			{#if data.isAdmin}
+				<span>#{data.user.id}</span>
 			{/if}
 			<input
 				class="serial border inset shadow"
 				type="text"
 				name="serial"
-				bind:value={user.serial}
+				bind:value={data.user.serial}
 				placeholder={originalSerial}
 				maxlength="7"
 				autocomplete="off"
@@ -46,20 +66,20 @@
 				type="text"
 				name="email"
 				disabled
-				bind:value={user.email}
+				bind:value={data.user.email}
 				placeholder={originalEmail}
 			/>
 			<div class="buttons">
 				<button class="good border inset shadow no-select" type="submit">update</button>
 
-				{#if isUser}
+				{#if data.isUser}
 					<!-- svelte-ignore a11y-accesskey -->
 					<button class="border inset shadow no-select" type="submit" form="logout" accesskey="l">
 						logout
 					</button>
 				{/if}
 
-				<a href={`/users/${user.serial}/delete`}>
+				<a href={`/users/${data.user.serial}/delete`}>
 					<button class="bad border inset shadow no-select">delete</button>
 				</a>
 			</div>
@@ -72,12 +92,12 @@
 <Divider horizontal={true} size={'0.4rem'} />
 
 <Section title="reviews" column>
-	{#if user.reviews.length > 0}
+	{#if data.user.reviews.length > 0}
 		<CardsGrid>
-			{#each user.reviews as review}
+			{#each data.user.reviews as review}
 				<ReviewCard
-					{categories}
-					review={writable({ ...review, user })}
+					categories={data.categories}
+					review={writable({ ...review, user: data.user })}
 					scores={reviewsScores[review.id]}
 				>
 					<a href="/plates/{review.modelId}">
