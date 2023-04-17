@@ -29,22 +29,26 @@
 		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.3.2",
-		"@playwright/test": "^1.31.2",
+		"@pierogis/utensils": "^0.4.2",
+		"@playwright/test": "^1.32.3",
 		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.13.0",
-		"@typescript-eslint/eslint-plugin": "^5.56.0",
-		"@typescript-eslint/parser": "^5.56.0",
-		"eslint": "^8.36.0",
+		"@sveltejs/kit": "^1.15.5",
+		"@typescript-eslint/eslint-plugin": "^5.58.0",
+		"@typescript-eslint/parser": "^5.58.0",
+		"eslint": "^8.38.0",
 		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-svelte3": "^4.0.0",
-		"prettier": "^2.8.6",
+		"prettier": "^2.8.7",
 		"prettier-plugin-svelte": "^2.10.0",
-		"svelte": "^3.57.0",
-		"svelte-check": "^3.1.4",
+		"svelte": "^3.58.0",
+		"svelte-check": "^3.2.0",
 		"svelte-preprocess": "^5.0.3",
 		"tslib": "^2.5.0",
-		"typescript": "~5.0.2"
+		"typescript": "~5.0.4"
+	},
+	"packageManager": "pnpm@8.1.0",
+	"engines": {
+		"pnpm": "^8.0.0"
 	},
 	"type": "module"
 }

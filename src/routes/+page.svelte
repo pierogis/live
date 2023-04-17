@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { writable, type Writable } from 'svelte/store';
 
 	function handleImport() {
 		$colorsStore = $paletteStore.split(' ');
@@ -19,76 +18,83 @@
 		$paletteStore = $colorsStore.join(' ');
 	}
 
-	const colorsStore = writable([]);
-	const paletteStore = writable('');
+	const defaultColors = ['e18c96', '8ccde1'];
+	const defaultPalette = defaultColors.join(' ');
+	const colorsStore: Writable<string[]> = writable(defaultColors);
+	const paletteStore: Writable<string> = writable(defaultPalette);
 
-	onMount(() => {
-		const defaultColors = ['e18c96', '8ccde1'];
-		const defaultPalette = defaultColors.join(' ');
+	function palette(window: Window) {
+		const storedPalette = window.localStorage.getItem('palette');
+		if (storedPalette) $paletteStore = storedPalette;
 
-		$paletteStore = localStorage.getItem('palette') || defaultPalette;
-
-		const storedColors = localStorage.getItem('colors');
-		$colorsStore = storedColors ? JSON.parse(storedColors) : defaultColors;
+		const storedColors = window.localStorage.getItem('colors');
+		if (storedColors) $colorsStore = JSON.parse(storedColors);
 
 		paletteStore.subscribe((palette) => {
-			localStorage.setItem('palette', palette);
+			window.localStorage.setItem('palette', palette);
 		});
 		colorsStore.subscribe((colors) => {
-			localStorage.setItem('colors', JSON.stringify(colors));
+			window.localStorage.setItem('colors', JSON.stringify(colors));
 		});
-	});
+	}
 </script>
 
-<br />
+<svelte:window use:palette />
 
-<form>
-	<textarea class="inset" rows="6" bind:value={$paletteStore} />
-	<br />
-	<div class="import-export">
-		<button
-			class="border inset shadow link-box"
-			type="submit"
-			on:click|preventDefault={handleImport}>import</button
-		>
-
-		{#if $colorsStore.length > 0}
+<div class="content">
+	<form>
+		<textarea class="inset" rows="6" bind:value={$paletteStore} />
+		<br />
+		<div class="import-export">
 			<button
 				class="border inset shadow link-box"
 				type="submit"
-				on:click|preventDefault={handleExport}
+				on:click|preventDefault={handleImport}
 			>
-				export
+				import ↓
 			</button>
-		{/if}
-	</div>
-</form>
 
-<br />
-
-<div class="colors">
-	{#each $colorsStore as color, i}
-		<div class="color-container">
-			<div class="color" style:background-color="#{color}">
-				<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}
-					>x</button
+			{#if $colorsStore.length > 0}
+				<button
+					class="border inset shadow link-box"
+					type="submit"
+					on:click|preventDefault={handleExport}
 				>
-			</div>
-			<input class="color-input inset" type="text" bind:value={color} />
+					export ↑
+				</button>
+			{/if}
 		</div>
-	{/each}
+	</form>
+
+	<button
+		class="border inset shadow link-box good"
+		type="submit"
+		on:click|preventDefault={handleAddColor}
+	>
+		+
+	</button>
+
+	<div class="colors">
+		{#each $colorsStore as color, i}
+			<div class="color-container">
+				<div class="color" style:background-color="#{color}">
+					<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}>
+						x
+					</button>
+				</div>
+				<input class="color-input inset" type="text" bind:value={color} />
+			</div>
+		{/each}
+	</div>
 </div>
 
-<br />
-<button
-	class="border inset shadow link-box good"
-	type="submit"
-	on:click|preventDefault={handleAddColor}
->
-	+
-</button>
-
 <style>
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1rem;
+	}
 	.colors {
 		display: flex;
 		flex-direction: row;
@@ -116,7 +122,7 @@
 		border-radius: 8px;
 	}
 	.color-input {
-		width: 4rem;
+		width: 5rem;
 		text-align: center;
 	}
 	.import-export {
