@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { Card, CardsGrid, Layout, ThemeToggle } from '@pierogis/utensils';
 
-	import type { PageData } from './$types';
-	export let data: PageData;
-	$: ({ tagline } = data);
+	export let data;
 </script>
 
 <Layout title="pierogis live">
-	<h3 class="tagline">{tagline}</h3>
+	<h3 class="tagline">{data.tagline}</h3>
 
 	<CardsGrid>
 		<Card>

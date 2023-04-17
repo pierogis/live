@@ -1,5 +1,4 @@
-import type { PageLoad } from './$types';
-export const load: PageLoad = async () => {
+export const load = async () => {
 	const taglines = [
 		'live pierogis multimedia experiences',
 		'data driven restaurant',
