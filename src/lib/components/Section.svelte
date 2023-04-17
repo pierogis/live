@@ -37,6 +37,5 @@
 
 	.section-title {
 		text-decoration: underline;
-		margin-bottom: 1rem;
 	}
 </style>
