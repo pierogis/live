@@ -8,7 +8,7 @@ import {
 } from '$lib/forms/review';
 
 export const load = async ({ parent, params }) => {
-	const { plate, sessionUser } = await parent();
+	const { sessionUser } = await parent();
 
 	const review = (await getReview({ modelId: parseInt(params.id), userId: sessionUser.id })) || {
 		id: null,
@@ -17,7 +17,7 @@ export const load = async ({ parent, params }) => {
 		description: ''
 	};
 
-	return { review, plate };
+	return { review };
 };
 
 export const actions = {

@@ -4,21 +4,20 @@
 	import { Card } from '@pierogis/utensils';
 
 	export let data;
-	$: ({ user, isUser, isAdmin } = data);
 
 	export let form;
 </script>
 
 <svelte:head>
-	<title>{'delete user: ' + user.serial.toUpperCase()}</title>
+	<title>{'delete user: ' + data.user.serial.toUpperCase()}</title>
 </svelte:head>
 
-{#if isUser || isAdmin}
+{#if data.isUser || data.isAdmin}
 	<Card>
 		<span>Are you sure you want to delete this account?</span>
-		<b>{user.email}</b>
+		<b>{data.user.email}</b>
 		<div class="buttons">
-			<a href={`/users/${user.serial}`}>
+			<a href={`/users/${data.user.serial}`}>
 				<button class="border inset shadow no-select">cancel</button>
 			</a>
 
@@ -34,7 +33,7 @@
 {/if}
 
 <form id="delete" method="post">
-	<input hidden name={userIdInputName} value={user.id} />
+	<input hidden name={userIdInputName} value={data.user.id} />
 </form>
 
 <style>

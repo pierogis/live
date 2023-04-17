@@ -2,17 +2,16 @@
 	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
 
 	export let data;
-	$: ({ plate, jurisdictions } = data);
 
 	export let form;
 </script>
 
 <svelte:head>
-	<title>{plate.jurisdiction.abbreviation} plate: ({plate.modelId}) edit</title>
+	<title>{data.plate.jurisdiction.abbreviation} plate: ({data.plate.modelId}) edit</title>
 </svelte:head>
 
-<form action="/plates/{plate.modelId}/edit?/update" method="post">
-	<PlateTemplate {jurisdictions} {plate} />
+<form action="/plates/{data.plate.modelId}/edit?/update" method="post">
+	<PlateTemplate jurisdictions={data.jurisdictions} plate={data.plate} />
 </form>
 
 {#if form?.body.message}

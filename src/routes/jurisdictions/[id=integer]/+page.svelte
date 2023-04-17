@@ -1,23 +1,21 @@
 <script lang="ts">
 	import { CardsGrid } from '@pierogis/utensils';
 
-	import PlateCard from '$lib/components/PlateCard.svelte';
-	import ScoreSheet from '$lib/components/ScoreSheet.svelte';
+	import { PlateCard, ScoreSheet } from '$lib/components';
 
 	export let data;
-	$: ({ jurisdiction, categories, platesInfo } = data);
 </script>
 
 <svelte:head>
-	<title>{jurisdiction.name}</title>
+	<title>{data.jurisdiction.name}</title>
 </svelte:head>
 
 <div class="top">
 	<CardsGrid>
-		{#each platesInfo as info}
+		{#each data.platesInfo as info}
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
-					{categories}
+					categories={data.categories}
 					userScores={info.userScores}
 					editorialScores={info.editorialScores}
 					graphScores={info.allScores}

@@ -6,12 +6,10 @@ import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import { valueInputName, categoryIdInputName } from './_form';
 
-export const load = async ({ parent, params }) => {
-	const { plate, categories } = await parent();
-
+export const load = async ({ params }) => {
 	const user = await getUser({ serial: params.serial });
 
-	return { user, plate, categories };
+	return { user };
 };
 
 export const actions = {

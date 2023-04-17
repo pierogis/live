@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 
 import type { Plate } from '@prisma/client';
 
-import { protect } from '$lib/helpers';
+import { protectAdmin } from '$lib/helpers';
 import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
 import { helpCreatePlate } from '$lib/server/database/plates';
@@ -18,7 +18,7 @@ export const load = async ({ parent }) => {
 
 	const { sessionUser } = await parent();
 
-	return protect(sessionUser, handle);
+	return protectAdmin(sessionUser, handle);
 };
 
 export const actions = {

@@ -2,7 +2,6 @@
 	import { PlateTemplate } from '$lib/components';
 
 	export let data;
-	$: ({ jurisdictions } = data);
 
 	export let form;
 </script>
@@ -12,7 +11,7 @@
 </svelte:head>
 
 <form method="post">
-	<PlateTemplate {jurisdictions} />
+	<PlateTemplate jurisdictions={data.jurisdictions} />
 </form>
 
 {#if form?.message}

@@ -6,7 +6,6 @@
 	import { Card } from '@pierogis/utensils';
 
 	export let data;
-	$: ({ sampleEmail, samplePhrase } = data);
 
 	export let form;
 
@@ -39,7 +38,7 @@
 			type="email"
 			name="email"
 			form={loginFormId}
-			placeholder={sampleEmail}
+			placeholder={data.sampleEmail}
 			bind:value={email}
 		/>
 	</label>
@@ -54,7 +53,7 @@
 				type="text"
 				name="passphrase"
 				form={loginFormId}
-				placeholder={samplePhrase}
+				placeholder={data.samplePhrase}
 				bind:value={passphrase}
 			/>
 		</label>

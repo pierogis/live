@@ -1,32 +1,10 @@
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
-
-	import type { Score } from '@prisma/client';
-
-	import { storeScores } from '$lib/api/scores';
+	import { writable } from 'svelte/store';
 
 	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
 	import { ReviewCard } from '$lib/components';
 
 	export let data;
-
-	const reviewsScores = data.user.reviews.reduce<{
-		[reviewId: number]: {
-			[categoryId: number]: Writable<Score>[];
-		};
-	}>((previous, review) => {
-		const reviewScores = storeScores(
-			review.model.scores,
-			review.modelId,
-			data.user?.id,
-			data.categories,
-			fetch
-		);
-
-		previous[review.id] = reviewScores.allScores;
-
-		return previous;
-	}, {});
 
 	$: originalSerial = data.user.serial;
 	$: originalEmail = data.user.email;
@@ -45,6 +23,8 @@
 	</Card>
 {/if}
 
+<br />
+
 {#if data.isUser || data.isAdmin}
 	<form method="post">
 		<Card>
@@ -61,14 +41,16 @@
 				autocomplete="off"
 				autocapitalize="characters"
 			/>
-			<input
-				class="email border inset shadow"
-				type="text"
-				name="email"
-				disabled
-				bind:value={data.user.email}
-				placeholder={originalEmail}
-			/>
+			{#if data.isUser}
+				<input
+					class="email border inset shadow"
+					type="text"
+					name="email"
+					disabled
+					bind:value={data.user.email}
+					placeholder={originalEmail}
+				/>
+			{/if}
 			<div class="buttons">
 				<button class="good border inset shadow no-select" type="submit">update</button>
 
@@ -87,7 +69,7 @@
 	</form>
 {/if}
 
-<form id="logout" action="/logout" method="post" />
+<form id="logout" action="/logout" method="post" hidden />
 
 <Divider horizontal={true} size={'0.4rem'} />
 
@@ -98,7 +80,7 @@
 				<ReviewCard
 					categories={data.categories}
 					review={writable({ ...review, user: data.user })}
-					scores={reviewsScores[review.id]}
+					scores={data.reviewsScores[review.id]}
 				>
 					<a href="/plates/{review.modelId}">
 						<ImageDisplay

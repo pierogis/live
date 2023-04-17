@@ -1,7 +1,8 @@
 import { storeScores } from '$lib/api/scores';
 
-export const load = async ({ parent }) => {
-	const { plates, sessionUser, categories } = await parent();
+export const load = async ({ parent, fetch, data }) => {
+	const { sessionUser, categories } = await parent();
+	const { plates } = data;
 
 	const platesInfo = plates.map((plate) => {
 		const { userScores, editorialScores, allScores } = storeScores(
@@ -14,9 +15,5 @@ export const load = async ({ parent }) => {
 
 		return { plate, userScores, editorialScores, allScores };
 	});
-
-	return {
-		categories,
-		platesInfo
-	};
+	return { platesInfo };
 };

@@ -3,11 +3,12 @@ import { fail, redirect } from '@sveltejs/kit';
 import { deleteUser } from '$lib/server/database/users';
 
 import { userIdInputName } from '$lib/forms/user';
+import { protectUserOrAdmin } from '$lib/helpers';
 
 export const load = async ({ parent }) => {
-	const { user } = await parent();
+	const { sessionUser, user } = await parent();
 
-	return { user };
+	return protectUserOrAdmin(sessionUser, user);
 };
 
 export const actions = {

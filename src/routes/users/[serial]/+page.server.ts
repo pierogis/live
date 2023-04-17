@@ -4,12 +4,10 @@ import type { Category, User } from '@prisma/client';
 import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
 
-export const load = async ({ parent }) => {
-	const { user } = await parent();
-
+export const load = async () => {
 	const categories: Category[] = await getCategories({ wareName: 'plate' });
 
-	return { user, categories };
+	return { categories };
 };
 
 export const actions = {

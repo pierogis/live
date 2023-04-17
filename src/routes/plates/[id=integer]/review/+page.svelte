@@ -1,20 +1,16 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 
-	import ReviewForm from '$lib/components/ReviewForm.svelte';
-
 	import { Section } from '@pierogis/utensils';
-	import { PlateCard } from '$lib/components';
+	import { ReviewForm, PlateCard } from '$lib/components';
 
 	export let data;
-
-	$: ({ plate, review } = data);
 </script>
 
-<PlateCard {plate} showYears small={false} />
+<PlateCard plate={data.plate} showYears small={false} />
 
 <br />
 
 <Section title="review" column>
-	<ReviewForm {plate} review={writable(review)} />
+	<ReviewForm plate={data.plate} review={writable(data.review)} />
 </Section>

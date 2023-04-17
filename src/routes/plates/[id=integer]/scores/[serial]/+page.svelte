@@ -8,9 +8,8 @@
 	import { PlateCard } from '$lib/components';
 
 	export let data;
-	$: ({ categories, plate, scores, serial, isUser } = data);
 
-	$: scoreSet = scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
+	$: scoreSet = data.scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
 		previous[score.categoryId] = score.value;
 		return previous;
 	}, {});
@@ -20,18 +19,18 @@
 
 <svelte:head>
 	<title>
-		user: {serial.toUpperCase()}
-		{plate.jurisdiction.abbreviation} plate ({plate.modelId}) scores
+		user: {data.serial.toUpperCase()}
+		{data.plate.jurisdiction.abbreviation} plate ({data.plate.modelId}) scores
 	</title>
 </svelte:head>
 
-<PlateCard {plate} small={true} />
+<PlateCard plate={data.plate} small={true} />
 
 <div class="grid">
-	{#each categories as category}
+	{#each data.categories as category}
 		<Card>
 			<span><u>{category.name}</u> {category.symbol}</span>
-			{#if isUser}
+			{#if data.isUser}
 				<form hidden method="post" id={scoreFormId} use:enhance />
 
 				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />

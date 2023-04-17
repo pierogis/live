@@ -1,10 +1,10 @@
 export const load = async ({ parent, params, data }) => {
-	const { user, plate, categories } = data;
+	const { user } = data;
 
-	const { sessionUser } = await parent();
+	const { plate, sessionUser } = await parent();
 	const isUser = sessionUser?.id == user.id;
 
 	const scores = plate.model.scores.filter((score) => score.userId == user.id);
 
-	return { plate, scores, serial: params.serial, isUser, categories };
+	return { scores, serial: params.serial, isUser };
 };
