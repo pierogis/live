@@ -78,7 +78,7 @@ export function storeScores(
 		editorialScores = userScores;
 	}
 
-	Object.entries(userScores).forEach(([_categoryId, scoreStore]) => {
+	Object.values(userScores).forEach((scoreStore) => {
 		let fired = false;
 		let previousValue: number;
 		scoreStore.subscribe(async (score) => {

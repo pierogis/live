@@ -29,7 +29,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {
 		const { serial }: { serial: string } = await request.json();
 
-		let data: Partial<Omit<User, 'isAdmin' | 'id'>> = {
+		const data: Partial<Omit<User, 'isAdmin' | 'id'>> = {
 			// ...(emailEntry && { email: emailEntry.toString() }),
 			...(serial && { serial: serial.toUpperCase() })
 		};
