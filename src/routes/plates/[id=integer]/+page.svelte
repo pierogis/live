@@ -9,6 +9,7 @@
 		plate,
 		sessionUser,
 		userReview,
+		reviewForm,
 		editorialReview,
 		allReviews,
 		userScores,
@@ -42,9 +43,9 @@
 <Divider horizontal={true} size={'0.4rem'} />
 
 <Section title="user review" column rowGap={'0.5rem'}>
-	{#if sessionUser}
+	{#if sessionUser !== null}
 		<ScoreSheet {categories} {userScores} {scoreUrl} />
-		<ReviewForm {plate} review={userReview} />
+		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
 	{:else}
 		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
 		<a class="border inset shadow good no-select link-box" href={loginUrl}> login </a>

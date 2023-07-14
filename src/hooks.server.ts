@@ -10,6 +10,7 @@ import { getUser } from '$lib/server/database/users';
 export const handle: Handle = async ({ event, resolve }) => {
 	if (!cache) setupCache();
 
+	event.locals.sessionUser = null;
 	const sessionCookie = event.cookies.get(SESSION_NAME);
 
 	let deleteCookie = false;
@@ -35,9 +36,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.cookies.delete(SESSION_NAME);
 	}
 
-	const response = await resolve(event);
-
-	return response;
+	return await resolve(event);
 };
 
 export const handleError: HandleServerError = ({ error }) => {

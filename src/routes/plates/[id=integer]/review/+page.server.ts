@@ -1,11 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
 
+import { message, superValidate } from 'sveltekit-superforms/server';
+
 import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
-import {
-	reviewDescriptionInputName,
-	reviewIdInputName,
-	reviewUserIdInputName
-} from '$lib/forms/review';
+import { schema } from '$lib/forms/review';
 
 export const load = async ({ parent, params }) => {
 	const { sessionUser } = await parent();
@@ -17,39 +15,43 @@ export const load = async ({ parent, params }) => {
 		description: ''
 	};
 
-	return { review };
+	const form = await superValidate(review, schema);
+
+	return { form };
 };
 
 export const actions = {
 	update: async ({ locals, request, params }) => {
-		if (locals.sessionUser) {
-			const formData: FormData = await request.formData();
-
+		if (locals.sessionUser !== null) {
 			const modelId = parseInt(params.id);
-			const userId: number = locals.sessionUser.id;
+			const userId = locals.sessionUser.id;
 
-			const reviewIdEntry = formData.get(reviewIdInputName);
+			const form = await superValidate(request, schema);
 
-			const descriptionEntry = formData.get(reviewDescriptionInputName);
+			if (!form.valid) {
+				console.log('invalid review update');
+				// Again, always return { form } and things will just work.
+				return fail(400, { form });
+			}
 
-			const description = descriptionEntry ? descriptionEntry.toString() : undefined;
+			if (form.data.userId !== userId) {
+				// Again, always return { form } and things will just work.
+				return message(form, 'Review does not belong to you', { status: 401 });
+			}
 
-			if (!description || (description == '' && reviewIdEntry)) {
-				const reviewUserIdEntry = formData.get(reviewUserIdInputName);
-				const reviewUserId = parseInt(reviewUserIdEntry.toString());
-
-				await deleteReview({ modelId, userId: reviewUserId });
+			if (!form.data.description || (form.data.description == '' && form.data.id)) {
+				await deleteReview({ modelId, userId: form.data.userId });
 
 				throw redirect(303, `/plates/${modelId}`);
 			} else {
-				const reviewId = parseInt(reviewIdEntry.toString());
-
 				const data = {
-					id: reviewId,
+					id: form.data.id,
 					modelId,
-					userId,
-					description: description
+					userId: form.data.userId,
+					description: form.data.description
 				};
+
+				console.log(data);
 
 				await upsertReview(data);
 
@@ -60,23 +62,25 @@ export const actions = {
 		}
 	},
 	delete: async ({ locals, request, params }) => {
-		if (locals.sessionUser) {
-			const formData: FormData = await request.formData();
-
+		if (locals.sessionUser !== null) {
 			const modelId = parseInt(params.id);
+			const userId = locals.sessionUser.id;
 
-			const reviewUserIdEntry = formData.get(reviewUserIdInputName);
-			const reviewUserId = parseInt(reviewUserIdEntry.toString());
+			const form = await superValidate(request, schema);
 
-			const userId: number = locals.sessionUser.id;
+			if (!form.valid) {
+				// Again, always return { form } and things will just work.
+				return fail(400, { form });
+			}
 
-			if (userId != reviewUserId && !locals.sessionUser.isAdmin) {
-				return fail(401, { message: 'not user' });
+			if (form.data.userId !== userId && !locals.sessionUser.isAdmin) {
+				// Again, always return { form } and things will just work.
+				return message(form, 'Review does not belong to you', { status: 401 });
 			}
 
 			const reviewParams = {
 				modelId,
-				userId: reviewUserId
+				userId: form.data.userId
 			};
 
 			await deleteReview(reviewParams);

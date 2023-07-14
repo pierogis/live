@@ -11,8 +11,8 @@ export const load = async ({ params, parent }) => {
 
 	const { sessionUser } = await parent();
 
-	const isUser = sessionUser && sessionUser.id == user.id;
-	const isAdmin = sessionUser && sessionUser.isAdmin;
+	const isUser = sessionUser !== null && sessionUser.id == user.id;
+	const isAdmin = sessionUser !== null && sessionUser.isAdmin;
 	user.email = isUser ? sessionUser.email : undefined;
 
 	return { user, isUser, isAdmin };

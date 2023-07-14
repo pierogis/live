@@ -1,7 +1,5 @@
 <script lang="ts">
-	import type { Jurisdiction } from '@prisma/client';
-
-	import type { FullPlate } from '$lib/models';
+	import type { Jurisdiction, FullPlate } from '$db/schema';
 
 	import { Card } from '@pierogis/utensils';
 
@@ -28,12 +26,12 @@
 		required
 		maxlength="2"
 		placeholder="oh"
-		value={plate ? plate.jurisdiction.abbreviation : ''}
+		value={plate ? plate.jurisdiction.id : ''}
 	/>
 
 	<datalist id="jurisdictions">
 		{#each jurisdictions as jurisdiction}
-			<option value={jurisdiction.abbreviation} />
+			<option value={jurisdiction.id}>{jurisdiction.abbreviation}</option>
 		{/each}
 	</datalist>
 
@@ -94,10 +92,10 @@
 	}
 
 	input[type='text'].jurisdiction {
-		width: 2em;
+		width: 4em;
 	}
 	input[type='text'].year {
-		width: 3em;
+		width: 4em;
 	}
 	input[type='url'] {
 		width: 20em;

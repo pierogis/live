@@ -1,49 +1,44 @@
-import { prisma } from '.';
-import type { Score } from '@prisma/client';
+import { eq, and } from 'drizzle-orm';
 
-export async function getScores(
-	params: Partial<Score>,
-	take: number = undefined,
-	skip = 0
-): Promise<Score[]> {
-	const scores = await prisma.score.findMany({ where: params, take, skip });
+import { type Score, scores, type NewScore } from '$db/schema';
 
-	return scores;
-}
+import { db } from '.';
 
-export async function upsertScore(
-	params: Partial<Score> & Pick<Score, 'modelId' | 'userId' | 'categoryId'>
-): Promise<Score> {
-	const score = await prisma.score.upsert({
-		where: {
-			modelId_userId_categoryId: {
-				modelId: params.modelId,
-				userId: params.userId,
-				categoryId: params.categoryId
-			}
-		},
-		update: { value: params.value },
-		create: {
-			modelId: params.modelId,
-			userId: params.userId,
-			categoryId: params.categoryId,
-			value: params.value
-		}
+export const getScores = async (params: Partial<Score>, take: number = undefined, skip = 0) =>
+	await db.query.scores.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.categoryId ? eq(table.categoryId, params.categoryId) : undefined,
+				params.userId ? eq(table.userId, params.userId) : undefined,
+				params.value ? eq(table.value, params.value) : undefined
+			),
+		limit: take,
+		offset: skip
 	});
 
-	return score;
-}
+export const upsertScore = async (params: NewScore) =>
+	(
+		await db
+			.insert(scores)
+			.values(params)
+			.onConflictDoUpdate({
+				target: [scores.modelId, scores.categoryId, scores.userId],
+				set: { value: params.value }
+			})
+			.returning()
+	)[0];
 
-export async function deleteScore(
-	params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>
-): Promise<Score> {
-	return await prisma.score.delete({
-		where: {
-			modelId_userId_categoryId: {
-				modelId: params.modelId,
-				userId: params.userId,
-				categoryId: params.categoryId
-			}
-		}
-	});
-}
+export const deleteScore = async (params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>) =>
+	(
+		await db
+			.delete(scores)
+			.where(
+				and(
+					eq(scores.modelId, params.modelId),
+					eq(scores.userId, params.userId),
+					eq(scores.categoryId, params.categoryId)
+				)
+			)
+			.returning()
+	)[0];

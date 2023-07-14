@@ -1,0 +1,442 @@
+{
+	"version": "5",
+	"dialect": "pg",
+	"id": "8542bc5f-b1b5-448f-97b5-37de88b86e49",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"tables": {
+		"categories": {
+			"name": "categories",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"ware_name": {
+					"name": "ware_name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"symbol": {
+					"name": "symbol",
+					"type": "varchar(4)",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"categories_name_wareName_unique": {
+					"name": "categories_name_wareName_unique",
+					"columns": ["name", "ware_name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"categories_ware_name_wares_name_fk": {
+					"name": "categories_ware_name_wares_name_fk",
+					"tableFrom": "categories",
+					"tableTo": "wares",
+					"columnsFrom": ["ware_name"],
+					"columnsTo": ["name"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"images": {
+			"name": "images",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"model_id": {
+					"name": "model_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"url": {
+					"name": "url",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"images_url_unique": {
+					"name": "images_url_unique",
+					"columns": ["url"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"images_model_id_models_id_fk": {
+					"name": "images_model_id_models_id_fk",
+					"tableFrom": "images",
+					"tableTo": "models",
+					"columnsFrom": ["model_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"jurisdictions": {
+			"name": "jurisdictions",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"abbreviation": {
+					"name": "abbreviation",
+					"type": "varchar(2)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"jurisdictions_abbreviation_unique": {
+					"name": "jurisdictions_abbreviation_unique",
+					"columns": ["abbreviation"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		},
+		"models": {
+			"name": "models",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"ware_id": {
+					"name": "ware_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"models_ware_id_wares_id_fk": {
+					"name": "models_ware_id_wares_id_fk",
+					"tableFrom": "models",
+					"tableTo": "wares",
+					"columnsFrom": ["ware_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"plates": {
+			"name": "plates",
+			"schema": "",
+			"columns": {
+				"model_id": {
+					"name": "model_id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"jurisdiction_id": {
+					"name": "jurisdiction_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"start_year": {
+					"name": "start_year",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"end_year": {
+					"name": "end_year",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"plates_model_id_models_id_fk": {
+					"name": "plates_model_id_models_id_fk",
+					"tableFrom": "plates",
+					"tableTo": "models",
+					"columnsFrom": ["model_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"plates_jurisdiction_id_jurisdictions_id_fk": {
+					"name": "plates_jurisdiction_id_jurisdictions_id_fk",
+					"tableFrom": "plates",
+					"tableTo": "jurisdictions",
+					"columnsFrom": ["jurisdiction_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"reviews": {
+			"name": "reviews",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"model_id": {
+					"name": "model_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "varchar(2048)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"reviews_user_id_model_id_unique": {
+					"name": "reviews_user_id_model_id_unique",
+					"columns": ["model_id", "user_id"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"reviews_model_id_models_id_fk": {
+					"name": "reviews_model_id_models_id_fk",
+					"tableFrom": "reviews",
+					"tableTo": "models",
+					"columnsFrom": ["model_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"reviews_user_id_users_id_fk": {
+					"name": "reviews_user_id_users_id_fk",
+					"tableFrom": "reviews",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"scores": {
+			"name": "scores",
+			"schema": "",
+			"columns": {
+				"model_id": {
+					"name": "model_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"category_id": {
+					"name": "category_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"value": {
+					"name": "value",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"scores_model_id_models_id_fk": {
+					"name": "scores_model_id_models_id_fk",
+					"tableFrom": "scores",
+					"tableTo": "models",
+					"columnsFrom": ["model_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"scores_user_id_users_id_fk": {
+					"name": "scores_user_id_users_id_fk",
+					"tableFrom": "scores",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"scores_category_id_categories_id_fk": {
+					"name": "scores_category_id_categories_id_fk",
+					"tableFrom": "scores",
+					"tableTo": "categories",
+					"columnsFrom": ["category_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"scores_model_id_user_id_category_id": {
+					"name": "scores_model_id_user_id_category_id",
+					"columns": ["model_id", "user_id", "category_id"]
+				}
+			}
+		},
+		"users": {
+			"name": "users",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"serial": {
+					"name": "serial",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"is_admin": {
+					"name": "is_admin",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"users_email_unique": {
+					"name": "users_email_unique",
+					"columns": ["email"],
+					"isUnique": true
+				},
+				"users_serial_unique": {
+					"name": "users_serial_unique",
+					"columns": ["serial"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		},
+		"wares": {
+			"name": "wares",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"Ware_name_unique": {
+					"name": "Ware_name_unique",
+					"columns": ["name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {
+			"\"Category\"": "\"categories\"",
+			"\"Image\"": "\"images\"",
+			"\"Jurisdiction\"": "\"jurisdictions\"",
+			"\"Model\"": "\"models\"",
+			"\"Plate\"": "\"plates\"",
+			"\"Review\"": "\"reviews\"",
+			"\"Score\"": "\"scores\"",
+			"\"User\"": "\"users\"",
+			"\"Ware\"": "\"wares\""
+		},
+		"columns": {
+			"\"categories\".\"wareName\"": "\"categories\".\"ware_name\"",
+			"\"images\".\"modelId\"": "\"images\".\"model_id\"",
+			"\"models\".\"wareId\"": "\"models\".\"ware_id\"",
+			"\"plates\".\"modelId\"": "\"plates\".\"model_id\"",
+			"\"plates\".\"jurisdictionId\"": "\"plates\".\"jurisdiction_id\"",
+			"\"plates\".\"startYear\"": "\"plates\".\"start_year\"",
+			"\"plates\".\"endYear\"": "\"plates\".\"end_year\"",
+			"\"reviews\".\"modelId\"": "\"reviews\".\"model_id\"",
+			"\"reviews\".\"userId\"": "\"reviews\".\"user_id\"",
+			"\"scores\".\"modelId\"": "\"scores\".\"model_id\"",
+			"\"scores\".\"userId\"": "\"scores\".\"user_id\"",
+			"\"scores\".\"categoryId\"": "\"scores\".\"category_id\"",
+			"\"users\".\"isAdmin\"": "\"users\".\"is_admin\""
+		}
+	}
+}

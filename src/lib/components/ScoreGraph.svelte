@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Score } from '@prisma/client';
+	import type { Score } from '$db/schema';
 	import { derived, type Readable } from 'svelte/store';
 
 	export let scoreStores: Readable<Score>[];
@@ -36,7 +36,7 @@
 	const dividerWidth = 1;
 </script>
 
-<svg height="20px" width="20px">
+<svg height="22px" width="20px">
 	{#each Object.values(quotients) as count, i}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect

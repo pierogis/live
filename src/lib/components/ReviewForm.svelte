@@ -1,49 +1,76 @@
 <script lang="ts">
-	import { get, type Writable } from 'svelte/store';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms/client';
 
-	import {
-		reviewDescriptionInputName,
-		reviewIdInputName,
-		reviewUserIdInputName
-	} from '$lib/forms/review';
+	import type { schema } from '$lib/forms/review';
 
-	import type { Review } from '@prisma/client';
-	import type { FullPlate } from '$lib/models';
+	import type { FullPlate } from '$db/schema';
 
 	export let plate: FullPlate;
-	export let review: Writable<Review>;
+
+	export let data: SuperValidated<typeof schema>;
+
+	const { form, errors, enhance, constraints, capture, restore } = superForm(data);
+
+	export const snapshot = {
+		capture,
+		restore
+	};
 
 	const reviewFormId = 'userReview';
 	const reviewTextareaId = 'review';
 
-	$: originalDescription = get(review).description;
-	$: description = originalDescription;
+	// allow parent to watch
+	export let description = $form.description;
 
-	$: submitMessage = $review.id ? 'update' : 'submit';
+	$: submitMessage = $form.id ? 'update' : 'submit';
 </script>
 
-<form hidden id={reviewFormId} action={`/plates/${plate.modelId}/review?/update`} method="post" />
+<form
+	hidden
+	id={reviewFormId}
+	action={`/plates/${plate.modelId}/review?/update`}
+	method="post"
+	use:enhance
+/>
 
 <label hidden for={reviewTextareaId}>review</label>
 <textarea
-	id={reviewTextareaId}
 	class="inset"
 	form={reviewFormId}
-	name={reviewDescriptionInputName}
-	required
 	rows="10"
-	bind:value={description}
+	name="description"
+	data-invalid={$errors.description}
+	bind:value={$form.description}
+	{...$constraints.description}
 />
 
-<input hidden form={reviewFormId} name={reviewIdInputName} value={$review.id} />
-<input hidden form={reviewFormId} name={reviewUserIdInputName} value={$review.userId} />
+<!-- id -->
+<input
+	hidden
+	form={reviewFormId}
+	name="id"
+	data-invalid={$errors.id}
+	bind:value={$form.id}
+	{...$constraints.id}
+/>
+<!-- userId -->
+<input
+	hidden
+	form={reviewFormId}
+	name="userId"
+	data-invalid={$errors.userId}
+	bind:value={$form.userId}
+	{...$constraints.userId}
+/>
+
 <div class="break-container">
 	<button
 		class="border inset shadow good no-select"
 		type="submit"
 		form={reviewFormId}
 		on:click={() => {
-			$review = { ...$review, description };
+			description = $form.description;
 		}}
 	>
 		{submitMessage}

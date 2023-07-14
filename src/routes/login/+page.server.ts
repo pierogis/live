@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { User } from '@prisma/client';
+import type { User } from '$db/schema';
 
 import { dev } from '$app/environment';
 

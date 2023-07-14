@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { get, type Readable } from 'svelte/store';
 
-	import type { Category, Review, Score, User } from '@prisma/client';
+	import type { Category, Review, Score, User } from '$db/schema';
 
 	import { Card } from '@pierogis/utensils';
 

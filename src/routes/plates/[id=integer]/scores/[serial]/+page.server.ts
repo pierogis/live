@@ -14,7 +14,7 @@ export const load = async ({ params }) => {
 
 export const actions = {
 	update: async ({ locals, request, params }) => {
-		if (locals.sessionUser) {
+		if (locals.sessionUser !== null) {
 			const formData: FormData = await request.formData();
 
 			const valueEntry = formData.get(valueInputName);

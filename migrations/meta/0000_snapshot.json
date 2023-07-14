@@ -1,0 +1,478 @@
+{
+	"id": "00000000-0000-0000-0000-000000000000",
+	"prevId": "",
+	"version": "5",
+	"dialect": "pg",
+	"tables": {
+		"_prisma_migrations": {
+			"name": "_prisma_migrations",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "varchar(36)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"checksum": {
+					"name": "checksum",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"finished_at": {
+					"name": "finished_at",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"migration_name": {
+					"name": "migration_name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"logs": {
+					"name": "logs",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"rolled_back_at": {
+					"name": "rolled_back_at",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"started_at": {
+					"name": "started_at",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"applied_steps_count": {
+					"name": "applied_steps_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"default": 0
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		},
+		"Ware": {
+			"name": "Ware",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"Ware_name_unique": {
+					"name": "Ware_name_unique",
+					"columns": ["name"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		},
+		"Model": {
+			"name": "Model",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"wareId": {
+					"name": "wareId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Model_wareId_fkey": {
+					"name": "Model_wareId_fkey",
+					"tableFrom": "Model",
+					"tableTo": "Ware",
+					"columnsFrom": ["wareId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"Category": {
+			"name": "Category",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"wareName": {
+					"name": "wareName",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"symbol": {
+					"name": "symbol",
+					"type": "varchar(4)",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"Category_name_wareName_unique": {
+					"name": "Category_name_wareName_unique",
+					"columns": ["name", "wareName"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"Category_wareName_fkey": {
+					"name": "Category_wareName_fkey",
+					"tableFrom": "Category",
+					"tableTo": "Ware",
+					"columnsFrom": ["wareName"],
+					"columnsTo": ["name"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"Review": {
+			"name": "Review",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"modelId": {
+					"name": "modelId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"userId": {
+					"name": "userId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "varchar(2047)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"Review_userId_modelId_unique": {
+					"name": "Review_userId_modelId_unique",
+					"columns": ["modelId", "userId"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"Review_modelId_fkey": {
+					"name": "Review_modelId_fkey",
+					"tableFrom": "Review",
+					"tableTo": "Model",
+					"columnsFrom": ["modelId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"Review_userId_fkey": {
+					"name": "Review_userId_fkey",
+					"tableFrom": "Review",
+					"tableTo": "User",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"Plate": {
+			"name": "Plate",
+			"schema": "",
+			"columns": {
+				"modelId": {
+					"name": "modelId",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"jurisdictionId": {
+					"name": "jurisdictionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"startYear": {
+					"name": "startYear",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"endYear": {
+					"name": "endYear",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Plate_modelId_fkey": {
+					"name": "Plate_modelId_fkey",
+					"tableFrom": "Plate",
+					"tableTo": "Model",
+					"columnsFrom": ["modelId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"Plate_jurisdictionId_fkey": {
+					"name": "Plate_jurisdictionId_fkey",
+					"tableFrom": "Plate",
+					"tableTo": "Jurisdiction",
+					"columnsFrom": ["jurisdictionId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"User": {
+			"name": "User",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"serial": {
+					"name": "serial",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"isAdmin": {
+					"name": "isAdmin",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				}
+			},
+			"indexes": {
+				"User_email_unique": {
+					"name": "User_email_unique",
+					"columns": ["email"],
+					"isUnique": true
+				},
+				"User_serial_unique": {
+					"name": "User_serial_unique",
+					"columns": ["serial"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		},
+		"Score": {
+			"name": "Score",
+			"schema": "",
+			"columns": {
+				"modelId": {
+					"name": "modelId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"userId": {
+					"name": "userId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"categoryId": {
+					"name": "categoryId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"value": {
+					"name": "value",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"Score_categoryId_fkey": {
+					"name": "Score_categoryId_fkey",
+					"tableFrom": "Score",
+					"tableTo": "Category",
+					"columnsFrom": ["categoryId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"Score_modelId_fkey": {
+					"name": "Score_modelId_fkey",
+					"tableFrom": "Score",
+					"tableTo": "Model",
+					"columnsFrom": ["modelId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"Score_userId_fkey": {
+					"name": "Score_userId_fkey",
+					"tableFrom": "Score",
+					"tableTo": "User",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"Score_modelId_userId_categoryId": {
+					"name": "Score_pkey",
+					"columns": ["modelId", "userId", "categoryId"]
+				}
+			}
+		},
+		"Image": {
+			"name": "Image",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"modelId": {
+					"name": "modelId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"url": {
+					"name": "url",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"Image_url_unique": {
+					"name": "Image_url_unique",
+					"columns": ["url"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {
+				"Image_modelId_fkey": {
+					"name": "Image_modelId_fkey",
+					"tableFrom": "Image",
+					"tableTo": "Model",
+					"columnsFrom": ["modelId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {}
+		},
+		"Jurisdiction": {
+			"name": "Jurisdiction",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"abbreviation": {
+					"name": "abbreviation",
+					"type": "varchar(2)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"Jurisdiction_abbreviation_unique": {
+					"name": "Jurisdiction_abbreviation_unique",
+					"columns": ["abbreviation"],
+					"isUnique": true
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {}
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"_meta": {
+		"schemas": {},
+		"tables": {},
+		"columns": {}
+	}
+}

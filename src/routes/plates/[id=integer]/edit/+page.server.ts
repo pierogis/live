@@ -14,12 +14,12 @@ export const actions: Actions = {
 			const endYearEntry = formData.get('endYear');
 			const imageUrlEntry = formData.get('imageUrl');
 
-			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
+			const jurisdictionId = parseInt(jurisdictionEntry.toString());
 			const startYear = startYearEntry != '' ? parseInt(startYearEntry.toString()) : null;
 			const endYear = endYearEntry != '' ? parseInt(endYearEntry.toString()) : null;
 			const imageUrls = imageUrlEntry != '' ? [imageUrlEntry.toString()] : [];
 
-			await helpUpdatePlate(parseInt(params.id), jurisdiction, startYear, endYear, imageUrls);
+			await helpUpdatePlate(parseInt(params.id), jurisdictionId, startYear, endYear, imageUrls);
 
 			throw redirect(303, `/plates/${params.id}/edit`);
 		} else {

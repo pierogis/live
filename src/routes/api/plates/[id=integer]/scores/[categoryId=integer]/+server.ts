@@ -4,7 +4,7 @@ import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (locals.sessionUser) {
+	if (locals.sessionUser !== null) {
 		const modelId = parseInt(params.id);
 		const userId: number = locals.sessionUser.id;
 		const categoryId = parseInt(params.categoryId);
@@ -31,7 +31,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (locals.sessionUser) {
+	if (locals.sessionUser !== null) {
 		const modelId = parseInt(params.id);
 		const userId: number = locals.sessionUser.id;
 		const categoryId = parseInt(params.categoryId);

@@ -1,7 +1,7 @@
 import { storeScores } from '$lib/api/scores';
 import { storeReviews } from '$lib/api/reviews';
 
-export const load = async ({ parent, fetch }) => {
+export const load = async ({ parent, fetch, data }) => {
 	const { plate, sessionUser, categories } = await parent();
 	const reviewStores = storeReviews(plate.model.reviews, plate.modelId, sessionUser?.id);
 
@@ -18,6 +18,7 @@ export const load = async ({ parent, fetch }) => {
 	const { userScores, editorialScores, allScores } = scoreStores;
 
 	return {
+		reviewForm: data.reviewForm,
 		userReview,
 		editorialReview,
 		allReviews,

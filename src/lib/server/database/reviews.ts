@@ -1,66 +1,58 @@
-import { prisma } from '.';
-import type { Review } from '@prisma/client';
+import { eq, like, and, sql } from 'drizzle-orm';
 
-export async function getReview(params: Partial<Omit<Review, 'explanation'>>): Promise<Review> {
-	const review = await prisma.review.findUnique({
-		where: {
-			id: params.id,
-			Review_userId_modelId_unique: { userId: params.userId, modelId: params.modelId }
-		}
+import { type Review, reviews, type NewReview } from '$db/schema';
+
+import { db } from '.';
+
+export const getReviews = async (params: Partial<Review>, take: number = undefined, skip = 0) =>
+	await db.query.reviews.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.userId ? eq(table.userId, params.userId) : undefined,
+				params.description ? like(table.description, sql`%${params.description}%`) : undefined
+			),
+		limit: take,
+		offset: skip
 	});
 
-	return review;
-}
-
-export async function getReviews(
-	params: Partial<Omit<Review, 'explanation'>>,
-	take: number = undefined,
-	skip = 0
-): Promise<Review[]> {
-	const reviews = await prisma.review.findMany({ where: params, take, skip });
-
-	return reviews;
-}
-
-export async function upsertReview(
-	params: Partial<Review> & Pick<Review, 'modelId' | 'userId'>
-): Promise<Review> {
-	const review = await prisma.review.upsert({
-		where: {
-			Review_userId_modelId_unique: {
-				modelId: params.modelId,
-				userId: params.userId
-			}
-		},
-		update: { description: params.description },
-		create: {
-			modelId: params.modelId,
-			userId: params.userId,
-			description: params.description
-		}
+export const getReview = async (params: Partial<Review>) =>
+	await db.query.reviews.findFirst({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.userId ? eq(table.userId, params.userId) : undefined,
+				params.description ? like(table.description, sql`%${params.description}%`) : undefined
+			)
 	});
 
-	return review;
-}
+export const upsertReview = async (params: NewReview) =>
+	(
+		await db
+			.insert(reviews)
+			.values(params)
+			.onConflictDoUpdate({
+				target: reviews.id,
+				set: { description: params.description }
+			})
+			.returning()
+	)[0];
 
-export async function updateReview(params: Review): Promise<Review> {
-	const review = await prisma.review.update({
-		where: {
-			id: params.id
-		},
-		data: { description: params.description }
-	});
+export const updateReview = async (params: Review) =>
+	(
+		await db
+			.update(reviews)
+			.set({ description: params.description })
+			.where(eq(reviews.id, params.id))
+			.returning()
+	)[0];
 
-	return review;
-}
-
-export async function deleteReview(params: Pick<Review, 'modelId' | 'userId'>): Promise<Review> {
-	return await prisma.review.delete({
-		where: {
-			Review_userId_modelId_unique: {
-				modelId: params.modelId,
-				userId: params.userId
-			}
-		}
-	});
-}
+export const deleteReview = async (params: Pick<Review, 'modelId' | 'userId'>) =>
+	(
+		await db
+			.delete(reviews)
+			.where(and(eq(reviews.modelId, params.modelId), eq(reviews.userId, params.userId)))
+			.returning()
+	)[0];

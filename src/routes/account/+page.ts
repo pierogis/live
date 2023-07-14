@@ -1,10 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ parent }) => {
+export const load = async (event) => {
 	let location = '/login';
 
-	const { sessionUser } = await parent();
-	if (sessionUser) {
+	const { sessionUser } = await event.parent();
+	if (sessionUser !== null) {
 		location = `/users/${sessionUser.serial}`;
 	}
 

@@ -3,7 +3,7 @@ import { getCategories } from '$lib/server/database/categories';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ setHeaders }) => {
-	const categories = await getCategories({ wareName: 'plate' });
+	const categories = await getCategories({ ware: 'plate' });
 
 	setHeaders({
 		'cache-control': 'public, max-age=3600'

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Readable, Writable } from 'svelte/store';
-	import type { Score } from '@prisma/client';
+	import type { Score } from '$db/schema';
 
 	export let editorialScore: Readable<Score> = null;
 	export let userScore: Writable<Score> = null;

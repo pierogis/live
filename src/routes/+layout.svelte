@@ -13,8 +13,8 @@
 			<a href="/plates/create"><h4 class="link-box border inset shadow good">create</h4></a>
 		{/if}
 		<a href="/account">
-			<h4 class="link-box border inset shadow" class:good={!data.sessionUser}>
-				{data.sessionUser ? data.sessionUser.serial : 'login'}
+			<h4 class="link-box border inset shadow" class:good={data.sessionUser === null}>
+				{data.sessionUser !== null ? data.sessionUser.serial : 'login'}
 			</h4>
 		</a>
 	</nav>

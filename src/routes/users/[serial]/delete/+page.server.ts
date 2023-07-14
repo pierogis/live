@@ -13,7 +13,7 @@ export const load = async ({ parent }) => {
 
 export const actions = {
 	default: async ({ locals, params, request }) => {
-		if (!locals.sessionUser) {
+		if (locals.sessionUser === null) {
 			return fail(401, { message: `not signed in` });
 		}
 		if (locals.sessionUser?.serial == params.serial || locals.sessionUser?.isAdmin) {

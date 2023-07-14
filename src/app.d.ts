@@ -9,7 +9,7 @@ interface SessionUser {
 
 declare namespace App {
 	interface Locals {
-		sessionUser: SessionUser;
+		sessionUser: SessionUser | null;
 	}
 	// interface PageData {}
 	// interface Platform {}

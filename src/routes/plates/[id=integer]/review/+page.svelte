@@ -12,5 +12,5 @@
 <br />
 
 <Section title="review" column>
-	<ReviewForm plate={data.plate} review={writable(data.review)} />
+	<ReviewForm plate={data.plate} data={data.form} />
 </Section>

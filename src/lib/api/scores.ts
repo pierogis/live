@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import { goto } from '$app/navigation';
-import type { Category, Score } from '@prisma/client';
+import type { Category, Score } from '$db/schema';
 
 async function handleChangeScore(
 	fetch: (info: RequestInfo, init?: RequestInit) => Promise<Response>,

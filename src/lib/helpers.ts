@@ -1,8 +1,11 @@
-import type { User } from '@prisma/client';
+import type { User } from '$db/schema';
 import { error } from '@sveltejs/kit';
 
-export async function protectAdmin<T>(sessionUser: SessionUser, callback?: () => Promise<T>) {
-	if (!sessionUser) {
+export async function protectAdmin<T>(
+	sessionUser: SessionUser | null,
+	callback?: () => Promise<T>
+) {
+	if (sessionUser === null) {
 		throw error(401, 'not signed in');
 	} else if (!sessionUser.isAdmin) {
 		throw error(403, 'not admin');
@@ -14,11 +17,11 @@ export async function protectAdmin<T>(sessionUser: SessionUser, callback?: () =>
 }
 
 export async function protectUser<T>(
-	sessionUser: SessionUser,
+	sessionUser: SessionUser | null,
 	user: User,
 	callback?: () => Promise<T>
 ) {
-	if (!sessionUser) {
+	if (sessionUser === null) {
 		throw error(401, 'not signed in');
 	} else if (sessionUser.id !== user.id) {
 		throw error(403, 'not user');
@@ -30,11 +33,11 @@ export async function protectUser<T>(
 }
 
 export async function protectUserOrAdmin<T>(
-	sessionUser: SessionUser,
+	sessionUser: SessionUser | null,
 	user: User,
 	callback?: () => Promise<T>
 ) {
-	if (!sessionUser) {
+	if (sessionUser === null) {
 		throw error(401, 'not signed in');
 	} else if (!sessionUser.isAdmin && sessionUser.id !== user.id) {
 		throw error(403, 'not user');

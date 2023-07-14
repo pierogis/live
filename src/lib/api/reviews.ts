@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 
-import type { Review, User } from '@prisma/client';
+import type { Review, User } from '$db/schema';
 
 export function storeReviews(
 	reviews: (Review & { user: User })[],

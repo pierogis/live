@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Category, Score } from '@prisma/client';
+	import type { Category, Score } from '$db/schema';
 	import type { Readable, Writable } from 'svelte/store';
 
 	import ScoreDisplay from './ScoreDisplay.svelte';

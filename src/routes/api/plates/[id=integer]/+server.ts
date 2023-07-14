@@ -1,9 +1,10 @@
 import { error, json } from '@sveltejs/kit';
 
-import type { Jurisdiction } from '@prisma/client';
 import { deletePlate, getFullPlate, helpUpdatePlate } from '$lib/server/database/plates';
 
 import type { RequestHandler } from './$types';
+import type { Jurisdiction } from '$db/schema';
+
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
@@ -26,7 +27,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			endYear,
 			imageUrls
 		}: {
-			jurisdiction: Partial<Jurisdiction>;
+			jurisdiction: Pick<Jurisdiction, 'id'>;
 			startYear?: number;
 			endYear?: number;
 			imageUrls: string[];
@@ -34,7 +35,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
 		const modelId: number = parseInt(params.id);
 
-		const plate = helpUpdatePlate(modelId, jurisdiction, startYear, endYear, imageUrls);
+		const plate = helpUpdatePlate(modelId, jurisdiction.id, startYear, endYear, imageUrls);
 
 		return json(plate);
 	} else {

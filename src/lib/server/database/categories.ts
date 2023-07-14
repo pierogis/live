@@ -1,6 +1,19 @@
-import type { Category, Prisma } from '@prisma/client';
-import { prisma } from '.';
+import type { Category } from '$db/schema';
+import { db } from '.';
 
-export async function getCategories(params: Prisma.CategoryWhereInput): Promise<Category[]> {
-	return await prisma.category.findMany({ where: params });
-}
+export const getCategories = async (
+	params: Partial<Category>,
+	take: number = undefined,
+	skip = 0
+) =>
+	await db.query.categories.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.name ? eq(table.name, params.name) : undefined,
+				params.symbol ? eq(table.symbol, params.symbol) : undefined,
+				params.ware ? eq(table.ware, params.ware) : undefined
+			),
+		limit: take,
+		offset: skip
+	});

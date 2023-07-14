@@ -9,6 +9,9 @@ const config = {
 		adapter: adapter(),
 		files: {
 			assets: 'static'
+		},
+		alias: {
+			$db: 'src/db'
 		}
 	}
 };

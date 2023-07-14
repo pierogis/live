@@ -1,22 +1,31 @@
-import { prisma } from '.';
-import type { Image } from '@prisma/client';
+import { eq, like, sql } from 'drizzle-orm';
 
-export async function getImages(
-	params: Partial<Omit<Image, 'url'>>,
-	take: number = undefined,
-	skip = 0
-): Promise<Image[]> {
-	const images = await prisma.image.findMany({ where: params, take, skip });
+import { type Image, type NewImage, images } from '$db/schema';
 
-	return images;
-}
+import { db } from '.';
 
-export async function createImage(data: Omit<Image, 'id'>): Promise<Image> {
-	const image = await prisma.image.create({ data });
+export const getImages = async (params: Partial<Image>, take: number = undefined, skip = 0) =>
+	await db.query.images.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.modelId, params.modelId) : undefined,
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.url ? like(table.url, sql`%${params.url}%`) : undefined
+			),
+		limit: take,
+		offset: skip
+	});
 
-	return image;
-}
+export const createImage = async (data: NewImage) =>
+	(
+		await db
+			.insert(images)
+			.values({
+				modelId: data.modelId,
+				url: data.url
+			})
+			.returning()
+	)[0];
 
-export async function deleteImages(params: Partial<Image>) {
-	return await prisma.image.deleteMany({ where: params });
-}
+export const deleteImages = async (id: Image['id']) =>
+	(await db.delete(images).where(eq(images.id, id)).returning())[0];

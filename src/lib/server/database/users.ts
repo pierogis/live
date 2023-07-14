@@ -1,25 +1,39 @@
-import { prisma } from '.';
-import type { User } from '@prisma/client';
+import { eq } from 'drizzle-orm';
 
-export async function getUsers(
+import { type User, users, type NewUser } from '$db/schema';
+
+import { db } from '.';
+
+export const getUsers = async (
 	params: Partial<Omit<User, 'isAdmin'>>,
 	take: number = undefined,
 	skip = 0
-): Promise<User[]> {
-	const users = await prisma.user.findMany({ where: params, take, skip });
+) =>
+	await db.query.users.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.email ? eq(table.email, params.email) : undefined,
+				params.serial ? eq(table.serial, params.serial) : undefined
+			),
+		limit: take,
+		offset: skip
+	});
 
-	return users;
-}
-
-export async function getUser(params: Partial<Omit<User, 'isAdmin'>>) {
-	const user = await prisma.user.findUnique({
-		where: params,
-		include: {
+export const getUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
+	await db.query.users.findFirst({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.email ? eq(table.email, params.email) : undefined,
+				params.serial ? eq(table.serial, params.serial) : undefined
+			),
+		with: {
 			scores: true,
 			reviews: {
-				include: {
+				with: {
 					model: {
-						include: {
+						with: {
 							scores: true,
 							images: true
 						}
@@ -29,29 +43,16 @@ export async function getUser(params: Partial<Omit<User, 'isAdmin'>>) {
 		}
 	});
 
-	return user;
-}
+export const createUser = async (partial: NewUser) =>
+	(await db.insert(users).values(partial).returning())[0];
 
-export async function createUser(partial: Omit<User, 'id' | 'isAdmin'>) {
-	const user = await prisma.user.create({ data: partial });
+export const updateUserById = async (id: User['id'], data: Partial<Omit<User, 'isAdmin' | 'id'>>) =>
+	(await db.update(users).set(data).where(eq(users.id, id)).returning())[0];
 
-	return user;
-}
-
-export async function updateUserById(
-	id: number,
+export const updateUserBySerial = async (
+	serial: User['serial'],
 	data: Partial<Omit<User, 'isAdmin' | 'id'>>
-): Promise<User> {
-	return await prisma.user.update({ where: { id }, data });
-}
+) => (await db.update(users).set(data).where(eq(users.serial, serial)).returning())[0];
 
-export async function updateUserBySerial(
-	serial: string,
-	data: Partial<Omit<User, 'isAdmin' | 'id'>>
-): Promise<User> {
-	return await prisma.user.update({ where: { serial }, data });
-}
-
-export async function deleteUser(id: number): Promise<User> {
-	return await prisma.user.delete({ where: { id } });
-}
+export const deleteUser = async (id: number) =>
+	(await db.delete(users).where(eq(users.id, id)).returning())[0];

@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Plate } from '@prisma/client';
+import type { Plate } from '$db/schema';
 
 import { protectAdmin } from '$lib/helpers';
 import { getJurisdictions } from '$lib/server/database/jurisdictions';
@@ -35,12 +35,12 @@ export const actions = {
 				return fail(400, { message: `jurisdiction not provided` });
 			}
 
-			const jurisdiction = { abbreviation: jurisdictionEntry.toString() };
+			const jurisdictionId = parseInt(jurisdictionEntry.toString());
 			const startYear = startYearEntry ? parseInt(startYearEntry.toString()) : undefined;
 			const endYear = endYearEntry ? parseInt(endYearEntry.toString()) : undefined;
 			const imageUrls = imageUrlEntry ? [imageUrlEntry.toString()] : [];
 
-			const plate: Plate = await helpCreatePlate(jurisdiction, startYear, endYear, imageUrls);
+			const plate: Plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
 
 			throw redirect(303, `/plates/${plate.modelId}`);
 		} else {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { FullPlate } from '$lib/models';
+	import type { FullPlate } from '$db/schema';
 
 	import { Card, ImageDisplay } from '@pierogis/utensils';
 

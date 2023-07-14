@@ -1,7 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 
-import type { User } from '@prisma/client';
 import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
+import type { User } from '$db/schema';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
 };
 
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (!locals.sessionUser) {
+	if (locals.sessionUser === null) {
 		throw error(401, `not signed in`);
 	}
 	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {
@@ -49,7 +49,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (!locals.sessionUser) {
+	if (locals.sessionUser === null) {
 		throw error(401, `not signed in`);
 	}
 	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {

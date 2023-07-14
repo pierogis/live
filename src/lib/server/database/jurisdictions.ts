@@ -1,42 +1,60 @@
-import { prisma } from '.';
-import type { Jurisdiction } from '@prisma/client';
-import type { FullPlate } from '../../models';
+import { jurisdictions, type Jurisdiction } from '$db/schema';
 
-export async function listJurisdictions(): Promise<Jurisdiction[]> {
-	const jurisdictions = await prisma.jurisdiction.findMany();
-	return jurisdictions;
-}
+import { db } from '.';
 
-export async function getJurisdictions(
+export const listJurisdictions = async () => await db.select().from(jurisdictions);
+
+export const getJurisdictions = async (
 	params: Partial<Jurisdiction>,
 	take: number = undefined,
 	skip = 0
-): Promise<Jurisdiction[]> {
-	const jurisdictions = await prisma.jurisdiction.findMany({ where: params, take, skip });
+) =>
+	await db.query.jurisdictions.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.abbreviation ? eq(table.abbreviation, params.abbreviation) : undefined,
+				params.name ? eq(table.name, params.name) : undefined
+			),
+		limit: take,
+		offset: skip
+	});
 
-	return jurisdictions;
-}
-
-export async function getJurisdiction(params: Partial<Jurisdiction>): Promise<Jurisdiction> {
-	const jurisdiction = await prisma.jurisdiction.findFirst({ where: params });
-
-	return jurisdiction;
-}
-
-export async function getJurisidictionWithPlates(
-	params: Partial<Jurisdiction>
-): Promise<Jurisdiction & { plates: FullPlate[] }> {
-	const jurisdictions = await prisma.jurisdiction.findUnique({
-		where: params,
-		include: {
+export const getJurisdictionWithPlates = async (params: Partial<Jurisdiction>) =>
+	await db.query.jurisdictions.findFirst({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.abbreviation ? eq(table.abbreviation, params.abbreviation) : undefined,
+				params.name ? eq(table.name, params.name) : undefined
+			),
+		with: {
 			plates: {
-				include: {
+				with: {
 					jurisdiction: true,
-					model: { include: { images: true, scores: true, reviews: { include: { user: true } } } }
+					model: {
+						columns: {},
+						with: {
+							scores: true,
+							reviews: {
+								with: {
+									user: true
+								}
+							},
+							images: true
+						}
+					}
 				}
 			}
 		}
 	});
 
-	return jurisdictions;
-}
+export const getJurisdiction = async (params: Partial<Jurisdiction>) =>
+	await db.query.jurisdictions.findFirst({
+		where: (table, { or, eq }) =>
+			or(
+				eq(table.id, params.id),
+				eq(table.abbreviation, params.abbreviation),
+				eq(table.name, params.name)
+			)
+	});

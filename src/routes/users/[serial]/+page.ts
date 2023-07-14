@@ -1,5 +1,5 @@
 import { storeScores } from '$lib/api/scores';
-import type { Score } from '@prisma/client';
+import type { Score } from '$db/schema';
 import type { Writable } from 'svelte/store';
 
 export const load = async ({ parent, data, fetch }) => {
@@ -7,8 +7,8 @@ export const load = async ({ parent, data, fetch }) => {
 	const { categories } = data;
 
 	const { sessionUser } = await parent();
-	const isUser = sessionUser && sessionUser.id == user.id;
-	const isAdmin = sessionUser && sessionUser.isAdmin;
+	const isUser = sessionUser !== null && sessionUser.id == user.id;
+	const isAdmin = sessionUser !== null && sessionUser.isAdmin;
 
 	if (isUser) user.email = sessionUser.email;
 

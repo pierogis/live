@@ -1,18 +1,18 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import type { Category, User } from '@prisma/client';
 import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
+import type { Category, User } from '$db/schema';
 
 export const load = async () => {
-	const categories: Category[] = await getCategories({ wareName: 'plate' });
+	const categories: Category[] = await getCategories({ ware: 'plate' });
 
 	return { categories };
 };
 
 export const actions = {
 	default: async ({ locals, request, params }) => {
-		if (!locals.sessionUser) {
+		if (locals.sessionUser === null) {
 			throw error(401, `not signed in`);
 		}
 		if (locals.sessionUser?.serial == params.serial || locals.sessionUser?.isAdmin) {

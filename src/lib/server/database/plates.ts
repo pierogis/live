@@ -1,150 +1,203 @@
-import { prisma } from '.';
-import type { Jurisdiction, Plate, Prisma } from '@prisma/client';
-import type { FullPlate } from '$lib/models';
-import { deleteImages } from './images';
+import { eq, like, and, sql, notInArray, desc } from 'drizzle-orm';
 
-export async function listPlates(): Promise<Plate[]> {
-	const plates = await prisma.plate.findMany();
-	return plates;
-}
+import { type Plate, plates, type NewPlate, models, images, type Image } from '$db/schema';
 
-export async function getPlates(
-	params: Partial<Plate>,
-	take: number = undefined,
-	skip = 0
-): Promise<Plate[]> {
-	const plates = await prisma.plate.findMany({
-		where: params,
-		take,
-		skip,
-		orderBy: [{ modelId: 'desc' }]
+import { db } from '.';
+
+export const getPlates = async (params: Partial<Plate>, take: number = undefined, skip = 0) =>
+	await db.query.plates.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.endYear ? eq(table.endYear, params.endYear) : undefined,
+				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
+			),
+		limit: take,
+		offset: skip,
+		orderBy: [desc(plates.modelId)]
 	});
 
-	return plates;
-}
-
-export async function getPlatePerJurisdiction(
-	take: number = undefined,
-	skip = 0
-): Promise<FullPlate[]> {
-	// one plate per jurisdiction
-	const plates = await prisma.plate.findMany({
-		take,
-		skip,
-		distinct: ['jurisdictionId'],
-		include: {
-			jurisdiction: true,
-			model: { include: { scores: true, images: true, reviews: { include: { user: true } } } }
-		},
-		orderBy: [{ jurisdiction: { abbreviation: 'asc' } }]
-	});
-
-	return plates;
-}
-
-export async function getFullPlates(take: number = undefined, skip = 0): Promise<FullPlate[]> {
-	const plates = await prisma.plate.findMany({
-		take,
-		skip,
-		include: {
-			jurisdiction: true,
-			model: { include: { scores: true, images: true, reviews: { include: { user: true } } } }
-		},
-		orderBy: [{ modelId: 'desc' }]
-	});
-
-	return plates;
-}
-
-export async function getFullPlate(params: Partial<Plate>): Promise<FullPlate> {
-	const plate = await prisma.plate.findUnique({
-		where: params,
-		include: {
+export const getFullPlate = async (params: Partial<Plate>) =>
+	await db.query.plates.findFirst({
+		where: (table, { and, eq }) =>
+			and(
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.endYear ? eq(table.endYear, params.endYear) : undefined,
+				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
+			),
+		with: {
 			jurisdiction: true,
 			model: {
-				include: {
+				columns: {},
+				with: {
 					scores: true,
-					images: true,
-					reviews: { include: { user: true } }
+					reviews: {
+						with: {
+							user: true
+						}
+					},
+					images: true
 				}
 			}
 		}
 	});
 
-	return plate;
-}
-
-export async function getPlate(params: Partial<Plate>): Promise<Plate> {
-	const plate = await prisma.plate.findUnique({ where: params });
-
-	return plate;
-}
-
-export async function createPlate(data: Prisma.PlateCreateInput): Promise<Plate> {
-	const plate = await prisma.plate.create({ data });
-
-	return plate;
-}
-
-export async function helpCreatePlate(
-	jurisdiction: Partial<Jurisdiction>,
-	startYear: number | undefined,
-	endYear: number | undefined,
-	imageUrls: string[]
-) {
-	const createInput: Prisma.PlateCreateInput = {
-		jurisdiction: { connect: { ...jurisdiction } },
-		startYear: startYear,
-		endYear: endYear,
-		model: {
-			create: {
-				ware: { connect: { name: 'plate' } },
-				images: {
-					createMany: {
-						data: imageUrls.map((imageUrl) => {
-							return { url: imageUrl };
-						})
-					}
+export const getFullPlates = async (params: Partial<Plate>, take: number = undefined, skip = 0) =>
+	await db.query.plates.findMany({
+		where: (table, { and, eq }) =>
+			and(
+				params.modelId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.endYear ? eq(table.endYear, params.endYear) : undefined,
+				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
+			),
+		with: {
+			jurisdiction: true,
+			model: {
+				columns: {},
+				with: {
+					scores: true,
+					reviews: {
+						with: {
+							user: true
+						}
+					},
+					images: true
 				}
 			}
-		}
-	};
+		},
+		limit: take,
+		offset: skip,
+		orderBy: [desc(plates.modelId)]
+	});
 
-	return await createPlate(createInput);
-}
-
-export async function updatePlate(modelId: number, data: Prisma.PlateUpdateInput) {
-	return await prisma.plate.update({ where: { modelId }, data });
-}
-export async function helpUpdatePlate(
-	modelId: number,
-	jurisdiction: Partial<Jurisdiction>,
-	startYear: number | undefined,
-	endYear: number | undefined,
-	imageUrls: string[]
-) {
-	await deleteImages({ modelId });
-
-	const data: Prisma.PlateUpdateInput = {
-		jurisdiction: { connect: { ...jurisdiction } },
-		startYear: startYear,
-		endYear: endYear,
-		model: {
-			update: {
-				images: {
-					createMany: {
-						data: imageUrls.map((imageUrl) => {
-							return { url: imageUrl };
-						})
+export const getPlatePerJurisdiction = async (take: number = undefined, skip = 0) => {
+	// one plate per jurisdiction
+	const jurisdictionsWithOnePlate = await db.query.jurisdictions.findMany({
+		columns: {},
+		with: {
+			plates: {
+				with: {
+					jurisdiction: true,
+					model: {
+						columns: {},
+						with: {
+							scores: true,
+							reviews: {
+								with: {
+									user: true
+								}
+							},
+							images: true
+						}
 					}
-				}
+				},
+				limit: 1
 			}
+		},
+		limit: take,
+		offset: skip,
+		orderBy: (table, { asc }) => [asc(table.abbreviation)]
+	});
+
+	const fullPlates = jurisdictionsWithOnePlate.flatMap((j) => j.plates);
+
+	return fullPlates;
+};
+
+export const updatePlate = async (modelId: Plate['modelId'], data: Omit<NewPlate, 'modelId'>) =>
+	(await db.update(plates).set(data).where(eq(plates.modelId, modelId)).returning())[0];
+
+export const deletePlate = async (modelId: Plate['modelId']) =>
+	(await db.delete(plates).where(eq(plates.modelId, modelId)).returning())[0];
+
+export const helpCreatePlate = async (
+	jurisdictionId: Plate['jurisdictionId'],
+	startYear: Plate['startYear'] | undefined,
+	endYear: Plate['endYear'] | undefined,
+	imageUrls: Image['url'][]
+) =>
+	await db.transaction(async (tx) => {
+		const model = (await tx.insert(models).values({ ware: 'plate' }).returning())[0];
+
+		if (!model) {
+			tx.rollback();
+			return;
 		}
-	};
 
-	return await updatePlate(modelId, data);
-}
+		const plate = (
+			await tx
+				.insert(plates)
+				.values({
+					modelId: model.id,
+					jurisdictionId: jurisdictionId,
+					startYear: startYear,
+					endYear: endYear
+				})
+				.returning()
+		)[0];
 
-export async function deletePlate(modelId: number): Promise<Plate> {
-	return await prisma.plate.delete({ where: { modelId } });
-}
+		if (!plate) {
+			tx.rollback();
+			return;
+		}
+
+		if (imageUrls.length > 0) {
+			await tx.insert(images).values(
+				imageUrls.map((url) => ({
+					modelId: model.id,
+					url: url
+				}))
+			);
+		}
+
+		return plate;
+	});
+
+export const helpUpdatePlate = async (
+	modelId: Plate['modelId'],
+	jurisdictionId: Plate['jurisdictionId'],
+	startYear: Plate['startYear'] | undefined,
+	endYear: Plate['endYear'] | undefined,
+	imageUrls: Image['url'][]
+) =>
+	await db.transaction(async (tx) => {
+		const plate = (
+			await tx
+				.update(plates)
+				.set({
+					jurisdictionId: jurisdictionId,
+					startYear: startYear,
+					endYear: endYear
+				})
+				.where(eq(plates.modelId, modelId))
+				.returning()
+		)[0];
+
+		if (!plate) {
+			tx.rollback();
+			return;
+		}
+
+		// delete images that are not in the put array
+		await tx
+			.delete(images)
+			.where(and(eq(images.modelId, modelId), notInArray(images.url, imageUrls)));
+
+		// insert images that are not a duplicate modelId-url
+		if (imageUrls.length > 0) {
+			await tx
+				.insert(images)
+				.values(
+					imageUrls.map((url) => ({
+						modelId: modelId,
+						url: url
+					}))
+				)
+				.onConflictDoNothing({ target: images.url });
+		}
+
+		return plate;
+	});
