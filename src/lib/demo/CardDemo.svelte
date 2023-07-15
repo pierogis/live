@@ -2,10 +2,12 @@
 	import { Card } from '$lib';
 </script>
 
-<Card>
-	<Card>
-		<span>a <code>Card</code> within a <code>Card</code></span>
-	</Card>
+<Card border={false}>
+	<Card inset={false}>
+		<Card shadow={true}>
+			<span>a <code>Card</code> within a <code>Card</code></span>
+		</Card>
 
-	<span>within a <code>Card</code> !</span>
+		<span>within a <code>Card</code> !</span>
+	</Card>
 </Card>

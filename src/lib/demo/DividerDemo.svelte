@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { Divider } from '$lib';
+	import { Card, Divider } from '$lib';
 </script>
 
-<span>a <code>Divider</code></span>
-<Divider size={'4px'} horizontal />
-<div class="horizontal-divider-flexbox">
-	<span>can separate horizontally</span>
+<Card>
+	<span>a <code>Divider</code></span>
+	<Divider size={'4px'} horizontal />
+	<div class="horizontal-divider-flexbox">
+		<span>can separate horizontally</span>
 
-	<Divider size={'4px'} />
+		<Divider size={'4px'} />
 
-	<span>or vertically</span>
-</div>
+		<span>or vertically</span>
+	</div>
+</Card>
 
 <style>
 	.horizontal-divider-flexbox {

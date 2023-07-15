@@ -1,10 +1,16 @@
-<div class="card border inset shadow">
+<script lang="ts">
+	export let border = true;
+	export let inset = true;
+	export let shadow = false;
+</script>
+
+<div class="card" class:border class:inset class:shadow>
 	<slot />
 </div>
 
 <style>
 	.card {
-		padding: 0.4rem;
+		padding: 12px;
 		max-width: 80vw;
 		height: 100%;
 
@@ -12,16 +18,10 @@
 		flex-direction: column;
 		place-items: center;
 		place-content: center;
+		gap: 12px;
 
 		position: relative;
 
 		background-color: var(--primary-color);
-	}
-
-	:global(.card > *) {
-		margin: 0.4rem;
-
-		max-width: 90%;
-		max-height: 90%;
 	}
 </style>

@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '$lib';
+
 	import {
 		CardDemo,
 		CardsGridDemo,
 		DividerDemo,
 		ImageDisplayDemo,
+		InteractableDemo,
 		SectionDemo,
 		ThemeToggleDemo
 	} from '$lib/demo';
@@ -22,13 +24,18 @@
 		alt="hello!"
 	/>
 
-	<span
-		>this is a simple svelte ui/style package called <a
-			style:text-decoration="underline"
-			href="https://github.com/pierogis/utensils">utensils</a
-		></span
+	<span>
+		this is a simple svelte ui/style package called
+		<a style:text-decoration="underline" href="https://github.com/pierogis/utensils"> utensils </a>
+	</span>
+	<Divider size="4px" horizontal={true} margin="0" />
+	<span>install with</span>
+	<textarea class="inset" rows="1" cols="35">npm i --save-dev @pierogis/utensils</textarea>
+	<span>and include</span>
+	<textarea class="inset" rows="1" cols="50"
+		>{`@import '@pierogis/utensils/styles/pierogis.css';`}</textarea
 	>
-	<textarea class="inset"> npm i --save-dev @pierogis/utensils </textarea>
+	<span>in a top level style</span>
 </Card>
 
 <br />
@@ -37,29 +44,13 @@
 
 <Section title="components">
 	<CardsGrid>
-		<Card>
-			<CardDemo />
-		</Card>
-
-		<Card>
-			<CardsGridDemo />
-		</Card>
-
-		<Card>
-			<DividerDemo />
-		</Card>
-
-		<Card>
-			<SectionDemo />
-		</Card>
-
-		<Card>
-			<ImageDisplayDemo />
-		</Card>
-
-		<Card>
-			<ThemeToggleDemo />
-		</Card>
+		<CardDemo />
+		<CardsGridDemo />
+		<DividerDemo />
+		<SectionDemo />
+		<ImageDisplayDemo />
+		<ThemeToggleDemo />
+		<InteractableDemo />
 	</CardsGrid>
 </Section>
 
@@ -79,7 +70,7 @@
 		</Card>
 		<Card>
 			<h4>.shadow</h4>
-			<div class="shadow">applies an outer box shadow with some blur</div>
+			<div class="shadow">applies an outer box shadow</div>
 		</Card>
 		<Card>
 			<h4>.link-box</h4>
@@ -110,7 +101,6 @@
 	}
 
 	textarea {
-		width: min(90%, 24rem);
 		font-family: 'Courier', monospace;
 		font-weight: bold;
 	}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Section } from '$lib';
+	import { Card, Section } from '$lib';
 
 	let sectionTitle = 'section title';
 	let columnGap = 2;
@@ -9,75 +9,77 @@
 	let sectionColumn = true;
 </script>
 
-<span>a <code>Section</code></span>
-<Section
-	title={sectionTitle}
-	columnGap={columnGap + columnGapUnit}
-	rowGap={rowGap + rowGapUnit}
-	column={sectionColumn}
->
-	<span class="padded inset">doesn't really do much</span>
+<Card>
+	<span>a <code>Section</code></span>
+	<Section
+		title={sectionTitle}
+		columnGap={columnGap + columnGapUnit}
+		rowGap={rowGap + rowGapUnit}
+		column={sectionColumn}
+	>
+		<span class="padded inset">doesn't really do much</span>
 
-	<div class="inputs padded inset">
-		<div>
-			<label>
-				title
-				<br />
-				<input class="inset" type="text" bind:value={sectionTitle} />
-			</label>
-		</div>
+		<div class="inputs padded inset">
+			<div>
+				<label>
+					title
+					<br />
+					<input class="inset" type="text" bind:value={sectionTitle} />
+				</label>
+			</div>
 
-		<div class="size-group">
-			<label>
-				columnGap
-				<input class="inset" type="number" bind:value={columnGap} />
-			</label>
+			<div class="size-group">
+				<label>
+					columnGap
+					<input class="inset" type="number" bind:value={columnGap} />
+				</label>
+
+				<div class="radio-group">
+					<label>
+						<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="rem" />
+						rem
+					</label>
+
+					<label>
+						<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="px" />
+						px
+					</label>
+				</div>
+			</div>
+
+			<div class="size-group">
+				<label>
+					rowGap
+					<input class="inset" type="number" bind:value={rowGap} />
+				</label>
+
+				<div class="radio-group">
+					<label>
+						<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="rem" />
+						rem
+					</label>
+
+					<label>
+						<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="px" />
+						px
+					</label>
+				</div>
+			</div>
 
 			<div class="radio-group">
 				<label>
-					<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="rem" />
-					rem
+					<input type="radio" bind:group={sectionColumn} name="column" value={true} />
+					column
 				</label>
 
 				<label>
-					<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="px" />
-					px
+					<input type="radio" bind:group={sectionColumn} name="column" value={false} />
+					row
 				</label>
 			</div>
 		</div>
-
-		<div class="size-group">
-			<label>
-				rowGap
-				<input class="inset" type="number" bind:value={rowGap} />
-			</label>
-
-			<div class="radio-group">
-				<label>
-					<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="rem" />
-					rem
-				</label>
-
-				<label>
-					<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="px" />
-					px
-				</label>
-			</div>
-		</div>
-
-		<div class="radio-group">
-			<label>
-				<input type="radio" bind:group={sectionColumn} name="column" value={true} />
-				column
-			</label>
-
-			<label>
-				<input type="radio" bind:group={sectionColumn} name="column" value={false} />
-				row
-			</label>
-		</div>
-	</div>
-</Section>
+	</Section>
+</Card>
 
 <style>
 	.inputs {

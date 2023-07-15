@@ -42,7 +42,7 @@
 	}
 </script>
 
-<div class="zone inset shadow" use:dropAction>
+<div class="zone inset" use:dropAction>
 	<input bind:this={inputElement} type="file" name="image" accept="image/*" bind:files />
 	<img class="image" src={thumbnailSrc} alt="upload" />
 </div>
