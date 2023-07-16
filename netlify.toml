@@ -1,7 +1,0 @@
-[build]
-  command = "prisma generate && npm run build"
-  publish = "public"
-
-[functions]
-  external_node_modules = ["@prisma/client"]
-  node_bundler = "esbuild"
