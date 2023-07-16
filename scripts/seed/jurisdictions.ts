@@ -1,4 +1,4 @@
-import { NewJurisdiction } from '../src/db/schema';
+import { NewJurisdiction } from '../../src/db/schema';
 
 export const seedJurisdictions: NewJurisdiction[] = [
 	{ abbreviation: 'al', name: 'alabama' },

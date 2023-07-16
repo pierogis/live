@@ -202,7 +202,7 @@ export const platesRelations = relations(plates, ({ one }) => ({
 	})
 }));
 
-export const jurisdictionsRelations = relations(jurisdictions, ({ many, one }) => ({
+export const jurisdictionsRelations = relations(jurisdictions, ({ many }) => ({
 	plates: many(plates)
 }));
 

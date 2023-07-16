@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-
 	import { Section } from '@pierogis/utensils';
 	import { ReviewForm, PlateCard } from '$lib/components';
 

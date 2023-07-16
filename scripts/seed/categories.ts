@@ -1,4 +1,4 @@
-import { NewCategory } from '../src/db/schema';
+import { NewCategory } from '../../src/db/schema';
 
 export const seedCategories: NewCategory[] = [
 	{ name: 'overall', symbol: '🌡️', ware: 'plate' },
