@@ -28,47 +28,41 @@
 	</title>
 </svelte:head>
 
-<div class="section-container">
-	<Section>
-		<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
+<Section>
+	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
 
-		<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
+	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
 
-		{#if $editorialReview.description}
-			<div class="break-container">
-				<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
-			</div>
-		{/if}
-	</Section>
-</div>
+	{#if $editorialReview.description}
+		<div class="break-container">
+			<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
+		</div>
+	{/if}
+</Section>
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<div class="section-container">
-	<Section title="user review" column rowGap={'0.5rem'}>
-		{#if sessionUser !== null}
-			<ScoreSheet {categories} {userScores} {scoreUrl} />
-			<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
-		{:else}
-			{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
-			<Interactable>
-				<a class="border inset good no-select link-box" href={loginUrl}>login</a>
-			</Interactable>
-		{/if}
-	</Section>
-</div>
+<Section title="user review" column rowGap={'0.5rem'}>
+	{#if sessionUser !== null}
+		<ScoreSheet {categories} {userScores} {scoreUrl} />
+		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
+	{:else}
+		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
+		<Interactable>
+			<a class="border inset good no-select link-box" href={loginUrl}>login</a>
+		</Interactable>
+	{/if}
+</Section>
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<div class="section-container">
-	<Section title="reviews" column>
-		<CardsGrid>
-			{#each allReviewsStores as review}
-				<ReviewCard {categories} {review} scores={allScores} />
-			{/each}
-		</CardsGrid>
-	</Section>
-</div>
+<Section title="reviews" column>
+	<CardsGrid>
+		{#each allReviewsStores as review}
+			<ReviewCard {categories} {review} scores={allScores} />
+		{/each}
+	</CardsGrid>
+</Section>
 
 <style>
 	.break-container {
@@ -83,8 +77,5 @@
 		width: 90%;
 		max-width: 80rem;
 		resize: none;
-	}
-	.section-container {
-		width: 90%;
 	}
 </style>
