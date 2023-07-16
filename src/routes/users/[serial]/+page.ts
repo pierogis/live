@@ -7,10 +7,10 @@ export const load = async ({ parent, data, fetch }) => {
 	const { categories } = data;
 
 	const { sessionUser } = await parent();
-	const isUser = sessionUser !== null && sessionUser.id == user.id;
-	const isAdmin = sessionUser !== null && sessionUser.isAdmin;
+	const isLoggedInUser = sessionUser !== null && sessionUser.id == user.id;
+	const isLoggedInAdmin = sessionUser !== null && sessionUser.isAdmin;
 
-	if (isUser) user.email = sessionUser.email;
+	if (isLoggedInUser) user.email = sessionUser.email;
 
 	const reviewsScores = user.reviews.reduce<{
 		[reviewId: number]: {
@@ -30,5 +30,5 @@ export const load = async ({ parent, data, fetch }) => {
 		return previous;
 	}, {});
 
-	return { user, isUser, isAdmin, reviewsScores, categories };
+	return { user, isLoggedInUser, isLoggedInAdmin, reviewsScores, categories };
 };

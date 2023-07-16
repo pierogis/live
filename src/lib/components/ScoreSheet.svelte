@@ -2,8 +2,8 @@
 	import type { Category, Score } from '$db/schema';
 	import type { Readable, Writable } from 'svelte/store';
 
-	import ScoreDisplay from './ScoreDisplay.svelte';
-	import ScoreGraph from './ScoreGraph.svelte';
+	import { Interactable } from '@pierogis/utensils';
+	import { ScoreDisplay, ScoreGraph } from '.';
 
 	export let categories: Category[];
 
@@ -16,7 +16,7 @@
 	const interactive = userScores != null;
 </script>
 
-<div style:position="relative" class="no-select">
+<Interactable clickable={false}>
 	<div class="inner">
 		{#each categories as category}
 			{@const categoryEditorialScore = editorialScores ? editorialScores[category.id] : null}
@@ -51,7 +51,7 @@
 			{/if}
 		{/each}
 	</div>
-</div>
+</Interactable>
 
 <style>
 	.category {
@@ -66,7 +66,7 @@
 		padding-bottom: 0.4rem;
 
 		border: dotted 0.2rem var(--text-color-st);
-		border-radius: 0.8rem;
+		border-radius: 10px;
 	}
 	.overall-seperator {
 		height: 2px;

@@ -3,7 +3,7 @@
 
 	import { FlowCode, flowStatuses } from './_flow';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let data;
 
@@ -24,7 +24,7 @@
 	<title>login</title>
 </svelte:head>
 
-<form id={loginFormId} action="/login?/{actionName}" method="post" />
+<form id={loginFormId} action="/login?/{actionName}" method="POST" />
 <Card>
 	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
 	<input type="hidden" name="generated" form={loginFormId} value={!form?.generated} />
@@ -32,7 +32,7 @@
 		<span>email</span>
 		<input
 			readonly={form?.generated && flowStatus && flowStatus.emailState}
-			class="border inset shadow"
+			class="border inset"
 			class:good={flowStatus && flowStatus.emailState === true}
 			class:bad={flowStatus && flowStatus.emailState === false}
 			type="email"
@@ -47,11 +47,12 @@
 		<label>
 			<span>temporary passphrase</span>
 			<input
-				class="border inset shadow"
+				class="border inset"
 				class:good={flowStatus && flowStatus.passphraseState === true}
 				class:bad={flowStatus && flowStatus.passphraseState === false}
 				type="text"
 				name="passphrase"
+				id="passphrase"
 				form={loginFormId}
 				placeholder={data.samplePhrase}
 				bind:value={passphrase}
@@ -59,47 +60,53 @@
 		</label>
 	{/if}
 
-	<button
-		class="border inset shadow good no-select"
-		type="submit"
-		form={loginFormId}
-		title={form?.generated ? '' : 'email a temporary passphrase'}
-	>
-		{form?.generated ? 'login' : 'generate'}
-	</button>
+	<Interactable>
+		<button
+			class="border inset good no-select"
+			type="submit"
+			form={loginFormId}
+			title={form?.generated ? '' : 'email a temporary passphrase'}
+		>
+			{form?.generated ? 'login' : 'generate'}
+		</button>
+	</Interactable>
 
 	{#if form?.generated}
-		<!-- svelte-ignore a11y-accesskey -->
-		<button
-			type="submit"
-			form={loginFormId}
-			formaction={'/login?/need'}
-			class="border inset shadow no-select"
-			accesskey="g"
-		>
-			need a new passphrase?
-		</button>
+		<Interactable>
+			<!-- svelte-ignore a11y-accesskey -->
+			<button
+				type="submit"
+				form={loginFormId}
+				formaction={'/login?/need'}
+				class="border inset no-select"
+				accesskey="g"
+			>
+				need a new passphrase?
+			</button>
+		</Interactable>
 	{:else}
-		<!-- svelte-ignore a11y-accesskey -->
-		<button
-			type="submit"
-			form={loginFormId}
-			formaction={'/login?/already'}
-			class="border inset shadow no-select"
-			accesskey="r"
-		>
-			already have a passphrase?
-		</button>
+		<Interactable>
+			<!-- svelte-ignore a11y-accesskey -->
+			<button
+				type="submit"
+				form={loginFormId}
+				formaction={'/login?/already'}
+				class="border inset no-select"
+				accesskey="r"
+			>
+				already have a passphrase?
+			</button>
+		</Interactable>
 	{/if}
 </Card>
 <br />
 {#if flowStatus}
 	<div
-		class="border inset shadow no-select alert"
+		class="border inset no-select alert"
 		class:good={flowStatus.alertState == true}
 		class:bad={flowStatus.alertState == false}
 	>
-		{flowStatus.message}
+		<u>{flowStatus.message}</u>
 	</div>
 {/if}
 

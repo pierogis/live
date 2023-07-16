@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 
 import { type User, users, type NewUser } from '$db/schema';
 
@@ -55,4 +55,9 @@ export const updateUserBySerial = async (
 ) => (await db.update(users).set(data).where(eq(users.serial, serial)).returning())[0];
 
 export const deleteUser = async (id: number) =>
-	(await db.delete(users).where(eq(users.id, id)).returning())[0];
+	(
+		await db
+			.delete(users)
+			.where(and(eq(users.id, id), ne(users.isAdmin, true)))
+			.returning()
+	)[0];

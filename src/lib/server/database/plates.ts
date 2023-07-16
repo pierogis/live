@@ -108,10 +108,20 @@ export const getPlatePerJurisdiction = async (take: number = undefined, skip = 0
 };
 
 export const updatePlate = async (modelId: Plate['modelId'], data: Omit<NewPlate, 'modelId'>) =>
-	(await db.update(plates).set(data).where(eq(plates.modelId, modelId)).returning())[0];
+	(
+		await db
+			.update(plates)
+			.set({
+				jurisdictionId: data.jurisdictionId,
+				startYear: data.startYear,
+				endYear: data.endYear
+			})
+			.where(eq(plates.modelId, modelId))
+			.returning()
+	)[0];
 
 export const deletePlate = async (modelId: Plate['modelId']) =>
-	(await db.delete(plates).where(eq(plates.modelId, modelId)).returning())[0];
+	(await db.delete(models).where(eq(models.id, modelId)).returning())[0];
 
 export const helpCreatePlate = async (
 	jurisdictionId: Plate['jurisdictionId'],

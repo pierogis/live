@@ -3,9 +3,9 @@
 
 	import type { Category, Review, Score, User } from '$db/schema';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, Interactable } from '@pierogis/utensils';
 
-	import ScoreSheet from './ScoreSheet.svelte';
+	import { ScoreSheet } from '.';
 
 	export let review: Readable<
 		Review & {
@@ -27,16 +27,20 @@
 	export let categories: Category[];
 </script>
 
-<Card>
-	{#if $review.user}
-		<a class="link-box border inset shadow" href="/users/{$review.user.serial}">
-			{$review.user.serial}
-		</a>
-	{/if}
-	<slot />
-	<textarea readonly class="inset" cols="40" rows="8">{$review.description}</textarea>
-	<ScoreSheet {categories} {editorialScores} graphScores={scores} />
-</Card>
+<Interactable clickable={false}>
+	<Card>
+		{#if $review.user}
+			<Interactable>
+				<a class="link-box border inset" href="/users/{$review.user.serial}">
+					{$review.user.serial}
+				</a>
+			</Interactable>
+		{/if}
+		<slot />
+		<textarea readonly class="inset" cols="40" rows="8">{$review.description}</textarea>
+		<ScoreSheet {categories} {editorialScores} graphScores={scores} />
+	</Card>
+</Interactable>
 
 <style>
 	textarea {

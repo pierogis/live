@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { userIdInputName } from '$lib/forms/user';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let data;
 
@@ -17,17 +17,19 @@
 		<span>Are you sure you want to delete this account?</span>
 		<b>{data.user.email}</b>
 		<div class="buttons">
-			<a href={`/users/${data.user.serial}`}>
-				<button class="border inset shadow no-select">cancel</button>
-			</a>
+			<Interactable>
+				<a class="link-box border inset no-select" href={`/users/${data.user.serial}`}>cancel</a>
+			</Interactable>
 
-			<button class="bad border inset shadow no-select" form="delete" type="submit">delete</button>
+			<Interactable>
+				<button class="bad border inset no-select" form="delete" type="submit">delete</button>
+			</Interactable>
 		</div>
 	</Card>
 {/if}
 
 {#if form?.message}
-	<div class="border inset shadow no-select bad alert">
+	<div class="border inset no-select bad alert">
 		{form?.message}
 	</div>
 {/if}

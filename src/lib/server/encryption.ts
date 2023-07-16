@@ -5,7 +5,8 @@ import { ENCRYPTION_SECRET } from '$env/static/private';
 // largely borrowed from https://github.com/pilcrowOnPaper/lucia-sveltekit/blob/4d542bba5791bb1bc967d6bf59af94e17ab81dd8/packages/lucia-sveltekit/src/utils/crypto.ts
 
 const algorithm = 'aes-192-cbc';
-const key = crypto.scryptSync(ENCRYPTION_SECRET, 'salt', 24);
+const salt = crypto.randomBytes(64);
+const key = crypto.scryptSync(ENCRYPTION_SECRET, salt, 24);
 
 export function encrypt<T>(data: T): string {
 	const stringData = JSON.stringify(data);

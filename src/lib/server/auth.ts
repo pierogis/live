@@ -19,7 +19,7 @@ export async function sendPassphraseEmail(email: string): Promise<string> {
 
 	// send mail with defined transport object
 	await transporter.sendMail({
-		from: '"Karlbot" <no-reply@pierogis.live>',
+		from: '"karlbot" <no-reply@pierogis.live>',
 		to: email,
 		subject: 'generated passphrase',
 		text: `hello ${email},

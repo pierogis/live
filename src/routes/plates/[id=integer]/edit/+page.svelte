@@ -15,7 +15,7 @@
 </form>
 
 {#if form?.body.message}
-	<div class="border inset shadow no-select bad alert">
+	<div class="border inset no-select bad alert">
 		{form?.body.message}
 	</div>
 {/if}

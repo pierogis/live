@@ -1,36 +1,58 @@
 <script lang="ts">
-	import { Layout, ThemeToggle } from '@pierogis/utensils';
+	import { Layout, ThemeToggle, Interactable } from '@pierogis/utensils';
 
 	import type { LayoutData } from './$types';
+
 	export let data: LayoutData;
 </script>
 
-<Layout title="karl's plate emporium">
+<Layout>
+	<Interactable slot="title">
+		<div class="link-box border inset">karl's plate emporium</div>
+	</Interactable>
 	<nav slot="nav">
-		<a href="/jurisdictions"><h4 class="link-box border inset shadow">jurisdictions</h4></a>
-		<a class="border shadow inset link-box" href="/plates/faq">faq</a>
+		<Interactable>
+			<a href="/jurisdictions"><h4 class="link-box border inset">jurisdictions</h4></a>
+		</Interactable>
+
+		<Interactable>
+			<a class="border inset link-box" href="/plates/faq">faq</a>
+		</Interactable>
 		{#if data.sessionUser?.isAdmin}
-			<a href="/plates/create"><h4 class="link-box border inset shadow good">create</h4></a>
+			<Interactable>
+				<a href="/plates/create"><h4 class="link-box border inset good">create</h4></a>
+			</Interactable>
 		{/if}
-		<a href="/account">
-			<h4 class="link-box border inset shadow" class:good={data.sessionUser === null}>
-				{data.sessionUser !== null ? data.sessionUser.serial : 'login'}
-			</h4>
-		</a>
+
+		<Interactable>
+			<a href="/account">
+				<h4 class="link-box border inset" class:good={data.sessionUser === null}>
+					{data.sessionUser !== null ? data.sessionUser.serial : 'login'}
+				</h4>
+			</a>
+		</Interactable>
 	</nav>
 
 	<slot />
 
 	<footer slot="footer">
-		<a class="border shadow inset link-box" href="https://pierogis.live">live</a>
-		<a class="border shadow inset link-box" href="https://github.com/pierogis/emporium">github</a>
-		<a class="border shadow inset link-box" href="https://twitter.com/pierogis_live">
-			@pierogis_live
-		</a>
+		<Interactable>
+			<a class="border inset link-box" href="https://pierogis.live">live</a>
+		</Interactable>
+
+		<Interactable>
+			<a class="border inset link-box" href="https://github.com/pierogis/emporium">github</a>
+		</Interactable>
+
+		<Interactable>
+			<a class="border inset link-box" href="https://twitter.com/pierogis_live">@pierogis_live</a>
+		</Interactable>
+
 		<ThemeToggle />
 	</footer>
 </Layout>
 
 <style>
-	@import 'style';
+	@import 'style.css';
+	@import '@pierogis/utensils/styles/pierogis.css';
 </style>

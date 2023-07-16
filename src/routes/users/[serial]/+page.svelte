@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 
-	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '@pierogis/utensils';
+	import {
+		Card,
+		CardsGrid,
+		Divider,
+		Interactable,
+		ImageDisplay,
+		Section
+	} from '@pierogis/utensils';
 	import { ReviewCard } from '$lib/components';
 
 	export let data;
@@ -14,9 +21,9 @@
 	<title>{'user: ' + data.user.serial.toUpperCase()}</title>
 </svelte:head>
 
-{#if !data.isUser}
+{#if !data.isLoggedInUser}
 	<Card>
-		{#if data.isAdmin}
+		{#if data.isLoggedInAdmin}
 			<span>#{data.user.id}</span>
 		{/if}
 		<span class="link-box">{data.user.serial}</span>
@@ -25,14 +32,14 @@
 
 <br />
 
-{#if data.isUser || data.isAdmin}
+{#if data.isLoggedInUser || data.isLoggedInAdmin}
 	<form method="post">
 		<Card>
-			{#if data.isAdmin}
+			{#if data.isLoggedInAdmin}
 				<span>#{data.user.id}</span>
 			{/if}
 			<input
-				class="serial border inset shadow"
+				class="serial border inset"
 				type="text"
 				name="serial"
 				bind:value={data.user.serial}
@@ -41,9 +48,9 @@
 				autocomplete="off"
 				autocapitalize="characters"
 			/>
-			{#if data.isUser}
+			{#if data.isLoggedInUser}
 				<input
-					class="email border inset shadow"
+					class="email border inset"
 					type="text"
 					name="email"
 					disabled
@@ -52,18 +59,27 @@
 				/>
 			{/if}
 			<div class="buttons">
-				<button class="good border inset shadow no-select" type="submit">update</button>
+				<Interactable>
+					<button class="good border inset no-select">update</button>
+				</Interactable>
 
-				{#if data.isUser}
-					<!-- svelte-ignore a11y-accesskey -->
-					<button class="border inset shadow no-select" type="submit" form="logout" accesskey="l">
-						logout
-					</button>
+				{#if data.isLoggedInUser}
+					<Interactable>
+						<!-- svelte-ignore a11y-accesskey -->
+						<button class="border inset no-select" form="logout" accesskey="l">logout</button>
+					</Interactable>
 				{/if}
 
-				<a href={`/users/${data.user.serial}/delete`}>
-					<button class="bad border inset shadow no-select">delete</button>
-				</a>
+				{#if !data.user.isAdmin}
+					<Interactable>
+						<a
+							class="link-box bad border inset no-select"
+							href={`/users/${data.user.serial}/delete`}
+						>
+							delete
+						</a>
+					</Interactable>
+				{/if}
 			</div>
 		</Card>
 	</form>
@@ -102,7 +118,7 @@
 		flex-direction: column;
 	}
 	input.serial {
-		width: 4.25rem;
+		width: 6rem;
 		text-transform: uppercase;
 	}
 	input.email {

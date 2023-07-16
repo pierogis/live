@@ -3,8 +3,9 @@
 	import { superForm } from 'sveltekit-superforms/client';
 
 	import type { schema } from '$lib/forms/review';
-
 	import type { FullPlate } from '$db/schema';
+
+	import { Interactable } from '@pierogis/utensils';
 
 	export let plate: FullPlate;
 
@@ -65,24 +66,29 @@
 />
 
 <div class="break-container">
-	<button
-		class="border inset shadow good no-select"
-		type="submit"
-		form={reviewFormId}
-		on:click={() => {
-			description = $form.description;
-		}}
-	>
-		{submitMessage}
-	</button>
-	<button
-		class="border inset shadow bad no-select"
-		type="submit"
-		form={reviewFormId}
-		formaction={`/plates/${plate.modelId}/review?/delete`}
-	>
-		delete
-	</button>
+	<Interactable>
+		<button
+			class="border inset good no-select"
+			type="submit"
+			form={reviewFormId}
+			on:click={() => {
+				description = $form.description;
+			}}
+		>
+			{submitMessage}
+		</button>
+	</Interactable>
+
+	<Interactable>
+		<button
+			class="border inset bad no-select"
+			type="submit"
+			form={reviewFormId}
+			formaction={`/plates/${plate.modelId}/review?/delete`}
+		>
+			delete
+		</button>
+	</Interactable>
 </div>
 
 <style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CardsGrid, Divider, Section } from '@pierogis/utensils';
+	import { CardsGrid, Divider, Interactable, Section } from '@pierogis/utensils';
 
 	import { PlateCard, ReviewCard, ScoreSheet, ReviewForm } from '$lib/components';
 
@@ -28,39 +28,47 @@
 	</title>
 </svelte:head>
 
-<Section>
-	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
+<div class="section-container">
+	<Section>
+		<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
+		<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
 
-	{#if $editorialReview.description}
-		<div class="break-container">
-			<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
-		</div>
-	{/if}
-</Section>
-
-<Divider horizontal={true} size={'0.4rem'} />
-
-<Section title="user review" column rowGap={'0.5rem'}>
-	{#if sessionUser !== null}
-		<ScoreSheet {categories} {userScores} {scoreUrl} />
-		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
-	{:else}
-		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
-		<a class="border inset shadow good no-select link-box" href={loginUrl}> login </a>
-	{/if}
-</Section>
+		{#if $editorialReview.description}
+			<div class="break-container">
+				<textarea class="inset" readonly rows="16">{$editorialReview.description}</textarea>
+			</div>
+		{/if}
+	</Section>
+</div>
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="reviews" column>
-	<CardsGrid>
-		{#each allReviewsStores as review}
-			<ReviewCard {categories} {review} scores={allScores} />
-		{/each}
-	</CardsGrid>
-</Section>
+<div class="section-container">
+	<Section title="user review" column rowGap={'0.5rem'}>
+		{#if sessionUser !== null}
+			<ScoreSheet {categories} {userScores} {scoreUrl} />
+			<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
+		{:else}
+			{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
+			<Interactable>
+				<a class="border inset good no-select link-box" href={loginUrl}>login</a>
+			</Interactable>
+		{/if}
+	</Section>
+</div>
+
+<Divider horizontal={true} size={'0.4rem'} />
+
+<div class="section-container">
+	<Section title="reviews" column>
+		<CardsGrid>
+			{#each allReviewsStores as review}
+				<ReviewCard {categories} {review} scores={allScores} />
+			{/each}
+		</CardsGrid>
+	</Section>
+</div>
 
 <style>
 	.break-container {
@@ -75,5 +83,8 @@
 		width: 90%;
 		max-width: 80rem;
 		resize: none;
+	}
+	.section-container {
+		width: 90%;
 	}
 </style>

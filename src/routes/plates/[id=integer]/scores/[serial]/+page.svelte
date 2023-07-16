@@ -3,7 +3,7 @@
 
 	import { valueInputName, categoryIdInputName } from './_form';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, Interactable } from '@pierogis/utensils';
 
 	import { PlateCard } from '$lib/components';
 
@@ -36,7 +36,7 @@
 				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />
 
 				<input
-					class="border inset shadow"
+					class="border inset"
 					type="number"
 					min="0"
 					max="10"
@@ -47,14 +47,17 @@
 				/>
 
 				<div>
-					<button
-						class="border inset shadow good"
-						type="submit"
-						form={scoreFormId}
-						formaction={'?/update'}
-					>
-						submit
-					</button>
+					<Interactable>
+						<button
+							class="border inset good"
+							type="submit"
+							form={scoreFormId}
+							formaction={'?/update'}
+						>
+							submit
+						</button>
+					</Interactable>
+
 					<button type="submit" form={scoreFormId} formaction={'?/delete'}>❌</button>
 				</div>
 			{:else}

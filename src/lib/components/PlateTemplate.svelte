@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Jurisdiction, FullPlate } from '$db/schema';
 
-	import { Card } from '@pierogis/utensils';
+	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let jurisdictions: Jurisdiction[];
 	export let plate: FullPlate = null;
@@ -20,7 +20,7 @@
 
 	<input
 		type="text"
-		class="jurisdiction border inset shadow"
+		class="jurisdiction border inset"
 		list="jurisdictions"
 		name="jurisdiction"
 		required
@@ -44,7 +44,7 @@
 
 	<input
 		type="url"
-		class="border inset shadow"
+		class="border inset"
 		name="imageUrl"
 		value={plate?.model.images ? plate.model.images[0]?.url || '' : ''}
 		placeholder="https://www.flhsmv.gov/wp-content/uploads/plate1-1.jpg"
@@ -53,21 +53,23 @@
 	<span>
 		<input
 			type="text"
-			class="year border inset shadow"
+			class="year border inset"
 			name="startYear"
 			value={plate ? plate.startYear : ''}
 			placeholder="2016"
 			maxlength="4"
 		/>-<input
 			type="text"
-			class="year border inset shadow"
+			class="year border inset"
 			name="endYear"
 			value={plate ? plate.endYear : ''}
 			placeholder="2022"
 			maxlength="4"
 		/>
 	</span>
-	<input class="border inset shadow no-select" type="submit" formmethod="post" value="submit" />
+	<Interactable>
+		<button class="border inset no-select" formmethod="post">submit</button>
+	</Interactable>
 </Card>
 
 <style>
@@ -77,8 +79,8 @@
 
 		background-color: transparent;
 
-		top: 0;
-		right: 0.4rem;
+		top: 10px;
+		right: 10px;
 	}
 
 	.back {
@@ -87,8 +89,8 @@
 
 		background-color: transparent;
 
-		top: 0;
-		left: 0.4rem;
+		top: 10px;
+		left: 10px;
 	}
 
 	input[type='text'].jurisdiction {

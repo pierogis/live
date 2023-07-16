@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import type { FullPlate } from '$db/schema';
 
-	import { Card, ImageDisplay } from '@pierogis/utensils';
+	import { Card, Interactable, ImageDisplay } from '@pierogis/utensils';
 
 	export let plate: FullPlate;
 
@@ -16,39 +15,42 @@
 	} license plate`;
 </script>
 
-<Card>
-	{#if isAdmin}
+<Interactable clickable={false}>
+	<Card shadow={false}>
+		{#if isAdmin}
+			<a class="edit no-select" href={`/plates/${plate.modelId}/edit`}>✎</a>
+		{/if}
+
+		<Interactable>
+			<a class="link-box border inset" href={'/jurisdictions/' + plate.jurisdiction.id}>
+				{plate.jurisdiction.abbreviation}
+			</a>
+		</Interactable>
+
 		<a
-			class="edit no-select"
-			href={`/plates/${plate.modelId}/edit`}
-			on:click|preventDefault={() => goto(`/plates/${plate.modelId}/edit`)}>✎</a
+			class="image-link"
+			href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}
 		>
-	{/if}
+			<Interactable>
+				<ImageDisplay
+					{alt}
+					shadow={false}
+					urls={plate.model.images.map((image) => image.url)}
+					width={small ? '200px' : '400px'}
+					height={small ? '100px' : '200px'}
+				/>
+			</Interactable>
+		</a>
 
-	<a class="link-box border inset shadow" href={'/jurisdictions/' + plate.jurisdiction.id}
-		>{plate.jurisdiction.abbreviation}</a
-	>
+		{#if showYears}
+			<a class="plate-link" href={'/plates/' + plate.modelId}>
+				{`${plate.startYear || '?'}-${plate.endYear || '?'}`}
+			</a>
+		{/if}
 
-	<a
-		class="image-link"
-		href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}
-	>
-		<ImageDisplay
-			{alt}
-			urls={plate.model.images.map((image) => image.url)}
-			width={small ? '200px' : '400px'}
-			height={small ? '100px' : '200px'}
-		/>
-	</a>
-
-	{#if showYears}
-		<a class="plate-link" href={'/plates/' + plate.modelId}
-			>{`${plate.startYear || '?'}-${plate.endYear || '?'}`}</a
-		>
-	{/if}
-
-	<slot />
-</Card>
+		<slot />
+	</Card>
+</Interactable>
 
 <style>
 	.edit {
@@ -57,12 +59,15 @@
 
 		background-color: transparent;
 
-		top: 0;
-		left: 0.4rem;
+		top: 10px;
+		left: 10px;
 	}
 
 	.plate-link {
 		color: var(--text-color);
+	}
+	.plate-link:hover {
+		text-decoration: underline;
 	}
 
 	.image-link {

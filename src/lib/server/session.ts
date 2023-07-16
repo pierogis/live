@@ -23,13 +23,7 @@ export async function setSessionCookie(
 }
 
 export function expireSessionCookie(cookies: Cookies): void {
-	return cookies.set(SESSION_NAME, '', {
-		expires: new Date(0),
-		httpOnly: true,
-		secure: process.env['NODE_ENV'] === 'production',
-		path: '/',
-		sameSite: 'lax'
-	});
+	return cookies.delete(SESSION_NAME);
 }
 
 export async function getUserSession<T>(cookie: string): Promise<T> {
