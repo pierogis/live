@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Interactable } from '@pierogis/utensils';
 	import { writable, type Writable } from 'svelte/store';
 
 	function handleImport() {
@@ -46,33 +47,35 @@
 		<textarea class="inset" rows="6" bind:value={$paletteStore} />
 		<br />
 		<div class="import-export">
-			<button
-				class="border inset shadow link-box"
-				type="submit"
-				on:click|preventDefault={handleImport}
-			>
-				import ↓
-			</button>
+			<Interactable>
+				<button class="border inset link-box" type="submit" on:click|preventDefault={handleImport}>
+					import ↓
+				</button>
+			</Interactable>
 
 			{#if $colorsStore.length > 0}
-				<button
-					class="border inset shadow link-box"
-					type="submit"
-					on:click|preventDefault={handleExport}
-				>
-					export ↑
-				</button>
+				<Interactable>
+					<button
+						class="border inset link-box"
+						type="submit"
+						on:click|preventDefault={handleExport}
+					>
+						export ↑
+					</button>
+				</Interactable>
 			{/if}
 		</div>
 	</form>
 
-	<button
-		class="border inset shadow link-box good"
-		type="submit"
-		on:click|preventDefault={handleAddColor}
-	>
-		+
-	</button>
+	<Interactable>
+		<button
+			class="border inset link-box good"
+			type="submit"
+			on:click|preventDefault={handleAddColor}
+		>
+			+
+		</button>
+	</Interactable>
 
 	<div class="colors">
 		{#each $colorsStore as color, i}
