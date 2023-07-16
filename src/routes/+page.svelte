@@ -1,16 +1,22 @@
 <script lang="ts">
+	import { Interactable } from '@pierogis/utensils';
+
 	const email = 'karl@pierogis.live';
 </script>
 
 <div class="container">
 	<div class="links">
-		<a class="border inset shadow link-box" href="https://ko-fi.com/Q5Q6C0OK3" target="_blank">
-			kofi
-		</a>
-		<a class="border inset shadow link-box" href="https://www.patreon.com/bePatron?u=72232597">
-			patreon
-		</a>
-		<a class="border inset shadow link-box" href="mailto:{email}">{email}</a>
+		<Interactable>
+			<a class="border inset link-box" href="https://ko-fi.com/Q5Q6C0OK3" target="_blank"> kofi </a>
+		</Interactable>
+		<Interactable>
+			<a class="border inset link-box" href="https://www.patreon.com/bePatron?u=72232597">
+				patreon
+			</a>
+		</Interactable>
+		<Interactable>
+			<a class="border inset link-box" href="mailto:{email}">{email}</a>
+		</Interactable>
 	</div>
 </div>
 
