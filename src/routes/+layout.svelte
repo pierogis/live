@@ -7,7 +7,7 @@
 </svelte:head>
 
 <Layout>
-	<Interactable>
+	<Interactable slot="title">
 		<div class="link-box border inset">colors</div>
 	</Interactable>
 
