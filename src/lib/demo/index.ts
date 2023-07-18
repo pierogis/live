@@ -4,6 +4,7 @@ import DividerDemo from './DividerDemo.svelte';
 import ImageDisplayDemo from './ImageDisplayDemo.svelte';
 import InteractableDemo from './InteractableDemo.svelte';
 import SectionDemo from './SectionDemo.svelte';
+import ShineDemo from './ShineDemo.svelte';
 import ThemeToggleDemo from './ThemeToggleDemo.svelte';
 
 export {
@@ -13,5 +14,6 @@ export {
 	ImageDisplayDemo,
 	InteractableDemo,
 	SectionDemo,
+	ShineDemo,
 	ThemeToggleDemo
 };

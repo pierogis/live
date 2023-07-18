@@ -91,11 +91,11 @@
 		padding: 0.4rem;
 	}
 	input[type='text'] {
-		width: 8rem;
+		width: 10rem;
 	}
 
 	input[type='number'] {
-		width: 2rem;
+		width: 4rem;
 	}
 	label:has(input[type='number']) {
 		display: flex;

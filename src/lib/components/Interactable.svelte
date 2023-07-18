@@ -3,7 +3,7 @@
 	export let hoverable = true;
 </script>
 
-<div class:clickable class:hoverable>
+<div class="no-select" class:clickable class:hoverable on:click on:keypress>
 	<slot />
 </div>
 

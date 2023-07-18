@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, CardsGrid, Divider, ImageDisplay, Section } from '$lib';
+	import { Card, CardsGrid, Divider, ImageDisplay, Interactable, Section, Shine } from '$lib';
 
 	import {
 		CardDemo,
@@ -8,21 +8,29 @@
 		ImageDisplayDemo,
 		InteractableDemo,
 		SectionDemo,
+		ShineDemo,
 		ThemeToggleDemo
 	} from '$lib/demo';
+
+	let rotateImage = false;
 </script>
 
 <Card>
 	<h3>hi!</h3>
 
-	<ImageDisplay
-		width={'400px'}
-		height={'200px'}
-		urls={[
-			'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Emoji_u1f44b.svg/2048px-Emoji_u1f44b.svg.png'
-		]}
-		alt="hello!"
-	/>
+	<Interactable on:click={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
+		<Shine>
+			<ImageDisplay
+				width={'200px'}
+				height={'200px'}
+				urls={[
+					'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Emoji_u1f44b.svg/2048px-Emoji_u1f44b.svg.png'
+				]}
+				style={rotateImage ? 'transform: rotate(90deg);' : ''}
+				alt="hello!"
+			/>
+		</Shine>
+	</Interactable>
 
 	<span>
 		this is a simple svelte ui/style package called
@@ -49,6 +57,7 @@
 		<DividerDemo />
 		<SectionDemo />
 		<ImageDisplayDemo />
+		<ShineDemo />
 		<ThemeToggleDemo />
 		<InteractableDemo />
 	</CardsGrid>
@@ -77,8 +86,11 @@
 			<div>
 				<div class="link-box">
 					useful for making normal text (<code>span</code>, <code>a</code>)
+					<br />
+					appear like button/link box
+					<br />
+					(especially when used with a border)
 				</div>
-				<div class="link-box">appear like button/link box</div>
 			</div>
 		</Card>
 		<Card>

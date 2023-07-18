@@ -33,67 +33,58 @@
 
 <svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />
 
-<div class="link-box">
-	<div class="holder">
-		<button
-			class="light"
-			class:stored={$storedTheme == Theme.Light}
-			on:click={() => {
-				if ($storedTheme == Theme.Light) {
-					removeTheme();
-				} else {
-					toggleTheme(Theme.Light);
-				}
-			}}
-		/>
-		<button
-			class="dark"
-			class:stored={$storedTheme == Theme.Dark}
-			on:click={() => {
-				if ($storedTheme == Theme.Dark) {
-					removeTheme();
-				} else {
-					toggleTheme(Theme.Dark);
-				}
-			}}
-		/>
-	</div>
+<div class="holder">
+	<button
+		class="light"
+		class:stored={$storedTheme == Theme.Light}
+		on:click={() => {
+			if ($storedTheme == Theme.Light) {
+				removeTheme();
+			} else {
+				toggleTheme(Theme.Light);
+			}
+		}}
+	/>
+	<button
+		class="dark"
+		class:stored={$storedTheme == Theme.Dark}
+		on:click={() => {
+			if ($storedTheme == Theme.Dark) {
+				removeTheme();
+			} else {
+				toggleTheme(Theme.Dark);
+			}
+		}}
+	/>
 </div>
 
 <style>
 	/* little hack to prevent display if no js */
-	:global(body[data-no-js]) button {
+	:global(body[data-no-js]) .holder {
 		display: none;
 	}
 
-	.link-box {
-		display: flex;
-		place-items: center;
-	}
 	.holder {
-		position: relative;
 		display: flex;
 		place-items: center;
+		gap: 4px;
+		padding: 2px;
+		border-radius: 12px;
 
-		height: 0.6rem;
-		width: 36px;
-
-		background-color: var(--primary-color);
+		background-color: var(--input-color);
+		border: solid var(--secondary-color) 2px;
 	}
 	button {
-		position: absolute;
-		height: 1.4rem;
-		width: 1.4rem;
+		height: 22px;
+		width: 22px;
 
 		border-radius: 50%;
 	}
 	.light {
-		left: -8px;
 		background-color: var(--light-color);
 		border: dotted var(--secondary-color) 3px;
 	}
 	.dark {
-		right: -8px;
 		background-color: var(--dark-color);
 		border: dotted var(--secondary-color) 3px;
 	}
