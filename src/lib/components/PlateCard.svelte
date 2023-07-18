@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { FullPlate } from '$db/schema';
 
-	import { Card, Interactable, ImageDisplay } from '@pierogis/utensils';
+	import { Card, Interactable, ImageDisplay, Shine } from '@pierogis/utensils';
 
 	export let plate: FullPlate;
 
@@ -16,7 +16,7 @@
 </script>
 
 <Interactable clickable={false}>
-	<Card shadow={false}>
+	<Card>
 		{#if isAdmin}
 			<a class="edit no-select" href={`/plates/${plate.modelId}/edit`}>✎</a>
 		{/if}
@@ -32,13 +32,15 @@
 			href={!showYears ? `/jurisdictions/${plate.jurisdiction.id}` : `/plates/${plate.modelId}`}
 		>
 			<Interactable>
-				<ImageDisplay
-					{alt}
-					shadow={false}
-					urls={plate.model.images.map((image) => image.url)}
-					width={small ? '200px' : '400px'}
-					height={small ? '100px' : '200px'}
-				/>
+				<Shine>
+					<ImageDisplay
+						{alt}
+						shadow={false}
+						urls={plate.model.images.map((image) => image.url)}
+						width={small ? '200px' : '400px'}
+						height={small ? '100px' : '200px'}
+					/>
+				</Shine>
 			</Interactable>
 		</a>
 

@@ -20,8 +20,8 @@ dependencies:
 
 devDependencies:
   '@pierogis/utensils':
-    specifier: ^0.5.1
-    version: 0.5.1
+    specifier: ^0.5.2
+    version: 0.5.2
   '@sveltejs/adapter-auto':
     specifier: ^2.0.0
     version: 2.0.0(@sveltejs/kit@1.22.3)
@@ -797,10 +797,10 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@pierogis/utensils@0.5.1:
+  /@pierogis/utensils@0.5.2:
     resolution:
       {
-        integrity: sha512-oLFO5QvtTFBbyV8kovJSUmXhoenIO2HOXYMy6lbVeSeTayH3cZG3O8J1uyJNZoDpeizcKbQX5eCdCIg6FV/DyA==
+        integrity: sha512-DwYMOzzgO16zj0MdqgROvgRK9YHf4rTJfOSwbp1gFhNv7z+UlhXPAEc27I6emch6iJpaKe5cBMBcunwJb1fUBQ==
       }
     dependencies:
       svelte: 3.58.0

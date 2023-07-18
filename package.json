@@ -21,7 +21,7 @@
 		"build": "vite build",
 		"package": "svelte-package",
 		"preview": "vite preview",
-		"db:generate": "drizzle-kit generate:pg --force",
+		"db:generate": "drizzle-kit generate:pg",
 		"db:migrate": "tsx ./scripts/migrate.ts",
 		"db:seed": "tsx ./scripts/seed/index.ts",
 		"test": "playwright test",
@@ -32,7 +32,7 @@
 		"lint:fix": "pnpm run format && eslint --fix --ignore-path .gitignore ."
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.5.1",
+		"@pierogis/utensils": "^0.5.2",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.22.3",
 		"@types/nodemailer": "^6.4.8",

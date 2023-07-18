@@ -67,6 +67,8 @@
 
 		border: dotted 0.2rem var(--text-color-st);
 		border-radius: 10px;
+
+		background-color: var(--primary-color);
 	}
 	.overall-seperator {
 		height: 2px;
