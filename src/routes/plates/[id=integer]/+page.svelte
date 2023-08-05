@@ -31,7 +31,7 @@
 <Section>
 	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
 
-	<ScoreSheet {categories} {editorialScores} graphScores={allScores} />
+	<ScoreSheet interactive={false} {categories} {editorialScores} graphScores={allScores} />
 
 	{#if $editorialReview.description}
 		<div class="break-container">

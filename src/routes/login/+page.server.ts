@@ -1,7 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { User } from '$db/schema';
-
 import { dev } from '$app/environment';
 
 import { createUser, getSessionUser } from '$lib/server/database/users';

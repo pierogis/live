@@ -4,8 +4,10 @@
 	import type { Score } from '$db/schema';
 	import { goto } from '$app/navigation';
 
+	export let interactive = true;
 	export let editorialScore: Readable<Score> | null = null;
 	export let userScore: Writable<Score> | null = null;
+
 	$: displayScore = userScore || editorialScore;
 
 	$: placeholder = $displayScore == null || $displayScore.value < 0;
@@ -40,7 +42,7 @@
 					}
 					return score;
 				});
-			} else {
+			} else if (interactive) {
 				goto(`/login`);
 			}
 		}
@@ -53,7 +55,7 @@
 			class="score"
 			class:user={userScore !== null}
 			class:placeholder
-			class:interactive={userScore !== null}
+			class:interactive
 			on:pointerdown|preventDefault={(e) => handlePointerDown(e, i)}
 		>
 			{pointStatus}

@@ -64,7 +64,11 @@
 <svg height="22px" width="20px">
 	{#each Object.values($quotients) as count, i}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
-			<rect height={1 + (count / $total) * 12} y={19 - (count / $total) * 12} width={barWidth} />
+			<rect
+				height={1 + (count / $total || 0) * 12}
+				y={19 - (count / $total || 0) * 12}
+				width={barWidth}
+			/>
 		</g>
 		{#if i < 4}
 			<g class="divider" transform={`translate(${i * (barWidth + dividerWidth) + barWidth},0)`}>
@@ -77,7 +81,7 @@
 <style>
 	.bar {
 		fill: var(--text-color);
-		transition: fill 400ms;
+		transition: fill 200ms;
 	}
 	.divider {
 		fill: transparent;

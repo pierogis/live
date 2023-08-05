@@ -6,6 +6,7 @@
 	import { Interactable } from '@pierogis/utensils';
 	import { ScoreDisplay, ScoreGraph } from '.';
 
+	export let interactive = true;
 	export let categories: Category[];
 
 	export let editorialScores: { [categoryId: number]: Readable<Score> } | null = null;
@@ -22,7 +23,11 @@
 			{@const categoryUserScore = userScores !== null ? userScores[category.id] : null}
 			<div class="category">
 				<span class="category-emoji" title={category.name}>{category.symbol}</span>
-				<ScoreDisplay editorialScore={categoryEditorialScore} userScore={categoryUserScore} />
+				<ScoreDisplay
+					{interactive}
+					editorialScore={categoryEditorialScore}
+					userScore={categoryUserScore}
+				/>
 				{#if graphScores != null}
 					{@const categoryAllScores = graphScores[category.id]}
 					<div class="graph">

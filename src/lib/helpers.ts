@@ -9,7 +9,7 @@ export async function protectAdmin(sessionUser: App.SessionUser | null) {
 	}
 }
 
-export async function protectUser<T>(sessionUser: App.SessionUser | null, user: User) {
+export async function protectUser(sessionUser: App.SessionUser | null, user: User) {
 	if (sessionUser === null) {
 		throw error(401, 'not signed in');
 	} else if (sessionUser.id !== user.id) {
@@ -17,7 +17,7 @@ export async function protectUser<T>(sessionUser: App.SessionUser | null, user: 
 	}
 }
 
-export async function protectUserOrAdmin<T>(
+export async function protectUserOrAdmin(
 	sessionUser: App.SessionUser | null,
 	user: { id: number }
 ) {

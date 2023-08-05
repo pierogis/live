@@ -46,7 +46,7 @@
 					value={scoreSet[category.id] || ''}
 				/>
 
-				<div>
+				<div class="button-group">
 					<Interactable>
 						<button
 							class="border inset good"
@@ -58,7 +58,16 @@
 						</button>
 					</Interactable>
 
-					<button type="submit" form={scoreFormId} formaction={'?/delete'}>❌</button>
+					<Interactable>
+						<button
+							class="border inset bad"
+							type="submit"
+							form={scoreFormId}
+							formaction={'?/delete'}
+						>
+							clear
+						</button>
+					</Interactable>
 				</div>
 			{:else}
 				<b>{scoreSet[category.id] || '_'}</b>
@@ -72,6 +81,7 @@
 		width: 10rem;
 		text-align: center;
 	}
+
 	.grid {
 		padding: 2rem;
 		display: flex;
@@ -80,5 +90,10 @@
 		gap: 2rem;
 
 		flex-wrap: wrap;
+	}
+
+	.button-group {
+		display: flex;
+		gap: 10px;
 	}
 </style>
