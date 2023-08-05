@@ -6,7 +6,7 @@ import { db } from '.';
 
 export const getUsers = async (
 	params: Partial<Omit<User, 'isAdmin'>>,
-	take: number = undefined,
+	take: number | undefined = undefined,
 	skip = 0
 ) =>
 	await db.query.users.findMany({
@@ -20,7 +20,17 @@ export const getUsers = async (
 		offset: skip
 	});
 
-export const getUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
+export const getSessionUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
+	await db.query.users.findFirst({
+		where: (table, { and, eq }) =>
+			and(
+				params.id ? eq(table.id, params.id) : undefined,
+				params.email ? eq(table.email, params.email) : undefined,
+				params.serial ? eq(table.serial, params.serial) : undefined
+			)
+	});
+
+export const getUserWithInteractions = async (params: Partial<Omit<User, 'isAdmin'>>) =>
 	await db.query.users.findFirst({
 		where: (table, { and, eq }) =>
 			and(

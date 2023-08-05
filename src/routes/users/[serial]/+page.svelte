@@ -21,21 +21,21 @@
 	<title>{'user: ' + data.user.serial.toUpperCase()}</title>
 </svelte:head>
 
-{#if !data.isLoggedInUser}
+{#if !data.isUser}
 	<Card>
-		{#if data.isLoggedInAdmin}
+		{#if data.isAdmin}
 			<span>#{data.user.id}</span>
 		{/if}
-		<span class="link-box">{data.user.serial}</span>
+		<span class="link-box" style:cursor="auto">{data.user.serial}</span>
 	</Card>
 {/if}
 
 <br />
 
-{#if data.isLoggedInUser || data.isLoggedInAdmin}
+{#if data.isUser || data.isAdmin}
 	<form method="post">
 		<Card>
-			{#if data.isLoggedInAdmin}
+			{#if data.isAdmin}
 				<span>#{data.user.id}</span>
 			{/if}
 			<input
@@ -48,7 +48,7 @@
 				autocomplete="off"
 				autocapitalize="characters"
 			/>
-			{#if data.isLoggedInUser}
+			{#if data.isUser}
 				<input
 					class="email border inset"
 					type="text"
@@ -63,7 +63,7 @@
 					<button class="good border inset no-select">update</button>
 				</Interactable>
 
-				{#if data.isLoggedInUser}
+				{#if data.isUser}
 					<Interactable>
 						<!-- svelte-ignore a11y-accesskey -->
 						<button class="border inset no-select" form="logout" accesskey="l">logout</button>

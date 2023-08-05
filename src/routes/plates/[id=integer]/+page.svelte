@@ -7,14 +7,14 @@
 	$: ({
 		categories,
 		plate,
-		sessionUser,
 		userReview,
 		reviewForm,
 		editorialReview,
 		allReviews,
 		userScores,
 		editorialScores,
-		allScores
+		allScores,
+		sessionUser
 	} = data);
 
 	$: scoreUrl = `/plates/${plate.modelId}/scores/`;

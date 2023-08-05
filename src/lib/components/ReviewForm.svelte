@@ -40,6 +40,7 @@
 	class="inset"
 	form={reviewFormId}
 	rows="10"
+	cols="300"
 	name="description"
 	data-invalid={$errors.description}
 	bind:value={$form.description}

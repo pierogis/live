@@ -19,7 +19,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			modelId,
 			userId,
 			categoryId,
-			value: body.value || undefined
+			value: body.value
 		};
 
 		const score = await upsertScore(data);

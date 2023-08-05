@@ -1,30 +1,24 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import type { Plate } from '$db/schema';
-
 import { protectAdmin } from '$lib/helpers';
 import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
 import { helpCreatePlate } from '$lib/server/database/plates';
 
-export const load = async ({ parent }) => {
-	async function handle() {
-		const jurisdictions = await getJurisdictions({});
+export const load = async (event) => {
+	await protectAdmin(event.locals.sessionUser);
 
-		return {
-			jurisdictions
-		};
-	}
+	const jurisdictions = await getJurisdictions({});
 
-	const { sessionUser } = await parent();
-
-	return protectAdmin(sessionUser, handle);
+	return {
+		jurisdictions
+	};
 };
 
 export const actions = {
-	default: async ({ locals, request }) => {
-		if (locals.sessionUser?.isAdmin) {
-			const formData: FormData = await request.formData();
+	default: async (event) => {
+		if (event.locals.sessionUser?.isAdmin) {
+			const formData: FormData = await event.request.formData();
 
 			const jurisdictionEntry = formData.get('jurisdiction');
 			const startYearEntry = formData.get('startYear');
@@ -40,7 +34,11 @@ export const actions = {
 			const endYear = endYearEntry ? parseInt(endYearEntry.toString()) : undefined;
 			const imageUrls = imageUrlEntry ? [imageUrlEntry.toString()] : [];
 
-			const plate: Plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
+			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
+
+			if (plate === undefined) {
+				return fail(403, { message: `couldn't create plate` });
+			}
 
 			throw redirect(303, `/plates/${plate.modelId}`);
 		} else {

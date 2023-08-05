@@ -5,13 +5,18 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
 import { schema } from '$lib/forms/review';
 
-export const load = async ({ parent, params }) => {
-	const { sessionUser } = await parent();
+export const load = async (event) => {
+	if (event.locals.sessionUser === null) {
+		throw redirect(302, `/login`);
+	}
 
-	const review = (await getReview({ modelId: parseInt(params.id), userId: sessionUser.id })) || {
-		id: null,
-		modelId: parseInt(params.id),
-		userId: sessionUser.id,
+	const review = (await getReview({
+		modelId: parseInt(event.params.id),
+		userId: event.locals.sessionUser.id
+	})) || {
+		id: undefined,
+		modelId: parseInt(event.params.id),
+		userId: event.locals.sessionUser.id,
 		description: ''
 	};
 
@@ -21,15 +26,14 @@ export const load = async ({ parent, params }) => {
 };
 
 export const actions = {
-	update: async ({ locals, request, params }) => {
-		if (locals.sessionUser !== null) {
-			const modelId = parseInt(params.id);
-			const userId = locals.sessionUser.id;
+	update: async (event) => {
+		if (event.locals.sessionUser !== null) {
+			const modelId = parseInt(event.params.id);
+			const userId = event.locals.sessionUser.id;
 
-			const form = await superValidate(request, schema);
+			const form = await superValidate(event.request, schema);
 
 			if (!form.valid) {
-				console.log('invalid review update');
 				// Again, always return { form } and things will just work.
 				return fail(400, { form });
 			}
@@ -51,8 +55,6 @@ export const actions = {
 					description: form.data.description
 				};
 
-				console.log(data);
-
 				await upsertReview(data);
 
 				throw redirect(303, `/plates/${modelId}`);
@@ -61,19 +63,19 @@ export const actions = {
 			throw redirect(302, `/login`);
 		}
 	},
-	delete: async ({ locals, request, params }) => {
-		if (locals.sessionUser !== null) {
-			const modelId = parseInt(params.id);
-			const userId = locals.sessionUser.id;
+	delete: async (event) => {
+		if (event.locals.sessionUser !== null) {
+			const modelId = parseInt(event.params.id);
+			const userId = event.locals.sessionUser.id;
 
-			const form = await superValidate(request, schema);
+			const form = await superValidate(event.request, schema);
 
 			if (!form.valid) {
 				// Again, always return { form } and things will just work.
 				return fail(400, { form });
 			}
 
-			if (form.data.userId !== userId && !locals.sessionUser.isAdmin) {
+			if (form.data.userId !== userId && !event.locals.sessionUser.isAdmin) {
 				// Again, always return { form } and things will just work.
 				return message(form, 'Review does not belong to you', { status: 401 });
 			}

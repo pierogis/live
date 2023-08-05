@@ -3,7 +3,7 @@ import { db } from '.';
 
 export const getCategories = async (
 	params: Partial<Category>,
-	take: number = undefined,
+	take: number | undefined = undefined,
 	skip = 0
 ) =>
 	await db.query.categories.findMany({

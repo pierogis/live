@@ -1,21 +1,26 @@
 import { error, fail } from '@sveltejs/kit';
 
-import { getUser } from '$lib/server/database/users';
-
+import { getUserWithInteractions } from '$lib/server/database/users';
 import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import { valueInputName, categoryIdInputName } from './_form';
 
-export const load = async ({ params }) => {
-	const user = await getUser({ serial: params.serial });
+export const load = async (event) => {
+	const user = await getUserWithInteractions({ serial: event.params.serial });
 
-	return { user };
+	if (user === undefined) {
+		throw error(404, "user doesn't exist");
+	}
+
+	const isUser = event.locals.sessionUser?.id == user.id;
+
+	return { user, isUser };
 };
 
 export const actions = {
-	update: async ({ locals, request, params }) => {
-		if (locals.sessionUser !== null) {
-			const formData: FormData = await request.formData();
+	update: async (event) => {
+		if (event.locals.sessionUser !== null) {
+			const formData: FormData = await event.request.formData();
 
 			const valueEntry = formData.get(valueInputName);
 			if (!valueEntry) {
@@ -29,8 +34,8 @@ export const actions = {
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 
-			const modelId = parseInt(params.id);
-			const userId: number = locals.sessionUser.id;
+			const modelId = parseInt(event.params.id);
+			const userId = event.locals.sessionUser.id;
 
 			if (value < 0 || value > 10) {
 				return fail(400, { message: 'score value less than 0 or greater than 10' });
@@ -50,9 +55,9 @@ export const actions = {
 			throw error(401, 'not signed in');
 		}
 	},
-	delete: async ({ locals, params, request }) => {
-		if (locals.sessionUser?.serial == params.serial) {
-			const formData: FormData = await request.formData();
+	delete: async (event) => {
+		if (event.locals.sessionUser?.serial == event.params.serial) {
+			const formData: FormData = await event.request.formData();
 
 			const categoryIdEntry = formData.get(categoryIdInputName);
 			if (!categoryIdEntry) {
@@ -60,8 +65,8 @@ export const actions = {
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 
-			const modelId = parseInt(params.id);
-			const userId: number = locals.sessionUser.id;
+			const modelId = parseInt(event.params.id);
+			const userId = event.locals.sessionUser.id;
 
 			const scoreParams = {
 				modelId,

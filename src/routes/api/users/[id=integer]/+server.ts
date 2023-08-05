@@ -1,22 +1,26 @@
 import { error, json } from '@sveltejs/kit';
 
-import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
+import { getSessionUser, updateUserById, deleteUser } from '$lib/server/database/users';
 import type { User } from '$db/schema';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
-	const user = await getUser({ id: parseInt(params.id) });
+	const user = await getSessionUser({ id: parseInt(params.id) });
 
 	if (user) {
-		if (locals.sessionUser?.id != parseInt(params.id) && !locals.sessionUser?.isAdmin) {
-			user.email = null;
-		}
+		const maskedUser = {
+			...user,
+			email:
+				locals.sessionUser?.id != parseInt(params.id) && !locals.sessionUser?.isAdmin
+					? null
+					: user.email
+		};
 
 		setHeaders({
 			'cache-control': 'no-cache, max-age=3600'
 		});
 
-		return json(user);
+		return json(maskedUser);
 	} else {
 		throw error(404, `user ${params.id} not found`);
 	}
@@ -38,7 +42,8 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			const user = await updateUserById(parseInt(params.id), data);
 
 			return json(user);
-		} catch (err) {
+		} catch (err: any) {
+			// TODO: fix this for drizzle
 			if (err.code == 23505) {
 				throw error(400, `user with serial ${serial.toUpperCase()} already exists`);
 			} else throw err;

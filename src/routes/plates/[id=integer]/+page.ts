@@ -2,7 +2,8 @@ import { storeScores } from '$lib/api/scores';
 import { storeReviews } from '$lib/api/reviews';
 
 export const load = async ({ parent, fetch, data }) => {
-	const { plate, sessionUser, categories } = await parent();
+	const { plate, categories } = await parent();
+	const { sessionUser } = data;
 	const reviewStores = storeReviews(plate.model.reviews, plate.modelId, sessionUser?.id);
 
 	const { userReview, editorialReview, allReviews } = reviewStores;
@@ -24,6 +25,7 @@ export const load = async ({ parent, fetch, data }) => {
 		allReviews,
 		userScores,
 		editorialScores,
-		allScores
+		allScores,
+		sessionUser
 	};
 };

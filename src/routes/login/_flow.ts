@@ -8,9 +8,9 @@ export enum FlowCode {
 }
 
 export interface FlowStatus {
-	alertState: boolean;
-	emailState: boolean;
-	passphraseState: boolean;
+	alertState: boolean | null;
+	emailState: boolean | null;
+	passphraseState: boolean | null;
 	message: string;
 }
 

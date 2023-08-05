@@ -1,13 +1,13 @@
 /// <reference types="@sveltejs/kit" />
 
-interface SessionUser {
-	id: number;
-	email: string;
-	serial: string;
-	isAdmin: boolean;
-}
-
 declare namespace App {
+	interface SessionUser {
+		id: number;
+		email: string;
+		serial: string;
+		isAdmin: boolean;
+	}
+
 	interface Locals {
 		sessionUser: SessionUser | null;
 	}

@@ -4,12 +4,16 @@ import { type Plate, plates, type NewPlate, models, images, type Image } from '$
 
 import { db } from '.';
 
-export const getPlates = async (params: Partial<Plate>, take: number = undefined, skip = 0) =>
+export const getPlates = async (
+	params: Partial<Plate>,
+	take: number | undefined = undefined,
+	skip = 0
+) =>
 	await db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
-				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.jurisdictionId, params.jurisdictionId) : undefined,
 				params.endYear ? eq(table.endYear, params.endYear) : undefined,
 				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
 			),
@@ -23,7 +27,7 @@ export const getFullPlate = async (params: Partial<Plate>) =>
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
-				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.jurisdictionId, params.jurisdictionId) : undefined,
 				params.endYear ? eq(table.endYear, params.endYear) : undefined,
 				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
 			),
@@ -44,12 +48,16 @@ export const getFullPlate = async (params: Partial<Plate>) =>
 		}
 	});
 
-export const getFullPlates = async (params: Partial<Plate>, take: number = undefined, skip = 0) =>
+export const getFullPlates = async (
+	params: Partial<Plate>,
+	take: number | undefined = undefined,
+	skip = 0
+) =>
 	await db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
-				params.jurisdictionId ? eq(table.modelId, params.modelId) : undefined,
+				params.jurisdictionId ? eq(table.jurisdictionId, params.jurisdictionId) : undefined,
 				params.endYear ? eq(table.endYear, params.endYear) : undefined,
 				params.startYear ? like(table.startYear, sql`%${params.startYear}%`) : undefined
 			),
@@ -73,7 +81,7 @@ export const getFullPlates = async (params: Partial<Plate>, take: number = undef
 		orderBy: [desc(plates.modelId)]
 	});
 
-export const getPlatePerJurisdiction = async (take: number = undefined, skip = 0) => {
+export const getPlatePerJurisdiction = async (take: number | undefined = undefined, skip = 0) => {
 	// one plate per jurisdiction
 	const jurisdictionsWithOnePlate = await db.query.jurisdictions.findMany({
 		columns: {},

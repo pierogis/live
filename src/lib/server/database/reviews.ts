@@ -4,7 +4,11 @@ import { type Review, reviews, type NewReview } from '$db/schema';
 
 import { db } from '.';
 
-export const getReviews = async (params: Partial<Review>, take: number = undefined, skip = 0) =>
+export const getReviews = async (
+	params: Partial<Review>,
+	take: number | undefined = undefined,
+	skip = 0
+) =>
 	await db.query.reviews.findMany({
 		where: (table, { and, eq }) =>
 			and(

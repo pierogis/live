@@ -4,7 +4,7 @@ import type { User } from '$db/schema';
 
 import { dev } from '$app/environment';
 
-import { createUser, getUser } from '$lib/server/database/users';
+import { createUser, getSessionUser } from '$lib/server/database/users';
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
 import { sendPassphraseEmail } from '$lib/server/auth';
 import { setSessionCookie } from '$lib/server/session';
@@ -57,8 +57,12 @@ export const actions = {
 	login: async (event) => {
 		const formData = await event.request.formData();
 
-		const email = formData.get('email').toString();
-		const passphrase = formData.get('passphrase').toString();
+		const email = formData.get('email')?.toString();
+		const passphrase = formData.get('passphrase')?.toString();
+
+		if (!email || !passphrase) {
+			return fail(400);
+		}
 
 		const correctPassphrase = await getEmailPassphrase(email);
 
@@ -67,7 +71,7 @@ export const actions = {
 
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
-				let user: User = await getUser({ email });
+				let user = await getSessionUser({ email });
 				if (!user) {
 					user = await createUser({ email, serial: generateSerial().toUpperCase() });
 				}
@@ -95,7 +99,7 @@ export const actions = {
 	need: async (event) => {
 		const formData = await event.request.formData();
 
-		const originalEmail = formData.get('email').toString();
+		const originalEmail = formData.get('email')?.toString();
 
 		const redirectUrlEntry = formData.get('redirectUrl');
 		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
@@ -112,7 +116,7 @@ export const actions = {
 
 		const emailEntry = formData.get('email');
 
-		const originalEmail = emailEntry.toString();
+		const originalEmail = emailEntry?.toString();
 
 		const redirectUrlEntry = formData.get('redirectUrl');
 		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';

@@ -26,6 +26,6 @@ export function expireSessionCookie(cookies: Cookies): void {
 	return cookies.delete(SESSION_NAME);
 }
 
-export async function getUserSession<T>(cookie: string): Promise<T> {
+export async function decryptSessionCookie<T>(cookie: string): Promise<T> {
 	return await decrypt(cookie);
 }

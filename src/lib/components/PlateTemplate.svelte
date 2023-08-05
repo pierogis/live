@@ -4,7 +4,7 @@
 	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let jurisdictions: Jurisdiction[];
-	export let plate: FullPlate = null;
+	export let plate: FullPlate | null = null;
 </script>
 
 <Card>

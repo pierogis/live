@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 
-import { EMAIL_PASS, EMAIL_USER } from '$env/static/private';
+import { EMAIL_PASS, EMAIL_USER, SESSION_NAME } from '$env/static/private';
 import { generatePhrase } from './words';
+import type { Cookies } from '@sveltejs/kit';
 
 export async function sendPassphraseEmail(email: string): Promise<string> {
 	const generatedPassphrase = generatePhrase();

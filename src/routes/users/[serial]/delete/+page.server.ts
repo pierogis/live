@@ -5,10 +5,12 @@ import { deleteUser } from '$lib/server/database/users';
 import { userIdInputName } from '$lib/forms/user';
 import { protectUserOrAdmin } from '$lib/helpers';
 
-export const load = async ({ parent }) => {
-	const { sessionUser, user } = await parent();
+export const load = async ({ locals, parent }) => {
+	const { user } = await parent();
 
-	return protectUserOrAdmin(sessionUser, user);
+	await protectUserOrAdmin(locals.sessionUser, user);
+
+	return { user };
 };
 
 export const actions = {
