@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { Layout, ThemeToggle, Interactable } from '@pierogis/utensils';
 
-	import type { LayoutData } from './$types';
-
-	export let data: LayoutData;
+	export let data;
+	$: ({ sessionUser } = data);
 </script>
 
 <Layout>
@@ -18,7 +17,7 @@
 		<Interactable>
 			<a class="border inset link-box" href="/plates/faq">faq</a>
 		</Interactable>
-		{#if data.sessionUser?.isAdmin}
+		{#if sessionUser?.isAdmin}
 			<Interactable>
 				<a href="/plates/create"><h4 class="link-box border inset good">create</h4></a>
 			</Interactable>
@@ -26,8 +25,8 @@
 
 		<Interactable>
 			<a href="/account">
-				<h4 class="link-box border inset" class:good={data.sessionUser === null}>
-					{data.sessionUser !== null ? data.sessionUser.serial : 'login'}
+				<h4 class="link-box border inset" class:good={sessionUser === null}>
+					{sessionUser !== null ? sessionUser.serial : 'login'}
 				</h4>
 			</a>
 		</Interactable>

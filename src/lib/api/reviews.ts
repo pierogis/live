@@ -5,17 +5,23 @@ import type { Review, User } from '$db/schema';
 export function storeReviews(
 	reviews: (Review & { user: User })[],
 	modelId: number,
-	userId: number
+	userId: number | undefined
 ) {
-	let userReview: Writable<Review> = writable({
-		id: null,
-		modelId: modelId,
-		userId: userId,
-		description: ''
-	});
+	let userReview: Writable<{ id?: number; modelId: number; userId?: number; description: string }> =
+		writable({
+			id: undefined,
+			modelId: modelId,
+			userId: userId,
+			description: ''
+		});
 
-	let editorialReview: Writable<Review> = writable({
-		id: null,
+	let editorialReview: Writable<{
+		id?: number;
+		modelId: number;
+		userId?: number;
+		description: string;
+	}> = writable({
+		id: undefined,
 		modelId: modelId,
 		userId: 1,
 		description: ''

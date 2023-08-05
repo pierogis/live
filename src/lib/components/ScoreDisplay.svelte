@@ -1,16 +1,18 @@
 <script lang="ts">
 	import type { Readable, Writable } from 'svelte/store';
-	import type { Score } from '$db/schema';
 
-	export let editorialScore: Readable<Score> = null;
-	export let userScore: Writable<Score> = null;
+	import type { Score } from '$db/schema';
+	import { goto } from '$app/navigation';
+
+	export let interactive = true;
+	export let editorialScore: Readable<Score> | null = null;
+	export let userScore: Writable<Score> | null = null;
+
 	$: displayScore = userScore || editorialScore;
 
-	$: interactive = userScore != null;
-	$: user = userScore != null;
-	$: placeholder = $displayScore?.value == null;
+	$: placeholder = $displayScore == null || $displayScore.value < 0;
 
-	$: displayValue = $displayScore?.value || 0;
+	$: displayValue = $displayScore == null || $displayScore?.value < 0 ? 0 : $displayScore?.value;
 
 	$: halfScores = displayValue % 2;
 	$: fullScores = (displayValue - halfScores) / 2;
@@ -29,7 +31,7 @@
 
 	function handlePointerDown(event: PointerEvent, i: number) {
 		if (event.button == 0) {
-			if (interactive) {
+			if (userScore !== null) {
 				userScore.update((score) => {
 					if (score.value == 2 * i + 2) {
 						score.value = 2 * i + 1;
@@ -40,6 +42,8 @@
 					}
 					return score;
 				});
+			} else if (interactive) {
+				goto(`/login`);
 			}
 		}
 	}
@@ -49,7 +53,7 @@
 	{#each pointStatuses as pointStatus, i (i)}
 		<span
 			class="score"
-			class:user
+			class:user={userScore !== null}
 			class:placeholder
 			class:interactive
 			on:pointerdown|preventDefault={(e) => handlePointerDown(e, i)}

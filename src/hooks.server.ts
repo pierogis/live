@@ -3,9 +3,9 @@ import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { SESSION_NAME } from '$env/static/private';
 
 import { cache, setupCache } from '$lib/server/cache';
-import { getUserSession } from '$lib/server/session';
 
-import { getUser } from '$lib/server/database/users';
+import { decryptSessionCookie } from '$lib/server/session';
+import { getSessionUser } from '$lib/server/database/users';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	if (!cache) setupCache();
@@ -17,15 +17,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (sessionCookie) {
 		try {
-			const { userId } = await getUserSession<{ userId: number }>(sessionCookie);
+			const { userId } = await decryptSessionCookie<{ userId: number }>(sessionCookie);
 
 			if (userId) {
-				const user = await getUser({ id: userId });
+				const sessionUser = await getSessionUser({ id: userId });
 
-				if (!user) {
+				if (!sessionUser) {
 					throw 'cookie user not in database';
 				}
-				event.locals.sessionUser = user;
+				event.locals.sessionUser = sessionUser;
 			}
 		} catch {
 			deleteCookie = true;

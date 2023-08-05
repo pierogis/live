@@ -9,20 +9,20 @@
 
 	export let review: Readable<
 		Review & {
-			user: User;
+			user: Omit<User, 'email'>;
 		}
 	>;
 	export let scores: { [categoryId: number]: Readable<Score>[] };
 
-	const editorialScores = Object.entries(scores).reduce<{ [categoryId: number]: Readable<Score> }>(
-		(previous, [categoryId, categoryScores]) => {
-			previous[parseInt(categoryId)] = categoryScores.find(
-				(score) => get(score).userId == $review.userId
-			);
-			return previous;
-		},
-		{}
-	);
+	const editorialScores = Object.entries(scores).reduce<{
+		[categoryId: number]: Readable<Score>;
+	}>((previous, [categoryId, categoryScores]) => {
+		const categoryScore = categoryScores.find((score) => get(score).userId == $review.userId);
+		if (categoryScore !== undefined) {
+			previous[parseInt(categoryId)] = categoryScore;
+		}
+		return previous;
+	}, {});
 
 	export let categories: Category[];
 </script>
@@ -38,7 +38,7 @@
 		{/if}
 		<slot />
 		<textarea readonly class="inset" cols="40" rows="8">{$review.description}</textarea>
-		<ScoreSheet {categories} {editorialScores} graphScores={scores} />
+		<ScoreSheet interactive={false} {categories} {editorialScores} graphScores={scores} />
 	</Card>
 </Interactable>
 

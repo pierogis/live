@@ -3,16 +3,28 @@ import { error, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
+import { getJurisdictions } from '$lib/server/database/jurisdictions';
+import { protectAdmin } from '$lib/helpers';
+
+export const load = async (event) => {
+	const jurisdictions = await getJurisdictions({});
+
+	await protectAdmin(event.locals.sessionUser);
+
+	return {
+		jurisdictions
+	};
+};
 
 export const actions: Actions = {
 	update: async ({ locals, request, params }) => {
 		if (locals.sessionUser?.isAdmin) {
 			const formData: FormData = await request.formData();
 
-			const jurisdictionEntry = formData.get('jurisdiction');
-			const startYearEntry = formData.get('startYear');
-			const endYearEntry = formData.get('endYear');
-			const imageUrlEntry = formData.get('imageUrl');
+			const jurisdictionEntry = formData.get('jurisdiction')!!;
+			const startYearEntry = formData.get('startYear')!!;
+			const endYearEntry = formData.get('endYear')!!;
+			const imageUrlEntry = formData.get('imageUrl')!!;
 
 			const jurisdictionId = parseInt(jurisdictionEntry.toString());
 			const startYear = startYearEntry != '' ? parseInt(startYearEntry.toString()) : null;

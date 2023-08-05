@@ -1,46 +1,47 @@
 import { writable, type Writable } from 'svelte/store';
-import { goto } from '$app/navigation';
+
 import type { Category, Score } from '$db/schema';
 
 async function handleChangeScore(
 	fetch: (info: RequestInfo, init?: RequestInit) => Promise<Response>,
 	score: Score
 ) {
-	if (!score.userId) {
-		goto(`/login?redirectUrl=/plates/${score.modelId}`);
+	if (score.value < 0) {
+		await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
+			method: 'delete'
+		});
 	} else {
-		if (score.value) {
-			const data = { value: score.value };
-			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
-				method: 'put',
-				body: JSON.stringify(data)
-			});
-		} else {
-			await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
-				method: 'delete'
-			});
-		}
+		const data = { value: score.value };
+		await fetch(`/api/plates/${score.modelId}/scores/${score.categoryId}`, {
+			method: 'put',
+			body: JSON.stringify(data)
+		});
 	}
 }
 
 export function storeScores(
 	scores: Score[],
 	modelId: number,
-	userId: number,
+	userId: number | undefined,
 	categories: Category[],
 	fetch: (info: RequestInfo, init?: RequestInit) => Promise<Response>
 ) {
-	const userScores = categories.reduce<{
+	let userScores: {
 		[categoryId: number]: Writable<Score>;
-	}>((previous, category) => {
-		previous[category.id] = writable({
-			modelId: modelId,
-			userId: userId,
-			categoryId: category.id,
-			value: null
-		});
-		return previous;
-	}, {});
+	} | null = null;
+	if (userId) {
+		userScores = categories.reduce<{
+			[categoryId: number]: Writable<Score>;
+		}>((previous, category) => {
+			previous[category.id] = writable({
+				modelId: modelId,
+				userId: userId,
+				categoryId: category.id,
+				value: -1
+			});
+			return previous;
+		}, {});
+	}
 
 	let editorialScores = categories.reduce<{
 		[categoryId: number]: Writable<Score>;
@@ -49,7 +50,7 @@ export function storeScores(
 			modelId: modelId,
 			userId: 1,
 			categoryId: category.id,
-			value: null
+			value: -1
 		});
 		return previous;
 	}, {});
@@ -63,35 +64,44 @@ export function storeScores(
 	scores.forEach((score) => {
 		const scoreStore = writable(score);
 
-		if (score.userId == userId) {
+		if (userScores && score.userId == userId) {
 			userScores[score.categoryId] = scoreStore;
+		} else {
+			allScores[score.categoryId].push(scoreStore);
 		}
 
 		if (score.userId == 1) {
 			editorialScores[score.categoryId] = scoreStore;
 		}
-
-		allScores[score.categoryId].push(scoreStore);
 	});
 
-	if (userId == 1) {
+	categories.forEach((category) => {
+		if (userScores) {
+			const scoreStore = userScores[category.id];
+			allScores[category.id].push(scoreStore);
+		}
+	});
+
+	if (userScores && userId == 1) {
 		editorialScores = userScores;
 	}
 
-	Object.values(userScores).forEach((scoreStore) => {
-		let fired = false;
-		let previousValue: number;
-		scoreStore.subscribe(async (score) => {
-			if (!fired) {
-				fired = true;
-			} else {
-				if (score.value != previousValue) {
-					await handleChangeScore(fetch, score);
+	if (userScores) {
+		Object.values(userScores).forEach((scoreStore) => {
+			let fired = false;
+			let previousValue: number | null;
+			scoreStore.subscribe(async (score) => {
+				if (!fired) {
+					fired = true;
+				} else {
+					if (score.value != previousValue) {
+						await handleChangeScore(fetch, { ...score, userId: score.userId });
+					}
 				}
-			}
-			previousValue = score.value;
+				previousValue = score.value;
+			});
 		});
-	});
+	}
 
 	return { userScores, editorialScores, allScores };
 }

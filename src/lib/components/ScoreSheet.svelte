@@ -1,35 +1,39 @@
 <script lang="ts">
-	import type { Category, Score } from '$db/schema';
 	import type { Readable, Writable } from 'svelte/store';
+
+	import type { Category, Score } from '$db/schema';
 
 	import { Interactable } from '@pierogis/utensils';
 	import { ScoreDisplay, ScoreGraph } from '.';
 
+	export let interactive = true;
 	export let categories: Category[];
 
-	export let editorialScores: { [categoryId: number]: Readable<Score> } = null;
-	export let userScores: { [categoryId: number]: Writable<Score> } = null;
-	export let graphScores: { [categoryId: number]: Readable<Score>[] } = null;
+	export let editorialScores: { [categoryId: number]: Readable<Score> } | null = null;
+	export let userScores: { [categoryId: number]: Writable<Score> } | null = null;
+	export let graphScores: { [categoryId: number]: Readable<Score>[] } | null = null;
 
-	export let scoreUrl: string = null;
-
-	const interactive = userScores != null;
+	export let scoreUrl: string | null = null;
 </script>
 
 <Interactable clickable={false}>
 	<div class="inner">
 		{#each categories as category}
 			{@const categoryEditorialScore = editorialScores ? editorialScores[category.id] : null}
-			{@const categoryUserScore = interactive ? userScores[category.id] : null}
+			{@const categoryUserScore = userScores !== null ? userScores[category.id] : null}
 			<div class="category">
 				<span class="category-emoji" title={category.name}>{category.symbol}</span>
-				<ScoreDisplay editorialScore={categoryEditorialScore} userScore={categoryUserScore} />
+				<ScoreDisplay
+					{interactive}
+					editorialScore={categoryEditorialScore}
+					userScore={categoryUserScore}
+				/>
 				{#if graphScores != null}
 					{@const categoryAllScores = graphScores[category.id]}
 					<div class="graph">
 						<ScoreGraph scoreStores={categoryAllScores} />
 					</div>
-				{:else if interactive}
+				{:else if categoryUserScore !== null}
 					<input
 						class="clear"
 						type="submit"
@@ -37,7 +41,7 @@
 						formmethod="post"
 						on:click|preventDefault={() => {
 							categoryUserScore.update((score) => {
-								score.value = null;
+								score.value = -1;
 								return score;
 							});
 						}}

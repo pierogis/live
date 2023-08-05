@@ -1,11 +1,11 @@
 import { error, json } from '@sveltejs/kit';
 
+import type { Image, FullPlate, Plate } from '$db/schema';
 import {
 	getFullPlates,
 	helpCreatePlate,
 	getPlatePerJurisdiction
 } from '$lib/server/database/plates';
-import type { Image, FullPlate, Plate } from '$db/schema';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ url, setHeaders }) => {
@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
 
 			return json(plate);
-		} catch (err) {
+		} catch (err: any) {
 			if (err.code == 'P2002') {
 				throw error(400, `one of image urls (${imageUrls}) already exists`);
 			} else throw err;

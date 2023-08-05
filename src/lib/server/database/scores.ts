@@ -4,7 +4,11 @@ import { type Score, scores, type NewScore } from '$db/schema';
 
 import { db } from '.';
 
-export const getScores = async (params: Partial<Score>, take: number = undefined, skip = 0) =>
+export const getScores = async (
+	params: Partial<Score>,
+	take: number | undefined = undefined,
+	skip = 0
+) =>
 	await db.query.scores.findMany({
 		where: (table, { and, eq }) =>
 			and(

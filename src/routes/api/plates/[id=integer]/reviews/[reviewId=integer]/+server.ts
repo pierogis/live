@@ -15,7 +15,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			id: reviewId,
 			modelId,
 			userId,
-			description: description || undefined
+			description: description
 		};
 
 		const review = await updateReview(data);

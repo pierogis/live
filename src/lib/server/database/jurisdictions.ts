@@ -6,7 +6,7 @@ export const listJurisdictions = async () => await db.select().from(jurisdiction
 
 export const getJurisdictions = async (
 	params: Partial<Jurisdiction>,
-	take: number = undefined,
+	take: number | undefined = undefined,
 	skip = 0
 ) =>
 	await db.query.jurisdictions.findMany({
@@ -53,8 +53,8 @@ export const getJurisdiction = async (params: Partial<Jurisdiction>) =>
 	await db.query.jurisdictions.findFirst({
 		where: (table, { or, eq }) =>
 			or(
-				eq(table.id, params.id),
-				eq(table.abbreviation, params.abbreviation),
-				eq(table.name, params.name)
+				params.id !== undefined ? eq(table.id, params.id) : undefined,
+				params.abbreviation !== undefined ? eq(table.abbreviation, params.abbreviation) : undefined,
+				params.name !== undefined ? eq(table.name, params.name) : undefined
 			)
 	});

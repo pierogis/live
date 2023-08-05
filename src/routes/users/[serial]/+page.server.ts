@@ -1,8 +1,11 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
+import { superValidate } from 'sveltekit-superforms/client';
+
+import type { Category } from '$db/schema';
 import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
-import type { Category, User } from '$db/schema';
+import { userSchema } from '$lib/forms/user';
 
 export const load = async () => {
 	const categories: Category[] = await getCategories({ ware: 'plate' });
@@ -11,27 +14,27 @@ export const load = async () => {
 };
 
 export const actions = {
-	default: async ({ locals, request, params }) => {
-		if (locals.sessionUser === null) {
+	default: async (event) => {
+		if (event.locals.sessionUser === null) {
 			throw error(401, `not signed in`);
 		}
-		if (locals.sessionUser?.serial == params.serial || locals.sessionUser?.isAdmin) {
-			const formData = await request.formData();
+		if (
+			event.locals.sessionUser.serial == event.params.serial ||
+			event.locals.sessionUser.isAdmin
+		) {
+			const form = await superValidate(event, userSchema);
+			if (!form.valid) {
+				return fail(400, form);
+			}
 
-			// const emailEntry = formData.get('email');
-			const serialEntry = formData.get('serial');
-
-			const data: Partial<Omit<User, 'isAdmin'>> & Pick<User, 'serial'> = {
-				// ...(emailEntry && { email: emailEntry.toString() }),
-				...(serialEntry && { serial: serialEntry.toString().toUpperCase() })
-			};
-
-			const user = await updateUserBySerial(params.serial, data);
+			const user = await updateUserBySerial(event.params.serial, {
+				serial: form.data.serial.toUpperCase()
+			});
 
 			// redirect to the updated user
 			throw redirect(302, `/users/${user.serial}`);
 		} else {
-			throw error(403, `not user ${params.serial} or admin`);
+			throw error(403, `not user ${event.params.serial} or admin`);
 		}
 	}
 };

@@ -15,7 +15,7 @@
 {#if data.isUser || data.isAdmin}
 	<Card>
 		<span>Are you sure you want to delete this account?</span>
-		<b>{data.user.email}</b>
+		<b>{data.user.serial}</b>
 		<div class="buttons">
 			<Interactable>
 				<a class="link-box border inset no-select" href={`/users/${data.user.serial}`}>cancel</a>

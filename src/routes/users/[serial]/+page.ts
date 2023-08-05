@@ -1,16 +1,13 @@
-import { storeScores } from '$lib/api/scores';
-import type { Score } from '$db/schema';
 import type { Writable } from 'svelte/store';
+import { superValidate } from 'sveltekit-superforms/client';
 
-export const load = async ({ parent, data, fetch }) => {
-	const { user } = await parent();
-	const { categories } = data;
+import type { Score } from '$db/schema';
+import { storeScores } from '$lib/api/scores';
+import { userSchema } from '$lib/forms/user';
 
-	const { sessionUser } = await parent();
-	const isLoggedInUser = sessionUser !== null && sessionUser.id == user.id;
-	const isLoggedInAdmin = sessionUser !== null && sessionUser.isAdmin;
-
-	if (isLoggedInUser) user.email = sessionUser.email;
+export const load = async (event) => {
+	const { user } = await event.parent();
+	const { categories } = event.data;
 
 	const reviewsScores = user.reviews.reduce<{
 		[reviewId: number]: {
@@ -30,5 +27,7 @@ export const load = async ({ parent, data, fetch }) => {
 		return previous;
 	}, {});
 
-	return { user, isLoggedInUser, isLoggedInAdmin, reviewsScores, categories };
+	const form = await superValidate({ serial: user.serial }, userSchema);
+
+	return { user, form, reviewsScores, categories };
 };

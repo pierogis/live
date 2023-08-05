@@ -1,10 +1,10 @@
 import { error, json } from '@sveltejs/kit';
 
+import type { Jurisdiction } from '$db/schema';
+
 import { deletePlate, getFullPlate, helpUpdatePlate } from '$lib/server/database/plates';
 
 import type { RequestHandler } from './$types';
-import type { Jurisdiction } from '$db/schema';
-
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
