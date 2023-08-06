@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 
 import { dev } from '$app/environment';
 
-import { createUser, getSessionUser } from '$lib/server/database/users';
+import { createUser, getUser } from '$lib/server/database/users';
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
 import { sendPassphraseEmail } from '$lib/server/auth';
 import { setSessionCookie } from '$lib/server/session';
@@ -69,7 +69,7 @@ export const actions = {
 
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
-				let user = await getSessionUser({ email });
+				let user = await getUser({ email });
 				if (!user) {
 					user = await createUser({ email, serial: generateSerial().toUpperCase() });
 				}

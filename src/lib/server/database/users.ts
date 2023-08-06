@@ -20,7 +20,7 @@ export const getUsers = async (
 		offset: skip
 	});
 
-export const getSessionUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
+export const getUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
 	await db.query.users.findFirst({
 		where: (table, { and, eq }) =>
 			and(

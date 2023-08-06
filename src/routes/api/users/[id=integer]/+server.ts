@@ -1,11 +1,11 @@
 import { error, json } from '@sveltejs/kit';
 
-import { getSessionUser, updateUserById, deleteUser } from '$lib/server/database/users';
+import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
 import type { User } from '$db/schema';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
-	const user = await getSessionUser({ id: parseInt(params.id) });
+	const user = await getUser({ id: parseInt(params.id) });
 
 	if (user) {
 		const maskedUser = {
