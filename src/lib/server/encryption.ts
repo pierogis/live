@@ -1,61 +1,38 @@
-// const { subtle } = globalThis.crypto;
-
 import { ENCRYPTION_SECRET } from '$env/static/private';
-
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8');
 
-const iterations = 1000;
-const hash = 'SHA-256';
-const salt = 'salt string for fun';
-
-const baseKey = await crypto.subtle.importKey(
-	'raw',
-	encoder.encode(ENCRYPTION_SECRET),
-	{ name: 'PBKDF2' },
-	false,
-	['deriveKey']
-);
-
-const key = await crypto.subtle.deriveKey(
-	{
-		name: 'PBKDF2',
-		salt: encoder.encode(salt),
-		iterations: iterations,
-		hash: hash
-	},
-	baseKey,
-	{
-		name: 'AES-GCM',
-		length: 128
-	}, // key type we want
-	true, // extractable
-	['encrypt', 'decrypt'] // new key usages
-);
+const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
+const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
 export const encrypt = async <T>(data: T): Promise<string> => {
-	const buffer = encoder.encode(JSON.stringify(data));
-	const encrptedBuffer = await crypto.subtle.encrypt(
-		{
-			name: 'AES-GCM',
-			iv: crypto.getRandomValues(new Uint8Array(12))
-		},
-		key,
-		buffer
-	);
-	return decoder.decode(encrptedBuffer);
+	const iv = crypto.getRandomValues(new Uint8Array(12)); // get 96-bit random iv
+
+	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
+
+	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['encrypt']); // generate key from pw
+
+	const ptUint8 = encoder.encode(JSON.stringify(data)); // encode plaintext as UTF-8
+	const ctBuffer = await crypto.subtle.encrypt(alg, key, ptUint8); // encrypt plaintext using key
+
+	return Buffer.from(iv).toString('base64') + Buffer.from(ctBuffer).toString('base64');
 };
 
 export const decrypt = async <T>(encryptedData: string): Promise<T> => {
-	const encrptedBuffer = encoder.encode(encryptedData);
+	const encodedbuffer = Buffer.from(encryptedData, 'base64');
+	const iv = encodedbuffer.subarray(0, 12);
 
-	const decryptedBuffer = await crypto.subtle.decrypt(
-		{
-			name: 'AES-GCM',
-			iv: crypto.getRandomValues(new Uint8Array(12))
-		},
-		key,
-		encrptedBuffer
-	);
-	return JSON.parse(decoder.decode(decryptedBuffer));
+	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
+
+	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['decrypt']); // generate key from pw
+
+	const ct = encodedbuffer.subarray(12); // decode base64 ciphertext
+
+	try {
+		const plainBuffer = await crypto.subtle.decrypt(alg, key, ct); // decrypt ciphertext using key
+		const plaintext = decoder.decode(plainBuffer); // plaintext from ArrayBuffer
+		return JSON.parse(plaintext); // return the plaintext
+	} catch (e) {
+		throw 'decrypt failed';
+	}
 };
