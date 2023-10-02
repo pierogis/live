@@ -22,7 +22,7 @@ export const requestMailerSend = async (
 		html: content.html
 	};
 
-	const response = await fetch('https://api.mailersend.com/v1', {
+	const response = await fetch('https://api.mailersend.com/v1/email', {
 		method: 'POST',
 		body: JSON.stringify(body),
 		headers: {

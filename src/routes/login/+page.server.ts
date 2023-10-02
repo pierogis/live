@@ -38,7 +38,7 @@ export const actions = {
 			const generatedPassphrase = dev ? DEV_PASSPHRASE : generatePhrase();
 			const content = createPassphraseEmail(originalEmail, generatedPassphrase);
 			// only send email in prod
-			dev ?? (await requestMailerSend(originalEmail, content, event.fetch));
+			if (!dev) await requestMailerSend(originalEmail, content, event.fetch);
 
 			await setEmailPassphrase(originalEmail, generatedPassphrase);
 
