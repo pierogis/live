@@ -1,16 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { dev } from '$app/environment';
+import { DEV_PASSPHRASE } from '$env/static/private';
 
 import { createUser, getUser } from '$lib/server/database/users';
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
-import { sendPassphraseEmail } from '$lib/server/auth';
+import { createPassphraseEmail } from '$lib/server/email';
+import { requestMailerSend } from '$lib/server/mailersend';
 import { setSessionCookie } from '$lib/server/session';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
 
 import { FlowCode } from './_flow';
-
-import { DEV_PASSPHRASE } from '$env/static/private';
 
 export const load = async () => {
 	const samplePhrase = generatePhrase();
@@ -33,7 +33,12 @@ export const actions = {
 
 		if (emailEntry) {
 			const originalEmail = emailEntry.toString();
-			const generatedPassphrase = dev ? DEV_PASSPHRASE : await sendPassphraseEmail(originalEmail);
+
+			// use dev passphrase in dev
+			const generatedPassphrase = dev ? DEV_PASSPHRASE : generatePhrase();
+			const content = createPassphraseEmail(originalEmail, generatedPassphrase);
+			// only send email in prod
+			dev ?? (await requestMailerSend(originalEmail, content, event.fetch));
 
 			await setEmailPassphrase(originalEmail, generatedPassphrase);
 
