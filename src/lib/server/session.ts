@@ -10,7 +10,7 @@ export async function setSessionCookie(
 		userId: number;
 	}
 ): Promise<void> {
-	const sessionCookie = encrypt(data);
+	const sessionCookie = await encrypt(data);
 
 	return cookies.set(SESSION_NAME, sessionCookie, {
 		maxAge: parseInt(SESSION_LENGTH) / 1000, // maxAge is in seconds. Divide by 1000 to convert from milliseconds to seconds.

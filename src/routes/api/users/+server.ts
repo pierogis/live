@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 
-import { getSessionUser } from '$lib/server/database/users';
+import { getUser } from '$lib/server/database/users';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -8,7 +8,7 @@ export const GET: RequestHandler = async (event) => {
 	if (!serial) {
 		throw error(403, 'user serial param not provided');
 	}
-	const user = await getSessionUser({ serial });
+	const user = await getUser({ serial });
 
 	if (user) {
 		const maskedUser = {

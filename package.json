@@ -32,10 +32,10 @@
 		"lint:fix": "pnpm run format && eslint --fix --ignore-path .gitignore ."
 	},
 	"devDependencies": {
-		"@pierogis/utensils": "^0.5.2",
+		"@pierogis/utensils": "^0.5.3",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.22.3",
-		"@types/nodemailer": "^6.4.8",
+		"@types/node": "^20.8.0",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
 		"dotenv": "^16.3.1",
@@ -48,15 +48,14 @@
 		"svelte": "^3.59.2",
 		"svelte-check": "^3.4.6",
 		"sveltekit-superforms": "^1.3.0",
-		"tsx": "^3.12.6",
 		"tslib": "^2.6.0",
+		"tsx": "^3.12.6",
 		"typescript": "^5.0.4",
 		"vite": "^4.4.3",
 		"zod": "^3.21.4"
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.27.2",
-		"nodemailer": "^6.9.3",
 		"postgres": "^3.3.5",
 		"redis": "^4.6.7"
 	},

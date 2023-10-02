@@ -1,25 +1,38 @@
-import crypto from 'crypto';
-
 import { ENCRYPTION_SECRET } from '$env/static/private';
+const encoder = new TextEncoder();
+const decoder = new TextDecoder('utf-8');
 
-// largely borrowed from https://github.com/pilcrowOnPaper/lucia-sveltekit/blob/4d542bba5791bb1bc967d6bf59af94e17ab81dd8/packages/lucia-sveltekit/src/utils/crypto.ts
+const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
+const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
-const algorithm = 'aes-192-cbc';
-const salt = crypto.randomBytes(64);
-const key = crypto.scryptSync(ENCRYPTION_SECRET, salt, 24);
+export const encrypt = async <T>(data: T): Promise<string> => {
+	const iv = crypto.getRandomValues(new Uint8Array(12)); // get 96-bit random iv
 
-export function encrypt<T>(data: T): string {
-	const stringData = JSON.stringify(data);
+	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
 
-	const iv = crypto.randomBytes(16);
-	const cipher = crypto.createCipheriv(algorithm, key, iv);
-	const encrypted = cipher.update(stringData, 'utf8', 'hex');
-	return [encrypted + cipher.final('hex'), Buffer.from(iv).toString('hex')].join('.');
-}
+	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['encrypt']); // generate key from pw
 
-export function decrypt<T>(encryptedData: string): T {
-	const [encrypted, iv] = encryptedData.split('.');
-	if (!iv) throw new Error('IV not found');
-	const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
-	return JSON.parse(decipher.update(encrypted, 'hex', 'utf8') + decipher.final('utf8'));
-}
+	const ptUint8 = encoder.encode(JSON.stringify(data)); // encode plaintext as UTF-8
+	const ctBuffer = await crypto.subtle.encrypt(alg, key, ptUint8); // encrypt plaintext using key
+
+	return Buffer.from(iv).toString('base64') + Buffer.from(ctBuffer).toString('base64');
+};
+
+export const decrypt = async <T>(encryptedData: string): Promise<T> => {
+	const encodedbuffer = Buffer.from(encryptedData, 'base64');
+	const iv = encodedbuffer.subarray(0, 12);
+
+	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
+
+	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['decrypt']); // generate key from pw
+
+	const ct = encodedbuffer.subarray(12); // decode base64 ciphertext
+
+	try {
+		const plainBuffer = await crypto.subtle.decrypt(alg, key, ct); // decrypt ciphertext using key
+		const plaintext = decoder.decode(plainBuffer); // plaintext from ArrayBuffer
+		return JSON.parse(plaintext); // return the plaintext
+	} catch (e) {
+		throw 'decrypt failed';
+	}
+};
