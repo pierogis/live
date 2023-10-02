@@ -6,8 +6,8 @@ settings:
 
 devDependencies:
   '@pierogis/utensils':
-    specifier: ^0.5.1
-    version: 0.5.1
+    specifier: ^0.5.3
+    version: 0.5.3
   '@playwright/test':
     specifier: ^1.36.1
     version: 1.36.1
@@ -357,8 +357,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@pierogis/utensils@0.5.1:
-    resolution: {integrity: sha512-oLFO5QvtTFBbyV8kovJSUmXhoenIO2HOXYMy6lbVeSeTayH3cZG3O8J1uyJNZoDpeizcKbQX5eCdCIg6FV/DyA==}
+  /@pierogis/utensils@0.5.3:
+    resolution: {integrity: sha512-eqseSa53pMFrbq1rIfNtB/+frKAmIZgMWKezfb3ptvlatzh+BglLfotAfghMYTDl9yEpSECe1reaNoO+JGJlPg==}
     dependencies:
       svelte: 3.58.0
     dev: true
