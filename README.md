@@ -29,3 +29,9 @@ npm i --save-dev @pierogis/utensils
 	@import '@pierogis/utensils/styles/pierogis.css';
 </style>
 ```
+
+## release
+
+```sh
+pnpm publish --access public
+```
