@@ -18,3 +18,17 @@
 <div class="content"><slot /></div>
 
 <slot name="footer" />
+
+<style>
+	.content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
+		flex-wrap: wrap;
+
+		padding: 1rem;
+		padding-top: 0;
+	}
+</style>

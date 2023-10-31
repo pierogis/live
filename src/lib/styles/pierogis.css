@@ -60,7 +60,6 @@
 	vertical-align: baseline;
 
 	font-family: 'Lora';
-	font-style: normal;
 	color: var(--text-color);
 
 	transition: color 400ms, background-color 400ms, border-color 400ms, outline-color 400ms;
@@ -77,6 +76,13 @@ h6 {
 
 @media only screen and (max-width: 320px) {
 	* {
+		font-size: 5vw;
+	}
+	input, textarea,
+	label
+	button,
+	.link-box,
+	code {
 		font-size: 5vw;
 	}
 }
@@ -246,17 +252,6 @@ nav {
 	justify-content: center;
 
 	text-align: center;
-}
-
-.content {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	align-content: center;
-	justify-content: center;
-	flex-wrap: wrap;
-
-	padding-top: 0;
 }
 
 footer {

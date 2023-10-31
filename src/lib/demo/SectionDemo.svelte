@@ -97,7 +97,7 @@
 	input[type='number'] {
 		width: 4rem;
 	}
-	label:has(input[type='number']) {
+	label:has(input) {
 		display: flex;
 		justify-content: right;
 		align-items: center;

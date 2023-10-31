@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, ImageDisplay, Shine } from '$lib';
+	import { Card, Divider, ImageDisplay, Shine } from '$lib';
 
 	let usingRandomLength = true;
 	let usingRandomStart = true;
@@ -47,74 +47,101 @@
 	<span>can cover anything in an undulating sheen</span>
 	<span>(try hovering too)</span>
 
-	<label>
-		<input type="checkbox" bind:checked={usingRandomLength} />
-		use random length
-	</label>
-
-	{#if usingRandomLength}
+	<div class="input-group">
 		<label>
-			max length
-			<input type="range" min={0} max={10} bind:value={maxLength} />
-			<input class="inset" type="number" min={0} max={10} bind:value={maxLength} />
+			<input type="checkbox" bind:checked={usingRandomLength} />
+			use random length
 		</label>
+
+		{#if usingRandomLength}
+			<label>
+				max length
+				<input type="range" min={0} max={10} bind:value={maxLength} />
+				<input class="inset" type="number" min={0} max={10} bind:value={maxLength} />
+			</label>
+			<label>
+				min length
+				<input type="range" min={0} max={maxLength} bind:value={minLength} />
+				<input class="inset" type="number" min={0} max={maxLength} bind:value={minLength} />
+			</label>
+		{:else}
+			<label>
+				length
+				<input type="range" min={0} max={10} bind:value={length} />
+				<input class="inset" type="number" min={0} max={10} bind:value={length} />
+			</label>
+		{/if}
+	</div>
+
+	<Divider horizontal margin="0" />
+
+	<div class="input-group">
 		<label>
-			min length
-			<input type="range" min={0} max={maxLength} bind:value={minLength} />
-			<input class="inset" type="number" min={0} max={maxLength} bind:value={minLength} />
+			<input type="checkbox" bind:checked={usingRandomStart} />
+			use random offset
 		</label>
-	{:else}
+
+		{#if !usingRandomStart}
+			<label>
+				start offset
+				<input
+					type="range"
+					min={0}
+					max={usingRandomLength ? maxLength : length}
+					bind:value={offset}
+				/>
+				<input
+					class="inset"
+					type="number"
+					min={0}
+					max={usingRandomLength ? maxLength : length}
+					bind:value={offset}
+				/>
+			</label>
+		{/if}
+	</div>
+
+	<Divider horizontal margin="0" />
+
+	<div class="input-group">
 		<label>
-			length
-			<input type="range" min={0} max={10} bind:value={length} />
-			<input class="inset" type="number" min={0} max={10} bind:value={length} />
+			unhover opacity
+			<input type="range" min={0} max={1} step={0.1} bind:value={unhoverOpacity} />
+			<input class="inset" type="number" min={0} max={1} step={0.1} bind:value={unhoverOpacity} />
 		</label>
-	{/if}
 
-	<label>
-		<input type="checkbox" bind:checked={usingRandomStart} />
-		use random offset
-	</label>
-
-	{#if !usingRandomStart}
 		<label>
-			start offset
-			<input
-				type="range"
-				min={0}
-				max={usingRandomLength ? maxLength : length}
-				bind:value={offset}
-			/>
-			<input
-				class="inset"
-				type="number"
-				min={0}
-				max={usingRandomLength ? maxLength : length}
-				bind:value={offset}
-			/>
+			<span>blur</span>
+			<input type="range" bind:value={blur} />
+			<input class="inset" type="number" bind:value={blur} />
 		</label>
-	{/if}
 
-	<label>
-		unhover opacity
-		<input type="range" min={0} max={1} step={0.1} bind:value={unhoverOpacity} />
-		<input class="inset" type="number" min={0} max={1} step={0.1} bind:value={unhoverOpacity} />
-	</label>
-
-	<label>
-		blur
-		<input type="range" bind:value={blur} />
-		<input class="inset" type="number" bind:value={blur} />
-	</label>
-
-	<label>
-		color
-		<input type="color" bind:value={color} />
-	</label>
+		<label>
+			<span>color</span>
+			<input type="color" bind:value={color} />
+		</label>
+	</div>
 </Card>
 
 <style>
 	input[type='number'] {
 		width: 4rem;
+	}
+	input[type='range'] {
+		width: 3rem;
+	}
+
+	label:has(input) {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	label > span {
+		font-family: Courier, monospace;
+	}
+
+	.input-group {
+		width: 90%;
 	}
 </style>

@@ -11,7 +11,7 @@
 <style>
 	.card {
 		padding: 12px;
-		max-width: 80vw;
+		max-width: 90vw;
 		height: 100%;
 
 		display: flex;
@@ -23,5 +23,7 @@
 		position: relative;
 
 		background-color: var(--primary-color);
+
+		text-align: center;
 	}
 </style>

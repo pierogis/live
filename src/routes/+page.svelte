@@ -115,5 +115,7 @@
 	textarea {
 		font-family: 'Courier', monospace;
 		font-weight: bold;
+		max-width: 100%;
+		white-space: nowrap;
 	}
 </style>

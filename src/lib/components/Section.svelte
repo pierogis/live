@@ -14,8 +14,6 @@
 
 <style>
 	section {
-		max-width: 90%;
-
 		display: flex;
 		flex-flow: wrap;
 

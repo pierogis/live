@@ -2,9 +2,9 @@
 	import { Card } from '$lib';
 </script>
 
-<Card border={false}>
+<Card shadow={true}>
 	<Card inset={false}>
-		<Card shadow={true}>
+		<Card border={false}>
 			<span>a <code>Card</code> within a <code>Card</code></span>
 		</Card>
 

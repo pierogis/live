@@ -71,4 +71,11 @@
 		justify-content: center;
 		gap: 10px;
 	}
+
+	label:has(input) {
+		display: flex;
+		justify-content: right;
+		align-items: center;
+		gap: 10px;
+	}
 </style>

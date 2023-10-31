@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let horizontal = false;
-	export let size: string;
+	export let size: string = '4px';
 	export let margin = '1rem';
 </script>
 
@@ -17,6 +17,6 @@
 
 	.divider.horizontal {
 		height: var(--size);
-		width: 90%;
+		width: 100%;
 	}
 </style>
