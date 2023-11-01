@@ -1,97 +1,121 @@
 <script lang="ts">
-	import { Card, CardsGrid, Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
+	import { Card, CardsGrid, Divider, ImageDisplay, Interactable, Section, Shine } from '$lib';
 
-	export let data;
+	import {
+		CardDemo,
+		CardsGridDemo,
+		DividerDemo,
+		ImageDisplayDemo,
+		InteractableDemo,
+		SectionDemo,
+		ShineDemo,
+		ThemeToggleDemo
+	} from '$lib/demo';
+
+	let rotateImage = false;
 </script>
 
-<svelte:head>
-	<title>pierogis live</title>
-</svelte:head>
+<Card>
+	<h3>hi!</h3>
 
-<Layout>
-	<Interactable slot="title">
-		<div class="link-box border inset">pierogis live</div>
+	<Interactable on:click={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
+		<Shine>
+			<ImageDisplay
+				width={'200px'}
+				height={'200px'}
+				urls={[
+					'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Emoji_u1f44b.svg/2048px-Emoji_u1f44b.svg.png'
+				]}
+				style={rotateImage ? 'transform: rotate(90deg);' : ''}
+				alt="hello!"
+			/>
+		</Shine>
 	</Interactable>
 
-	<h3 class="tagline">{data.tagline}</h3>
+	<span>
+		this is a simple svelte ui/style package called
+		<a style:text-decoration="underline" href="https://github.com/pierogis/utensils"> utensils </a>
+	</span>
+	<Divider size="4px" horizontal={true} margin="0" />
+	<span>install with</span>
+	<textarea class="inset" rows="1" cols="35">npm i --save-dev @pierogis/utensils</textarea>
+	<span>and include</span>
+	<textarea class="inset" rows="1" cols="50"
+		>{`@import '@pierogis/utensils/styles/pierogis.css';`}</textarea
+	>
+	<span>in a top level style</span>
+</Card>
 
+<br />
+
+<Divider horizontal size={'4px'} />
+
+<Section title="components">
 	<CardsGrid>
-		<Interactable clickable={false}>
-			<Card>
-				<Interactable>
-					<a class="border inset link-box" href="https://kitchen.pierogis.live">kitchen</a>
-				</Interactable>
-				<span>work on a recipe</span>
-				<iframe title="kitchen" src="https://kitchen.pierogis.live" />
-				<br />
-			</Card>
-		</Interactable>
-
-		<Interactable clickable={false}>
-			<Card>
-				<Interactable>
-					<a class="border inset link-box" href="https://emporium.pierogis.live">emporium</a>
-				</Interactable>
-				<span>a place for plates</span>
-				<iframe title="emporium" src="https://emporium.pierogis.live" />
-				<br />
-			</Card>
-		</Interactable>
-
-		<Interactable clickable={false}>
-			<Card>
-				<Interactable>
-					<a class="border inset link-box" href="https://colors.pierogis.live">colors</a>
-				</Interactable>
-				<span>refine your palette</span>
-				<iframe title="colors" src="https://colors.pierogis.live" />
-				<br />
-			</Card>
-		</Interactable>
-
-		<Interactable clickable={false}>
-			<Card>
-				<Interactable>
-					<a class="border inset link-box" href="https://utensils.pierogis.live">utensils</a>
-				</Interactable>
-				<span>some implements to aid consumption</span>
-				<iframe title="utensils" src="https://utensils.pierogis.live" />
-				<br />
-			</Card>
-		</Interactable>
+		<CardDemo />
+		<CardsGridDemo />
+		<DividerDemo />
+		<SectionDemo />
+		<ImageDisplayDemo />
+		<ShineDemo />
+		<ThemeToggleDemo />
+		<InteractableDemo />
 	</CardsGrid>
+</Section>
 
-	<br />
+<br />
 
-	<footer slot="footer">
-		<Interactable>
-			<a class="border inset link-box" href="https://careers.pierogis.live">careers</a>
-		</Interactable>
-		<Interactable>
-			<a class="border inset link-box" href="https://github.com/pierogis/live">github</a>
-		</Interactable>
-		<Interactable>
-			<a class="border inset link-box" href="https://twitter.com/pierogis_live">@pierogis_live</a>
-		</Interactable>
-		<ThemeToggle />
-	</footer>
-</Layout>
+<Divider horizontal size={'4px'} />
 
-<style>
-	@import '@pierogis/utensils/styles/pierogis.css';
+<Section title="styles">
+	<CardsGrid>
+		<Card>
+			<h4>.border</h4>
+			<div class="border">wraps anything with this cheesy two tone border</div>
+		</Card>
+		<Card>
+			<h4>.inset</h4>
+			<div class="inset">applies an inner box shadow</div>
+		</Card>
+		<Card>
+			<h4>.shadow</h4>
+			<div class="shadow">applies an outer box shadow</div>
+		</Card>
+		<Card>
+			<h4>.link-box</h4>
+			<div>
+				<div class="link-box">
+					useful for making normal text (<code>span</code>, <code>a</code>)
+					<br />
+					appear like button/link box
+					<br />
+					(especially when used with a border)
+				</div>
+			</div>
+		</Card>
+		<Card>
+			<h4>.border.inset.shadow.link-box</h4>
+			<div class="link-box border inset shadow">they work well when combined</div>
+		</Card>
+		<Card>
+			<h4>.good / .bad</h4>
+			<div class="good">used for affirmative</div>
+			<div class="bad">and negative signals</div>
+		</Card>
+	</CardsGrid>
+</Section>
 
-	.tagline {
+<br />
+
+<style global>
+	span {
 		text-align: center;
-		padding: 1rem;
 	}
-	iframe {
-		max-width: 90%;
-		width: 60rem;
-		height: 30rem;
 
-		padding: 0.4rem;
-
-		border: dashed var(--text-color) 1px;
-		border-radius: 1rem;
+	textarea {
+		font-family: 'Courier', monospace;
+		font-weight: bold;
+		max-width: 100%;
+		white-space: nowrap;
 	}
 </style>
