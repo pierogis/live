@@ -17,10 +17,10 @@
 		"components"
 	],
 	"scripts": {
-		"dev": "svelte-package --watch",
+		"dev": "svelte-kit sync && svelte-package --watch",
 		"build": "pnpm run package",
 		"preview": "vite preview",
-		"package": "svelte-package && publint",
+		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "npm run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
