@@ -14,5 +14,8 @@
     "turbo": "latest"
   },
   "packageManager": "pnpm@8.6.10",
+  "engines": {
+    "pnpm": "^8.0.0"
+  },
   "name": "live"
 }
