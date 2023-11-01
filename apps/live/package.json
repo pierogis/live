@@ -1,0 +1,44 @@
+{
+	"name": "live",
+	"version": "0.0.1",
+	"description": "a basecamp for pierogis",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pierogis/live.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/pierogis/live/issues"
+	},
+	"homepage": "https://pierogis.live",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"package": "svelte-kit package",
+		"preview": "vite preview",
+		"test": "playwright test",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check --plugin-search-dir=. . && eslint .",
+		"format": "prettier --write --plugin-search-dir=. ."
+	},
+	"devDependencies": {
+		"@pierogis/utensils": "workspace:*",
+		"@playwright/test": "^1.36.1",
+		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/kit": "^1.22.3",
+		"eslint-config-custom": "workspace:*",
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.1",
+		"svelte": "^3.59.2",
+		"svelte-check": "^3.4.6",
+		"tslib": "^2.6.0",
+		"typescript": "^5.1.6",
+		"vite": "^4.4.4"
+	},
+	"packageManager": "pnpm@8.1.0",
+	"engines": {
+		"pnpm": "^8.0.0"
+	},
+	"type": "module"
+}

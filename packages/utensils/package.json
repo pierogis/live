@@ -1,0 +1,65 @@
+{
+	"name": "@pierogis/utensils",
+	"version": "0.6.0",
+	"description": "a set of utensils to aid consumption",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pierogis/utensils.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/pierogis/utensils/issues"
+	},
+	"homepage": "https://github.com/pierogis/utensils#readme",
+	"keywords": [
+		"svelte",
+		"ui",
+		"components"
+	],
+	"scripts": {
+		"dev": "svelte-package --watch",
+		"build": "pnpm run package",
+		"preview": "vite preview",
+		"package": "svelte-package && publint",
+		"prepublishOnly": "npm run package",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test:unit": "vitest",
+		"lint": "prettier --plugin-search-dir . --check . && eslint .",
+		"format": "prettier --plugin-search-dir . --write ."
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.36.1",
+		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/kit": "^1.22.3",
+		"@sveltejs/package": "^2.2.0",
+		"eslint-config-custom": "workspace:*",
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.1",
+		"publint": "^0.1.16",
+		"svelte": "^3.58.0",
+		"svelte-check": "^3.4.6",
+		"tslib": "^2.6.0",
+		"typescript": "^5.1.6",
+		"vite": "^4.4.4",
+		"vitest": "^0.25.8"
+	},
+	"dependencies": {
+		"svelte": "3.58.0"
+	},
+	"type": "module",
+	"files": [
+		"dist",
+		"./dist/styles/*",
+		"!dist/demo"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js"
+		},
+		"./styles/*": "./dist/styles/*"
+	},
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts"
+}

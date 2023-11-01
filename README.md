@@ -1,37 +1,13 @@
-# utensils
+# live
 
-a set of svelte components
+all things related to pierogis
 
-## install
+### apps and packages
 
-```sh
-npm i --save-dev @pierogis/utensils
-```
-
-## usage
-
-```svelte title="src/+page.ts"
-<script lang="ts">
-	import {
-		Card,
-		CardsGrid,
-		Divider,
-		ImageDisplay,
-		Layout,
-		Section,
-		ThemeToggle
-	} from '@pierogis/utensils';
-</script>
-
-...
-
-<style>
-	@import '@pierogis/utensils/styles/pierogis.css';
-</style>
-```
-
-## release
-
-```sh
-pnpm publish --access public
-```
+- apps
+  - `utensils`: utensils demo app
+  - `live`: base camp
+- packages
+  - `@pierogis/utensils`: component library
+- misc
+  - `eslint-config-custom`: `eslint` configurations
