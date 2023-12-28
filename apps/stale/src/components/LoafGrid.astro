@@ -1,0 +1,36 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import LoafCard from "./LoafCard.astro";
+
+interface Props {
+  loafs: CollectionEntry<"loafs">[];
+}
+
+const { loafs } = Astro.props;
+---
+
+<div class="grid">
+  {
+    loafs.map((loaf) => (
+      <a href={`/loafs/${loaf.slug}`}>
+        <LoafCard loaf={loaf.data} />
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 1rem;
+  }
+
+  @media screen and (max-width: 650px) {
+    .grid {
+      display: block;
+    }
+  }
+</style>

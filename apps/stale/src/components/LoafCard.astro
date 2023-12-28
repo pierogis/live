@@ -1,0 +1,17 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Card, Interactable } from "@pierogis/utensils";
+
+interface Props {
+  loaf: CollectionEntry<"loafs">["data"];
+}
+
+const { loaf } = Astro.props;
+---
+
+<Interactable>
+  <Card border inset>
+    <h4>{loaf.title}</h4>
+    <h5>{loaf.subtitle}</h5>
+  </Card>
+</Interactable>

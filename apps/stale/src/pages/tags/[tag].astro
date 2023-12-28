@@ -1,0 +1,34 @@
+---
+import { getCollection } from "astro:content";
+
+import { SEO } from "astro-seo";
+
+import Base from "../../layouts/Base.astro";
+import LoafGrid from "../../components/LoafGrid.astro";
+
+export async function getStaticPaths() {
+  const allLoafs = await getCollection("loafs");
+
+  const uniqueTags = [
+    ...new Set(allLoafs.map((loaf) => loaf.data.tags).flat()),
+  ];
+
+  return uniqueTags.map((tag) => {
+    const filteredLoafs = allLoafs.filter((loaf) =>
+      loaf.data.tags.includes(tag)
+    );
+    return {
+      params: { tag },
+      props: { loafs: filteredLoafs },
+    };
+  });
+}
+
+const { tag } = Astro.params;
+const { loafs } = Astro.props;
+---
+
+<Base pageTitle={`${tag} loafs`}>
+  <p>Posts tagged with {tag}</p>
+  <LoafGrid {loafs} />
+</Base>

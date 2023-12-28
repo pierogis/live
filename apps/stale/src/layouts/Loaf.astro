@@ -1,0 +1,154 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { SEO } from "astro-seo";
+
+import { Divider } from "@pierogis/utensils";
+import Base from "./Base.astro";
+
+interface Props {
+  frontmatter: CollectionEntry<"loafs">["data"];
+}
+
+const { frontmatter } = Astro.props;
+
+const {
+  title,
+  pubDate,
+  subtitle,
+  description,
+  author,
+  twitterHandle,
+  image,
+  tags,
+} = frontmatter;
+---
+
+<html lang="en">
+  <head>
+    <SEO
+      title={title}
+      description={description}
+      openGraph={{
+        basic: {
+          title: title,
+          type: "loaf",
+          image: image.url || image.alt,
+        },
+        image: {
+          url: image.url,
+          alt: image.alt,
+        },
+      }}
+      twitter={{
+        title: title,
+        description: description,
+        card: frontmatter.image.url
+          ? ("summary_large_image" as const)
+          : ("summary" as const),
+        creator: twitterHandle ? "@" + twitterHandle : undefined,
+        image: image.url,
+        imageAlt: image.alt,
+      }}
+      extend={{
+        // extending the default link tags
+        link: [{ rel: "icon", href: "/favicon.ico" }],
+      }}
+    />
+  </head>
+  <Base pageTitle={title}>
+    <article>
+      <div>
+        <div class="lead">
+          <h1 class="title">
+            {title}
+          </h1>
+          <i>{subtitle}</i>
+          <div class="metadata">
+            <p class="author">{author}</p>
+            <p class="date">
+              {pubDate.toISOString().slice(0, 10)}
+            </p>
+          </div>
+        </div>
+
+        <Divider horizontal margin="0" />
+      </div>
+
+      <slot />
+    </article>
+
+    <div>
+      {
+        tags.map((tag) => {
+          return (
+            <a href={`/tags/${tag}`}>
+              <i>#{tag}</i>
+            </a>
+          );
+        })
+      }
+    </div>
+  </Base>
+
+  <style>
+    article {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      max-width: none;
+    }
+    .lead {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: none;
+    }
+
+    .title {
+      margin-bottom: 1rem;
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+    @media (min-width: 768px) {
+      .title {
+        font-size: 3rem;
+        line-height: 1;
+        text-align: center;
+      }
+    }
+
+    .metadata {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .metadata {
+        align-items: flex-start;
+      }
+    }
+    @media (min-width: 768px) {
+      .metadata {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .author {
+      font-weight: 700;
+    }
+    .date {
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</html>

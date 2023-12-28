@@ -1,0 +1,95 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import { getImage } from "astro:assets";
+
+import { Layout, Interactable, ThemeToggle } from "@pierogis/utensils";
+import "@pierogis/utensils/styles/pierogis.css";
+
+import faviconSrc from "../images/favicon.png";
+import faviconSvgSrc from "../images/favicon.svg";
+
+interface Props {
+  pageTitle: string;
+}
+
+const { pageTitle } = Astro.props;
+const tagline = "truly beyond the pale";
+
+const appleTouchIcon = await getImage({
+  src: faviconSrc,
+  width: 180,
+  height: 180,
+  format: "png",
+});
+const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href={faviconSvg.src} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={appleTouchIcon.src} />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <ViewTransitions />
+  </head>
+  <body>
+    <div>
+      <Layout>
+        <Interactable slot="title">
+          <div class="link-box border inset">stale</div>
+        </Interactable>
+
+        <nav slot="nav">
+          <Interactable>
+            <a href="/tags" class="link-box border inset">tags</a>
+          </Interactable>
+
+          <Interactable>
+            <a href="/about" class="border inset link-box">about</a>
+          </Interactable>
+        </nav>
+
+        <i>{tagline}</i>
+
+        <slot />
+
+        <footer slot="footer">
+          <Interactable>
+            <a class="border inset link-box" href="https://pierogis.live"
+              >live</a
+            >
+          </Interactable>
+
+          <Interactable>
+            <a
+              class="border inset link-box"
+              href="https://github.com/pierogis/stale">github</a
+            >
+          </Interactable>
+
+          <Interactable>
+            <a
+              class="border inset link-box"
+              href="https://twitter.com/pierogis_live">@pierogis_live</a
+            >
+          </Interactable>
+
+          <ThemeToggle client:load />
+        </footer>
+      </Layout>
+    </div>
+
+    <style>
+      nav {
+        padding-top: 8px;
+      }
+      i {
+        padding: 8px;
+      }
+    </style>
+  </body>
+</html>

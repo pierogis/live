@@ -1,16 +1,9 @@
 {
 	"name": "live",
-	"version": "0.0.1",
 	"description": "a basecamp for pierogis",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/pierogis/live.git"
-	},
-	"license": "AGPL-3.0",
-	"bugs": {
-		"url": "https://github.com/pierogis/live/issues"
-	},
-	"homepage": "https://pierogis.live",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -36,7 +29,6 @@
 		"typescript": "^5.1.6",
 		"vite": "^4.4.4"
 	},
-	"type": "module",
 	"packageManager": "pnpm@8.6.10",
 	"engines": {
 		"pnpm": "^8.0.0"

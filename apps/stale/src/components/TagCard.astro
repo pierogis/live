@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Card, Interactable } from "@pierogis/utensils";
+
+interface Props {
+  tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<a href={`/tags/${tag}`}>
+  <Interactable>
+    <Card border inset>
+      <h4>#{tag}</h4>
+      <!-- <h5>{count}</h5> -->
+    </Card>
+  </Interactable>
+</a>

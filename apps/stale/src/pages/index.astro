@@ -1,0 +1,12 @@
+---
+import { getCollection } from "astro:content";
+
+import Base from "../layouts/Base.astro";
+import LoafGrid from "../components/LoafGrid.astro";
+
+const allLoafs = await getCollection("loafs");
+---
+
+<Base pageTitle="stale">
+  <LoafGrid loafs={allLoafs} />
+</Base>
