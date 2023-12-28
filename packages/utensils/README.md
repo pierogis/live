@@ -5,7 +5,7 @@ a set of svelte components
 ## install
 
 ```sh
-pnpm i --save-dev @pierogis/utensils
+pnpm add -D @pierogis/utensils
 ```
 
 ## usage

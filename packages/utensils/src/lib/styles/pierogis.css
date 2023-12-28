@@ -78,6 +78,7 @@ h6 {
 	* {
 		font-size: 5vw;
 	}
+
 	input,
 	textarea,
 	label button,
@@ -196,6 +197,7 @@ input.good {
 	background-color: var(--secondary-color);
 	color: var(--primary-color);
 }
+
 .bad,
 input.bad {
 	background-color: var(--accent-color);
@@ -218,10 +220,11 @@ textarea {
 	font-size: 16px;
 	font-weight: 400;
 }
+
 /* end global css class/element style */
 
 /* global layout style */
-body > div {
+body>div {
 	position: relative;
 	min-height: 100vh;
 }

@@ -1,5 +1,5 @@
 # utensils
 
-some implements to aid consumption
+a demonstration of table manners
 
-demo for @pierogis/utensils
+demo for [@pierogis/utensils](../../packages/utensils/README.md)
