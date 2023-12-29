@@ -1,0 +1,54 @@
+{
+	"name": "@pierogis/colors",
+	"version": "0.0.1",
+	"description": "a way to develop your palette",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pierogis/colors.git"
+	},
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/pierogis/colors/issues"
+	},
+	"homepage": "https://colors.pierogis.live",
+	"keywords": [
+		"svelte",
+		"colors",
+		"palette",
+		"website"
+	],
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"package": "svelte-package",
+		"test": "playwright test",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
+		"format": "prettier --ignore-path .gitignore --write --plugin-search-dir=. ."
+	},
+	"devDependencies": {
+		"@pierogis/utensils": "^0.5.1",
+		"@playwright/test": "^1.36.1",
+		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/kit": "^1.22.3",
+		"@typescript-eslint/eslint-plugin": "^5.62.0",
+		"@typescript-eslint/parser": "^5.62.0",
+		"eslint": "^8.45.0",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-svelte3": "^4.0.0",
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.1",
+		"svelte": "^3.59.2",
+		"svelte-check": "^3.4.6",
+		"svelte-preprocess": "^5.0.4",
+		"tslib": "^2.6.0",
+		"typescript": "^5.1.6"
+	},
+	"packageManager": "pnpm@8.1.0",
+	"engines": {
+		"pnpm": "^8.0.0"
+	},
+	"type": "module"
+}
