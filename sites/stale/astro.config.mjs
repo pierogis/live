@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, passthroughImageService } from "astro/config";
 import svelte from "@astrojs/svelte";
 
 // https://astro.build/config

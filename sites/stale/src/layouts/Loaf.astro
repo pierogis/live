@@ -20,11 +20,13 @@ const {
   subtitle,
   description,
   author,
-  twitterHandle,
   image,
   alt,
   tags,
 } = data;
+
+const ogImageSrc = new URL(image.og.src, Astro.url.origin).toString();
+const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
 ---
 
 <html lang="en">
@@ -36,33 +38,34 @@ const {
         basic: {
           title: title,
           type: "loaf",
-          image: image.src,
+          image: ogImageSrc,
         },
         image: {
-          url: image.src,
+          url: ogImageSrc,
           alt: alt,
         },
       }}
       twitter={{
         title: title,
         description: description,
-        card: image ? ("summary_large_image" as const) : ("summary" as const),
-        creator: twitterHandle ? "@" + twitterHandle : undefined,
-        image: image.src,
+        card: "summary",
+        site: "@pierogis_live",
+        creator: author.twitterHandle ? "@" + author.twitterHandle : undefined,
+        image: twitterImageSrc,
         imageAlt: alt,
       }}
     />
   </head>
   <Base pageTitle={title}>
     <article>
-      <div>
+      <section>
         <div class="lead">
           <h1 class="title">
             {title}
           </h1>
           <i>{subtitle}</i>
           <div class="metadata">
-            <p class="author">{author}</p>
+            <p class="author">{author.name}</p>
             <p class="date">
               {publishedDate.toISOString().slice(0, 10)}
             </p>
@@ -70,23 +73,30 @@ const {
         </div>
 
         <Divider horizontal margin="0" />
-      </div>
+      </section>
+
+      <!-- <Image
+        src={image[1200]}
+        widths={[300, 600, image[1200].width]}
+        sizes={`(max-width: 360px) 300px, (max-width: 720px) 600px, ${image[1200].width}px`}
+        {alt}
+      /> -->
+
+      <picture>
+        <source
+          srcset={image[300].src}
+          media="(orientation: portrait), (max-width: 768px)"
+        />
+        <source srcset={image[600].src} media="(max-width: 1500px)" />
+        <img src={image[1200].src} {alt} class="border" />
+      </picture>
 
       <div class="content">
-        <Image
-          src={image}
-          {alt}
-          height={image.height / 2}
-          class="image border"
-        />
-
-        <div>
-          <slot />
-        </div>
+        <slot />
       </div>
     </article>
 
-    <div>
+    <div class="tags">
       {
         tags.map((tag) => {
           return (
@@ -100,15 +110,9 @@ const {
   </Base>
 
   <style>
-    .image {
+    img {
       border-radius: 16px;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      image-rendering: pixelated;
     }
 
     article {
@@ -117,7 +121,6 @@ const {
       justify-content: center;
       align-items: center;
       gap: 10px;
-      max-width: 768px;
     }
     .lead {
       display: flex;
@@ -127,48 +130,62 @@ const {
     }
 
     .title {
-      margin-bottom: 1rem;
-      font-size: 1.875rem;
-      line-height: 2.25rem;
       font-weight: 700;
-      letter-spacing: -0.025em;
+      /* letter-spacing: -0.025em; */
+      margin: 0;
+      line-height: 1em;
     }
 
     .metadata {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       margin-top: 0.5rem;
       width: 100%;
       gap: 8px;
-    }
-
-    @media (min-width: 640px) {
-      .metadata {
-        justify-content: center;
-      }
-    }
-
-    @media (min-width: 768px) {
-      .title {
-        font-size: 3rem;
-        line-height: 1;
-        text-align: center;
-      }
-      .content {
-        padding: 0 10rem;
-      }
-      .metadata {
-        justify-content: space-between;
-      }
     }
 
     .author {
       font-weight: 700;
     }
     .date {
-      font-weight: 600;
+      font-weight: 500;
     }
 
+    .author,
+    .date,
+    .title {
+      margin: 0;
+    }
+
+    .content {
+      padding: 0 10rem;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @media (orientation: portait) {
+      img {
+        max-width: 90vw;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        text-align: center;
+      }
+      .content {
+        padding: 0;
+      }
+    }
+
+    .tags {
+      padding: 8px;
+    }
     a:hover {
       text-decoration: underline;
     }

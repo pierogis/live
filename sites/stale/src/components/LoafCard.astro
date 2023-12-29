@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Card, Interactable } from "@pierogis/utensils";
+import { Card, Shine } from "@pierogis/utensils";
 
 interface Props {
   loaf: CollectionEntry<"loafs">["data"];
@@ -9,9 +9,21 @@ interface Props {
 const { loaf } = Astro.props;
 ---
 
-<Interactable>
-  <Card border inset>
-    <h4>{loaf.title}</h4>
-    <h5>{loaf.subtitle}</h5>
-  </Card>
-</Interactable>
+<Card border inset>
+  <Shine randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }}>
+    <img src={loaf.image[300].src} class="border" />
+  </Shine>
+  <h4>{loaf.title}</h4>
+  <h5>{loaf.subtitle}</h5>
+</Card>
+
+<style>
+  img {
+    border-radius: 16px;
+    image-rendering: pixelated;
+  }
+  h4,
+  h5 {
+    margin: 0;
+  }
+</style>

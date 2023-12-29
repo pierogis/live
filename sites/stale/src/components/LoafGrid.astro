@@ -12,25 +12,81 @@ const { loafs } = Astro.props;
 
 <div class="grid">
   {
-    loafs.map((loaf) => (
-      <a href={`/loafs/${loaf.slug}`}>
-        <LoafCard loaf={loaf.data} />
-      </a>
-    ))
+    loafs
+      .sort(
+        (a, b) =>
+          b.data.publishedDate.getTime() - a.data.publishedDate.getTime()
+      )
+      .map((loaf) => (
+        <div class="tile">
+          <a href={`/loafs/${loaf.slug}`} class="clickable">
+            <LoafCard loaf={loaf.data} />
+          </a>
+        </div>
+      ))
   }
 </div>
 
 <style>
   .grid {
     display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
     padding: 1rem;
+    width: 100%;
+  }
+  .tile a {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  @media screen and (max-width: 650px) {
+  .tile:nth-child(1) {
+    grid-column: span 4;
+    grid-row: span 2;
+  }
+
+  .tile:nth-child(2),
+  .tile:nth-child(3) {
+    grid-column: span 2;
+  }
+
+  .tile:nth-child(4),
+  .tile:nth-child(5) {
+    grid-column: span 3;
+  }
+
+  @media screen and (max-width: 768px) {
     .grid {
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
+  }
+
+  a {
+    display: block;
+    position: relative;
+    z-index: 0;
+  }
+
+  a::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+
+    border-radius: 10px;
+    opacity: 0;
+
+    box-shadow: var(--shadow);
+    transform: scale(0.95);
+
+    transition: all 200ms;
+  }
+
+  a:hover::before {
+    opacity: 1;
+    transform: scale(1);
   }
 </style>
