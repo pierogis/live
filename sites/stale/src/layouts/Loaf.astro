@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
 
 import { SEO } from "astro-seo";
 
@@ -7,21 +8,23 @@ import { Divider } from "@pierogis/utensils";
 import Base from "./Base.astro";
 
 interface Props {
-  frontmatter: CollectionEntry<"loafs">["data"];
+  loaf: CollectionEntry<"loafs">;
 }
 
-const { frontmatter } = Astro.props;
+const { loaf } = Astro.props;
+const { data } = loaf;
 
 const {
   title,
-  pubDate,
+  publishedDate,
   subtitle,
   description,
   author,
   twitterHandle,
   image,
+  alt,
   tags,
-} = frontmatter;
+} = data;
 ---
 
 <html lang="en">
@@ -33,26 +36,20 @@ const {
         basic: {
           title: title,
           type: "loaf",
-          image: image.url || image.alt,
+          image: image.src,
         },
         image: {
-          url: image.url,
-          alt: image.alt,
+          url: image.src,
+          alt: alt,
         },
       }}
       twitter={{
         title: title,
         description: description,
-        card: frontmatter.image.url
-          ? ("summary_large_image" as const)
-          : ("summary" as const),
+        card: image ? ("summary_large_image" as const) : ("summary" as const),
         creator: twitterHandle ? "@" + twitterHandle : undefined,
-        image: image.url,
-        imageAlt: image.alt,
-      }}
-      extend={{
-        // extending the default link tags
-        link: [{ rel: "icon", href: "/favicon.ico" }],
+        image: image.src,
+        imageAlt: alt,
       }}
     />
   </head>
@@ -67,7 +64,7 @@ const {
           <div class="metadata">
             <p class="author">{author}</p>
             <p class="date">
-              {pubDate.toISOString().slice(0, 10)}
+              {publishedDate.toISOString().slice(0, 10)}
             </p>
           </div>
         </div>
@@ -75,7 +72,18 @@ const {
         <Divider horizontal margin="0" />
       </div>
 
-      <slot />
+      <div class="content">
+        <Image
+          src={image}
+          {alt}
+          height={image.height / 2}
+          class="image border"
+        />
+
+        <div>
+          <slot />
+        </div>
+      </div>
     </article>
 
     <div>
@@ -92,18 +100,30 @@ const {
   </Base>
 
   <style>
+    .image {
+      border-radius: 16px;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     article {
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: center;
       gap: 10px;
-      max-width: none;
+      max-width: 768px;
     }
     .lead {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      max-width: none;
+      max-width: 768px;
     }
 
     .title {
@@ -113,30 +133,32 @@ const {
       font-weight: 700;
       letter-spacing: -0.025em;
     }
+
+    .metadata {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0.5rem;
+      width: 100%;
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .metadata {
+        justify-content: center;
+      }
+    }
+
     @media (min-width: 768px) {
       .title {
         font-size: 3rem;
         line-height: 1;
         text-align: center;
       }
-    }
-
-    .metadata {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 0.5rem;
-      width: 100%;
-    }
-
-    @media (min-width: 640px) {
-      .metadata {
-        align-items: flex-start;
+      .content {
+        padding: 0 10rem;
       }
-    }
-    @media (min-width: 768px) {
       .metadata {
-        flex-direction: row;
-        align-items: center;
+        justify-content: space-between;
       }
     }
 

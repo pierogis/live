@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import Loaf from "../../layouts/Loaf.astro";
+import Loaf from "../../../layouts/Loaf.astro";
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection("loafs");
@@ -14,6 +14,6 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Loaf frontmatter={entry.data}>
+<Loaf loaf={entry}>
   <Content />
 </Loaf>

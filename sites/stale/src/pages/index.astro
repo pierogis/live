@@ -1,12 +1,40 @@
 ---
 import { getCollection } from "astro:content";
 
+import { SEO } from "astro-seo";
+
 import Base from "../layouts/Base.astro";
 import LoafGrid from "../components/LoafGrid.astro";
 
 const allLoafs = await getCollection("loafs");
+const title = "stale";
+const description = "well beyond the pale";
+const twitterHandle = "pierogis_live";
 ---
 
-<Base pageTitle="stale">
+<Base pageTitle={title}>
+  <SEO
+    title={title}
+    description={description}
+    openGraph={{
+      basic: {
+        title: title,
+        type: "loaf",
+        image: "/index.png",
+      },
+      image: {
+        url: "/index.png",
+        alt: "forest",
+      },
+    }}
+    twitter={{
+      title: title,
+      description: description,
+      card: "summary_large_image",
+      creator: twitterHandle ? "@" + twitterHandle : undefined,
+      image: "/index.png",
+      imageAlt: "forest",
+    }}
+  />
   <LoafGrid loafs={allLoafs} />
 </Base>

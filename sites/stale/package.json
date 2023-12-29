@@ -10,12 +10,12 @@
     "preview": "astro preview",
     "astro": "astro"
   },
-	"type": "module",
+  "type": "module",
   "dependencies": {
     "@astrojs/check": "^0.3.4",
     "@astrojs/rss": "^4.0.1",
     "@astrojs/svelte": "^5.0.3",
-		"@pierogis/utensils": "workspace:*",
+    "@pierogis/utensils": "workspace:*",
     "astro": "^4.0.8",
     "astro-seo": "^0.8.0",
     "sharp": "^0.33.1",

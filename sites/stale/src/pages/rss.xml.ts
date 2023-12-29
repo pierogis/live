@@ -10,7 +10,7 @@ export const GET: APIRoute = async (context) => {
     site: context.site!,
     items: loafs.map((loaf) => ({
       title: loaf.data.title,
-      pubDate: loaf.data.pubDate,
+      pubDate: loaf.data.publishedDate,
       description: loaf.data.description,
       link: `/loafs/${loaf.slug}/`,
     })),
