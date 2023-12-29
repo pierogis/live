@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 
 	import { Card, CardsGrid, Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
+	import '@pierogis/utensils/styles/pierogis.css';
 
 	export let data;
 
@@ -52,8 +53,6 @@
 </Layout>
 
 <style>
-	@import '@pierogis/utensils/styles/pierogis.css';
-
 	.tagline {
 		text-align: center;
 		padding: 1rem;
