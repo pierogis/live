@@ -2,9 +2,9 @@
 
 all things related to [pierogis.live](https://pierogis.live)
 
-## apps and packages
+## sites and packages
 
-- apps
+- sites
   - [`utensils`](https://utensils.pierogis.live): utensils demo app
   - [`live`](https://pierogis.live): base camp
   - [`stale`](https://stale.pierogis.live): blog
