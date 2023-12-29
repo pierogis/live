@@ -3,7 +3,6 @@
   "description": "well beyond the pale",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -11,6 +10,7 @@
     "preview": "astro preview",
     "astro": "astro"
   },
+	"type": "module",
   "dependencies": {
     "@astrojs/check": "^0.3.4",
     "@astrojs/rss": "^4.0.1",

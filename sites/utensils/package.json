@@ -3,7 +3,6 @@
 	"description": "a demonstration of table manners",
 	"version": "0.0.1",
 	"private": true,
-	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -13,6 +12,7 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
+	"type": "module",
 	"devDependencies": {
 		"@pierogis/utensils": "workspace:*",
 		"@sveltejs/adapter-auto": "^3.0.1",

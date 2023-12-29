@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
+	import '@pierogis/utensils/styles/pierogis.css';
 </script>
 
 <svelte:head>
@@ -29,5 +30,4 @@
 </Layout>
 
 <style>
-	@import '@pierogis/utensils/styles/pierogis.css';
 </style>
