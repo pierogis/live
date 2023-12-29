@@ -1,3 +1,3 @@
 # careers
 
-a starting point for working with pierogis
+a good place to start working with pierogis

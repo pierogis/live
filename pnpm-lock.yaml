@@ -45,9 +45,6 @@ importers:
         specifier: 3.58.0
         version: 3.58.0
     devDependencies:
-      '@playwright/test':
-        specifier: ^1.36.1
-        version: 1.39.0
       '@sveltejs/adapter-auto':
         specifier: ^2.1.0
         version: 2.1.0(@sveltejs/kit@1.27.2)
@@ -85,14 +82,53 @@ importers:
         specifier: ^0.25.8
         version: 0.25.8
 
+  sites/careers:
+    devDependencies:
+      '@pierogis/utensils':
+        specifier: workspace:*
+        version: link:../../packages/utensils
+      '@sveltejs/adapter-auto':
+        specifier: ^3.0.1
+        version: 3.0.1(@sveltejs/kit@2.0.6)
+      '@sveltejs/kit':
+        specifier: ^2.0.6
+        version: 2.0.6(@sveltejs/vite-plugin-svelte@3.0.1)(svelte@4.2.8)(vite@5.0.10)
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^3.0.1
+        version: 3.0.1(svelte@4.2.8)(vite@5.0.10)
+      '@vercel/speed-insights':
+        specifier: ^1.0.2
+        version: 1.0.2
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../../packages/eslint-config-custom
+      prettier:
+        specifier: ^3.1.1
+        version: 3.1.1
+      prettier-plugin-svelte:
+        specifier: ^3.1.2
+        version: 3.1.2(prettier@3.1.1)(svelte@4.2.8)
+      svelte:
+        specifier: ^4.2.8
+        version: 4.2.8
+      svelte-check:
+        specifier: ^3.6.2
+        version: 3.6.2(svelte@4.2.8)
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.10
+        version: 5.0.10
+
   sites/colors:
     devDependencies:
       '@pierogis/utensils':
         specifier: workspace:*
         version: link:../../packages/utensils
-      '@playwright/test':
-        specifier: ^1.40.1
-        version: 1.40.1
       '@sveltejs/adapter-auto':
         specifier: ^3.0.1
         version: 3.0.1(@sveltejs/kit@2.0.6)
@@ -135,9 +171,6 @@ importers:
       '@pierogis/utensils':
         specifier: workspace:*
         version: link:../../packages/utensils
-      '@playwright/test':
-        specifier: ^1.40.1
-        version: 1.40.1
       '@sveltejs/adapter-auto':
         specifier: ^3.0.1
         version: 3.0.1(@sveltejs/kit@2.0.6)
@@ -1590,22 +1623,6 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.16.0
-
-  /@playwright/test@1.39.0:
-    resolution: {integrity: sha512-3u1iFqgzl7zr004bGPYiN/5EZpRUSFddQBra8Rqll5N0/vfpqlP9I9EXqAoGacuAbX6c9Ulg/Cjqglp5VkK6UQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dependencies:
-      playwright: 1.39.0
-    dev: true
-
-  /@playwright/test@1.40.1:
-    resolution: {integrity: sha512-EaaawMTOeEItCRvfmkI9v6rBkF1svM8wjl/YPRrg2N2Wmp+4qJYkWtJsbew1szfKKDm6fPLy4YAanBhIlf9dWw==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dependencies:
-      playwright: 1.40.1
-    dev: true
 
   /@polka/url@1.0.0-next.23:
     resolution: {integrity: sha512-C16M+IYz0rgRhWZdCmK+h58JMv8vijAA61gmz2rspCSwKwzBebpdcsiUmwrtJRdphuY30i6BSLEOP8ppbNLyLg==}
@@ -3526,14 +3543,6 @@ packages:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
     dev: true
 
-  /fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -5192,38 +5201,6 @@ packages:
     dependencies:
       find-up: 4.1.0
 
-  /playwright-core@1.39.0:
-    resolution: {integrity: sha512-+k4pdZgs1qiM+OUkSjx96YiKsXsmb59evFoqv8SKO067qBA+Z2s/dCzJij/ZhdQcs2zlTAgRKfeiiLm8PQ2qvw==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dev: true
-
-  /playwright-core@1.40.1:
-    resolution: {integrity: sha512-+hkOycxPiV534c4HhpfX6yrlawqVUzITRKwHAmYfmsVreltEl6fAZJ3DPfLMOODw0H3s1Itd6MDCWmP1fl/QvQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dev: true
-
-  /playwright@1.39.0:
-    resolution: {integrity: sha512-naE5QT11uC/Oiq0BwZ50gDmy8c8WLPRTEWuSSFVG2egBka/1qMoSqYQcROMT9zLwJ86oPofcTH2jBY/5wWOgIw==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dependencies:
-      playwright-core: 1.39.0
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /playwright@1.40.1:
-    resolution: {integrity: sha512-2eHI7IioIpQ0bS1Ovg/HszsN/XKNwEG1kbzSDDmADpclKc7CyqkHw7Mg2JCz/bbCxg25QUPcjksoMW7JcIFQmw==}
-    engines: {node: '>=16'}
-    hasBin: true
-    dependencies:
-      playwright-core: 1.40.1
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
   /postcss-load-config@3.1.4(postcss@8.4.31):
     resolution: {integrity: sha512-6DiM4E7v4coTE4uzA8U//WhtPwyhiim3eyjEMFCnUpzbrkK9wJHgKDT2mR+HbtSrd/NubVaYTOpSpjUl8NQeRg==}
     engines: {node: '>= 10'}
@@ -6081,7 +6058,7 @@ packages:
   /strip-literal@1.3.0:
     resolution: {integrity: sha512-PugKzOsyXpArk0yWmUwqOZecSO0GH0bPoctLcqNDH9J04pVW3lflYE0ujElBGTloevcxF5MofAOZ7C5l2b+wLg==}
     dependencies:
-      acorn: 8.10.0
+      acorn: 8.11.2
     dev: true
 
   /strnum@1.0.5:
@@ -6118,8 +6095,8 @@ packages:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 3.58.0
-      svelte-preprocess: 5.1.3(svelte@3.58.0)(typescript@5.2.2)
-      typescript: 5.2.2
+      svelte-preprocess: 5.1.3(svelte@3.58.0)(typescript@5.3.3)
+      typescript: 5.3.3
     transitivePeerDependencies:
       - '@babel/core'
       - coffeescript
@@ -6192,7 +6169,7 @@ packages:
     dependencies:
       svelte: 4.2.8
 
-  /svelte-preprocess@5.1.3(svelte@3.58.0)(typescript@5.2.2):
+  /svelte-preprocess@5.1.3(svelte@3.58.0)(typescript@5.3.3):
     resolution: {integrity: sha512-xxAkmxGHT+J/GourS5mVJeOXZzne1FR5ljeOUAMXUkfEhkLEllRreXpbl3dIYJlcJRfL1LO1uIAPpBpBfiqGPw==}
     engines: {node: '>= 16.0.0', pnpm: ^8.0.0}
     requiresBuild: true
@@ -6236,7 +6213,7 @@ packages:
       sorcery: 0.11.0
       strip-indent: 3.0.0
       svelte: 3.58.0
-      typescript: 5.2.2
+      typescript: 5.3.3
     dev: true
 
   /svelte-preprocess@5.1.3(svelte@4.2.8)(typescript@5.3.3):
