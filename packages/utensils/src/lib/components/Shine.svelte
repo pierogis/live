@@ -5,12 +5,12 @@
 	 * defaults to 6-8s
 	 */
 	export let randomLength = {
-		min: 6,
-		max: 8
+		x: { min: 6, max: 8 },
+		y: { min: 6, max: 8 }
 	};
 
 	$: {
-		if (randomLength.min > randomLength.max) {
+		if (randomLength.x.min > randomLength.x.max || randomLength.y.min > randomLength.y.max) {
 			throw 'Shine random length min must not be greater than max';
 		}
 	}
@@ -18,17 +18,24 @@
 	/**
 	 * offset in seconds for start of animation
 	 */
-	export let offset = Math.random() * (randomLength.max - 0) + 0;
+	export let offset = {
+		x: Math.random() * (randomLength.x.max - 0) + 0,
+		y: Math.random() * (randomLength.y.max - 0) + 0
+	};
 
 	/**
 	 * specify length in seconds
 	 * defaults to uniform distribution from `min` to `max` in `randomLength`
 	 */
-	export let length: number | undefined = undefined;
+	export let length: { x?: number; y?: number } | undefined = undefined;
 
-	$: realLength = length
-		? length
-		: Math.random() * (randomLength.max - randomLength.min) + randomLength.min;
+	$: realLengthX = length?.x
+		? length.x
+		: Math.random() * (randomLength.x.max - randomLength.x.min) + randomLength.x.min;
+
+	$: realLengthY = length?.y
+		? length.y
+		: Math.random() * (randomLength.y.max - randomLength.y.min) + randomLength.y.min;
 
 	/**
 	 * blur filter applied over shine gradient (use 0 for no blur)
@@ -48,14 +55,17 @@
 	export let unhoverOpacity = 0.4;
 </script>
 
-<div
-	class="shine"
-	style:--length="{realLength}s"
-	style:--start="-{offset}s"
-	style:--blur={blur}
-	style:--color={color}
-	style:--unhoverOpacity={unhoverOpacity}
->
+<div class="shine">
+	<div
+		class="shine-x"
+		style:--length-x="{realLengthX}s"
+		style:--length-y="{realLengthY}s"
+		style:--start-x="-{offset.x}s"
+		style:--start-y="-{offset.y}s"
+		style:--blur={blur}
+		style:--color={color}
+		style:--unhoverOpacity={unhoverOpacity}
+	/>
 	<slot />
 </div>
 
@@ -65,7 +75,17 @@
 		overflow: hidden;
 		position: relative;
 	}
-	.shine:after {
+	.shine-x {
+		content: '';
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 1;
+		animation: slideX var(--length-x) infinite var(--start-x);
+	}
+	.shine-x:after {
 		opacity: var(--unhoverOpacity);
 		content: '';
 		top: 0;
@@ -74,7 +94,7 @@
 		height: 100%;
 		position: absolute;
 		z-index: 1;
-		animation: slide var(--length) infinite var(--start);
+		animation: slideY var(--length-y) infinite var(--start-y);
 
 		transition: opacity 2000ms;
 
@@ -88,13 +108,13 @@
 		filter: blur(50px);
 	}
 
-	.shine:hover:after {
+	.shine:hover .shine-x:after {
 		opacity: 1;
 	}
 
 	/* animation */
 
-	@keyframes slide {
+	@keyframes slideX {
 		0% {
 			transform: translateX(-60%);
 		}
@@ -103,6 +123,18 @@
 		}
 		100% {
 			transform: translateX(-60%);
+		}
+	}
+
+	@keyframes slideY {
+		0% {
+			transform: translateY(-60%);
+		}
+		50% {
+			transform: translateY(60%);
+		}
+		100% {
+			transform: translateY(-60%);
 		}
 	}
 </style>

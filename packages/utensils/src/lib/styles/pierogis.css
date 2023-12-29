@@ -50,8 +50,6 @@
 }
 
 * {
-	margin: 0;
-	padding: 0;
 	border: 0;
 	outline: 0;
 
@@ -74,17 +72,13 @@ h6 {
 	font-family: 'Courier', monospace;
 }
 
-@media only screen and (max-width: 320px) {
-	* {
-		font-size: 5vw;
-	}
+body {
+	font-size: 16px;
+}
 
-	input,
-	textarea,
-	label button,
-	.link-box,
-	code {
-		font-size: 5vw;
+@media screen and (max-width: 768px) {
+	body {
+		font-size: calc(15px + 0.25vw);
 	}
 }
 
@@ -94,9 +88,9 @@ h6 {
 input,
 textarea {
 	background-color: var(--input-color);
-	padding: 2px 4px;
+	padding: .25rem .5rem;
 
-	font-size: 16px;
+	font-size: 1em;
 }
 
 textarea[readonly] {
@@ -108,15 +102,12 @@ button,
 .link-box,
 code {
 	background-color: var(--primary-color);
-
-	font-family: 'Courier', monospace;
-	font-size: 16px;
-	font-weight: 600;
 }
 
 input[type='submit'],
 button,
-.link-box {
+.link-box,
+.clickable {
 	cursor: pointer;
 }
 
@@ -128,8 +119,19 @@ input[type='number'],
 input[type='submit'],
 button,
 .link-box {
-	font-weight: bold;
-	padding: 4px 8px;
+	padding: .25rem .5rem;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='url'],
+input[type='number'],
+input[type='submit'],
+button,
+.link-box,
+code {
+	font-weight: 600;
 }
 
 input[type='text']:disabled,
@@ -146,9 +148,11 @@ textarea:disabled {
 
 label,
 input,
-button {
+textarea,
+button,
+.link-box,
+code {
 	font-family: Courier, monospace;
-	font-size: 16px;
 }
 
 a {
@@ -192,6 +196,10 @@ a:active {
 	color: var(--text-color);
 }
 
+.clickable:active {
+	transform: translate(0, 1px);
+}
+
 .good,
 input.good {
 	background-color: var(--secondary-color);
@@ -210,16 +218,54 @@ input.bad::placeholder {
 }
 
 textarea {
-	padding: 0.5rem;
-	line-height: 1.4;
-
 	text-align: left;
 
 	border-radius: 10px;
-
-	font-size: 16px;
 	font-weight: 400;
 }
+
+h6 {
+	font-size: 0.875em;
+	/* 14px */
+	line-height: 1.25em;
+	/* 20px */
+}
+
+h5 {
+	font-size: 1em;
+	/* 16px */
+	line-height: 1.5em;
+	/* 24px */
+}
+
+h4 {
+	font-size: 1.125em;
+	/* 18px */
+	line-height: 1.75em;
+	/* 28px */
+}
+
+h3 {
+	font-size: 1.25em;
+	/* 20px */
+	line-height: 1.75em;
+	/* 28px */
+}
+
+h2 {
+	font-size: 1.5em;
+	/* 24px */
+	line-height: 2em;
+	/* 32px */
+}
+
+h1 {
+	font-size: 1.875em;
+	/* 30px */
+	line-height: 2.25em;
+	/* 36px */
+}
+
 
 /* end global css class/element style */
 

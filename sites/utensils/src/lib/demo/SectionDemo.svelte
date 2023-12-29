@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Card, Section } from '@pierogis/utensils';
 
-	let sectionTitle = 'section title';
 	let columnGap = 2;
 	let columnGapUnit = 'rem';
 	let rowGap = 1;
@@ -12,56 +11,48 @@
 <Card>
 	<span>a <code>Section</code></span>
 	<Section
-		title={sectionTitle}
 		columnGap={columnGap + columnGapUnit}
 		rowGap={rowGap + rowGapUnit}
 		column={sectionColumn}
 	>
+		<h3 slot="title">section title</h3>
 		<span class="padded inset">doesn't really do much</span>
 
 		<div class="inputs padded inset">
-			<div>
-				<label>
-					title
-					<br />
-					<input class="inset" type="text" bind:value={sectionTitle} />
-				</label>
-			</div>
-
 			<div class="size-group">
 				<label>
-					columnGap
+					<span>columnGap</span>
 					<input class="inset" type="number" bind:value={columnGap} />
 				</label>
 
 				<div class="radio-group">
 					<label>
 						<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="rem" />
-						rem
+						<span>rem</span>
 					</label>
 
 					<label>
 						<input type="radio" bind:group={columnGapUnit} name="columnGapUnit" value="px" />
-						px
+						<span>px</span>
 					</label>
 				</div>
 			</div>
 
 			<div class="size-group">
 				<label>
-					rowGap
+					<span>rowGap</span>
 					<input class="inset" type="number" bind:value={rowGap} />
 				</label>
 
 				<div class="radio-group">
 					<label>
 						<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="rem" />
-						rem
+						<span>rem</span>
 					</label>
 
 					<label>
 						<input type="radio" bind:group={rowGapUnit} name="rowGapUnit" value="px" />
-						px
+						<span>px</span>
 					</label>
 				</div>
 			</div>
@@ -69,12 +60,12 @@
 			<div class="radio-group">
 				<label>
 					<input type="radio" bind:group={sectionColumn} name="column" value={true} />
-					column
+					<span>column</span>
 				</label>
 
 				<label>
 					<input type="radio" bind:group={sectionColumn} name="column" value={false} />
-					row
+					<span>row</span>
 				</label>
 			</div>
 		</div>
@@ -82,26 +73,28 @@
 </Card>
 
 <style>
+	h3 {
+		margin: 0;
+	}
 	.inputs {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		gap: 1rem;
+		width: 90%;
 	}
 	.padded {
 		padding: 0.4rem;
 	}
-	input[type='text'] {
-		width: 10rem;
-	}
 
 	input[type='number'] {
-		width: 4rem;
+		width: 3em;
 	}
 	label:has(input) {
 		display: flex;
-		justify-content: right;
+		justify-content: space-between;
 		align-items: center;
-		gap: 10px;
+		gap: 8px;
 	}
 	.size-group {
 		display: flex;
@@ -112,7 +105,7 @@
 	}
 	.radio-group {
 		display: flex;
-		justify-content: center;
-		gap: 10px;
+		justify-content: space-between;
+		gap: 8px;
 	}
 </style>

@@ -4,23 +4,36 @@
 	let usingRandomLength = true;
 	let usingRandomStart = true;
 
-	let maxLength = 8;
-	let minLength = 6;
-	let offset = 0;
-	let length = 6;
+	let maxXLength = 8;
+	let maxYLength = 8;
+	let minXLength = 6;
+	let minYLength = 6;
+	let offsetX = 0;
+	let offsetY = 0;
+	let lengthX = 6;
+	let lengthY = 6;
 	let blur = 50;
 	let color = '#ffffff';
 	let unhoverOpacity = 0.5;
 
 	$: {
-		if (minLength > maxLength) {
-			minLength = maxLength;
+		if (minXLength > maxXLength) {
+			minXLength = maxXLength;
 		}
-		if (offset > maxLength && usingRandomLength) {
-			offset = maxLength;
+		if (minYLength > maxYLength) {
+			minYLength = maxYLength;
 		}
-		if (offset > length && !usingRandomLength) {
-			offset = length;
+		if (offsetX > maxXLength && usingRandomLength) {
+			offsetX = maxXLength;
+		}
+		if (offsetY > maxYLength && usingRandomLength) {
+			offsetY = maxYLength;
+		}
+		if (offsetX > lengthX && !usingRandomLength) {
+			offsetX = lengthX;
+		}
+		if (offsetY > lengthY && !usingRandomLength) {
+			offsetY = lengthY;
 		}
 	}
 </script>
@@ -28,9 +41,12 @@
 <Card>
 	<span>a <code>Shine</code></span>
 	<Shine
-		randomLength={{ min: minLength, max: maxLength }}
-		offset={!usingRandomStart ? offset : undefined}
-		length={!usingRandomLength ? length : undefined}
+		randomLength={{
+			x: { min: minXLength, max: maxXLength },
+			y: { min: minYLength, max: maxYLength }
+		}}
+		offset={!usingRandomStart ? { x: offsetX, y: offsetY } : undefined}
+		length={!usingRandomLength ? { x: lengthX, y: lengthY } : undefined}
 		blur="{blur}px"
 		{color}
 		{unhoverOpacity}
@@ -55,20 +71,35 @@
 
 		{#if usingRandomLength}
 			<label>
-				max length
-				<input type="range" min={0} max={10} bind:value={maxLength} />
-				<input class="inset" type="number" min={0} max={10} bind:value={maxLength} />
+				max x length
+				<input type="range" min={0} max={10} bind:value={maxXLength} />
+				<input class="inset" type="number" min={0} max={10} bind:value={maxXLength} />
 			</label>
 			<label>
-				min length
-				<input type="range" min={0} max={maxLength} bind:value={minLength} />
-				<input class="inset" type="number" min={0} max={maxLength} bind:value={minLength} />
+				min x length
+				<input type="range" min={0} max={maxXLength} bind:value={minXLength} />
+				<input class="inset" type="number" min={0} max={maxXLength} bind:value={minXLength} />
+			</label>
+			<label>
+				max y length
+				<input type="range" min={0} max={10} bind:value={maxYLength} />
+				<input class="inset" type="number" min={0} max={10} bind:value={maxYLength} />
+			</label>
+			<label>
+				min y length
+				<input type="range" min={0} max={maxYLength} bind:value={minYLength} />
+				<input class="inset" type="number" min={0} max={maxYLength} bind:value={minYLength} />
 			</label>
 		{:else}
 			<label>
-				length
-				<input type="range" min={0} max={10} bind:value={length} />
-				<input class="inset" type="number" min={0} max={10} bind:value={length} />
+				x length
+				<input type="range" min={0} max={10} bind:value={lengthX} />
+				<input class="inset" type="number" min={0} max={10} bind:value={lengthX} />
+			</label>
+			<label>
+				y length
+				<input type="range" min={0} max={10} bind:value={lengthY} />
+				<input class="inset" type="number" min={0} max={10} bind:value={lengthY} />
 			</label>
 		{/if}
 	</div>
@@ -83,19 +114,35 @@
 
 		{#if !usingRandomStart}
 			<label>
-				start offset
+				start x offset
 				<input
 					type="range"
 					min={0}
-					max={usingRandomLength ? maxLength : length}
-					bind:value={offset}
+					max={usingRandomLength ? maxXLength : lengthX}
+					bind:value={offsetX}
 				/>
 				<input
 					class="inset"
 					type="number"
 					min={0}
-					max={usingRandomLength ? maxLength : length}
-					bind:value={offset}
+					max={usingRandomLength ? maxXLength : lengthX}
+					bind:value={offsetX}
+				/>
+			</label>
+			<label>
+				start y offset
+				<input
+					type="range"
+					min={0}
+					max={usingRandomLength ? maxYLength : lengthY}
+					bind:value={offsetY}
+				/>
+				<input
+					class="inset"
+					type="number"
+					min={0}
+					max={usingRandomLength ? maxYLength : lengthY}
+					bind:value={offsetY}
 				/>
 			</label>
 		{/if}
@@ -125,16 +172,24 @@
 
 <style>
 	input[type='number'] {
-		width: 4rem;
+		width: 4em;
 	}
 	input[type='range'] {
-		width: 3rem;
+		width: 3em;
+	}
+	input[type='color'] {
+		width: 3em;
+		height: 3em;
 	}
 
 	label:has(input) {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		justify-content: space-between;
+		gap: 8px;
+	}
+	label:has(input[type='checkbox']) {
+		justify-content: center;
 	}
 
 	label > span {
@@ -143,5 +198,8 @@
 
 	.input-group {
 		width: 90%;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 </style>

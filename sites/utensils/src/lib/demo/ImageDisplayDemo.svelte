@@ -60,7 +60,7 @@
 
 <style>
 	input[type='number'] {
-		width: 4rem;
+		width: 4em;
 	}
 	.input-group {
 		display: flex;

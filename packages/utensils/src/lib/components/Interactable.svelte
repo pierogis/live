@@ -14,10 +14,6 @@
 		z-index: 0;
 	}
 
-	.clickable {
-		cursor: pointer;
-	}
-
 	.hoverable::before {
 		content: '';
 		position: absolute;
@@ -37,9 +33,5 @@
 	.hoverable:hover::before {
 		opacity: 1;
 		transform: scale(1);
-	}
-
-	.clickable:active {
-		transform: translate(0, 1px);
 	}
 </style>

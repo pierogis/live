@@ -18,10 +18,10 @@
 	],
 	"scripts": {
 		"dev": "svelte-kit sync && svelte-package --watch",
-		"build": "pnpm run package",
+		"build": "pnpm package",
 		"preview": "vite preview",
 		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
+		"prepublishOnly": "pnpm package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
@@ -49,8 +49,7 @@
 	"type": "module",
 	"files": [
 		"dist",
-		"./dist/styles/*",
-		"!dist/demo"
+		"./dist/styles/*"
 	],
 	"exports": {
 		".": {

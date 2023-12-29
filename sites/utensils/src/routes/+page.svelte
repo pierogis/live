@@ -52,19 +52,20 @@
 	</span>
 	<Divider size="4px" horizontal={true} margin="0" />
 	<span>install with</span>
-	<textarea class="inset" rows="1" cols="35">npm i --save-dev @pierogis/utensils</textarea>
+	<textarea class="inset" rows="1" cols="35">pnpm add -D @pierogis/utensils</textarea>
 	<span>and include</span>
 	<textarea class="inset" rows="1" cols="50"
-		>{`@import '@pierogis/utensils/styles/pierogis.css';`}</textarea
+		>{`import '@pierogis/utensils/styles/pierogis.css';`}</textarea
 	>
-	<span>in a top level style</span>
+	<span>in a top level layout script</span>
 </Card>
 
 <br />
 
 <Divider horizontal size={'4px'} />
 
-<Section title="components">
+<Section>
+	<h3 slot="title" class="section-title">components</h3>
 	<CardsGrid>
 		<CardDemo />
 		<CardsGridDemo />
@@ -81,7 +82,8 @@
 
 <Divider horizontal size={'4px'} />
 
-<Section title="styles">
+<Section>
+	<h3 slot="title" class="section-title">classes</h3>
 	<CardsGrid>
 		<Card>
 			<h4>.border</h4>
@@ -108,6 +110,12 @@
 			</div>
 		</Card>
 		<Card>
+			<h4>.clickable</h4>
+			<div>
+				<div class="clickable">cursor and jiggle on mousedown</div>
+			</div>
+		</Card>
+		<Card>
 			<h4>.border.inset.shadow.link-box</h4>
 			<div class="link-box border inset shadow">they work well when combined</div>
 		</Card>
@@ -122,6 +130,12 @@
 <br />
 
 <style global>
+	h3 {
+		margin: 0;
+	}
+	.section-title {
+		text-decoration: underline;
+	}
 	span {
 		text-align: center;
 	}

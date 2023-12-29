@@ -1,14 +1,11 @@
 <script lang="ts">
-	export let title: string | null = null;
 	export let columnGap = '2rem';
 	export let rowGap = '1rem';
 	export let column = false;
 </script>
 
 <section class:column style:--row-gap={rowGap} style:--column-gap={columnGap}>
-	{#if title}
-		<h3 class="section-title">{title}</h3>
-	{/if}
+	<slot name="title" />
 	<slot />
 </section>
 
@@ -31,9 +28,5 @@
 		section {
 			flex-direction: row;
 		}
-	}
-
-	.section-title {
-		text-decoration: underline;
 	}
 </style>
