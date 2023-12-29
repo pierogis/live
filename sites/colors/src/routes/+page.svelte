@@ -95,6 +95,7 @@
 	.content {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		gap: 1rem;
 		padding: 1rem;
 	}
@@ -125,7 +126,7 @@
 		border-radius: 8px;
 	}
 	.color-input {
-		width: 5rem;
+		width: 5em;
 		text-align: center;
 	}
 	.import-export {

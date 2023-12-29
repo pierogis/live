@@ -54,6 +54,7 @@
 
 <style>
 	.tagline {
+		margin: 0;
 		text-align: center;
 		padding: 1rem;
 	}

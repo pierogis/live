@@ -1,0 +1,86 @@
+---
+title: Urgent action required
+publishedDate: 2023-12-29
+updatedDate: 2023-12-29
+subtitle: Pierogis Newsletter
+description: Neither news nor a letter
+author:
+    name: karl
+    twitterHandle: pierogis_live
+image:
+    300: './300.png'
+    600: './600.png'
+    1200: './1200.png'
+    og: './og.png'
+    twitter: './twitter.png'
+alt: 'forest'
+tags: ["news"]
+---
+
+sender:please-reply@pierogis.live
+
+view this [POST]() in you browser
+
+They were playing Sixteen Candles and SVU episodes about a closeted football player and a molestor basketball coach. I hear songs like Magnificent Seven, and I get pumped up, and it makes my day, and the song ends, and my day is ruined. I search online youtube for hail mary highlights.
+
+## What do we have? For entertainment?
+
+And I was on a Delta airplane where the in flight monitors had a chess game that I witnessed outplaying 6 people, including myself. The little boy next to me said "the computer is smarter than me", and I told him I agreed. He was a Korean little boy and had a mullet, and I realized that maybe he thought I was calling him stupid. I did not mean that. He behaved very maturely for a ~seven year old on a long flight and endeared me: he and father got along like old friends. I wouldn't want to slight that. It always took the monitor a while to think though. Novelty in apparently lapsed Delta policy for grandmaster on each flight. Take solace anyways in the miracle that is delta satellite relay to grandmaster now seated in HQ. The lady a few rows fore had better luck hustling Hidden Object Hunt by tapping every pixel she could find. She then turned to Joanna Gaines cooking for two minutes before settling into Fixer Upper for the next four hours. There is nothing worth broadcasting that you can cook in two minutes. I have reason to believe she was German or didn't bother to reset the language setting.
+
+Sometimes I walk on the magic carpets that get you to B52 that much faster. Sometimes I have a several months layover that necessitates no rush gatewards. A lot of people don't realize that you can board in any group. Sometimes the stewardess pulls me over to tell me that she appreciates how often I fly with Delta (zero times in memory).
+
+As for myself? Well they had *Call Me by Your Name* which I didn't watch due to the boy next to me. And they had *Local Hero* which I didn't watch due to other concerns. And they had *Phantom Thread* which I didn't watch due to the boy next to me and other concerns. *The Birdcage* I had already seen. So I watched *12 Angry Men* and then *1883: A Yellowstone Origin Story* via another lady diagonally in front of me. All these distractions.. don't these people know that I have some very important thinking to do? Light comes from the stewardess booth, allowing me to finish *A Night of Serious Drinking* by [Rene Daumal](https://www.marionettes.cz/en-USD/detail/1283-rene-daumal-haed-3Dmodel-marionette) and *The Ballad of Peckham Rye* by Muriel Spark.
+
+A Squeeze song came on at the bar. The guy next to me was talking about Baldurs Gate and Counter-Strike skins. I pointed and told him I love Squeeze, and he said this song sucks. Then I got nosy, and I read her letterboxd.
+
+## Familiarity, breeds
+
+You know how you hear those stories about the moment-in-culture justifications for slavery and trail of tears and holocaust, and the takeaway is supposed to be "what rubes could actually believe in all that?” And you watch Ancient Aliens or one of the more editorial World War Twos in Colors, and they make sure you know that inexplicably the average man was swept up by the zeitgeist. And sometimes David Muir says "terrorism”.
+
+My grandpa likes both *The Birdcage* and *Fox News*. My dad set me up and told him that I was interested in his thoughts on *politics* (summarized, recounted, redacted, despecified). One of Grandpa's friend's adult kids died from an overdose earlier this year. I made a joke to that friend about inheritance, and he went silent. I realized in real time that what I said could have been about <u>the tragedy</u>. I really didn't mean it like that, but i am worried it was felt it like that. I said "I'm just kidding”. I usually am. I spent the next two weeks worrying that I made light like the stewardess booth. Sometimes I think "someone should shoot me with a massive gun”. The massive gun shoots 5 meter slugs, so very impractical.. don't worry. Sometimes it's "were you born in a barn”. Kind of the same idea.. except a barn could put me in a manger, natally. My grandpa is trying to get me to take his 6 or 8 foot ladder, electric saws, carpenter's square, belt sander, and two leaves for a dining table I don't own.
+
+Things have continued to progress. It doesn't matter how many gay jokes I can make, my parents will still try to map the borders of autism and talk about the patterns of immigrants moving to the west side. I can watch <u>the liquor</u> and <u>the boredom</u> degrade them any night of any month. Mom starts to talk about arrested development. Dad puts on Facebook and reading glasses.
+"How is it possible for them to cast Charlize Theron, Martin Short, AND Justin Bateman”.
+"Now it's not possible for a litter to have a yellow, brown, AND black lab”.
+
+"No, his sister was Justine”
+"No, he's in a T-Mobile commercial”
+
+".. so people like that have always existed”
+".. so it's like more of an umbrella”
+
+"It was cute the kids had a peaceful protest on the playground”
+"I was teaching the kids about *Clockwork Orange* at soccer practice”
+
+There is a dog that lives on the property behind them that I ought to strangle. Not because I have some disorder. It just has an awful, shrill bark that says to me "life is likely misery”. Scientists have known for decades that dying tragically is poetic; maybe sometimes its a swing and a miss (for non-American readers: an equivalent cricket analogy might be like letting the bowler take a wicket), and they didn't want to die. Or maybe they did, or maybe they were just destined for misery, so it's for the best. I don't think there are any eminent minds on the topic, so someone should probably strangle the dog.
+
+My other grandma is the only one of us with an excuse for the sundowning. In no ceremony, she has earmarked the family silverware for me, a great honor. The chest was stored in a suitcase in the 505 storage closet across the hall, and it is now stored under my bed. I could refine probably 15oz gold with the set—<u>the temptation</u>—if not for lack of fume hood and if for lack of scruples. She said that she doesn't think my sister will get married, but that there is still hope for me. Phenomenologically, love proxies for up and up silver set ownership. My uncle gets the writing desk, his wife gets first pick at the baskets suitcase, and I read Gabba's draft for her own obituary.
+
+## The Bakersfield Sound
+
+Watched a bad movie.. thats a brave thing to do. It's hard to be a chronic hater, and it's easy to imagine that it's warmer somewhere else. Either way you usually can just wear the right clothes to make up for any deficit. That's really the marvel of modern fabrics: the ease with which they fuck off. It's my impression that back in the day, you were hard pressed to find something breathable.
+
+The thing that I would have you understand about Bakersfield is that there is nothing particularly going on there. You have to drive at least two hours to get there, and in that time, you could rather better places. You excavate a temple of why bother. It has not even luxury of being a driveover city on 90 interstate highway. I've no points in Ohio on my Ohio drivers license. A cop yelled at me because he thought I didn't put out a cigarette all the way. I'm not really interested in confrontation, so I didn't bother to tell him that the lack of oxygen in the modern, urban trash bin would strangle any latent embers. That episode was in Massachusetts anyways.
+
+I spend a fair amount of time thinking about all of the times I've sworn in front of a child. I can count it on one hand. Does not count if the baby doesn't speak English! Which makes my life a lot easier. This is another instance of the manger birth/massive gun dilemma. You have to come to terms with this kind of thing. If I was a hack, I would tell you that about how you pay penance for debasing innocence via a "Swear Jar” in some kind of indulgence or capitalist perversion. But I'm not a hack nor Catholic, and the swear jar sent me to college*. *IS what I would say if this were a stand up bit, and I was a hack pretending to be a little bit less of a hack than the person that said "capitalist perversion” in the prior set. But I'm not a hack, I've never told a joke, and I really hope you were sitting down for this.
+
+And to that point, I must admit that I get extra enjoyment sending people pictures from my phone with the dots, smudges because the camera lens is busted.. I want the newest iPhone because it is usb-c, but I would have to carry two phones. My hairline cracks and I provide an end to all debate: the phone and anything we share are just abstraction.
+
+Opdater
+- my mom still loves me
+- my uncle is still bald
+- i have some plots at work 
+- Tim (1985) reissued
+- my parents' dog got neutered
+- father is taking it rather vicariously
+Words of the week
+- harangued
+
+[playlist](https://open.spotify.com/playlist/6uzO26FjuA8jdJHmEZ2F4k?si=7f1aab1562d14260&pt=6dc72df40b120cffb2e5b3140881ea2e)
+
+On the flight back, in much less event, I watched *Paris is Burning* because there were neither boys flanking nor these other concerns.
+
+In any case, I just wanted to let you know that your pierogis.live account has an outstanding balance of <b>0.00</b>. To set up auto pay, you can set your payment method. To set your payment method, please Go to accounts -> payment -> method. You have 17 credits remaining.. this is also outstanding. They are worth their weight in gold and never expire. Now one thing that you have to understand about credits is that use of credits can be so fulfilling.
+
+This is an automated account service. To opt in to opting out please tell me why you fricken hate me :/
+￼

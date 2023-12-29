@@ -86,21 +86,20 @@ body {
 
 /* global css class/element style */
 input,
-textarea {
+textarea,
+input[type='submit'],
+button {
 	background-color: var(--input-color);
 	padding: .25rem .5rem;
 
 	font-size: 1em;
 }
 
-textarea[readonly] {
-	background-color: var(--primary-color);
-}
-
 input[type='submit'],
 button,
 .link-box,
-code {
+code,
+textarea[readonly] {
 	background-color: var(--primary-color);
 }
 
