@@ -122,6 +122,14 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
       align-items: center;
       gap: 10px;
     }
+
+    section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     .lead {
       display: flex;
       flex-direction: column;
@@ -161,11 +169,9 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
       padding: 0 10rem;
     }
 
-    section {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+    .content :global(a) {
+      text-decoration: underline;
+      color: var(--link-color);
     }
 
     @media (orientation: portait) {

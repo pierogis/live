@@ -5,10 +5,11 @@
 	--dark-color: rgba(58, 96, 106);
 
 	--primary-color: var(--light-color);
-	--accent-color: rgba(225, 140, 150, 1);
-	--secondary-color: rgb(140, 205, 225);
+	--accent-color: rgba(225, 140, 150);
+	--secondary-color: hsl(194, 58.6%, 71.6%);
 	--text-color: var(--dark-color);
-	--input-color: rgba(235, 245, 245, 1);
+	--input-color: rgba(235, 245, 245);
+	--link-color: hsl(194, 58.6%, 41.6%);
 
 	--primary-color-st: rgba(255, 240, 220, 0.4);
 	--accent-color-st: rgba(225, 140, 150, 0.4);

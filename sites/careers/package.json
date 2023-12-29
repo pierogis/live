@@ -2,6 +2,7 @@
 	"name": "careers",
 	"version": "0.0.1",
 	"description": "a good place to start working with pierogis",
+	"private": true,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
