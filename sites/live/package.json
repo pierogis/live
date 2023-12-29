@@ -20,6 +20,7 @@
 		"@playwright/test": "^1.36.1",
 		"@sveltejs/adapter-auto": "^2.1.0",
 		"@sveltejs/kit": "^1.22.3",
+		"@vercel/speed-insights": "^1.0.2",
 		"eslint-config-custom": "workspace:*",
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.1",

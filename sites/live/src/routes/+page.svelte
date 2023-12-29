@@ -1,7 +1,13 @@
 <script lang="ts">
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+	import { browser } from '$app/environment';
+
 	import { Card, CardsGrid, Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
 
 	export let data;
+
+	$: browser && injectSpeedInsights();
 </script>
 
 <svelte:head>

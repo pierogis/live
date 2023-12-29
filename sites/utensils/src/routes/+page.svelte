@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+	import { browser } from '$app/environment';
+
 	import {
 		Card,
 		CardsGrid,
@@ -19,6 +23,8 @@
 		ShineDemo,
 		ThemeToggleDemo
 	} from '$lib/demo';
+
+	$: browser && injectSpeedInsights();
 
 	let rotateImage = false;
 </script>
