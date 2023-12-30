@@ -27,8 +27,5 @@
 		align-content: center;
 		justify-content: center;
 		flex-wrap: wrap;
-
-		padding: 1rem;
-		padding-top: 0;
 	}
 </style>

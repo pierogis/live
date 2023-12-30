@@ -11,7 +11,6 @@
 <style>
 	.card {
 		padding: 12px;
-		max-width: 90vw;
 		height: 100%;
 
 		display: flex;
