@@ -58,22 +58,19 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
   </head>
   <Base pageTitle={title}>
     <article>
-      <section>
-        <div class="lead">
-          <h1 class="title">
-            {title}
-          </h1>
-          <i>{subtitle}</i>
-          <div class="metadata">
-            <p class="author">{author.name}</p>
-            <p class="date">
-              {publishedDate.toISOString().slice(0, 10)}
-            </p>
-          </div>
+      <div class="lead">
+        <h1 class="title">
+          {title}
+        </h1>
+        <i>{subtitle}</i>
+        <div class="metadata">
+          <p class="author">{author.name}</p>
+          <p class="date">
+            {publishedDate.toISOString().slice(0, 10)}
+          </p>
         </div>
-
         <Divider horizontal margin="0" />
-      </section>
+      </div>
 
       <!-- <Image
         src={image[1200]}
@@ -94,69 +91,42 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
       <div class="content">
         <slot />
       </div>
+      <div class="tags">
+        {
+          tags.map((tag) => {
+            return (
+              <a href={`/tags/${tag}`}>
+                <i>#{tag}</i>
+              </a>
+            );
+          })
+        }
+      </div>
     </article>
-
-    <div class="tags">
-      {
-        tags.map((tag) => {
-          return (
-            <a href={`/tags/${tag}`}>
-              <i>#{tag}</i>
-            </a>
-          );
-        })
-      }
-    </div>
   </Base>
 
   <style>
     img {
-      border-radius: 16px;
       image-rendering: pixelated;
-    }
-
-    article {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-    }
-
-    section {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
     }
 
     .lead {
       display: flex;
+      gap: 0.5em;
       flex-direction: column;
       justify-content: center;
       max-width: 768px;
     }
 
-    .title {
-      font-weight: 700;
-      /* letter-spacing: -0.025em; */
-      margin: 0;
-      line-height: 1em;
-    }
-
     .metadata {
       display: flex;
       justify-content: space-between;
-      margin-top: 0.5rem;
       width: 100%;
       gap: 8px;
     }
 
     .author {
       font-weight: 700;
-    }
-    .date {
-      font-weight: 500;
     }
 
     .author,
@@ -166,12 +136,9 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
     }
 
     .content {
-      padding: 0 10rem;
-    }
-
-    .content :global(a) {
-      text-decoration: underline;
-      color: var(--link-color);
+      margin: 0 5em;
+      display: flex;
+      flex-direction: column;
     }
 
     @media (orientation: portait) {
@@ -185,13 +152,14 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
         text-align: center;
       }
       .content {
-        padding: 0;
+        margin: 0;
       }
     }
 
-    .tags {
-      padding: 8px;
+    a {
+      text-decoration: none;
     }
+
     a:hover {
       text-decoration: underline;
     }

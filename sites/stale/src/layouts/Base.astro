@@ -13,7 +13,6 @@ interface Props {
 }
 
 const { pageTitle } = Astro.props;
-const tagline = "truly beyond the pale";
 
 const appleTouchIcon = await getImage({
   src: faviconSrc,
@@ -51,9 +50,11 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
           <Interactable>
             <a href="/about" class="border inset link-box">about</a>
           </Interactable>
-        </nav>
 
-        <i>{tagline}</i>
+          <Interactable>
+            <a href="/newsletter" class="border inset link-box">newsletter</a>
+          </Interactable>
+        </nav>
 
         <slot />
 
@@ -82,18 +83,5 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
         </footer>
       </Layout>
     </div>
-
-    <style>
-      nav {
-        padding-top: 8px;
-        padding-bottom: 0;
-      }
-      i {
-        padding: 8px;
-      }
-      footer {
-        margin-top: 0;
-      }
-    </style>
   </body>
 </html>

@@ -13,8 +13,9 @@ const { loaf } = Astro.props;
   <Shine randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }}>
     <img src={loaf.image[300].src} class="border" />
   </Shine>
-  <h4>{loaf.title}</h4>
-  <h5>{loaf.subtitle}</h5>
+  <h1>{loaf.title}</h1>
+  <h3>{loaf.subtitle}</h3>
+  <span>{loaf.description}</span>
 </Card>
 
 <style>
@@ -22,8 +23,9 @@ const { loaf } = Astro.props;
     border-radius: 16px;
     image-rendering: pixelated;
   }
-  h4,
-  h5 {
+
+  h1,
+  h3 {
     margin: 0;
   }
 </style>

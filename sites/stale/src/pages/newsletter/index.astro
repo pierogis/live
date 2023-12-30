@@ -1,0 +1,55 @@
+---
+import Base from "../../layouts/Base.astro";
+import { Interactable } from "@pierogis/utensils";
+import { generateEmailAddress } from "@pierogis/utensils/utils/words";
+
+const sampleEmail = generateEmailAddress();
+---
+
+<Base pageTitle="stale newsletter">
+  <h1>fresh loafs delivered right to your mailbox</h1>
+  <form action="/api/newsletter" method="POST">
+    <label>
+      <span>email</span>
+      <input
+        class="border inset"
+        type="email"
+        name="email"
+        placeholder={sampleEmail}
+      />
+    </label>
+    <Interactable>
+      <button type="submit" class="border inset no-select"> submit</button>
+    </Interactable>
+  </form>
+</Base>
+
+<style>
+  h1 {
+    text-align: center;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  label > span {
+    text-decoration: underline;
+  }
+
+  input {
+    width: 20rem;
+    max-width: 90%;
+
+    text-decoration: none;
+  }
+</style>
