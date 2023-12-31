@@ -1,5 +1,15 @@
 # @pierogis/utensils
 
+## 0.8.0
+
+### Minor Changes
+
+- 2a80b9e: separate `ThemeToggle` into the provider and the button
+
+### Patch Changes
+
+- 6b7f724: add words utils
+
 ## 0.7.0
 
 ### Minor Changes
