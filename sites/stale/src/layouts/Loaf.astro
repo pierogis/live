@@ -1,8 +1,5 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { Image } from "astro:assets";
-
-import { SEO } from "astro-seo";
 
 import { Divider } from "@pierogis/utensils";
 import Base from "./Base.astro";
@@ -33,12 +30,12 @@ const {
     description={description}
     type="article"
     og={{
-      image: image.twitter.src,
+      image: image.og.src,
       alt: alt,
     }}
     twitter={{
       card: "summary",
-      image: image.og.src,
+      image: image.twitter.src,
       alt: alt,
       handle: author.twitterHandle,
     }}
