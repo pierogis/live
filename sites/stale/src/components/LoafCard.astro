@@ -10,8 +10,11 @@ const { loaf } = Astro.props;
 ---
 
 <Card border inset>
-  <Shine randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }}>
-    <img src={loaf.image[300].src} class="border" />
+  <Shine
+    randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }}
+    borderRadius="16px"
+  >
+    <img src={loaf.image[300].src} class="border" alt={loaf.alt} />
   </Shine>
   <h1>{loaf.title}</h1>
   <h3>{loaf.subtitle}</h3>

@@ -28,7 +28,7 @@ const { tag } = Astro.params;
 const { loafs } = Astro.props;
 ---
 
-<Base pageTitle={`${tag} loafs`}>
+<Base title={`${tag} loafs`} description={`loafs with tag ${tag}`}>
   <p>Posts tagged with {tag}</p>
   <LoafGrid {loafs} />
 </Base>

@@ -5,10 +5,10 @@ import TagCard from "../../components/TagCard.astro";
 
 const allLoafs = await getCollection("loafs");
 const tags = [...new Set(allLoafs.map((loaf) => loaf.data.tags).flat())];
-const pageTitle = "tags";
+const pageTitle = "stale tags";
 ---
 
-<Base pageTitle={pageTitle}>
+<Base title={pageTitle} description={"stale loafs by tags"}>
   <div class="tags">
     {tags.map((tag) => <TagCard tag={tag} />)}
   </div>

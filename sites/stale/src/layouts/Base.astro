@@ -1,18 +1,56 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 import { getImage } from "astro:assets";
+import { SEO } from "astro-seo";
 
-import { Layout, Interactable, ThemeToggle } from "@pierogis/utensils";
-import "@pierogis/utensils/styles/pierogis.css";
+import { Interactable } from "@pierogis/utensils";
+import { themeKey, Theme } from "@pierogis/utensils/theme";
 
+import { Layout } from "ui";
+
+import fallbackOpenGraphImageSrc from "../images/og.png";
+import fallbackTwitterImageSrc from "../images/twitter.png";
 import faviconSrc from "../images/favicon.png";
 import faviconSvgSrc from "../images/favicon.svg";
+import ThemeComponent from "../components/Theme.svelte";
 
 interface Props {
-  pageTitle: string;
+  title: string;
+  description: string;
+  type?: string;
+  og?: {
+    image: string;
+    alt: string;
+  };
+  twitter?: {
+    card: "summary" | "summary_large_image";
+    image: string;
+    alt: string;
+    handle?: string;
+  };
 }
 
-const { pageTitle } = Astro.props;
+const ogImage = await getImage({
+  src: fallbackOpenGraphImageSrc,
+});
+const twitterImage = await getImage({
+  src: fallbackTwitterImageSrc,
+});
+
+const {
+  title,
+  description,
+  type = "website",
+  og = {
+    image: ogImage.src,
+    alt: "stale",
+  },
+  twitter = {
+    card: "summary",
+    image: twitterImage.src,
+    alt: "stale",
+  },
+} = Astro.props;
 
 const appleTouchIcon = await getImage({
   src: faviconSrc,
@@ -32,16 +70,67 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>{pageTitle}</title>
+    <title>{title}</title>
     <ViewTransitions />
+    <script
+      is:inline
+      transition:persist
+      define:vars={{ themeKey, dark: Theme.Dark, light: Theme.Dark }}
+    >
+      function setTheme(document) {
+        let theme = (() => {
+          if (
+            typeof localStorage !== "undefined" &&
+            localStorage.getItem(themeKey)
+          ) {
+            return localStorage.getItem(themeKey);
+          }
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return dark;
+          }
+          return light;
+        })();
+        document.documentElement.dataset.theme = theme;
+      }
+
+      setTheme(document);
+
+      document.addEventListener("astro:before-swap", (ev) => {
+        ev.newDocument.documentElement.dataset.theme =
+          document.documentElement.dataset.theme;
+      });
+    </script>
   </head>
+  <SEO
+    title={title}
+    description={description}
+    openGraph={{
+      basic: {
+        title: title,
+        type: type,
+        image: og.image,
+      },
+      image: {
+        url: og.image,
+        alt: og.alt,
+      },
+    }}
+    twitter={{
+      title: title,
+      description: description,
+      card: "summary_large_image",
+      site: "@pierogis_live",
+      creator: twitter?.handle ? "@" + twitter.handle : undefined,
+      image: twitter.image,
+      imageAlt: twitter.alt,
+    }}
+  />
   <body>
     <div>
-      <Layout>
-        <Interactable slot="title">
-          <div class="link-box border inset">stale</div>
-        </Interactable>
-
+      <Layout
+        title="stale"
+        github="https://github.com/pierogis/live/tree/main/sites/stale"
+      >
         <nav slot="nav">
           <Interactable>
             <a href="/tags" class="link-box border inset">tags</a>
@@ -58,29 +147,7 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
 
         <slot />
 
-        <footer slot="footer">
-          <Interactable>
-            <a class="border inset link-box" href="https://pierogis.live"
-              >live</a
-            >
-          </Interactable>
-
-          <Interactable>
-            <a
-              class="border inset link-box"
-              href="https://github.com/pierogis/stale">github</a
-            >
-          </Interactable>
-
-          <Interactable>
-            <a
-              class="border inset link-box"
-              href="https://twitter.com/pierogis_live">@pierogis_live</a
-            >
-          </Interactable>
-
-          <ThemeToggle client:load />
-        </footer>
+        <ThemeComponent slot="theme" client:load />
       </Layout>
     </div>
   </body>

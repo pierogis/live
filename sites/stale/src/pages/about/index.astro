@@ -1,9 +1,11 @@
 ---
 import Base from "../../layouts/Base.astro";
+
+const description = "this is a place for learning and aspiring";
 ---
 
-<Base pageTitle="about stale">
-  <span>this is a place for learning and aspiring</span>
+<Base title="about stale" description={description}>
+  <span>{description}</span>
 </Base>
 
 <style>

@@ -56,7 +56,21 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
       }}
     />
   </head>
-  <Base pageTitle={title}>
+  <Base
+    title={title}
+    description={description}
+    type="article"
+    og={{
+      image: ogImageSrc,
+      alt: alt,
+    }}
+    twitter={{
+      card: "summary",
+      image: twitterImageSrc,
+      alt: alt,
+      handle: author.twitterHandle,
+    }}
+  >
     <article>
       <div class="lead">
         <h1 class="title">
