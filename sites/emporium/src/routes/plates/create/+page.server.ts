@@ -40,7 +40,7 @@ export const actions = {
 				return fail(403, { message: `couldn't create plate` });
 			}
 
-			throw redirect(303, `/plates/${plate.modelId}`);
+			redirect(303, `/plates/${plate.modelId}`);
 		} else {
 			return fail(403, { message: `not admin` });
 		}

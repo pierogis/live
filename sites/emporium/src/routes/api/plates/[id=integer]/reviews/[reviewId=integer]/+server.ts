@@ -22,7 +22,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
 		return json(review);
 	} else {
-		throw error(401, 'not signed in');
+		error(401, 'not signed in');
 	}
 };
 
@@ -40,6 +40,6 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
 		return json(review);
 	} else {
-		throw error(401, 'not signed in');
+		error(401, 'not signed in');
 	}
 };

@@ -8,6 +8,6 @@ export const actions: Actions = {
 	default: (event) => {
 		expireSessionCookie(event.cookies);
 
-		throw redirect(301, '/');
+		redirect(301, '/');
 	}
 };

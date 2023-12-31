@@ -28,7 +28,7 @@ export const actions = {
 				await deleteUser(parseInt(userId.toString()));
 			}
 
-			throw redirect(303, '/');
+			redirect(303, '/');
 		} else {
 			return fail(403, { message: `not user ${params.serial} or admin` });
 		}

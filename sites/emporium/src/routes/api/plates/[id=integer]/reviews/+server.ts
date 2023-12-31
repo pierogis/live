@@ -20,6 +20,6 @@ export const POST: RequestHandler = async (event) => {
 
 		return json(review);
 	} else {
-		throw error(401, 'not signed in');
+		error(401, 'not signed in');
 	}
 };

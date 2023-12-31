@@ -6,7 +6,7 @@ export const load = async (event) => {
 	const user = await getUserWithInteractions({ serial: event.params.serial });
 
 	if (user === undefined) {
-		throw error(404, "user doesn't exist");
+		error(404, "user doesn't exist");
 	}
 
 	const sessionUser = event.locals.sessionUser;

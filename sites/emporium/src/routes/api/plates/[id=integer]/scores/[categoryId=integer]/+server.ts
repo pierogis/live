@@ -12,7 +12,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 		const body: { value: number } = await request.json();
 
 		if (body.value < 0 || body.value > 10) {
-			throw error(400, 'score value less than 0 or greater than 10');
+			error(400, 'score value less than 0 or greater than 10');
 		}
 
 		const data = {
@@ -26,7 +26,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
 		return json(score);
 	} else {
-		throw error(401, 'not signed in');
+		error(401, 'not signed in');
 	}
 };
 
@@ -46,6 +46,6 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
 		return json(score);
 	} else {
-		throw error(401, 'not signed in');
+		error(401, 'not signed in');
 	}
 };

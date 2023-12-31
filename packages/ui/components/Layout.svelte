@@ -15,7 +15,7 @@
     <div class="link-box border inset">{title}</div>
   </Interactable>
 
-  <slot name="nav" />
+  <slot name="nav" slot="nav" />
 
   <slot />
 

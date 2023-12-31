@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 
 		return json(plate);
 	} else {
-		throw error(404, `plate ${params.id} not found`);
+		error(404, `plate ${params.id} not found`);
 	}
 };
 
@@ -39,7 +39,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
 		return json(plate);
 	} else {
-		throw error(403, 'not admin');
+		error(403, 'not admin');
 	}
 };
 
@@ -50,6 +50,6 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
 		return json(plate);
 	} else {
-		throw error(403, 'not admin');
+		error(403, 'not admin');
 	}
 };

@@ -14,6 +14,6 @@ export const GET: RequestHandler = async (event) => {
 
 		return json(scores);
 	} else {
-		throw error(401, 'not signed in and userId not specified');
+		error(401, 'not signed in and userId not specified');
 	}
 };

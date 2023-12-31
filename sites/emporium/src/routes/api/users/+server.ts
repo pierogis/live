@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
 	const serial = event.url.searchParams.get('serial');
 	if (!serial) {
-		throw error(403, 'user serial param not provided');
+		error(403, 'user serial param not provided');
 	}
 	const user = await getUser({ serial });
 
@@ -22,5 +22,5 @@ export const GET: RequestHandler = async (event) => {
 
 		return json(maskedUser);
 	}
-	throw error(404, `user with serial ${serial} not found`);
+	error(404, `user with serial ${serial} not found`);
 };

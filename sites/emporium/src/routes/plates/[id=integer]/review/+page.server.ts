@@ -7,7 +7,7 @@ import { schema } from '$lib/forms/review';
 
 export const load = async (event) => {
 	if (event.locals.sessionUser === null) {
-		throw redirect(302, `/login`);
+		redirect(302, `/login`);
 	}
 
 	const review = (await getReview({
@@ -46,7 +46,7 @@ export const actions = {
 			if (!form.data.description || (form.data.description == '' && form.data.id)) {
 				await deleteReview({ modelId, userId: form.data.userId });
 
-				throw redirect(303, `/plates/${modelId}`);
+				redirect(303, `/plates/${modelId}`);
 			} else {
 				const data = {
 					id: form.data.id,
@@ -57,10 +57,10 @@ export const actions = {
 
 				await upsertReview(data);
 
-				throw redirect(303, `/plates/${modelId}`);
+				redirect(303, `/plates/${modelId}`);
 			}
 		} else {
-			throw redirect(302, `/login`);
+			redirect(302, `/login`);
 		}
 	},
 	delete: async (event) => {
@@ -86,9 +86,9 @@ export const actions = {
 			};
 
 			await deleteReview(reviewParams);
-			throw redirect(303, `/plates/${modelId}`);
+			redirect(303, `/plates/${modelId}`);
 		} else {
-			throw redirect(302, `/login`);
+			redirect(302, `/login`);
 		}
 	}
 };

@@ -1,17 +1,20 @@
 <script lang="ts">
-	import { Layout, ThemeToggle, Interactable } from '@pierogis/utensils';
+	import { Interactable } from '@pierogis/utensils';
+	import { Layout } from 'ui';
+
+	import './style.css';
 
 	export let data;
 	$: ({ sessionUser } = data);
 </script>
 
-<Layout>
-	<Interactable slot="title">
-		<div class="link-box border inset">karl's plate emporium</div>
-	</Interactable>
+<Layout
+	title="karl's plate emporium"
+	github="https://github.com/pierogis/live/tree/main/sites/emporium"
+>
 	<nav slot="nav">
 		<Interactable>
-			<a href="/jurisdictions"><h4 class="link-box border inset">jurisdictions</h4></a>
+			<a href="/jurisdictions" class="link-box border inset">jurisdictions</a>
 		</Interactable>
 
 		<Interactable>
@@ -24,34 +27,11 @@
 		{/if}
 
 		<Interactable>
-			<a href="/account">
-				<h4 class="link-box border inset" class:good={sessionUser === null}>
-					{sessionUser !== null ? sessionUser.serial : 'login'}
-				</h4>
+			<a href="/account" class="link-box border inset" class:good={sessionUser === null}>
+				{sessionUser !== null ? sessionUser.serial : 'login'}
 			</a>
 		</Interactable>
 	</nav>
 
 	<slot />
-
-	<footer slot="footer">
-		<Interactable>
-			<a class="border inset link-box" href="https://pierogis.live">live</a>
-		</Interactable>
-
-		<Interactable>
-			<a class="border inset link-box" href="https://github.com/pierogis/emporium">github</a>
-		</Interactable>
-
-		<Interactable>
-			<a class="border inset link-box" href="https://twitter.com/pierogis_live">@pierogis_live</a>
-		</Interactable>
-
-		<ThemeToggle />
-	</footer>
 </Layout>
-
-<style>
-	@import 'style.css';
-	@import '@pierogis/utensils/styles/pierogis.css';
-</style>

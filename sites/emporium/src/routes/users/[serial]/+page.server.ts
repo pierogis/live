@@ -16,7 +16,7 @@ export const load = async () => {
 export const actions = {
 	default: async (event) => {
 		if (event.locals.sessionUser === null) {
-			throw error(401, `not signed in`);
+			error(401, `not signed in`);
 		}
 		if (
 			event.locals.sessionUser.serial == event.params.serial ||
@@ -32,9 +32,9 @@ export const actions = {
 			});
 
 			// redirect to the updated user
-			throw redirect(302, `/users/${user.serial}`);
+			redirect(302, `/users/${user.serial}`);
 		} else {
-			throw error(403, `not user ${event.params.serial} or admin`);
+			error(403, `not user ${event.params.serial} or admin`);
 		}
 	}
 };

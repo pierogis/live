@@ -81,7 +81,7 @@ export const actions = {
 
 				await setSessionCookie(event.cookies, { userId: user.id });
 
-				throw redirect(303, redirectUrl);
+				redirect(303, redirectUrl);
 			} else {
 				return fail(400, {
 					redirectUrl,

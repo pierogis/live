@@ -9,7 +9,7 @@ export const load = async (event) => {
 	const user = await getUserWithInteractions({ serial: event.params.serial });
 
 	if (user === undefined) {
-		throw error(404, "user doesn't exist");
+		error(404, "user doesn't exist");
 	}
 
 	const isUser = event.locals.sessionUser?.id == user.id;
@@ -52,7 +52,7 @@ export const actions = {
 
 			return { score };
 		} else {
-			throw error(401, 'not signed in');
+			error(401, 'not signed in');
 		}
 	},
 	delete: async (event) => {
@@ -78,7 +78,7 @@ export const actions = {
 
 			return { score };
 		} else {
-			throw error(403, 'not user');
+			error(403, 'not user');
 		}
 	}
 };

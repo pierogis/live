@@ -6,7 +6,7 @@ export const load = async ({ params }) => {
 	const plate = await getFullPlate({ modelId: parseInt(params.id) });
 
 	if (!plate) {
-		throw error(404, "plate doesn't exist");
+		error(404, "plate doesn't exist");
 	}
 
 	return {
