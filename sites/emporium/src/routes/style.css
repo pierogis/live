@@ -1,0 +1,4 @@
+.alert {
+	padding: 1rem;
+	background-color: var(--primary-color);
+}
