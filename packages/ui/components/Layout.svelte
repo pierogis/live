@@ -3,12 +3,8 @@
   import "@pierogis/utensils/styles/pierogis.css";
 
   export let title: string;
-  export let github: string;
+  export let github: { repo: string };
 </script>
-
-<svelte:head>
-  <title>{title}</title>
-</svelte:head>
 
 <Layout>
   <Interactable slot="title">
@@ -26,7 +22,7 @@
       </Interactable>
     </slot>
     <Interactable>
-      <a class="border inset link-box" href={github}>github</a>
+      <a class="border inset link-box" href={github.repo}>github</a>
     </Interactable>
     <Interactable>
       <a class="border inset link-box" href="https://twitter.com/pierogis_live">

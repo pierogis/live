@@ -1,5 +1,8 @@
 declare namespace App {
 	// interface Locals {}
-	// interface PageData {}
+	interface PageData {
+		title: string;
+		description: string;
+	}
 	// interface Platform {}
 }

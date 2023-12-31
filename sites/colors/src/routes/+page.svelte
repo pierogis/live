@@ -1,6 +1,9 @@
 <script lang="ts">
-	import { Interactable } from '@pierogis/utensils';
+	import { Interactable, SEO } from '@pierogis/utensils';
 	import { writable, type Writable } from 'svelte/store';
+
+	export let data;
+	$: ({ canonical, title, description } = data);
 
 	function handleImport() {
 		$colorsStore = $paletteStore.split(' ');
@@ -41,6 +44,10 @@
 </script>
 
 <svelte:window use:palette />
+
+<svelte:head>
+	<SEO {canonical} {title} {description} type="website" />
+</svelte:head>
 
 <div class="content">
 	<form>

@@ -2,14 +2,26 @@
 	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
+
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 
 	$: browser && injectSpeedInsights();
+
+	export let data;
+	$: ({ title } = data);
 </script>
 
+<svelte:head>
+	<title>{$page.data.title}</title>
+	<link rel="canonical" href={$page.data.canonical} />
+	<meta name="description" content={$page.data.description} />
+	<meta name="robots" content="index, follow" />
+</svelte:head>
+
 <ThemeProvider>
-	<Layout title="colors" github="https://github.com/pierogis/live/tree/main/sites/colors">
+	<Layout {title} github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/colors' }}>
 		<slot />
 	</Layout>
 </ThemeProvider>
