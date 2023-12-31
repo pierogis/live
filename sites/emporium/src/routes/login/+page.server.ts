@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { dev } from '$app/environment';
-import { DEV_PASSPHRASE } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 import { createUser, getUser } from '$lib/server/database/users';
 import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
@@ -11,6 +11,7 @@ import { setSessionCookie } from '$lib/server/session';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
 
 import { FlowCode } from './_flow';
+import type { Actions } from './$types';
 
 export const load = async () => {
 	const samplePhrase = generatePhrase();
@@ -22,7 +23,7 @@ export const load = async () => {
 	};
 };
 
-export const actions = {
+export const actions: Actions = {
 	generate: async (event) => {
 		const formData = await event.request.formData();
 
@@ -35,7 +36,7 @@ export const actions = {
 			const originalEmail = emailEntry.toString();
 
 			// use dev passphrase in dev
-			const generatedPassphrase = dev ? DEV_PASSPHRASE : generatePhrase();
+			const generatedPassphrase = (dev && env.DEV_PASSPHRASE) || generatePhrase();
 			const content = createPassphraseEmail(originalEmail, generatedPassphrase);
 			// only send email in prod
 			if (!dev) await requestMailerSend(originalEmail, content, event.fetch);
