@@ -30,27 +30,29 @@ interface Props {
   };
 }
 
-const ogImage = await getImage({
-  src: fallbackOpenGraphImageSrc,
-});
-const twitterImage = await getImage({
-  src: fallbackTwitterImageSrc,
-});
-
 const {
   title,
   description,
   type = "website",
   og = {
-    image: ogImage.src,
+    image: fallbackOpenGraphImageSrc.src,
     alt: "stale",
   },
   twitter = {
     card: "summary",
-    image: twitterImage.src,
+    image: fallbackTwitterImageSrc.src,
     alt: "stale",
   },
 } = Astro.props;
+
+const ogImageSrc = new URL(
+  fallbackOpenGraphImageSrc.src,
+  Astro.url.origin
+).toString();
+const twitterImageSrc = new URL(
+  fallbackTwitterImageSrc.src,
+  Astro.url.origin
+).toString();
 
 const appleTouchIcon = await getImage({
   src: faviconSrc,
@@ -108,10 +110,10 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
       basic: {
         title: title,
         type: type,
-        image: og.image,
+        image: ogImageSrc,
       },
       image: {
-        url: og.image,
+        url: ogImageSrc,
         alt: og.alt,
       },
     }}
@@ -121,7 +123,7 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
       card: "summary_large_image",
       site: "@pierogis_live",
       creator: twitter?.handle ? "@" + twitter.handle : undefined,
-      image: twitter.image,
+      image: twitterImageSrc,
       imageAlt: twitter.alt,
     }}
   />

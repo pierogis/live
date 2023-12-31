@@ -24,49 +24,20 @@ const {
   alt,
   tags,
 } = data;
-
-const ogImageSrc = new URL(image.og.src, Astro.url.origin).toString();
-const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
 ---
 
 <html lang="en">
-  <head>
-    <SEO
-      title={title}
-      description={description}
-      openGraph={{
-        basic: {
-          title: title,
-          type: "loaf",
-          image: ogImageSrc,
-        },
-        image: {
-          url: ogImageSrc,
-          alt: alt,
-        },
-      }}
-      twitter={{
-        title: title,
-        description: description,
-        card: "summary",
-        site: "@pierogis_live",
-        creator: author.twitterHandle ? "@" + author.twitterHandle : undefined,
-        image: twitterImageSrc,
-        imageAlt: alt,
-      }}
-    />
-  </head>
   <Base
     title={title}
     description={description}
     type="article"
     og={{
-      image: ogImageSrc,
+      image: image.twitter.src,
       alt: alt,
     }}
     twitter={{
       card: "summary",
-      image: twitterImageSrc,
+      image: image.og.src,
       alt: alt,
       handle: author.twitterHandle,
     }}
@@ -179,4 +150,5 @@ const twitterImageSrc = new URL(image.twitter.src, Astro.url.origin).toString();
       text-decoration: underline;
     }
   </style>
+
 </html>
