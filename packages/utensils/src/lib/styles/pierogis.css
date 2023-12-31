@@ -1,7 +1,7 @@
 /* default styles */
 
 :root {
-	--light-color: rgba(255, 240, 220, 1);
+	--light-color: hsla(34, 100%, 93.1%, 1);
 	--dark-color: rgba(58, 96, 106);
 
 	--primary-color: var(--light-color);
@@ -38,6 +38,7 @@
 	--secondary-color: rgb(140, 205, 225);
 	--text-color: var(--light-color);
 	--input-color: rgba(100, 120, 120, 0.8);
+	--link-color: hsl(34, 100%, 83.1%);
 
 	--primary-color-st: rgba(58, 96, 106, 0.3);
 	--accent-color-st: rgba(225, 140, 150, 0.3);

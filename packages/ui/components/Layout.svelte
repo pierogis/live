@@ -20,9 +20,11 @@
   <slot />
 
   <footer slot="footer">
-    <Interactable>
-      <a class="border inset link-box" href="https://pierogis.live">live</a>
-    </Interactable>
+    <slot name="footer">
+      <Interactable>
+        <a class="border inset link-box" href="https://pierogis.live">live</a>
+      </Interactable>
+    </slot>
     <Interactable>
       <a class="border inset link-box" href={github}>github</a>
     </Interactable>
