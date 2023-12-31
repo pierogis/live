@@ -8,7 +8,11 @@ const tags = [...new Set(allLoafs.map((loaf) => loaf.data.tags).flat())];
 const pageTitle = "stale tags";
 ---
 
-<Base title={pageTitle} description={"stale loafs by tags"}>
+<Base
+  canonical={`https://stale.pierogis.live/tags`}
+  title={pageTitle}
+  description={"stale loafs by tags"}
+>
   <div class="tags">
     {tags.map((tag) => <TagCard tag={tag} />)}
   </div>

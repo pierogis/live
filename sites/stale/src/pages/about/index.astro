@@ -4,7 +4,11 @@ import Base from "../../layouts/Base.astro";
 const description = "this is a place for learning and aspiring";
 ---
 
-<Base title="about stale" description={description}>
+<Base
+  canonical={`https://stale.pierogis.live/about`}
+  title="about stale"
+  description={description}
+>
   <span>{description}</span>
 </Base>
 

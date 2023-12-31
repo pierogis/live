@@ -1,7 +1,6 @@
 ---
 import { ViewTransitions } from "astro:transitions";
 import { getImage } from "astro:assets";
-import { SEO } from "astro-seo";
 
 import { Interactable } from "@pierogis/utensils";
 import { themeKey, Theme } from "@pierogis/utensils/theme";
@@ -13,8 +12,10 @@ import fallbackTwitterImageSrc from "../images/twitter.png";
 import faviconSrc from "../images/favicon.png";
 import faviconSvgSrc from "../images/favicon.svg";
 import ThemeComponent from "../components/Theme.svelte";
+import SEO from "../components/SEO.svelte";
 
 interface Props {
+  canonical: string;
   title: string;
   description: string;
   type?: string;
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const {
+  canonical,
   title,
   description,
   type = "website",
@@ -72,7 +74,23 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <SEO
+      canonical={Astro.url.toString()}
+      {title}
+      {description}
+      {type}
+      og={{
+        image: ogImageSrc,
+        alt: og.alt,
+      }}
+      twitter={{
+        card: "summary_large_image",
+        site: "@pierogis_live",
+        handle: twitter?.handle ? "@" + twitter.handle : undefined,
+        image: twitterImageSrc,
+        alt: twitter.alt,
+      }}
+    />
     <ViewTransitions />
     <script
       is:inline
@@ -103,35 +121,13 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
       });
     </script>
   </head>
-  <SEO
-    title={title}
-    description={description}
-    openGraph={{
-      basic: {
-        title: title,
-        type: type,
-        image: ogImageSrc,
-      },
-      image: {
-        url: ogImageSrc,
-        alt: og.alt,
-      },
-    }}
-    twitter={{
-      title: title,
-      description: description,
-      card: "summary_large_image",
-      site: "@pierogis_live",
-      creator: twitter?.handle ? "@" + twitter.handle : undefined,
-      image: twitterImageSrc,
-      imageAlt: twitter.alt,
-    }}
-  />
   <body>
     <div>
       <Layout
         title="stale"
-        github="https://github.com/pierogis/live/tree/main/sites/stale"
+        github={{
+          repo: "https://github.com/pierogis/live/tree/main/sites/stale",
+        }}
       >
         <nav slot="nav">
           <Interactable>

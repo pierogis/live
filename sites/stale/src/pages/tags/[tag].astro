@@ -28,7 +28,11 @@ const { tag } = Astro.params;
 const { loafs } = Astro.props;
 ---
 
-<Base title={`${tag} loafs`} description={`loafs with tag ${tag}`}>
+<Base
+  canonical={`https://stale.pierogis.live/tags/${tag}`}
+  title={`${tag} loafs`}
+  description={`loafs with tag ${tag}`}
+>
   <p>Posts tagged with {tag}</p>
   <LoafGrid {loafs} />
 </Base>

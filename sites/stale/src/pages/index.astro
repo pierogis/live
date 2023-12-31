@@ -9,7 +9,11 @@ const allLoafs = await getCollection("loafs");
 const description = "well beyond the pale";
 ---
 
-<Base title="stale" description={description}>
+<Base
+  canonical={`https://stale.pierogis.live`}
+  title="stale"
+  description={description}
+>
   <i>{description}</i>
   <LoafGrid loafs={allLoafs} />
 </Base>

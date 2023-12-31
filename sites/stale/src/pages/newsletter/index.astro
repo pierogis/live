@@ -7,7 +7,11 @@ const sampleEmail = generateEmailAddress();
 const description = "fresh loafs delivered right to your mailbox";
 ---
 
-<Base title="stale newsletter" description={description}>
+<Base
+  canonical={`https://stale.pierogis.live/newsletter`}
+  title="stale newsletter"
+  description={description}
+>
   <h1>{description}</h1>
   <form action="/api/newsletter" method="POST">
     <label>

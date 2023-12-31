@@ -12,7 +12,7 @@ interface Props {
 }
 
 const { loaf } = Astro.props;
-const { data } = loaf;
+const { slug, data } = loaf;
 
 const {
   title,
@@ -28,6 +28,7 @@ const {
 
 <html lang="en">
   <Base
+    canonical={`https://stale.pierogis.live/loafs/${slug}`}
     title={title}
     description={description}
     type="article"
