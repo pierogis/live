@@ -4,7 +4,7 @@
 </script>
 
 <ThemeProvider>
-	<Layout title="colors" github="https://github.com/pierogis/live/tree/main/sites/colors">
+	<Layout title="pierogis live" github="https://github.com/pierogis/live">
 		<slot />
 	</Layout>
 </ThemeProvider>

@@ -1,0 +1,30 @@
+{
+  "name": "ui",
+  "version": "0.0.0",
+  "description": "internal components for sites",
+  "private": true,
+  "scripts": {
+    "lint": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
+    "format": "prettier --write --ignore-path=../../.prettierignore ."
+  },
+  "devDependencies": {
+    "@pierogis/utensils": "workspace:*",
+    "eslint-config-custom": "workspace:*",
+    "prettier": "^3.1.0",
+    "prettier-plugin-svelte": "^3.1.2",
+    "svelte": "^4.2.7"
+  },
+  "type": "module",
+  "module": "index.ts",
+  "svelte": "index.ts",
+  "exports": {
+    ".": {
+      "svelte": "./components/index.ts",
+      "import": "./components/index.ts"
+    },
+    "./**/*.svelte": {
+      "svelte": "./**/*.svelte",
+      "import": "./**/*.svelte"
+    }
+  }
+}

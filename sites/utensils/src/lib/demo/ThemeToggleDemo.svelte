@@ -7,4 +7,5 @@
 	<ThemeToggle />
 	<span>can force light or dark mode</span>
 	<span>(and defaults to the os setting)</span>
+	<span>Nest (at any level) in a <code>ThemeProvider</code> for functionality</span>
 </Card>

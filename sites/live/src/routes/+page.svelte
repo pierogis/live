@@ -3,54 +3,28 @@
 
 	import { browser } from '$app/environment';
 
-	import { Card, CardsGrid, Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
-	import '@pierogis/utensils/styles/pierogis.css';
+	import { Card, CardsGrid, Interactable } from '@pierogis/utensils';
 
 	export let data;
 
 	$: browser && injectSpeedInsights();
 </script>
 
-<svelte:head>
-	<title>pierogis live</title>
-</svelte:head>
+<h3 class="tagline">{data.tagline}</h3>
 
-<Layout>
-	<Interactable slot="title">
-		<div class="link-box border inset">pierogis live</div>
-	</Interactable>
-
-	<h3 class="tagline">{data.tagline}</h3>
-
-	<CardsGrid>
-		{#each data.sites as site}
-			<Interactable clickable={false}>
-				<Card>
-					<Interactable>
-						<a class="border inset link-box" href={site.href}>{site.tagline}</a>
-					</Interactable>
-					<iframe title={site.title} src={site.href} />
-					<br />
-				</Card>
-			</Interactable>
-		{/each}
-	</CardsGrid>
-
-	<br />
-
-	<footer slot="footer">
-		<Interactable>
-			<a class="border inset link-box" href="https://careers.pierogis.live">careers</a>
+<CardsGrid>
+	{#each data.sites as site}
+		<Interactable clickable={false}>
+			<Card>
+				<Interactable>
+					<a class="border inset link-box" href={site.href}>{site.tagline}</a>
+				</Interactable>
+				<iframe title={site.title} src={site.href} />
+				<br />
+			</Card>
 		</Interactable>
-		<Interactable>
-			<a class="border inset link-box" href="https://github.com/pierogis/live">github</a>
-		</Interactable>
-		<Interactable>
-			<a class="border inset link-box" href="https://twitter.com/pierogis_live">@pierogis_live</a>
-		</Interactable>
-		<ThemeToggle />
-	</footer>
-</Layout>
+	{/each}
+</CardsGrid>
 
 <style>
 	.tagline {

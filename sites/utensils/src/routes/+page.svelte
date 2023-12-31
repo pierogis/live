@@ -29,6 +29,7 @@
 	let rotateImage = false;
 </script>
 
+<br />
 <Card>
 	<h3>hi!</h3>
 
@@ -129,7 +130,7 @@
 
 <br />
 
-<style global>
+<style>
 	h3 {
 		margin: 0;
 	}
