@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 </script>
 
 <ThemeProvider>
-	<Layout title="pierogis live" github="https://github.com/pierogis/live">
+	<Layout title="pierogis live" github="https://github.com/pierogis/live" inject={browser}>
 		<slot />
 
 		<Interactable slot="footer">

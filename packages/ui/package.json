@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@pierogis/utensils": "workspace:*",
+    "@vercel/speed-insights": "^1.0.2",
     "eslint-config-custom": "workspace:*",
     "prettier": "^3.1.0",
     "prettier-plugin-svelte": "^3.1.2",

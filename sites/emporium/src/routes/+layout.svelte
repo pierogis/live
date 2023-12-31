@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 
@@ -12,6 +14,7 @@
 	<Layout
 		title="karl's plate emporium"
 		github="https://github.com/pierogis/live/tree/main/sites/emporium"
+		inject={browser}
 	>
 		<nav slot="nav">
 			<Interactable>

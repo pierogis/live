@@ -1,13 +1,7 @@
 <script lang="ts">
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-
-	import { browser } from '$app/environment';
-
 	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let data;
-
-	$: browser && injectSpeedInsights();
 </script>
 
 <h3 class="tagline">{data.tagline}</h3>
