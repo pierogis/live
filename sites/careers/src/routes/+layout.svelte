@@ -7,9 +7,6 @@
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 
-	export let data;
-	$: ({ title } = data);
-
 	$: browser && injectSpeedInsights();
 </script>
 
@@ -21,7 +18,10 @@
 </svelte:head>
 
 <ThemeProvider>
-	<Layout {title} github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/careers' }}>
+	<Layout
+		title="careers"
+		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/careers' }}
+	>
 		<slot />
 	</Layout>
 </ThemeProvider>

@@ -8,9 +8,6 @@
 	import { Layout } from 'ui';
 
 	$: browser && injectSpeedInsights();
-
-	export let data;
-	$: ({ title } = data);
 </script>
 
 <svelte:head>
@@ -21,7 +18,10 @@
 </svelte:head>
 
 <ThemeProvider>
-	<Layout {title} github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/colors' }}>
+	<Layout
+		title="colors"
+		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/colors' }}
+	>
 		<slot />
 	</Layout>
 </ThemeProvider>

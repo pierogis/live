@@ -5,7 +5,6 @@ import DropZone from './DropZone.svelte';
 import Interactable from './Interactable.svelte';
 import ImageDisplay from './ImageDisplay.svelte';
 import Layout from './Layout.svelte';
-import SEO from './SEO.svelte';
 import Section from './Section.svelte';
 import Shine from './Shine.svelte';
 import ThemeProvider from './ThemeProvider.svelte';
@@ -20,7 +19,6 @@ export {
 	ImageDisplay,
 	Layout,
 	Section,
-	SEO,
 	Shine,
 	ThemeProvider,
 	ThemeToggle

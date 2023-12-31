@@ -8,7 +8,7 @@
 	import { page } from '$app/stores';
 
 	export let data;
-	$: ({ title, sessionUser } = data);
+	$: ({ sessionUser } = data);
 
 	$: browser && injectSpeedInsights();
 </script>
@@ -21,7 +21,10 @@
 </svelte:head>
 
 <ThemeProvider>
-	<Layout {title} github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/emporium' }}>
+	<Layout
+		title="karl's plate emporium"
+		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/emporium' }}
+	>
 		<nav slot="nav">
 			<Interactable>
 				<a href="/jurisdictions" class="link-box border inset">jurisdictions</a>

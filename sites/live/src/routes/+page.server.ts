@@ -1,4 +1,6 @@
-export const load = async () => {
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async () => {
 	const taglines = [
 		'live pierogis multimedia experiences',
 		'data driven restaurant',
@@ -19,7 +21,14 @@ export const load = async () => {
 		}
 	];
 
+	const canonical = 'https://pierogis.live';
+	const title = 'pierogis live';
+	const description = 'a basecamp for pierogis';
+
 	return {
+		canonical,
+		title,
+		description,
 		tagline,
 		sites
 	};
