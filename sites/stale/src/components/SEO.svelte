@@ -12,6 +12,8 @@
   export let twitter:
     | {
         card: "summary" | "summary_large_image";
+        domain: string;
+        url: string;
         image: string;
         alt: string;
         site: string;
@@ -24,13 +26,17 @@
 <link rel="canonical" href={canonical} />
 <meta name="description" content={description} />
 <meta name="robots" content="index, follow" />
-<meta name="og:title" content={title} />
-<meta name="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={type} />
 {#if og}
-  <meta name="og:image" content={og.image} />
-  <meta name="og:image:alt" content={og.alt} />
+  <meta property="og:image" content={og.image} />
+  <meta property="og:image:alt" content={og.alt} />
 {/if}
 {#if twitter}
+  <meta property="twitter:domain" content={twitter.domain} />
+  <meta property="twitter:url" content={canonical} />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:card" content={twitter.card} />

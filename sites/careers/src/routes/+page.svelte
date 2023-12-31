@@ -22,8 +22,9 @@
 
 <style>
 	.container {
-		height: 80vh;
+		margin: 2rem;
 
+		height: 100%;
 		display: flex;
 		flex-direction: column;
 
@@ -32,6 +33,8 @@
 
 	.links {
 		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
 
 		gap: 1rem;
 	}

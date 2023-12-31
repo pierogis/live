@@ -33,6 +33,8 @@ export function syncThemeAction(
 
 	if (matchPrefersDark.matches) {
 		osTheme.set(Theme.Dark);
+	} else {
+		osTheme.set(Theme.Light);
 	}
 
 	matchPrefersDark.addEventListener('change', (event) => {

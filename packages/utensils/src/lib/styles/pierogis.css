@@ -51,6 +51,11 @@
 	--text-color-t: rgba(255, 240, 220, 0);
 }
 
+body {
+	font-size: 16px;
+	margin: 0;
+}
+
 * {
 	border: 0;
 	outline: 0;
@@ -72,10 +77,6 @@ h4,
 h5,
 h6 {
 	font-family: 'Courier', monospace;
-}
-
-body {
-	font-size: 16px;
 }
 
 /* end default styles */
@@ -220,13 +221,6 @@ textarea {
 }
 
 
-/* end global css class/element style */
-
-/* global layout style */
-body>div {
-	position: relative;
-	min-height: 100vh;
-}
 
 header {
 	position: sticky;
@@ -334,3 +328,5 @@ h6 {
 ul {
 	margin: 0;
 }
+
+/* end global css class/element style */
