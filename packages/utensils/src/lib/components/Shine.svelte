@@ -53,9 +53,10 @@
 	 * opacity when not hovering (combines with alpha in the color)
 	 */
 	export let unhoverOpacity = 0.4;
+	export let borderRadius = '0px';
 </script>
 
-<div class="shine">
+<div class="shine" style:border-radius={borderRadius}>
 	<div
 		class="shine-x"
 		style:--length-x="{realLengthX}s"

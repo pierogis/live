@@ -1,18 +1,10 @@
 <script lang="ts">
-	import { writable, derived, type Writable } from 'svelte/store';
+	import { getContext } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
-	import { localStorageThemeKey, syncThemeAction, Theme } from './theme';
+	import { Theme, themeKey } from '../theme';
 
-	const storedTheme: Writable<Theme | null> = writable();
-	const osTheme: Writable<Theme> = writable(Theme.Light);
-
-	const theme = derived([storedTheme, osTheme], ([$storedTheme, $osTheme]) => {
-		if ($storedTheme) {
-			return $storedTheme;
-		} else {
-			return $osTheme;
-		}
-	});
+	export let storedTheme: Writable<Theme | null> = getContext(themeKey) || writable();
 
 	function toggleTheme(theme: Theme) {
 		$storedTheme = theme;
@@ -22,16 +14,6 @@
 		$storedTheme = null;
 	}
 </script>
-
-<svelte:head>
-	{@html `
-		<script>
-			document.documentElement.setAttribute('data-theme', localStorage.getItem('${localStorageThemeKey}'))
-		</script>
-	`}
-</svelte:head>
-
-<svelte:window use:syncThemeAction={{ storedTheme, osTheme, theme }} />
 
 <div class="holder">
 	<button

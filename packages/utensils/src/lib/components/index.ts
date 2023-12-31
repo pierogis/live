@@ -7,6 +7,7 @@ import ImageDisplay from './ImageDisplay.svelte';
 import Layout from './Layout.svelte';
 import Section from './Section.svelte';
 import Shine from './Shine.svelte';
+import ThemeProvider from './ThemeProvider.svelte';
 import ThemeToggle from './ThemeToggle.svelte';
 
 export {
@@ -19,5 +20,6 @@ export {
 	Layout,
 	Section,
 	Shine,
+	ThemeProvider,
 	ThemeToggle
 };

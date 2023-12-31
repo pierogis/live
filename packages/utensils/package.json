@@ -58,6 +58,10 @@
 			"svelte": "./dist/index.js"
 		},
 		"./styles/*": "./dist/styles/*",
+		"./theme": {
+			"types": "./dist/theme/index.d.ts",
+			"import": "./dist/theme/index.js"
+		},
 		"./utils/*": {
 			"types": "./dist/utils/*/index.d.ts",
 			"import": "./dist/utils/*/index.js"
