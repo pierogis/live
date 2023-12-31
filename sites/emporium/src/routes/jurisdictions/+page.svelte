@@ -4,14 +4,11 @@
 	import { PlateCard } from '$lib/components';
 
 	export let data;
+	$: ({ plates } = data);
 </script>
 
-<svelte:head>
-	<title>jurisdictions</title>
-</svelte:head>
-
 <CardsGrid>
-	{#each data.plates as plate}
+	{#each plates as plate}
 		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

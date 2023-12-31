@@ -8,6 +8,13 @@ import { schema } from '$lib/forms/review';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
+	const { plate } = await event.parent();
+	const canonical = `https://emporium.pierogis.live/plates/${event.params.id}/review`;
+	const title = `${plate.jurisdiction.name} plate (${plate.startYear || '?'}-${
+		plate.endYear || '?'
+	}) review`;
+	const description = title;
+
 	if (event.locals.sessionUser === null) {
 		redirect(302, `/login`);
 	}
@@ -24,7 +31,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const form = await superValidate(review, schema);
 
-	return { form };
+	return { canonical, title, description, form };
 };
 
 export const actions: Actions = {

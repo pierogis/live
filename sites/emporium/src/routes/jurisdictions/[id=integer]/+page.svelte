@@ -4,18 +4,15 @@
 	import { PlateCard, ScoreSheet } from '$lib/components';
 
 	export let data;
+	$: ({ categories, platesInfo } = data);
 </script>
-
-<svelte:head>
-	<title>{data.jurisdiction.name}</title>
-</svelte:head>
 
 <div class="top">
 	<CardsGrid>
-		{#each data.platesInfo as info}
+		{#each platesInfo as info}
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
-					categories={data.categories}
+					{categories}
 					userScores={info.userScores}
 					editorialScores={info.editorialScores}
 					graphScores={info.allScores}

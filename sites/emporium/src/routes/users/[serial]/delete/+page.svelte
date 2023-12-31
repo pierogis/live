@@ -1,24 +1,21 @@
 <script lang="ts">
-	import { userIdInputName } from '$lib/forms/user';
-
 	import { Card, Interactable } from '@pierogis/utensils';
 
+	import { userIdInputName } from '$lib/forms/user';
+
 	export let data;
+	$: ({ isUser, isAdmin, user } = data);
 
 	export let form;
 </script>
 
-<svelte:head>
-	<title>{'delete user: ' + data.user.serial.toUpperCase()}</title>
-</svelte:head>
-
-{#if data.isUser || data.isAdmin}
+{#if isUser || isAdmin}
 	<Card>
 		<span>Are you sure you want to delete this account?</span>
-		<b>{data.user.serial}</b>
+		<b>{user.serial}</b>
 		<div class="buttons">
 			<Interactable>
-				<a class="link-box border inset no-select" href={`/users/${data.user.serial}`}>cancel</a>
+				<a class="link-box border inset no-select" href={`/users/${user.serial}`}>cancel</a>
 			</Interactable>
 
 			<Interactable>
@@ -35,7 +32,7 @@
 {/if}
 
 <form id="delete" method="post">
-	<input hidden name={userIdInputName} value={data.user.id} />
+	<input hidden name={userIdInputName} value={user.id} />
 </form>
 
 <style>

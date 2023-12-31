@@ -5,17 +5,23 @@
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 	import './style.css';
+	import { page } from '$app/stores';
 
 	export let data;
-	$: ({ sessionUser } = data);
+	$: ({ title, sessionUser } = data);
+
 	$: browser && injectSpeedInsights();
 </script>
 
+<svelte:head>
+	<title>{$page.data.title}</title>
+	<link rel="canonical" href={$page.data.canonical} />
+	<meta name="description" content={$page.data.description} />
+	<meta name="robots" content="index, follow" />
+</svelte:head>
+
 <ThemeProvider>
-	<Layout
-		title="karl's plate emporium"
-		github="https://github.com/pierogis/live/tree/main/sites/emporium"
-	>
+	<Layout {title} github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/emporium' }}>
 		<nav slot="nav">
 			<Interactable>
 				<a href="/jurisdictions" class="link-box border inset">jurisdictions</a>

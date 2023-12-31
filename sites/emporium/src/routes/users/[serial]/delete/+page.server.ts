@@ -5,12 +5,18 @@ import { deleteUser } from '$lib/server/database/users';
 import { userIdInputName } from '$lib/forms/user';
 import { protectUserOrAdmin } from '$lib/helpers';
 
-export const load = async ({ locals, parent }) => {
-	const { user } = await parent();
+import type { PageServerLoad } from './$types.js';
 
-	await protectUserOrAdmin(locals.sessionUser, user);
+export const load: PageServerLoad = async (event) => {
+	const { user } = await event.parent();
 
-	return { user };
+	await protectUserOrAdmin(event.locals.sessionUser, user);
+
+	const canonical = `https://emporium.pierogis.live/users/${event.params.serial}/delete`;
+	const title = `delete user: ${user.serial.toUpperCase()}`;
+	const description = `delete user: ${user.serial.toUpperCase()} of the emporium`;
+
+	return { canonical, title, description, user };
 };
 
 export const actions = {

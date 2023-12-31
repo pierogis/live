@@ -4,10 +4,6 @@
 	import questions from './_faq.json';
 </script>
 
-<svelte:head>
-	<title>faq</title>
-</svelte:head>
-
 <div class="faqs">
 	{#each questions as question}
 		<div>

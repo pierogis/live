@@ -11,6 +11,10 @@ declare namespace App {
 	interface Locals {
 		sessionUser: SessionUser | null;
 	}
-	// interface PageData {}
+	interface PageData {
+		title: string;
+		canonical: string;
+		description: string;
+	}
 	// interface Platform {}
 }

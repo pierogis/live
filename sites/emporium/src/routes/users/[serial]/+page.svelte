@@ -12,49 +12,46 @@
 	import { ReviewCard } from '$lib/components';
 
 	export let data;
+	$: ({ user, isUser, isAdmin, categories, reviewsScores } = data);
 
-	$: originalSerial = data.user.serial;
-	$: originalEmail = data.user.email;
+	$: originalSerial = user.serial;
+	$: originalEmail = user.email;
 </script>
 
-<svelte:head>
-	<title>{'user: ' + data.user.serial.toUpperCase()}</title>
-</svelte:head>
-
-{#if !data.isUser}
+{#if !isUser}
 	<Card>
-		{#if data.isAdmin}
-			<span>#{data.user.id}</span>
+		{#if isAdmin}
+			<span>#{user.id}</span>
 		{/if}
-		<span class="link-box" style:cursor="auto">{data.user.serial}</span>
+		<span class="link-box" style:cursor="auto">{user.serial}</span>
 	</Card>
 {/if}
 
 <br />
 
-{#if data.isUser || data.isAdmin}
+{#if isUser || isAdmin}
 	<form method="post">
 		<Card>
-			{#if data.isAdmin}
-				<span>#{data.user.id}</span>
+			{#if isAdmin}
+				<span>#{user.id}</span>
 			{/if}
 			<input
 				class="serial border inset"
 				type="text"
 				name="serial"
-				bind:value={data.user.serial}
+				bind:value={user.serial}
 				placeholder={originalSerial}
 				maxlength="7"
 				autocomplete="off"
 				autocapitalize="characters"
 			/>
-			{#if data.isUser}
+			{#if isUser}
 				<input
 					class="email border inset"
 					type="text"
 					name="email"
 					disabled
-					bind:value={data.user.email}
+					bind:value={user.email}
 					placeholder={originalEmail}
 				/>
 			{/if}
@@ -63,19 +60,16 @@
 					<button class="good border inset no-select">update</button>
 				</Interactable>
 
-				{#if data.isUser}
+				{#if isUser}
 					<Interactable>
 						<!-- svelte-ignore a11y-accesskey -->
 						<button class="border inset no-select" form="logout" accesskey="l">logout</button>
 					</Interactable>
 				{/if}
 
-				{#if !data.user.isAdmin}
+				{#if !user.isAdmin}
 					<Interactable>
-						<a
-							class="link-box bad border inset no-select"
-							href={`/users/${data.user.serial}/delete`}
-						>
+						<a class="link-box bad border inset no-select" href={`/users/${user.serial}/delete`}>
 							delete
 						</a>
 					</Interactable>
@@ -91,13 +85,13 @@
 
 <Section column>
 	<h3 slot="title">reviews</h3>
-	{#if data.user.reviews.length > 0}
+	{#if user.reviews.length > 0}
 		<CardsGrid>
-			{#each data.user.reviews as review}
+			{#each user.reviews as review}
 				<ReviewCard
-					categories={data.categories}
-					review={writable({ ...review, user: data.user })}
-					scores={data.reviewsScores[review.id]}
+					{categories}
+					review={writable({ ...review, user: user })}
+					scores={reviewsScores[review.id]}
 				>
 					<a href="/plates/{review.modelId}">
 						<ImageDisplay

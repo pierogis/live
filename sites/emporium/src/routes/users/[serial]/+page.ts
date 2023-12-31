@@ -29,5 +29,9 @@ export const load = async (event) => {
 
 	const form = await superValidate({ serial: user.serial }, userSchema);
 
-	return { user, form, reviewsScores, categories };
+	const canonical = `https://emporium.pierogis.live/users/${event.params.serial}`;
+	const title = `user: ${user.serial.toUpperCase()}`;
+	const description = `user: ${user.serial.toUpperCase()} of the emporium`;
+
+	return { canonical, title, description, user, form, reviewsScores, categories };
 };

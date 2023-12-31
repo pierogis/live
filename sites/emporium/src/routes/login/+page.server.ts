@@ -11,13 +11,20 @@ import { setSessionCookie } from '$lib/server/session';
 import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
 
 import { FlowCode } from './_flow';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
-export const load = async () => {
+export const load: PageServerLoad = async () => {
+	const canonical = `https://emporium.pierogis.live/login`;
+	const title = `login`;
+	const description = `enter the emporium`;
+
 	const samplePhrase = generatePhrase();
 	const sampleEmail = generateEmailAddress();
 
 	return {
+		canonical,
+		title,
+		description,
 		samplePhrase,
 		sampleEmail
 	};

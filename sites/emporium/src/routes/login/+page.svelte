@@ -6,6 +6,7 @@
 	import { Card, Interactable } from '@pierogis/utensils';
 
 	export let data;
+	$: ({ sampleEmail, samplePhrase } = data);
 
 	export let form;
 
@@ -19,10 +20,6 @@
 	const loginFormId = 'login';
 	$: actionName = form?.generated ? 'login' : 'generate';
 </script>
-
-<svelte:head>
-	<title>login</title>
-</svelte:head>
 
 <form id={loginFormId} action="/login?/{actionName}" method="POST" />
 <Card>
@@ -38,7 +35,7 @@
 			type="email"
 			name="email"
 			form={loginFormId}
-			placeholder={data.sampleEmail}
+			placeholder={sampleEmail}
 			bind:value={email}
 		/>
 	</label>
@@ -54,7 +51,7 @@
 				name="passphrase"
 				id="passphrase"
 				form={loginFormId}
-				placeholder={data.samplePhrase}
+				placeholder={samplePhrase}
 				bind:value={passphrase}
 			/>
 		</label>

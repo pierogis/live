@@ -15,5 +15,10 @@ export const load = async ({ parent, fetch, data }) => {
 
 		return { plate, userScores, editorialScores, allScores };
 	});
-	return { platesInfo };
+
+	const canonical = `https://emporium.pierogis.live/plates`;
+	const title = `plates`;
+	const description = `plates in the emporium`;
+
+	return { canonical, title, description, platesInfo };
 };

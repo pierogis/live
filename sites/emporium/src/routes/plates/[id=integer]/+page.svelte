@@ -22,12 +22,6 @@
 	$: allReviewsStores = allReviews.map((review) => review);
 </script>
 
-<svelte:head>
-	<title>
-		{plate.jurisdiction.name} plate ({plate.startYear || '?'}-{plate.endYear || '?'})
-	</title>
-</svelte:head>
-
 <Section>
 	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
 

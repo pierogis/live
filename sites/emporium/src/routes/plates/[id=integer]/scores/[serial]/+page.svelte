@@ -9,7 +9,9 @@
 
 	export let data;
 
-	$: scoreSet = data.scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
+	$: ({ categories, scores, plate, isUser } = data);
+
+	$: scoreSet = scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
 		previous[score.categoryId] = score.value;
 		return previous;
 	}, {});
@@ -17,20 +19,13 @@
 	const scoreFormId = 'scoreForm';
 </script>
 
-<svelte:head>
-	<title>
-		user: {data.serial.toUpperCase()}
-		{data.plate.jurisdiction.abbreviation} plate ({data.plate.modelId}) scores
-	</title>
-</svelte:head>
-
-<PlateCard plate={data.plate} small={true} />
+<PlateCard {plate} small={true} />
 
 <div class="grid">
-	{#each data.categories as category}
+	{#each categories as category}
 		<Card>
 			<span><u>{category.name}</u> {category.symbol}</span>
-			{#if data.isUser}
+			{#if isUser}
 				<form hidden method="post" id={scoreFormId} use:enhance />
 
 				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />

@@ -7,11 +7,21 @@ import { protectAdmin } from '$lib/helpers';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
+	const { plate } = await event.parent();
+	const canonical = `https://emporium.pierogis.live/plates/${event.params.id}/edit`;
+	const title = `edit ${plate.jurisdiction.name} plate (${plate.startYear || '?'}-${
+		plate.endYear || '?'
+	})`;
+	const description = title;
+
 	const jurisdictions = await getJurisdictions({});
 
 	await protectAdmin(event.locals.sessionUser);
 
 	return {
+		canonical,
+		title,
+		description,
 		jurisdictions
 	};
 };

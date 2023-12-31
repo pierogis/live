@@ -1,9 +1,11 @@
 import { storeScores } from '$lib/api/scores';
 import { storeReviews } from '$lib/api/reviews';
 
-export const load = async ({ parent, fetch, data }) => {
-	const { plate, categories } = await parent();
-	const { sessionUser } = data;
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async (event) => {
+	const { plate, categories } = await event.parent();
+	const { sessionUser } = event.data;
 	const reviewStores = storeReviews(plate.model.reviews, plate.modelId, sessionUser?.id);
 
 	const { userReview, editorialReview, allReviews } = reviewStores;
@@ -18,8 +20,17 @@ export const load = async ({ parent, fetch, data }) => {
 
 	const { userScores, editorialScores, allScores } = scoreStores;
 
+	const canonical = `https://emporium.pierogis.live/plates/${event.params.id}`;
+	const title = `${plate.jurisdiction.name} plate (${plate.startYear || '?'}-${
+		plate.endYear || '?'
+	})`;
+	const description = `view ${title}`;
+
 	return {
-		reviewForm: data.reviewForm,
+		canonical,
+		title,
+		description,
+		reviewForm: event.data.reviewForm,
 		userReview,
 		editorialReview,
 		allReviews,

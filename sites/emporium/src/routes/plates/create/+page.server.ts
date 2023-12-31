@@ -5,12 +5,21 @@ import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
 import { helpCreatePlate } from '$lib/server/database/plates';
 
-export const load = async (event) => {
+import type { PageServerLoad } from './$types.js';
+
+export const load: PageServerLoad = async (event) => {
+	const canonical = `https://emporium.pierogis.live/plates/create`;
+	const title = `create plate`;
+	const description = `register a plate for the emporium`;
+
 	await protectAdmin(event.locals.sessionUser);
 
 	const jurisdictions = await getJurisdictions({});
 
 	return {
+		canonical,
+		title,
+		description,
 		jurisdictions
 	};
 };
