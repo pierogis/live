@@ -22,11 +22,11 @@
 			</Interactable>
 
 			<Interactable>
-				<a class="border inset link-box" href="/plates/faq">faq</a>
+				<a href="/plates/faq" class="border inset link-box">faq</a>
 			</Interactable>
 			{#if sessionUser?.isAdmin}
 				<Interactable>
-					<a href="/plates/create"><h4 class="link-box border inset good">create</h4></a>
+					<a href="/plates/create" class="link-box border inset good">create</a>
 				</Interactable>
 			{/if}
 

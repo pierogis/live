@@ -40,13 +40,14 @@ importers:
         version: 4.9.5
 
   packages/ui:
+    dependencies:
+      '@vercel/speed-insights':
+        specifier: ^1.0.2
+        version: 1.0.2
     devDependencies:
       '@pierogis/utensils':
         specifier: workspace:*
         version: link:../utensils
-      '@vercel/speed-insights':
-        specifier: ^1.0.2
-        version: 1.0.2
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom
@@ -2591,7 +2592,7 @@ packages:
   /@vercel/speed-insights@1.0.2:
     resolution: {integrity: sha512-y5HWeB6RmlyVYxJAMrjiDEz8qAIy2cit0fhBq+MD78WaUwQvuBnQlX4+5MuwVTWi46bV3klaRMq83u9zUy1KOg==}
     requiresBuild: true
-    dev: true
+    dev: false
 
   /@volar/kit@1.10.10(typescript@5.3.3):
     resolution: {integrity: sha512-V2SyUPCPUhueqH8j5t48LJ0QsjExGSXzTv/XOdkUHV7hJ/ekyRGFqKxcfBtMq/nK6Tgu2G1ba+6u0d7e6wKcQw==}
