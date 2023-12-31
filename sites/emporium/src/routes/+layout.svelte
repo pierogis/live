@@ -1,20 +1,20 @@
 <script lang="ts">
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import { browser } from '$app/environment';
 
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
-
 	import './style.css';
 
 	export let data;
 	$: ({ sessionUser } = data);
+	$: browser && injectSpeedInsights();
 </script>
 
 <ThemeProvider>
 	<Layout
 		title="karl's plate emporium"
 		github="https://github.com/pierogis/live/tree/main/sites/emporium"
-		inject={browser}
 	>
 		<nav slot="nav">
 			<Interactable>

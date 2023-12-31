@@ -1,15 +1,9 @@
 <script lang="ts">
-  import { injectSpeedInsights } from "@vercel/speed-insights/sveltekit";
-
   import { Interactable, Layout, ThemeToggle } from "@pierogis/utensils";
   import "@pierogis/utensils/styles/pierogis.css";
 
   export let title: string;
   export let github: string;
-
-  export let inject: boolean;
-
-  $: inject && injectSpeedInsights();
 </script>
 
 <svelte:head>

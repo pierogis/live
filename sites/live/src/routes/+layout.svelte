@@ -1,11 +1,15 @@
 <script lang="ts">
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import { browser } from '$app/environment';
+
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
+
+	$: browser && injectSpeedInsights();
 </script>
 
 <ThemeProvider>
-	<Layout title="pierogis live" github="https://github.com/pierogis/live" inject={browser}>
+	<Layout title="pierogis live" github="https://github.com/pierogis/live">
 		<slot />
 
 		<Interactable slot="footer">
