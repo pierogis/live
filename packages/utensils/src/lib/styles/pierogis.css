@@ -276,14 +276,22 @@ footer {
 	border-top: 2px dashed var(--text-color-st);
 }
 
+img {
+	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
 blockquote {
 	background-color: var(--secondary-color-st);
 	padding: 1em;
+	margin: 0 5%;
 	border-radius: 8px;
 	width: fit-content;
 	font-family: Courier, monospace;
 }
-
 
 article {
 	display: flex;
@@ -308,9 +316,6 @@ article a {
 
 article img {
 	border-radius: 16px;
-	object-fit: contain;
-	max-width: 100%;
-	max-height: 100%;
 }
 
 article * {

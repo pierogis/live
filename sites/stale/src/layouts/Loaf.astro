@@ -67,10 +67,23 @@ const {
       <picture>
         <source
           srcset={image[300].src}
+          width={image[300].width}
+          height={image[300].height}
           media="(orientation: portrait), (max-width: 768px)"
         />
-        <source srcset={image[600].src} media="(max-width: 1500px)" />
-        <img src={image[1200].src} {alt} class="border" />
+        <source
+          srcset={image[600].src}
+          width={image[600].width}
+          height={image[600].height}
+          media="(max-width: 1500px)"
+        />
+        <img
+          src={image[1200].src}
+          width={image[1200].width}
+          height={image[1200].height}
+          {alt}
+          class="border"
+        />
       </picture>
 
       <div class="content">
@@ -93,7 +106,6 @@ const {
   <style>
     img {
       image-rendering: pixelated;
-      width: 100%;
     }
 
     .lead {
@@ -150,5 +162,6 @@ const {
       text-decoration: underline;
     }
   </style>
+
 
 </html>
