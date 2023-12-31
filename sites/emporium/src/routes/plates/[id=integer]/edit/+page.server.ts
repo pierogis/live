@@ -1,12 +1,12 @@
-import { error, redirect } from '@sveltejs/kit';
-
-import type { Actions } from './$types';
+import { fail, redirect } from '@sveltejs/kit';
 
 import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
 import { getJurisdictions } from '$lib/server/database/jurisdictions';
 import { protectAdmin } from '$lib/helpers';
 
-export const load = async (event) => {
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async (event) => {
 	const jurisdictions = await getJurisdictions({});
 
 	await protectAdmin(event.locals.sessionUser);
@@ -35,7 +35,7 @@ export const actions: Actions = {
 
 			redirect(303, `/plates/${params.id}/edit`);
 		} else {
-			return error(403, { message: `not admin` });
+			return fail(403, { message: `not admin` });
 		}
 	},
 	delete: async ({ locals, params }) => {
@@ -45,7 +45,7 @@ export const actions: Actions = {
 
 			redirect(303, `/plates`);
 		} else {
-			error(403, 'not admin');
+			return fail(403, { message: 'not admin' });
 		}
 	}
 };

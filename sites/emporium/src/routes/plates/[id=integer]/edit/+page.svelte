@@ -14,8 +14,8 @@
 	<PlateTemplate jurisdictions={data.jurisdictions} plate={data.plate} />
 </form>
 
-{#if form?.body.message}
+{#if form?.message}
 	<div class="border inset no-select bad alert">
-		{form?.body.message}
+		{form.message}
 	</div>
 {/if}

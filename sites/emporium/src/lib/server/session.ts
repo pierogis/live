@@ -23,7 +23,7 @@ export async function setSessionCookie(
 }
 
 export function expireSessionCookie(cookies: Cookies): void {
-	return cookies.delete(SESSION_NAME);
+	return cookies.delete(SESSION_NAME, { path: '/' });
 }
 
 export async function decryptSessionCookie<T>(cookie: string): Promise<T> {

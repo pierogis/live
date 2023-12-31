@@ -5,7 +5,9 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
 import { schema } from '$lib/forms/review';
 
-export const load = async (event) => {
+import type { Actions, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async (event) => {
 	if (event.locals.sessionUser === null) {
 		redirect(302, `/login`);
 	}
@@ -25,7 +27,7 @@ export const load = async (event) => {
 	return { form };
 };
 
-export const actions = {
+export const actions: Actions = {
 	update: async (event) => {
 		if (event.locals.sessionUser !== null) {
 			const modelId = parseInt(event.params.id);

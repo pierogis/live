@@ -9,6 +9,7 @@
 
 <br />
 
-<Section title="review" column>
+<Section column>
+	<h3 slot="title">review</h3>
 	<ReviewForm plate={data.plate} data={data.form} />
 </Section>

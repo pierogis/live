@@ -42,7 +42,8 @@
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="user review" column rowGap={'0.5rem'}>
+<Section column rowGap={'0.5rem'}>
+	<h3 slot="title">user review</h3>
 	{#if sessionUser !== null}
 		<ScoreSheet {categories} {userScores} {scoreUrl} />
 		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
@@ -56,7 +57,8 @@
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="reviews" column>
+<Section column>
+	<h3 slot="title">reviews</h3>
 	<CardsGrid>
 		{#each allReviewsStores as review}
 			<ReviewCard {categories} {review} scores={allScores} />

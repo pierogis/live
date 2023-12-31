@@ -89,7 +89,8 @@
 
 <Divider horizontal={true} size={'0.4rem'} />
 
-<Section title="reviews" column>
+<Section column>
+	<h3 slot="title">reviews</h3>
 	{#if data.user.reviews.length > 0}
 		<CardsGrid>
 			{#each data.user.reviews as review}

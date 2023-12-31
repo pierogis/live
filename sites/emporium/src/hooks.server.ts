@@ -33,7 +33,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (deleteCookie) {
-		/* @migration task: add path argument */ event.cookies.delete(SESSION_NAME);
+		event.cookies.delete(SESSION_NAME, { path: '/' });
 	}
 
 	return await resolve(event);
