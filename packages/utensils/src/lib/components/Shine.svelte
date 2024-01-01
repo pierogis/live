@@ -72,6 +72,7 @@
 
 <style>
 	.shine {
+		display: flex;
 		overflow: hidden;
 		position: relative;
 	}
