@@ -19,6 +19,7 @@
 	<button
 		class="light"
 		class:stored={$storedTheme == Theme.Light}
+		aria-label="light"
 		on:click={() => {
 			if ($storedTheme == Theme.Light) {
 				removeTheme();
@@ -30,6 +31,7 @@
 	<button
 		class="dark"
 		class:stored={$storedTheme == Theme.Dark}
+		aria-label="dark"
 		on:click={() => {
 			if ($storedTheme == Theme.Dark) {
 				removeTheme();

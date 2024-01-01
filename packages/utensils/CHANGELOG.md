@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 0.8.2
+
+### Patch Changes
+
+- fix img cls/responsive issues
+
 ## 0.8.1
 
 ### Patch Changes

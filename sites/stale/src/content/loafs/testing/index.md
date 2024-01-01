@@ -8,11 +8,11 @@ author:
     name: karl
     twitterHandle: pierogis_live
 image:
-    300x300: './300x300.png'
-    600x300: './600x300.png'
-    1200x600: './1200x600.png'
-    og: './og.png'
-    twitter: './twitter.png'
+    300x300: './300x300.webp'
+    600x300: './600x300.webp'
+    1200x600: './1200x600.webp'
+    og: './og.webp'
+    twitter: './twitter.webp'
 alt: 'mountain'
 tags: ["test"]
 ---
