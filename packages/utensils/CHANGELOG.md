@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 0.8.1
+
+### Patch Changes
+
+- 6ff3973: styles
+
 ## 0.8.0
 
 ### Minor Changes
