@@ -3,8 +3,13 @@ import { fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 
+import {
+	generatePhrase,
+	generateEmailAddress,
+	generateSerial
+} from '@pierogis/utensils/utils/words';
+
 import { createUser, getUser } from '$lib/server/database/users';
-import { generatePhrase, generateEmailAddress, generateSerial } from '$lib/server/words';
 import { createPassphraseEmail } from '$lib/server/email';
 import { requestMailerSend } from '$lib/server/mailersend';
 import { setSessionCookie } from '$lib/server/session';

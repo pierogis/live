@@ -1,17 +1,17 @@
 {
-	"compilerOptions": {
-		"verbatimModuleSyntax": true,
-		"isolatedModules": true,
-		"lib": ["esnext", "DOM", "DOM.Iterable"],
-		"moduleResolution": "bundler",
-		"module": "esnext",
-		"noEmit": true,
-		"target": "esnext"
-	},
-	"include": [
-		"../components/**/*.js",
-		"../components/**/*.ts",
-		"../components/**/*.svelte"
-	],
-	"exclude": ["../node_modules/**"]
+  "compilerOptions": {
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    "target": "esnext"
+  },
+  "include": [
+    "../components/**/*.js",
+    "../components/**/*.ts",
+    "../components/**/*.svelte"
+  ],
+  "exclude": ["../node_modules/**"]
 }
