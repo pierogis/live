@@ -2,20 +2,7 @@
 	"name": "emporium",
 	"version": "0.0.1",
 	"description": "a place for plates",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/pierogis/emporium.git"
-	},
-	"license": "AGPL-3.0",
-	"bugs": {
-		"url": "https://github.com/pierogis/emporium/issues"
-	},
-	"homepage": "https://emporium.pierogis.live",
-	"keywords": [
-		"svelte",
-		"plates",
-		"website"
-	],
+	"private": true,
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
