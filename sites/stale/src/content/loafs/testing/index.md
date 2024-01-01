@@ -8,9 +8,9 @@ author:
     name: karl
     twitterHandle: pierogis_live
 image:
-    300: './300.png'
-    600: './600.png'
-    1200: './1200.png'
+    300x300: './300x300.png'
+    600x300: './600x300.png'
+    1200x600: './1200x600.png'
     og: './og.png'
     twitter: './twitter.png'
 alt: 'mountain'

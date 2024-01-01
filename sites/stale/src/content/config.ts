@@ -26,24 +26,24 @@ const loafsCollection = defineCollection({
           .refine((img) => img.width == 1200, {
             message: "twitter image must be 1200 pixels wide",
           })
-          .refine((img) => img.height == 1200, {
-            message: "twitter image must be 1200 pixels tall",
+          .refine((img) => img.height == 600, {
+            message: "twitter image must be 600 pixels tall",
           }),
-        [1200]: image()
+        ["1200x600"]: image()
           .refine((img) => img.width == 1200, {
             message: "1200w image must be 1200 pixels wide",
           })
           .refine((img) => img.height == 600, {
             message: "1200w image must be 600 pixels tall",
           }),
-        [600]: image()
+        ["600x300"]: image()
           .refine((img) => img.width == 600, {
             message: "600w image must be 600 pixels wide",
           })
           .refine((img) => img.height == 300, {
             message: "600w image must be 300 pixels tall",
           }),
-        [300]: image()
+        ["300x300"]: image()
           .refine((img) => img.width == 300, {
             message: "300w image must be 300 pixels wide",
           })

@@ -8,6 +8,7 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "check": "astro check",
     "astro": "astro"
   },
   "type": "module",
@@ -15,6 +16,7 @@
     "@astrojs/check": "^0.3.4",
     "@astrojs/mdx": "^2.0.3",
     "@astrojs/rss": "^4.0.1",
+    "@astrojs/sitemap": "^3.0.4",
     "@astrojs/svelte": "^5.0.3",
     "@astrojs/vercel": "^6.1.1",
     "@pierogis/utensils": "workspace:*",

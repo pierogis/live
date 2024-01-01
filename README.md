@@ -5,13 +5,16 @@ all things related to [pierogis.live](https://pierogis.live)
 ## sites and packages
 
 - sites
-  - [`utensils`](https://utensils.pierogis.live): utensils demo app
+  - [`careers`](https://careers.pierogis.live): start working
+  - [`colors`](https://colors.pierogis.live): palettes
+  - [`emporium`](https://emporium.pierogis.live): plates
   - [`live`](https://pierogis.live): base camp
   - [`stale`](https://stale.pierogis.live): blog
+  - [`utensils`](https://utensils.pierogis.live): table manners
 - packages
   - `@pierogis/utensils`: component library
-- misc
   - `eslint-config-custom`: `eslint` configurations
+  - `ui`: component recipes
 
 ## release
 

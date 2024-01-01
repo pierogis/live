@@ -34,7 +34,7 @@ const {
       alt: alt,
     }}
     twitter={{
-      card: "summary",
+      card: "summary_large_image",
       image: image.twitter.src,
       alt: alt,
       handle: author.twitterHandle,
@@ -47,7 +47,17 @@ const {
         </h1>
         <i>{subtitle}</i>
         <div class="metadata">
-          <p class="author">{author.name}</p>
+          <p class="author">
+            {
+              author.twitterHandle ? (
+                <a href={`https://twitter.com/${author.twitterHandle}`}>
+                  {author.name}
+                </a>
+              ) : (
+                author.name
+              )
+            }
+          </p>
           <p class="date">
             {publishedDate.toISOString().slice(0, 10)}
           </p>
@@ -64,21 +74,21 @@ const {
 
       <picture>
         <source
-          srcset={image[300].src}
-          width={image[300].width}
-          height={image[300].height}
+          srcset={image["300x300"].src}
+          width={image["300x300"].width}
+          height={image["300x300"].height}
           media="(orientation: portrait), (max-width: 768px)"
         />
         <source
-          srcset={image[600].src}
-          width={image[600].width}
-          height={image[600].height}
+          srcset={image["600x300"].src}
+          width={image["600x300"].width}
+          height={image["600x300"].height}
           media="(max-width: 1500px)"
         />
         <img
-          src={image[1200].src}
-          width={image[1200].width}
-          height={image[1200].height}
+          src={image["1200x600"].src}
+          width={image["1200x600"].width}
+          height={image["1200x600"].height}
           {alt}
           class="border"
         />
@@ -91,9 +101,9 @@ const {
         {
           tags.map((tag) => {
             return (
-              <a href={`/tags/${tag}`}>
-                <i>#{tag}</i>
-              </a>
+              <i>
+                <a href={`/tags/${tag}`}>#{tag}</a>
+              </i>
             );
           })
         }

@@ -13,7 +13,6 @@
     | {
         card: "summary" | "summary_large_image";
         domain: string;
-        url: string;
         image: string;
         alt: string;
         site: string;

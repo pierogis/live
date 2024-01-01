@@ -1,0 +1,5 @@
+---
+"@pierogis/utensils": patch
+---
+
+styles

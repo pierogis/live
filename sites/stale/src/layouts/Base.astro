@@ -68,8 +68,9 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <SEO
-      canonical={canonical}
+      {canonical}
       {title}
       {description}
       {type}
@@ -78,7 +79,7 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
         alt: og.alt,
       }}
       twitter={{
-        card: "summary_large_image",
+        card: twitter.card,
         domain: "stale.pierogis.live",
         site: "@pierogis_live",
         handle: twitter?.handle ? "@" + twitter.handle : undefined,
@@ -133,9 +134,9 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
             <a href="/about" class="border inset link-box">about</a>
           </Interactable>
 
-          <Interactable>
+          <!-- <Interactable>
             <a href="/newsletter" class="border inset link-box">newsletter</a>
-          </Interactable>
+          </Interactable> -->
         </nav>
 
         <slot />

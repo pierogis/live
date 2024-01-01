@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["careers", "colors", "live", "stale", "utensils"]
+  "ignore": ["careers", "colors", "emporium", "live", "stale", "utensils"]
 }
