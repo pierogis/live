@@ -51,16 +51,16 @@
 	.holder {
 		display: flex;
 		place-items: center;
-		gap: 4px;
-		padding: 2px;
+		gap: 8px;
+		padding: 8px;
 		border-radius: 12px;
 
 		background-color: var(--input-color);
 		border: solid var(--secondary-color) 2px;
 	}
 	button {
-		height: 22px;
-		width: 22px;
+		height: 28px;
+		width: 28px;
 
 		border-radius: 50%;
 	}

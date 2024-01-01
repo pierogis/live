@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 0.8.3
+
+### Patch Changes
+
+- fix shine overflow
+
 ## 0.8.2
 
 ### Patch Changes
