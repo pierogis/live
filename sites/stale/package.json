@@ -20,6 +20,7 @@
     "@astrojs/svelte": "^5.0.3",
     "@astrojs/vercel": "^6.1.1",
     "@pierogis/utensils": "workspace:*",
+    "@vercel/speed-insights": "^1.0.2",
     "astro": "^4.0.8",
     "sharp": "^0.33.1",
     "sharp-ico": "^0.1.5",

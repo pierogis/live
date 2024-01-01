@@ -11,9 +11,5 @@ export default defineConfig({
   output: "hybrid",
   integrations: [svelte(), mdx(), sitemap()],
   site: "https://stale.pierogis.live",
-  adapter: vercel({
-    speedInsights: {
-      enabled: true,
-    },
-  }),
+  adapter: vercel(),
 });
