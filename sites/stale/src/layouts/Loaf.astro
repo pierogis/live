@@ -21,11 +21,18 @@ const {
   alt,
   tags,
 } = data;
+
+const canonical = `https://stale.pierogis.live/loafs/${slug}`;
+
+const shareUrl = new URL("/intent/tweet", "https://twitter.com");
+shareUrl.searchParams.append("original_referer", Astro.url.origin);
+shareUrl.searchParams.append("text", title);
+shareUrl.searchParams.append("url", canonical);
 ---
 
 <html lang="en">
   <Base
-    canonical={`https://stale.pierogis.live/loafs/${slug}`}
+    canonical={canonical}
     title={title}
     description={description}
     type="article"
@@ -108,6 +115,7 @@ const {
           })
         }
       </div>
+      <a href={shareUrl.toString()} target="_blank">share</a>
     </article>
   </Base>
 
@@ -142,7 +150,7 @@ const {
     }
 
     .content {
-      margin: 0 5em;
+      max-width: max(700px, 70%);
       display: flex;
       flex-direction: column;
     }
