@@ -27,5 +27,8 @@
 		align-content: center;
 		justify-content: center;
 		flex-wrap: wrap;
+
+		padding: 1em;
+		gap: 1em;
 	}
 </style>

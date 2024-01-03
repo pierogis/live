@@ -23,7 +23,6 @@
 	let rotateImage = false;
 </script>
 
-<br />
 <Card>
 	<h3>hi!</h3>
 
@@ -55,9 +54,7 @@
 	<span>in a top level layout script</span>
 </Card>
 
-<br />
-
-<Divider horizontal size={'4px'} />
+<Divider horizontal size={'4px'} margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
 	<h3 slot="title" class="section-title">components</h3>
@@ -73,9 +70,7 @@
 	</CardsGrid>
 </Section>
 
-<br />
-
-<Divider horizontal size={'4px'} />
+<Divider horizontal size={'4px'} margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
 	<h3 slot="title" class="section-title">classes</h3>
@@ -121,8 +116,6 @@
 		</Card>
 	</CardsGrid>
 </Section>
-
-<br />
 
 <style>
 	h3 {

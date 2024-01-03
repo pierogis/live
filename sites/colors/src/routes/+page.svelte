@@ -42,63 +42,46 @@
 
 <svelte:window use:palette />
 
-<div class="content">
-	<form>
-		<textarea class="inset" rows="6" bind:value={$paletteStore} />
-		<br />
-		<div class="import-export">
+<form>
+	<textarea class="inset" rows="6" bind:value={$paletteStore} />
+	<br />
+	<div class="import-export">
+		<Interactable>
+			<button class="border inset link-box" type="submit" on:click|preventDefault={handleImport}>
+				import ↓
+			</button>
+		</Interactable>
+
+		{#if $colorsStore.length > 0}
 			<Interactable>
-				<button class="border inset link-box" type="submit" on:click|preventDefault={handleImport}>
-					import ↓
+				<button class="border inset link-box" type="submit" on:click|preventDefault={handleExport}>
+					export ↑
 				</button>
 			</Interactable>
-
-			{#if $colorsStore.length > 0}
-				<Interactable>
-					<button
-						class="border inset link-box"
-						type="submit"
-						on:click|preventDefault={handleExport}
-					>
-						export ↑
-					</button>
-				</Interactable>
-			{/if}
-		</div>
-	</form>
-
-	<Interactable>
-		<button
-			class="border inset link-box good"
-			type="submit"
-			on:click|preventDefault={handleAddColor}
-		>
-			+
-		</button>
-	</Interactable>
-
-	<div class="colors">
-		{#each $colorsStore as color, i}
-			<div class="color-container">
-				<div class="color" style:background-color="#{color}">
-					<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}>
-						x
-					</button>
-				</div>
-				<input class="color-input inset" type="text" bind:value={color} />
-			</div>
-		{/each}
+		{/if}
 	</div>
+</form>
+
+<Interactable>
+	<button class="border inset link-box good" type="submit" on:click|preventDefault={handleAddColor}>
+		+
+	</button>
+</Interactable>
+
+<div class="colors">
+	{#each $colorsStore as color, i}
+		<div class="color-container">
+			<div class="color" style:background-color="#{color}">
+				<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}>
+					x
+				</button>
+			</div>
+			<input class="color-input inset" type="text" bind:value={color} />
+		</div>
+	{/each}
 </div>
 
 <style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		padding: 1rem;
-	}
 	.colors {
 		display: flex;
 		flex-direction: row;

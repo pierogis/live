@@ -24,14 +24,12 @@
 	.tagline {
 		margin: 0;
 		text-align: center;
-		padding: 1rem;
 	}
 
 	.grid {
 		display: grid;
 		grid-template-columns: repeat(6, 1fr);
 		gap: 1rem;
-		margin: 0 2rem;
 	}
 	.tile a {
 		width: 100%;

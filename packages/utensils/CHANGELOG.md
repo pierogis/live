@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 0.8.4
+
+### Patch Changes
+
+- improve spacing style
+
 ## 0.8.3
 
 ### Patch Changes
