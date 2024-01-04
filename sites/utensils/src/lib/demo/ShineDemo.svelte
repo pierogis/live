@@ -50,6 +50,7 @@
 		blur="{blur}px"
 		{color}
 		{unhoverOpacity}
+		borderRadius="10px"
 	>
 		<ImageDisplay
 			width="200px"

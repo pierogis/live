@@ -27,7 +27,7 @@
 	<h3>hi!</h3>
 
 	<Interactable on:click={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
-		<Shine>
+		<Shine borderRadius="10px">
 			<ImageDisplay
 				width={'200px'}
 				height={'200px'}

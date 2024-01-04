@@ -1,5 +1,15 @@
 # @pierogis/utensils
 
+## 0.9.0
+
+### Minor Changes
+
+- require svelte 4
+
+### Patch Changes
+
+- fix: add aria role to `Interactable`
+
 ## 0.8.4
 
 ### Patch Changes
