@@ -11,21 +11,21 @@
 
 <svelte:head>
 	{@html `
-	<script>
-		let theme = (() => {
-		  if (
-			typeof localStorage !== "undefined" &&
-			localStorage.getItem('${themeKey}')
-		  ) {
-			return localStorage.getItem('${themeKey}');
-		  }
-		  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-			return "${Theme.Dark}";
-		  }
-		  return "${Theme.Light}";
-		})();
-		document.documentElement.dataset.theme = theme;
-	</script>
+		<script>
+			let theme = (() => {
+				if (
+					typeof localStorage !== "undefined" &&
+					localStorage.getItem('${themeKey}')
+				) {
+					return localStorage.getItem('${themeKey}');
+				}
+				if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+					return "${Theme.Dark}";
+				}
+				return "${Theme.Light}";
+			})();
+			document.documentElement.dataset.theme = theme;
+		</script>
 	`}
 </svelte:head>
 

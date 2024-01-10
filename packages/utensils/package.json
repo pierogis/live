@@ -18,9 +18,10 @@
 	],
 	"scripts": {
 		"dev": "svelte-kit sync && svelte-package --watch",
-		"build": "pnpm package",
+		"build": "npm run package",
+		"prepare": "npm run build",
 		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "pnpm package",
+		"prepublishOnly": "npm run package",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
@@ -64,9 +65,5 @@
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"type": "module",
-	"packageManager": "pnpm@8.6.10",
-	"engines": {
-		"pnpm": "^8.0.0"
-	}
+	"type": "module"
 }

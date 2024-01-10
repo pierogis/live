@@ -30,9 +30,5 @@
 		"ui": "workspace:*",
 		"vite": "^5.0.10"
 	},
-	"type": "module",
-	"packageManager": "pnpm@8.6.10",
-	"engines": {
-		"pnpm": "^8.0.0"
-	}
+	"type": "module"
 }

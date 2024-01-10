@@ -1,4 +1,5 @@
 {
+  "name": "live",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -14,9 +15,5 @@
     "prettier": "^3.0.3",
     "turbo": "latest"
   },
-  "packageManager": "pnpm@8.6.10",
-  "engines": {
-    "pnpm": "^8.0.0"
-  },
-  "name": "live"
+  "packageManager": "pnpm@8.6.10"
 }

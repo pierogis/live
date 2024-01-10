@@ -279,7 +279,7 @@ blockquote {
 	width: fit-content;
 }
 
-blockquote>blockquote {
+blockquote > blockquote {
 	margin: 0;
 }
 
@@ -330,7 +330,7 @@ dl {
 	margin: 0;
 }
 
-dl>dd {
+dl > dd {
 	display: list-item;
 }
 
