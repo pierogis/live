@@ -26,7 +26,7 @@
 		<Card>
 			<span><u>{category.name}</u> {category.symbol}</span>
 			{#if isUser}
-				<form hidden method="post" id={scoreFormId} use:enhance />
+				<form hidden method="post" id={scoreFormId} use:enhance></form>
 
 				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />
 

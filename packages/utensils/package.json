@@ -4,7 +4,8 @@
 	"description": "a set of utensils to aid consumption",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/pierogis/live.git"
+		"url": "git+https://github.com/pierogis/live.git",
+		"directory": "packages/utensils"
 	},
 	"license": "AGPL-3.0",
 	"bugs": {
@@ -54,9 +55,6 @@
 		"@sveltejs/kit": "^2.0.6",
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"@sveltejs/package": "^2.2.5",
-		"eslint-config-custom": "workspace:*",
-		"prettier": "^2.8.8",
-		"prettier-plugin-svelte": "^2.10.1",
 		"publint": "^0.1.16",
 		"svelte": "^4.2.8",
 		"svelte-check": "^3.4.6",

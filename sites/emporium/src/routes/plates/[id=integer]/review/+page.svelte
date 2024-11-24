@@ -12,5 +12,5 @@
 
 <Section column>
 	<h3 slot="title">review</h3>
-	<ReviewForm {plate} data={data.form} />
+	<ReviewForm {plate} data={data.form}></ReviewForm>
 </Section>

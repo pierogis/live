@@ -13,7 +13,6 @@ all things related to [pierogis.live](https://pierogis.live)
   - [`utensils`](https://utensils.pierogis.live): table manners
 - packages
   - `@pierogis/utensils`: component library
-  - `eslint-config-custom`: `eslint` configurations
   - `ui`: component recipes
 
 ## release

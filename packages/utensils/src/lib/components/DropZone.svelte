@@ -26,7 +26,7 @@
 	}
 	let thumbnailSrc = '#';
 
-	let files: FileList;
+	let files = new FileList();
 
 	const reader = new FileReader();
 	reader.onload = (e) => {

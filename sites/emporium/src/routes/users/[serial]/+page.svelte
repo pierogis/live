@@ -79,7 +79,7 @@
 	</form>
 {/if}
 
-<form id="logout" action="/logout" method="post" hidden />
+<form id="logout" action="/logout" method="post" hidden></form>
 
 <Divider horizontal={true} size={'0.4rem'} />
 

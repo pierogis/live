@@ -1,19 +1,26 @@
 {
-  "name": "live",
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "turbo run format",
-    "check": "turbo run check",
-    "changeset:publish": "changeset publish"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.26.2",
-    "eslint": "^8.52.0",
-    "prettier": "^3.0.3",
-    "turbo": "latest"
-  },
-  "packageManager": "pnpm@8.6.10"
+	"name": "live",
+	"private": true,
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "prettier --check . && eslint ./",
+		"format": "prettier --write .",
+		"check": "turbo run check",
+		"changeset:publish": "changeset publish"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.27.10",
+		"@eslint/eslintrc": "^3.2.0",
+		"@eslint/js": "^9.15.0",
+		"@typescript-eslint/eslint-plugin": "^8.15.0",
+		"@typescript-eslint/parser": "^8.15.0",
+		"eslint": "^9.15.0",
+		"eslint-plugin-svelte": "^2.46.0",
+		"globals": "^15.12.0",
+		"prettier": "^3.3.3",
+		"prettier-plugin-svelte": "^3.3.2",
+		"turbo": "latest"
+	},
+	"packageManager": "pnpm@9.14.2"
 }

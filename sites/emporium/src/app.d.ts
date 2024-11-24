@@ -1,5 +1,7 @@
 /// <reference types="@sveltejs/kit" />
 
+import { KVNamespace } from '@sveltejs/adapter-cloudflare';
+
 declare namespace App {
 	interface SessionUser {
 		id: number;
@@ -16,5 +18,9 @@ declare namespace App {
 		canonical: string;
 		description: string;
 	}
-	// interface Platform {}
+	interface Platform {
+		env: {
+			EMPORIUM_KV: KVNamespace;
+		};
+	}
 }
