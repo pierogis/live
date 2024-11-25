@@ -1,22 +1,22 @@
 import { error, json } from '@sveltejs/kit';
 
-import { getUser } from '$lib/server/database/users';
+import { getUser } from '$queries';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async (event) => {
-	const serial = event.url.searchParams.get('serial');
+export const GET: RequestHandler = async ({ url, locals, setHeaders }) => {
+	const serial = url.searchParams.get('serial');
 	if (!serial) {
 		error(403, 'user serial param not provided');
 	}
-	const user = await getUser({ serial });
+	const user = await getUser(locals.db, { serial });
 
 	if (user) {
 		const maskedUser = {
 			...user,
-			email: !event.locals.sessionUser?.isAdmin ? null : user.email
+			email: !locals.sessionUser?.isAdmin ? null : user.email
 		};
 
-		event.setHeaders({
+		setHeaders({
 			'cache-control': 'public, max-age=3600'
 		});
 

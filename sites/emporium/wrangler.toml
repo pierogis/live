@@ -1,7 +1,8 @@
 name = "emporium"
+compatibility_date = "2024-11-24"
 pages_build_output_dir = ".svelte-kit/cloudflare"
 compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]
-binding = "EMPORIUM_KV"
+binding = "KV"
 id = "98f1e079cec344c6a2560cd9c73f4df8"

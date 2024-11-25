@@ -1,26 +1,25 @@
 import { error, fail } from '@sveltejs/kit';
 
-import { getUserWithInteractions } from '$lib/server/database/users';
-import { deleteScore, upsertScore } from '$lib/server/database/scores';
+import { getUserWithInteractions, deleteScore, upsertScore } from '$queries';
 
 import { valueInputName, categoryIdInputName } from './_form';
 
-export const load = async (event) => {
-	const user = await getUserWithInteractions({ serial: event.params.serial });
+export const load = async ({ locals, params }) => {
+	const user = await getUserWithInteractions(locals.db, { serial: params.serial });
 
 	if (user === undefined) {
 		error(404, "user doesn't exist");
 	}
 
-	const isUser = event.locals.sessionUser?.id == user.id;
+	const isUser = locals.sessionUser?.id == user.id;
 
 	return { user, isUser };
 };
 
 export const actions = {
-	update: async (event) => {
-		if (event.locals.sessionUser !== null) {
-			const formData: FormData = await event.request.formData();
+	update: async ({ locals, request, params }) => {
+		if (locals.sessionUser !== null) {
+			const formData: FormData = await request.formData();
 
 			const valueEntry = formData.get(valueInputName);
 			if (!valueEntry) {
@@ -34,8 +33,8 @@ export const actions = {
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 
-			const modelId = parseInt(event.params.id);
-			const userId = event.locals.sessionUser.id;
+			const modelId = parseInt(params.id);
+			const userId = locals.sessionUser.id;
 
 			if (value < 0 || value > 10) {
 				return fail(400, { message: 'score value less than 0 or greater than 10' });
@@ -48,16 +47,16 @@ export const actions = {
 				value: value
 			};
 
-			const score = await upsertScore(data);
+			const score = await upsertScore(locals.db, data);
 
 			return { score };
 		} else {
 			error(401, 'not signed in');
 		}
 	},
-	delete: async (event) => {
-		if (event.locals.sessionUser?.serial == event.params.serial) {
-			const formData: FormData = await event.request.formData();
+	delete: async ({ locals, params, request }) => {
+		if (locals.sessionUser?.serial == params.serial) {
+			const formData: FormData = await request.formData();
 
 			const categoryIdEntry = formData.get(categoryIdInputName);
 			if (!categoryIdEntry) {
@@ -65,8 +64,8 @@ export const actions = {
 			}
 			const categoryId = parseInt(categoryIdEntry.toString());
 
-			const modelId = parseInt(event.params.id);
-			const userId = event.locals.sessionUser.id;
+			const modelId = parseInt(params.id);
+			const userId = locals.sessionUser.id;
 
 			const scoreParams = {
 				modelId,
@@ -74,7 +73,7 @@ export const actions = {
 				categoryId
 			};
 
-			const score = await deleteScore(scoreParams);
+			const score = await deleteScore(locals.db, scoreParams);
 
 			return { score };
 		} else {

@@ -1,22 +1,18 @@
 import { error, json } from '@sveltejs/kit';
 
 import type { Image, FullPlate, Plate } from '$db/schema';
-import {
-	getFullPlates,
-	helpCreatePlate,
-	getPlatePerJurisdiction
-} from '$lib/server/database/plates';
+import { getFullPlates, helpCreatePlate, getPlatePerJurisdiction } from '$queries';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async ({ url, setHeaders }) => {
+export const GET: RequestHandler = async ({ locals, url, setHeaders }) => {
 	const distinct = url.searchParams.get('distinct');
 
 	let plates: FullPlate[];
 
 	if (distinct == 'jurisdictionId') {
-		plates = await getPlatePerJurisdiction();
+		plates = await getPlatePerJurisdiction(locals.db);
 	} else {
-		plates = await getFullPlates({});
+		plates = await getFullPlates(locals.db, {});
 	}
 
 	setHeaders({
@@ -45,7 +41,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 
 		try {
-			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
+			const plate = await helpCreatePlate(locals.db, jurisdictionId, startYear, endYear, imageUrls);
 
 			return json(plate);
 		} catch (err: any) {

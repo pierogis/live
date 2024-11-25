@@ -1,15 +1,17 @@
-import { jurisdictions, type Jurisdiction } from '$db/schema';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
-import { db } from '.';
+import { jurisdictions, type Jurisdiction, type schema } from '$db';
 
-export const listJurisdictions = async () => await db.select().from(jurisdictions);
+export const listJurisdictions = (db: PostgresJsDatabase<typeof schema>) =>
+	db.select().from(jurisdictions);
 
-export const getJurisdictions = async (
+export const getJurisdictions = (
+	db: PostgresJsDatabase<typeof schema>,
 	params: Partial<Jurisdiction>,
 	take: number | undefined = undefined,
 	skip = 0
 ) =>
-	await db.query.jurisdictions.findMany({
+	db.query.jurisdictions.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -20,8 +22,11 @@ export const getJurisdictions = async (
 		offset: skip
 	});
 
-export const getJurisdictionWithPlates = async (params: Partial<Jurisdiction>) =>
-	await db.query.jurisdictions.findFirst({
+export const getJurisdictionWithPlates = (
+	db: PostgresJsDatabase<typeof schema>,
+	params: Partial<Jurisdiction>
+) =>
+	db.query.jurisdictions.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -49,8 +54,11 @@ export const getJurisdictionWithPlates = async (params: Partial<Jurisdiction>) =
 		}
 	});
 
-export const getJurisdiction = async (params: Partial<Jurisdiction>) =>
-	await db.query.jurisdictions.findFirst({
+export const getJurisdiction = (
+	db: PostgresJsDatabase<typeof schema>,
+	params: Partial<Jurisdiction>
+) =>
+	db.query.jurisdictions.findFirst({
 		where: (table, { or, eq }) =>
 			or(
 				params.id !== undefined ? eq(table.id, params.id) : undefined,

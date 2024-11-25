@@ -11,7 +11,8 @@ const config = {
 			assets: 'static'
 		},
 		alias: {
-			$db: 'src/db'
+			$db: 'src/db',
+			$queries: 'src/lib/server/queries'
 		}
 	}
 };

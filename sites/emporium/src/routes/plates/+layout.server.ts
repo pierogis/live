@@ -1,7 +1,7 @@
-import { getCategories } from '$lib/server/database/categories';
+import { getCategories } from '$queries';
 
-export const load = async () => {
-	const categories = await getCategories({ ware: 'plate' });
+export const load = async ({ locals }) => {
+	const categories = await getCategories(locals.db, { ware: 'plate' });
 
 	return {
 		categories

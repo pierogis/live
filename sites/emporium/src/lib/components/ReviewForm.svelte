@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 
 	import type { schema } from '$lib/forms/review';
@@ -9,7 +9,7 @@
 
 	export let plate: FullPlate;
 
-	export let data: SuperValidated<typeof schema>;
+	export let data: SuperValidated<Infer<typeof schema>>;
 
 	const { form, errors, enhance, constraints, capture, restore } = superForm(data);
 
@@ -33,7 +33,7 @@
 	action={`/plates/${plate.modelId}/review?/update`}
 	method="post"
 	use:enhance
-/>
+></form>
 
 <label hidden for={reviewTextareaId}>review</label>
 <textarea
@@ -45,7 +45,7 @@
 	data-invalid={$errors.description}
 	bind:value={$form.description}
 	{...$constraints.description}
-/>
+></textarea>
 
 <!-- id -->
 <input

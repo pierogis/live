@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-	import { browser } from '$app/environment';
-
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 	import './style.css';
@@ -9,8 +6,6 @@
 
 	export let data;
 	$: ({ sessionUser } = data);
-
-	$: browser && injectSpeedInsights();
 </script>
 
 <svelte:head>

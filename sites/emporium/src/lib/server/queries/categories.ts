@@ -1,12 +1,14 @@
-import type { Category } from '$db/schema';
-import { db } from '.';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
-export const getCategories = async (
+import type { Category, schema } from '$db';
+
+export const getCategories = (
+	db: PostgresJsDatabase<typeof schema>,
 	params: Partial<Category>,
 	take: number | undefined = undefined,
 	skip = 0
 ) =>
-	await db.query.categories.findMany({
+	db.query.categories.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,

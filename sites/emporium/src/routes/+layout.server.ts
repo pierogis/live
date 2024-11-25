@@ -1,5 +1,5 @@
-export const load = async (event) => {
+export const load = async ({ locals }) => {
 	return {
-		sessionUser: event.locals.sessionUser
+		sessionUser: locals.sessionUser
 	};
 };

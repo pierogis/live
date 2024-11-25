@@ -1,22 +1,21 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
-import { getJurisdictions } from '$lib/server/database/jurisdictions';
+import { deletePlate, helpUpdatePlate, getJurisdictions } from '$queries';
 import { protectAdmin } from '$lib/helpers';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async (event) => {
-	const { plate } = await event.parent();
-	const canonical = `https://emporium.pierogis.live/plates/${event.params.id}/edit`;
+export const load: PageServerLoad = async ({ parent, params, locals }) => {
+	const { plate } = await parent();
+	const canonical = `https://emporium.pierogis.live/plates/${params.id}/edit`;
 	const title = `edit ${plate.jurisdiction.name} plate (${plate.startYear || '?'}-${
 		plate.endYear || '?'
 	})`;
 	const description = title;
 
-	const jurisdictions = await getJurisdictions({});
+	const jurisdictions = await getJurisdictions(locals.db, {});
 
-	await protectAdmin(event.locals.sessionUser);
+	await protectAdmin(locals.sessionUser);
 
 	return {
 		canonical,
@@ -41,7 +40,14 @@ export const actions: Actions = {
 			const endYear = endYearEntry != '' ? parseInt(endYearEntry.toString()) : null;
 			const imageUrls = imageUrlEntry != '' ? [imageUrlEntry.toString()] : [];
 
-			await helpUpdatePlate(parseInt(params.id), jurisdictionId, startYear, endYear, imageUrls);
+			await helpUpdatePlate(
+				locals.db,
+				parseInt(params.id),
+				jurisdictionId,
+				startYear,
+				endYear,
+				imageUrls
+			);
 
 			redirect(303, `/plates/${params.id}/edit`);
 		} else {
@@ -51,7 +57,7 @@ export const actions: Actions = {
 	delete: async ({ locals, params }) => {
 		if (locals.sessionUser?.isAdmin) {
 			const modelId = parseInt(params.id);
-			await deletePlate(modelId);
+			await deletePlate(locals.db, modelId);
 
 			redirect(303, `/plates`);
 		} else {

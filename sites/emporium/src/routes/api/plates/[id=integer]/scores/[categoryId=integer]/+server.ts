@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 
-import { deleteScore, upsertScore } from '$lib/server/database/scores';
+import { deleteScore, upsertScore } from '$queries';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
@@ -22,7 +22,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			value: body.value
 		};
 
-		const score = await upsertScore(data);
+		const score = await upsertScore(locals.db, data);
 
 		return json(score);
 	} else {
@@ -42,7 +42,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			categoryId
 		};
 
-		const score = await deleteScore(scoreParams);
+		const score = await deleteScore(locals.db, scoreParams);
 
 		return json(score);
 	} else {

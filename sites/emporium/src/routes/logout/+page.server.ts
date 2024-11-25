@@ -17,8 +17,8 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: (event) => {
-		expireSessionCookie(event.cookies);
+	default: ({ cookies }) => {
+		expireSessionCookie(cookies);
 
 		redirect(301, '/');
 	}

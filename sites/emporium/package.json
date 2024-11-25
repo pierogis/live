@@ -11,11 +11,12 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"db:generate": "drizzle-kit generate:pg",
+		"db:generate": "drizzle-kit generate:sqlite",
 		"db:migrate": "tsx ./scripts/migrate.ts",
 		"db:seed": "tsx ./scripts/seed/index.ts"
 	},
 	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20241112.0",
 		"@pierogis/utensils": "workspace:*",
 		"@sveltejs/adapter-cloudflare": "^4.7.4",
 		"@sveltejs/kit": "^2.8.2",
@@ -31,6 +32,7 @@
 		"typescript": "^5.7.2",
 		"ui": "workspace:*",
 		"vite": "^5.4.11",
+		"wrangler": "^3.90.0",
 		"zod": "^3.23.8"
 	},
 	"dependencies": {

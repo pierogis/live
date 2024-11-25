@@ -1,20 +1,20 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { protectAdmin } from '$lib/helpers';
-import { getJurisdictions } from '$lib/server/database/jurisdictions';
 
-import { helpCreatePlate } from '$lib/server/database/plates';
+import { helpCreatePlate, getJurisdictions } from '$queries';
 
 import type { PageServerLoad } from './$types.js';
+import { plates } from '$db';
 
-export const load: PageServerLoad = async (event) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const canonical = `https://emporium.pierogis.live/plates/create`;
 	const title = `create plate`;
 	const description = `register a plate for the emporium`;
 
-	await protectAdmin(event.locals.sessionUser);
+	await protectAdmin(locals.sessionUser);
 
-	const jurisdictions = await getJurisdictions({});
+	const jurisdictions = await getJurisdictions(locals.db, {});
 
 	return {
 		canonical,
@@ -25,9 +25,9 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-	default: async (event) => {
-		if (event.locals.sessionUser?.isAdmin) {
-			const formData: FormData = await event.request.formData();
+	default: async ({ locals, request }) => {
+		if (locals.sessionUser?.isAdmin) {
+			const formData: FormData = await request.formData();
 
 			const jurisdictionEntry = formData.get('jurisdiction');
 			const startYearEntry = formData.get('startYear');
@@ -43,8 +43,9 @@ export const actions = {
 			const endYear = endYearEntry ? parseInt(endYearEntry.toString()) : undefined;
 			const imageUrls = imageUrlEntry ? [imageUrlEntry.toString()] : [];
 
-			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
-
+			const plate = (
+				await helpCreatePlate(locals.db, jurisdictionId, startYear, endYear, imageUrls)
+			)[0];
 			if (plate === undefined) {
 				return fail(403, { message: `couldn't create plate` });
 			}

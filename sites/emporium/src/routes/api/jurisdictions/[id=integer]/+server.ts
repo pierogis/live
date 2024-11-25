@@ -1,10 +1,10 @@
 import { json } from '@sveltejs/kit';
 
-import { getJurisdictionWithPlates } from '$lib/server/database/jurisdictions';
+import { getJurisdictionWithPlates } from '$queries';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const jurisdiction = await getJurisdictionWithPlates({ id: parseInt(params.id) });
+export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
+	const jurisdiction = await getJurisdictionWithPlates(locals.db, { id: parseInt(params.id) });
 
 	setHeaders({
 		'cache-control': 'no-cache'

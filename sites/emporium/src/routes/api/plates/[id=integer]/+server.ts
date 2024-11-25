@@ -2,11 +2,11 @@ import { error, json } from '@sveltejs/kit';
 
 import type { Jurisdiction } from '$db/schema';
 
-import { deletePlate, getFullPlate, helpUpdatePlate } from '$lib/server/database/plates';
+import { deletePlate, getFullPlate, helpUpdatePlate } from '$queries';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const plate = await getFullPlate({ modelId: parseInt(params.id) });
+export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
+	const plate = await getFullPlate(locals.db, { modelId: parseInt(params.id) });
 
 	if (plate) {
 		setHeaders({
@@ -35,7 +35,14 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 
 		const modelId: number = parseInt(params.id);
 
-		const plate = helpUpdatePlate(modelId, jurisdiction.id, startYear, endYear, imageUrls);
+		const plate = helpUpdatePlate(
+			locals.db,
+			modelId,
+			jurisdiction.id,
+			startYear,
+			endYear,
+			imageUrls
+		);
 
 		return json(plate);
 	} else {
@@ -46,7 +53,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 export const DELETE: RequestHandler = async ({ locals, params }) => {
 	if (locals.sessionUser?.isAdmin) {
 		const modelId = parseInt(params.id);
-		const plate = await deletePlate(modelId);
+		const plate = await deletePlate(locals.db, modelId);
 
 		return json(plate);
 	} else {

@@ -4,6 +4,8 @@
 	import type { Score } from '$db/schema';
 	import { goto } from '$app/navigation';
 
+	import { PointStatus } from './types';
+
 	export let interactive = true;
 	export let editorialScore: Readable<Score> | null = null;
 	export let userScore: Writable<Score> | null = null;
@@ -18,11 +20,6 @@
 	$: fullScores = (displayValue - halfScores) / 2;
 	$: emptyScores = 5 - (fullScores + halfScores);
 
-	enum PointStatus {
-		full = '●',
-		half = '◐',
-		empty = '○'
-	}
 	let pointStatuses: PointStatus[];
 	$: pointStatuses = Array(fullScores)
 		.fill(PointStatus.full)

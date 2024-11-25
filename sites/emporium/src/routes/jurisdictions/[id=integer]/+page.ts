@@ -2,11 +2,11 @@ import { storeScores } from '$lib/api/scores';
 
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async (event) => {
-	const { sessionUser } = await event.parent();
-	const { jurisdiction, categories } = event.data;
+export const load: PageLoad = async ({ params, parent, data }) => {
+	const { sessionUser } = await parent();
+	const { jurisdiction, categories } = data;
 
-	const canonical = `https://emporium.pierogis.live/jurisdictions/${event.params.id}`;
+	const canonical = `https://emporium.pierogis.live/jurisdictions/${params.id}`;
 	const title = `${jurisdiction.name} plates`;
 	const description = `plates from ${jurisdiction.name}`;
 

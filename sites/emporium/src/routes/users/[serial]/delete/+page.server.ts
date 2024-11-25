@@ -1,18 +1,18 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { deleteUser } from '$lib/server/database/users';
+import { deleteUser } from '$queries';
 
 import { userIdInputName } from '$lib/forms/user';
 import { protectUserOrAdmin } from '$lib/helpers';
 
 import type { PageServerLoad } from './$types.js';
 
-export const load: PageServerLoad = async (event) => {
-	const { user } = await event.parent();
+export const load: PageServerLoad = async ({ parent, locals, params }) => {
+	const { user } = await parent();
 
-	await protectUserOrAdmin(event.locals.sessionUser, user);
+	await protectUserOrAdmin(locals.sessionUser, user);
 
-	const canonical = `https://emporium.pierogis.live/users/${event.params.serial}/delete`;
+	const canonical = `https://emporium.pierogis.live/users/${params.serial}/delete`;
 	const title = `delete user: ${user.serial.toUpperCase()}`;
 	const description = `delete user: ${user.serial.toUpperCase()} of the emporium`;
 
@@ -31,7 +31,7 @@ export const actions = {
 			if (!userId) {
 				return fail(400, { message: 'userId missing' });
 			} else {
-				await deleteUser(parseInt(userId.toString()));
+				await deleteUser(locals.db, parseInt(userId.toString()));
 			}
 
 			redirect(303, '/');

@@ -1,14 +1,19 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
-import { SESSION_NAME } from '$env/static/private';
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
 
-import { cache, setupCache } from '$lib/server/cache';
+import { SESSION_NAME, DATABASE_URL } from '$env/static/private';
 
 import { decryptSessionCookie } from '$lib/server/session';
-import { getUser } from '$lib/server/database/users';
+import * as schema from '$db/schema';
+import { getUser } from '$queries';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	if (!cache) setupCache();
+	const client = postgres(DATABASE_URL);
+	event.locals.db = drizzle(client, { schema });
+
+	event.locals.kv = event.platform!.env.KV;
 
 	event.locals.sessionUser = null;
 	const sessionCookie = event.cookies.get(SESSION_NAME);
@@ -20,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const { userId } = await decryptSessionCookie<{ userId: number }>(sessionCookie);
 
 			if (userId) {
-				const sessionUser = await getUser({ id: userId });
+				const sessionUser = await getUser(event.locals.db, { id: userId });
 
 				if (!sessionUser) {
 					throw 'cookie user not in database';

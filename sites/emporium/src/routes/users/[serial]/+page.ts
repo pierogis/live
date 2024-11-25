@@ -1,13 +1,11 @@
 import type { Writable } from 'svelte/store';
-import { superValidate } from 'sveltekit-superforms/client';
 
 import type { Score } from '$db/schema';
 import { storeScores } from '$lib/api/scores';
-import { userSchema } from '$lib/forms/user';
 
-export const load = async (event) => {
-	const { user } = await event.parent();
-	const { categories } = event.data;
+export const load = async ({ parent, data, params }) => {
+	const { user } = await parent();
+	const { categories, form } = data;
 
 	const reviewsScores = user.reviews.reduce<{
 		[reviewId: number]: {
@@ -27,11 +25,9 @@ export const load = async (event) => {
 		return previous;
 	}, {});
 
-	const form = await superValidate({ serial: user.serial }, userSchema);
-
-	const canonical = `https://emporium.pierogis.live/users/${event.params.serial}`;
+	const canonical = `https://emporium.pierogis.live/users/${params.serial}`;
 	const title = `user: ${user.serial.toUpperCase()}`;
 	const description = `user: ${user.serial.toUpperCase()} of the emporium`;
 
-	return { canonical, title, description, user, form, reviewsScores, categories };
+	return { canonical, title, description, user, categories, reviewsScores, form };
 };

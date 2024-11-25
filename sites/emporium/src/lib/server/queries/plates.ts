@@ -1,15 +1,16 @@
 import { eq, like, and, sql, notInArray, desc } from 'drizzle-orm';
 
-import { type Plate, plates, type NewPlate, models, images, type Image } from '$db/schema';
+import { type Plate, plates, type NewPlate, models, images, type Image, type schema } from '$db';
 
-import { db } from '.';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
-export const getPlates = async (
+export const getPlates = (
+	db: PostgresJsDatabase<typeof schema>,
 	params: Partial<Plate>,
 	take: number | undefined = undefined,
 	skip = 0
 ) =>
-	await db.query.plates.findMany({
+	db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -22,8 +23,8 @@ export const getPlates = async (
 		orderBy: [desc(plates.modelId)]
 	});
 
-export const getFullPlate = async (params: Partial<Plate>) =>
-	await db.query.plates.findFirst({
+export const getFullPlate = (db: PostgresJsDatabase<typeof schema>, params: Partial<Plate>) =>
+	db.query.plates.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -48,12 +49,13 @@ export const getFullPlate = async (params: Partial<Plate>) =>
 		}
 	});
 
-export const getFullPlates = async (
+export const getFullPlates = (
+	db: PostgresJsDatabase<typeof schema>,
 	params: Partial<Plate>,
 	take: number | undefined = undefined,
 	skip = 0
 ) =>
-	await db.query.plates.findMany({
+	db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -81,7 +83,11 @@ export const getFullPlates = async (
 		orderBy: [desc(plates.modelId)]
 	});
 
-export const getPlatePerJurisdiction = async (take: number | undefined = undefined, skip = 0) => {
+export const getPlatePerJurisdiction = async (
+	db: PostgresJsDatabase<typeof schema>,
+	take: number | undefined = undefined,
+	skip = 0
+) => {
 	// one plate per jurisdiction
 	const jurisdictionsWithOnePlate = await db.query.jurisdictions.findMany({
 		columns: {},
@@ -115,55 +121,42 @@ export const getPlatePerJurisdiction = async (take: number | undefined = undefin
 	return fullPlates;
 };
 
-export const updatePlate = async (modelId: Plate['modelId'], data: Omit<NewPlate, 'modelId'>) =>
-	(
-		await db
-			.update(plates)
-			.set({
-				jurisdictionId: data.jurisdictionId,
-				startYear: data.startYear,
-				endYear: data.endYear
-			})
-			.where(eq(plates.modelId, modelId))
-			.returning()
-	)[0];
+export const updatePlate = (
+	db: PostgresJsDatabase<typeof schema>,
+	modelId: Plate['modelId'],
+	data: Omit<NewPlate, 'modelId'>
+) =>
+	db
+		.update(plates)
+		.set({
+			jurisdictionId: data.jurisdictionId,
+			startYear: data.startYear,
+			endYear: data.endYear
+		})
+		.where(eq(plates.modelId, modelId));
 
-export const deletePlate = async (modelId: Plate['modelId']) =>
-	(await db.delete(models).where(eq(models.id, modelId)).returning())[0];
+export const deletePlate = (db: PostgresJsDatabase<typeof schema>, modelId: Plate['modelId']) =>
+	db.delete(models).where(eq(models.id, modelId));
 
-export const helpCreatePlate = async (
+export const helpCreatePlate = (
+	db: PostgresJsDatabase<typeof schema>,
 	jurisdictionId: Plate['jurisdictionId'],
 	startYear: Plate['startYear'] | undefined,
 	endYear: Plate['endYear'] | undefined,
 	imageUrls: Image['url'][]
 ) =>
-	await db.transaction(async (tx) => {
+	db.transaction(async (tx) => {
 		const model = (await tx.insert(models).values({ ware: 'plate' }).returning())[0];
 
-		if (!model) {
-			tx.rollback();
-			return;
-		}
-
-		const plate = (
-			await tx
-				.insert(plates)
-				.values({
-					modelId: model.id,
-					jurisdictionId: jurisdictionId,
-					startYear: startYear,
-					endYear: endYear
-				})
-				.returning()
-		)[0];
-
-		if (!plate) {
-			tx.rollback();
-			return;
-		}
+		const plate = tx.insert(plates).values({
+			modelId: model.id,
+			jurisdictionId: jurisdictionId,
+			startYear: startYear,
+			endYear: endYear
+		});
 
 		if (imageUrls.length > 0) {
-			await tx.insert(images).values(
+			tx.insert(images).values(
 				imageUrls.map((url) => ({
 					modelId: model.id,
 					url: url
@@ -171,43 +164,33 @@ export const helpCreatePlate = async (
 			);
 		}
 
-		return plate;
+		return plate.returning();
 	});
 
-export const helpUpdatePlate = async (
+export const helpUpdatePlate = (
+	db: PostgresJsDatabase<typeof schema>,
 	modelId: Plate['modelId'],
 	jurisdictionId: Plate['jurisdictionId'],
 	startYear: Plate['startYear'] | undefined,
 	endYear: Plate['endYear'] | undefined,
 	imageUrls: Image['url'][]
 ) =>
-	await db.transaction(async (tx) => {
-		const plate = (
-			await tx
-				.update(plates)
-				.set({
-					jurisdictionId: jurisdictionId,
-					startYear: startYear,
-					endYear: endYear
-				})
-				.where(eq(plates.modelId, modelId))
-				.returning()
-		)[0];
-
-		if (!plate) {
-			tx.rollback();
-			return;
-		}
+	db.transaction(async (tx) => {
+		const plate = tx
+			.update(plates)
+			.set({
+				jurisdictionId: jurisdictionId,
+				startYear: startYear,
+				endYear: endYear
+			})
+			.where(eq(plates.modelId, modelId));
 
 		// delete images that are not in the put array
-		await tx
-			.delete(images)
-			.where(and(eq(images.modelId, modelId), notInArray(images.url, imageUrls)));
+		tx.delete(images).where(and(eq(images.modelId, modelId), notInArray(images.url, imageUrls)));
 
 		// insert images that are not a duplicate modelId-url
 		if (imageUrls.length > 0) {
-			await tx
-				.insert(images)
+			tx.insert(images)
 				.values(
 					imageUrls.map((url) => ({
 						modelId: modelId,

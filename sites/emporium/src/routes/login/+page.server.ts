@@ -9,7 +9,7 @@ import {
 	generateSerial
 } from '@pierogis/utensils/utils/words';
 
-import { createUser, getUser } from '$lib/server/database/users';
+import { createUser, getUser } from '$queries';
 import { createPassphraseEmail } from '$lib/server/email';
 import { requestMailerSend } from '$lib/server/mailersend';
 import { setSessionCookie } from '$lib/server/session';
@@ -36,8 +36,8 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	generate: async (event) => {
-		const formData = await event.request.formData();
+	generate: async ({ request, fetch, locals }) => {
+		const formData = await request.formData();
 
 		const emailEntry = formData.get('email');
 
@@ -51,9 +51,9 @@ export const actions: Actions = {
 			const generatedPassphrase = (dev && env.DEV_PASSPHRASE) || generatePhrase();
 			const content = createPassphraseEmail(originalEmail, generatedPassphrase);
 			// only send email in prod
-			if (!dev) await requestMailerSend(originalEmail, content, event.fetch);
+			if (!dev) await requestMailerSend(originalEmail, content, fetch);
 
-			await setEmailPassphrase(originalEmail, generatedPassphrase);
+			await setEmailPassphrase(locals.kv, originalEmail, generatedPassphrase);
 
 			return {
 				redirectUrl,
@@ -70,8 +70,8 @@ export const actions: Actions = {
 			});
 		}
 	},
-	login: async (event) => {
-		const formData = await event.request.formData();
+	login: async ({ request, locals, cookies }) => {
+		const formData = await request.formData();
 
 		const email = formData.get('email')?.toString();
 		const passphrase = formData.get('passphrase')?.toString();
@@ -80,19 +80,24 @@ export const actions: Actions = {
 			return fail(400);
 		}
 
-		const correctPassphrase = await getEmailPassphrase(email);
+		const correctPassphrase = await getEmailPassphrase(locals.kv, email);
 
 		const redirectUrlEntry = formData.get('redirectUrl');
 		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
 
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
-				let user = await getUser({ email });
+				let user = await getUser(locals.db, { email });
 				if (!user) {
-					user = await createUser({ email, serial: generateSerial().toUpperCase() });
+					user = (
+						await createUser(locals.db, {
+							email,
+							serial: generateSerial().toUpperCase()
+						}).returning()
+					)[0];
 				}
 
-				await setSessionCookie(event.cookies, { userId: user.id });
+				await setSessionCookie(cookies, { userId: user.id });
 
 				redirect(303, redirectUrl);
 			} else {
@@ -112,8 +117,8 @@ export const actions: Actions = {
 			});
 		}
 	},
-	need: async (event) => {
-		const formData = await event.request.formData();
+	need: async ({ request }) => {
+		const formData = await request.formData();
 
 		const originalEmail = formData.get('email')?.toString();
 
@@ -127,8 +132,8 @@ export const actions: Actions = {
 			originalEmail
 		};
 	},
-	already: async (event) => {
-		const formData = await event.request.formData();
+	already: async ({ request }) => {
+		const formData = await request.formData();
 
 		const emailEntry = formData.get('email');
 

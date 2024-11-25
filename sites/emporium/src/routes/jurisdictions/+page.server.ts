@@ -1,13 +1,13 @@
-import { getPlatePerJurisdiction } from '$lib/server/database/plates';
+import { getPlatePerJurisdiction } from '$queries';
 
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+	const plates = await getPlatePerJurisdiction(locals.db);
+
 	const canonical = `https://emporium.pierogis.live/jurisdictions`;
 	const title = `jurisdictions`;
 	const description = `plates by jurisdiction`;
-
-	const plates = await getPlatePerJurisdiction();
 
 	return { canonical, title, description, plates };
 };

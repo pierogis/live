@@ -51,7 +51,7 @@
 				<br />
 			</div>
 			{#if category.name == 'overall'}
-				<div class="overall-seperator" />
+				<div class="overall-seperator"></div>
 			{/if}
 		{/each}
 	</div>

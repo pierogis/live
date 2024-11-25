@@ -1,11 +1,11 @@
 import { error, json } from '@sveltejs/kit';
 
-import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
+import { getUser, updateUserById, deleteUser } from '$queries';
 import type { User } from '$db/schema';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ locals, params, setHeaders }) => {
-	const user = await getUser({ id: parseInt(params.id) });
+	const user = await getUser(locals.db, { id: parseInt(params.id) });
 
 	if (user) {
 		const maskedUser = {
@@ -39,7 +39,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 		};
 
 		try {
-			const user = await updateUserById(parseInt(params.id), data);
+			const user = await updateUserById(locals.db, parseInt(params.id), data);
 
 			return json(user);
 		} catch (err: any) {
@@ -58,7 +58,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 		error(401, `not signed in`);
 	}
 	if (locals.sessionUser?.id == parseInt(params.id) || locals.sessionUser?.isAdmin) {
-		const user = await deleteUser(parseInt(params.id));
+		const user = await deleteUser(locals.db, parseInt(params.id));
 
 		return json(user);
 	} else {

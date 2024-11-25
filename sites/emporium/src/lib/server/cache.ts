@@ -1,27 +1,24 @@
 import { encrypt, decrypt } from './encryption';
+import type { KVNamespace } from '@cloudflare/workers-types';
 
 function getPassphraseKey(email: string) {
 	return `passphrases:${email}`;
 }
 
-export async function setEmailPassphrase(
-	platform: App.Platform,
-	email: string,
-	passphrase: string
-) {
+export async function setEmailPassphrase(kv: KVNamespace, email: string, passphrase: string) {
 	const key = getPassphraseKey(email);
 	const value = await encrypt(passphrase);
 
-	platform.env.EMPORIUM_KV;
-	await cache.multi().set(key, value).expire(key, 120).exec();
+	await kv.put(key, value, { expirationTtl: 120 });
 }
 
 export async function getEmailPassphrase(
-	platform: App.Platform,
+	kv: KVNamespace,
 	email: string
 ): Promise<string | undefined> {
 	const key = getPassphraseKey(email);
-	const value = await cache.getDel(key);
+	const value = await kv.get(key);
+	await kv.delete(key);
 	if (value != null) {
 		return await decrypt(value);
 	} else {

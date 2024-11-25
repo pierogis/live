@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 
-import { deleteReview, updateReview } from '$lib/server/database/reviews';
+import { deleteReview, updateReview } from '$queries';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async ({ locals, request, params }) => {
@@ -18,7 +18,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			description: description
 		};
 
-		const review = await updateReview(data);
+		const review = await updateReview(locals.db, data);
 
 		return json(review);
 	} else {
@@ -36,7 +36,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			userId
 		};
 
-		const review = await deleteReview(reviewParams);
+		const review = await deleteReview(locals.db, reviewParams);
 
 		return json(review);
 	} else {

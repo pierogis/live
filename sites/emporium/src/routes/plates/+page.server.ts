@@ -1,7 +1,7 @@
-import { getFullPlates } from '$lib/server/database/plates';
+import { getFullPlates } from '$queries';
 
-export const load = async () => {
-	const plates = await getFullPlates({});
+export const load = async ({ locals }) => {
+	const plates = await getFullPlates(locals.db, {});
 
 	return {
 		plates
