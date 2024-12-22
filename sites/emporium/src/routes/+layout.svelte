@@ -3,7 +3,7 @@
 	import { browser } from '$app/environment';
 
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
-	import { Layout } from 'ui';
+	import { Layout, SEO } from 'ui';
 	import './style.css';
 	import { page } from '$app/stores';
 
@@ -11,14 +11,22 @@
 	$: ({ sessionUser } = data);
 
 	$: browser && injectSpeedInsights();
+
+	$: title = $page.data.title || "karl's plate emporium";
+	$: description = $page.data.description || 'a place for plates';
+	$: canonical = new URL($page.url.pathname, 'https://emporium.pierogis.live').toString();
+	$: og = {
+		image: new URL(`pierogis-live-og.webp`, $page.url.origin).toString(),
+		alt: 'pierogis live'
+	};
+	$: twitter = {
+		card: 'summary_large_image' as const,
+		image: new URL(`pierogis-live-twitter.webp`, $page.url.origin).toString(),
+		alt: 'pierogis live'
+	};
 </script>
 
-<svelte:head>
-	<title>{$page.data.title}</title>
-	<link rel="canonical" href={$page.data.canonical} />
-	<meta name="description" content={$page.data.description} />
-	<meta name="robots" content="index, follow" />
-</svelte:head>
+<SEO {title} {description} {canonical} type="website" {og} {twitter} />
 
 <ThemeProvider>
 	<Layout
