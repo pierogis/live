@@ -20,7 +20,7 @@
 		ThemeToggleDemo
 	} from '$lib/demo';
 
-	let rotateImage = false;
+	let rotateImage = $state(false);
 </script>
 
 <Card>
@@ -57,7 +57,9 @@
 <Divider horizontal size="4px" margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
-	<h3 slot="title" class="section-title">components</h3>
+	{#snippet title()}
+		<h3 class="section-title">components</h3>
+	{/snippet}
 	<CardsGrid>
 		<CardDemo />
 		<CardsGridDemo />
@@ -73,7 +75,9 @@
 <Divider horizontal size="4px" margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
-	<h3 slot="title" class="section-title">classes</h3>
+	{#snippet title()}
+		<h3 class="section-title">classes</h3>
+	{/snippet}
 	<CardsGrid>
 		<Card>
 			<h4>.border</h4>

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Card, Section } from '@pierogis/utensils';
 
-	let columnGap = 2;
-	let columnGapUnit = 'rem';
-	let rowGap = 1;
-	let rowGapUnit = 'rem';
-	let sectionColumn = true;
+	let columnGap = $state(2);
+	let columnGapUnit = $state('rem');
+	let rowGap = $state(1);
+	let rowGapUnit = $state('rem');
+	let sectionColumn = $state(true);
 </script>
 
 <Card>
@@ -15,7 +15,9 @@
 		rowGap={rowGap + rowGapUnit}
 		column={sectionColumn}
 	>
-		<h3 slot="title">section title</h3>
+		{#snippet title()}
+			<h3>section title</h3>
+		{/snippet}
 		<span class="padded inset">doesn't really do much</span>
 
 		<div class="inputs padded inset">
@@ -90,7 +92,7 @@
 	input[type='number'] {
 		width: 3em;
 	}
-	label:has(input) {
+	label:has(:global(input)) {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Card, ImageDisplay } from '@pierogis/utensils';
 
-	let width = 200;
-	let height = 100;
-	let widthUnit = 'px';
-	let heightUnit = 'px';
+	let width = $state(200);
+	let height = $state(100);
+	let widthUnit = $state('px');
+	let heightUnit = $state('px');
 </script>
 
 <Card>
@@ -72,7 +72,7 @@
 		gap: 10px;
 	}
 
-	label:has(input) {
+	label:has(:global(input)) {
 		display: flex;
 		justify-content: right;
 		align-items: center;
