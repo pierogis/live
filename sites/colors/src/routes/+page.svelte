@@ -43,18 +43,32 @@
 <svelte:window use:palette />
 
 <form>
-	<textarea class="inset" rows="6" bind:value={$paletteStore} />
+	<textarea class="inset" rows="6" bind:value={$paletteStore}></textarea>
 	<br />
 	<div class="import-export">
 		<Interactable>
-			<button class="border inset link-box" type="submit" on:click|preventDefault={handleImport}>
+			<button
+				class="border inset link-box"
+				type="submit"
+				onclick={(e) => {
+					e.preventDefault();
+					handleImport();
+				}}
+			>
 				import ↓
 			</button>
 		</Interactable>
 
 		{#if $colorsStore.length > 0}
 			<Interactable>
-				<button class="border inset link-box" type="submit" on:click|preventDefault={handleExport}>
+				<button
+					class="border inset link-box"
+					type="submit"
+					onclick={(e) => {
+						e.preventDefault();
+						handleExport();
+					}}
+				>
 					export ↑
 				</button>
 			</Interactable>
@@ -63,7 +77,14 @@
 </form>
 
 <Interactable>
-	<button class="border inset link-box good" type="submit" on:click|preventDefault={handleAddColor}>
+	<button
+		class="border inset link-box good"
+		type="submit"
+		onclick={(e) => {
+			e.preventDefault();
+			handleAddColor();
+		}}
+	>
 		+
 	</button>
 </Interactable>
@@ -72,7 +93,14 @@
 	{#each $colorsStore as color, i (color)}
 		<div class="color-container">
 			<div class="color" style:background-color="#{color}">
-				<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}>
+				<button
+					class="remove"
+					type="submit"
+					onclick={(e) => {
+						e.preventDefault();
+						handleRemoveColor(i);
+					}}
+				>
 					x
 				</button>
 			</div>
