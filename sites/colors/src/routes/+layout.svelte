@@ -7,7 +7,9 @@
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 
-	$: browser && injectSpeedInsights();
+	if (browser) {
+		injectSpeedInsights();
+	}
 </script>
 
 <svelte:head>

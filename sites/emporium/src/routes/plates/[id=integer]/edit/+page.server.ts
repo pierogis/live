@@ -31,10 +31,10 @@ export const actions: Actions = {
 		if (locals.sessionUser?.isAdmin) {
 			const formData: FormData = await request.formData();
 
-			const jurisdictionEntry = formData.get('jurisdiction')!!;
-			const startYearEntry = formData.get('startYear')!!;
-			const endYearEntry = formData.get('endYear')!!;
-			const imageUrlEntry = formData.get('imageUrl')!!;
+			const jurisdictionEntry = formData.get('jurisdiction')!;
+			const startYearEntry = formData.get('startYear')!;
+			const endYearEntry = formData.get('endYear')!;
+			const imageUrlEntry = formData.get('imageUrl')!;
 
 			const jurisdictionId = parseInt(jurisdictionEntry.toString());
 			const startYear = startYearEntry != '' ? parseInt(startYearEntry.toString()) : null;

@@ -32,7 +32,7 @@ export const decrypt = async <T>(encryptedData: string): Promise<T> => {
 		const plainBuffer = await crypto.subtle.decrypt(alg, key, ct); // decrypt ciphertext using key
 		const plaintext = decoder.decode(plainBuffer); // plaintext from ArrayBuffer
 		return JSON.parse(plaintext); // return the plaintext
-	} catch (e) {
+	} catch {
 		throw 'decrypt failed';
 	}
 };

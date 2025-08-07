@@ -62,7 +62,7 @@
 </script>
 
 <svg height="22px" width="20px">
-	{#each Object.values($quotients) as count, i}
+	{#each Object.values($quotients) as count, i (count)}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect
 				height={1 + (count / $total || 0) * 12}

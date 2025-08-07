@@ -18,7 +18,7 @@
 
 <Interactable clickable={false}>
 	<div class="inner">
-		{#each categories as category}
+		{#each categories as category (category.id)}
 			{@const categoryEditorialScore = editorialScores ? editorialScores[category.id] : null}
 			{@const categoryUserScore = userScores !== null ? userScores[category.id] : null}
 			<div class="category">

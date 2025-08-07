@@ -9,7 +9,7 @@
 
 <div class="top">
 	<CardsGrid>
-		{#each platesInfo as info}
+		{#each platesInfo as info (info)}
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
 					{categories}

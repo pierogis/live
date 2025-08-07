@@ -7,7 +7,9 @@
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
-	$: browser && injectSpeedInsights();
+	if (browser) {
+		injectSpeedInsights();
+	}
 
 	$: title = $page.data.title || 'utensils';
 	$: description = $page.data.description || 'a demonstration of table manners';

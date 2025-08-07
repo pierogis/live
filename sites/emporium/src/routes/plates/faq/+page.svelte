@@ -5,7 +5,7 @@
 </script>
 
 <div class="faqs">
-	{#each questions as question}
+	{#each questions as question (question)}
 		<div>
 			<Card>
 				<span class="question">{question.question}</span>

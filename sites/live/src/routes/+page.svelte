@@ -7,7 +7,7 @@
 <h3 class="tagline">{data.tagline}</h3>
 
 <div class="grid">
-	{#each data.sites as site}
+	{#each data.sites as site (site)}
 		<div class="tile">
 			<Card border={false} inset={false}>
 				<Interactable>

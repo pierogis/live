@@ -4,6 +4,7 @@
 
 	import { Theme, themeKey } from '../theme';
 
+	// eslint-disable-next-line svelte/require-store-reactive-access
 	export let storedTheme: Writable<Theme | null> = getContext(themeKey) || writable();
 
 	function toggleTheme(theme: Theme) {

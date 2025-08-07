@@ -20,6 +20,8 @@
 	$: scoreUrl = `/plates/${plate.modelId}/scores/`;
 
 	$: allReviewsStores = allReviews.map((review) => review);
+
+	let description = $userReview.description;
 </script>
 
 <Section>
@@ -34,13 +36,13 @@
 	{/if}
 </Section>
 
-<Divider horizontal={true} size={'0.4rem'} />
+<Divider horizontal={true} size="0.4rem" />
 
-<Section column rowGap={'0.5rem'}>
+<Section column rowGap="0.5rem">
 	<h3 slot="title">user review</h3>
 	{#if sessionUser !== null}
 		<ScoreSheet {categories} {userScores} {scoreUrl} />
-		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
+		<ReviewForm {plate} data={reviewForm} bind:description />
 	{:else}
 		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
 		<Interactable>
@@ -49,12 +51,12 @@
 	{/if}
 </Section>
 
-<Divider horizontal={true} size={'0.4rem'} />
+<Divider horizontal={true} size="0.4rem" />
 
 <Section column>
 	<h3 slot="title">reviews</h3>
 	<CardsGrid>
-		{#each allReviewsStores as review}
+		{#each allReviewsStores as review (review)}
 			<ReviewCard {categories} {review} scores={allScores} />
 		{/each}
 	</CardsGrid>

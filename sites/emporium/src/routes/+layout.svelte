@@ -10,7 +10,9 @@
 	export let data;
 	$: ({ sessionUser } = data);
 
-	$: browser && injectSpeedInsights();
+	if (browser) {
+		injectSpeedInsights();
+	}
 
 	$: title = $page.data.title || "karl's plate emporium";
 	$: description = $page.data.description || 'a place for plates';

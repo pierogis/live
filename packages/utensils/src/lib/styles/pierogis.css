@@ -67,7 +67,11 @@ body {
 	font-family: 'Lora';
 	color: var(--text-color);
 
-	transition: color 400ms, background-color 400ms, border-color 400ms, outline-color 400ms;
+	transition:
+		color 400ms,
+		background-color 400ms,
+		border-color 400ms,
+		outline-color 400ms;
 }
 
 h1,

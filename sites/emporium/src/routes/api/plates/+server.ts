@@ -48,6 +48,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
 
 			return json(plate);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			if (err.code == 'P2002') {
 				error(400, `one of image urls (${imageUrls}) already exists`);

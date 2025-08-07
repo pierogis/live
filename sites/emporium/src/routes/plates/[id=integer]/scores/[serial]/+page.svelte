@@ -22,7 +22,7 @@
 <PlateCard {plate} small={true} />
 
 <div class="grid">
-	{#each categories as category}
+	{#each categories as category (category.id)}
 		<Card>
 			<span><u>{category.name}</u> {category.symbol}</span>
 			{#if isUser}
@@ -47,19 +47,14 @@
 							class="border inset good"
 							type="submit"
 							form={scoreFormId}
-							formaction={'?/update'}
+							formaction="?/update"
 						>
 							submit
 						</button>
 					</Interactable>
 
 					<Interactable>
-						<button
-							class="border inset bad"
-							type="submit"
-							form={scoreFormId}
-							formaction={'?/delete'}
-						>
+						<button class="border inset bad" type="submit" form={scoreFormId} formaction="?/delete">
 							clear
 						</button>
 					</Interactable>

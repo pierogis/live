@@ -74,7 +74,7 @@
 			<button
 				type="submit"
 				form={loginFormId}
-				formaction={'/login?/need'}
+				formaction="/login?/need"
 				class="border inset no-select"
 				accesskey="g"
 			>
@@ -87,7 +87,7 @@
 			<button
 				type="submit"
 				form={loginFormId}
-				formaction={'/login?/already'}
+				formaction="/login?/already"
 				class="border inset no-select"
 				accesskey="r"
 			>

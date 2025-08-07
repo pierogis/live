@@ -29,8 +29,8 @@
 	<Interactable on:click={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
 		<Shine borderRadius="10px">
 			<ImageDisplay
-				width={'200px'}
-				height={'200px'}
+				width="200px"
+				height="200px"
 				urls={[
 					'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Emoji_u1f44b.svg/2048px-Emoji_u1f44b.svg.png'
 				]}
@@ -48,13 +48,13 @@
 	<span>install with</span>
 	<textarea class="inset" rows="1" cols="35">pnpm add -D @pierogis/utensils</textarea>
 	<span>and include</span>
-	<textarea class="inset" rows="1" cols="50"
-		>{`import '@pierogis/utensils/styles/pierogis.css';`}</textarea
-	>
+	<textarea class="inset" rows="1" cols="50">
+		import '@pierogis/utensils/styles/pierogis.css';
+	</textarea>
 	<span>in a top level layout script</span>
 </Card>
 
-<Divider horizontal size={'4px'} margin="0" backgroundColor="var(--secondary-color-st)" />
+<Divider horizontal size="4px" margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
 	<h3 slot="title" class="section-title">components</h3>
@@ -70,7 +70,7 @@
 	</CardsGrid>
 </Section>
 
-<Divider horizontal size={'4px'} margin="0" backgroundColor="var(--secondary-color-st)" />
+<Divider horizontal size="4px" margin="0" backgroundColor="var(--secondary-color-st)" />
 
 <Section>
 	<h3 slot="title" class="section-title">classes</h3>

@@ -8,7 +8,7 @@
 </script>
 
 <CardsGrid>
-	{#each plates as plate}
+	{#each plates as plate (plate)}
 		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

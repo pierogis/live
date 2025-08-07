@@ -16,6 +16,9 @@
 
 	$: originalSerial = user.serial;
 	$: originalEmail = user.email;
+
+	let serial = user.serial;
+	let email = user.email;
 </script>
 
 {#if !isUser}
@@ -23,7 +26,7 @@
 		{#if isAdmin}
 			<span>#{user.id}</span>
 		{/if}
-		<span class="link-box" style:cursor="auto">{user.serial}</span>
+		<span class="link-box" style:cursor="auto">{serial}</span>
 	</Card>
 {/if}
 
@@ -39,7 +42,7 @@
 				class="serial border inset"
 				type="text"
 				name="serial"
-				bind:value={user.serial}
+				bind:value={serial}
 				placeholder={originalSerial}
 				maxlength="7"
 				autocomplete="off"
@@ -51,7 +54,7 @@
 					type="text"
 					name="email"
 					disabled
-					bind:value={user.email}
+					bind:value={email}
 					placeholder={originalEmail}
 				/>
 			{/if}
@@ -81,13 +84,13 @@
 
 <form id="logout" action="/logout" method="post" hidden />
 
-<Divider horizontal={true} size={'0.4rem'} />
+<Divider horizontal={true} size="0.4rem"></Divider>
 
 <Section column>
 	<h3 slot="title">reviews</h3>
 	{#if user.reviews.length > 0}
 		<CardsGrid>
-			{#each user.reviews as review}
+			{#each user.reviews as review (review.id)}
 				<ReviewCard
 					{categories}
 					review={writable({ ...review, user: user })}
@@ -97,8 +100,8 @@
 						<ImageDisplay
 							alt="model {review.modelId}"
 							urls={review.model.images.map((image) => image.url)}
-							width={'200px'}
-							height={'100px'}
+							width="200px"
+							height="100px"
 						/>
 					</a>
 				</ReviewCard>

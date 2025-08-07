@@ -42,6 +42,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			const user = await updateUserById(parseInt(params.id), data);
 
 			return json(user);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			// TODO: fix this for drizzle
 			if (err.code == 23505) {

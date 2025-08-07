@@ -27,12 +27,12 @@
 
 		<div class="radio-group">
 			<label>
-				<input type="radio" bind:group={widthUnit} name="widthUnit" value={'rem'} />
+				<input type="radio" bind:group={widthUnit} name="widthUnit" value="rem" />
 				rem
 			</label>
 
 			<label>
-				<input type="radio" bind:group={widthUnit} name="widthUnit" value={'px'} />
+				<input type="radio" bind:group={widthUnit} name="widthUnit" value="px" />
 				px
 			</label>
 		</div>
@@ -46,12 +46,12 @@
 
 		<div class="radio-group">
 			<label>
-				<input type="radio" bind:group={heightUnit} name="heightUnit" value={'rem'} />
+				<input type="radio" bind:group={heightUnit} name="heightUnit" value="rem" />
 				rem
 			</label>
 
 			<label>
-				<input type="radio" bind:group={heightUnit} name="heightUnit" value={'px'} />
+				<input type="radio" bind:group={heightUnit} name="heightUnit" value="px" />
 				px
 			</label>
 		</div>

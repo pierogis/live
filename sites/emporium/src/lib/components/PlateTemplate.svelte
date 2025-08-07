@@ -30,7 +30,7 @@
 	/>
 
 	<datalist id="jurisdictions">
-		{#each jurisdictions as jurisdiction}
+		{#each jurisdictions as jurisdiction (jurisdiction.id)}
 			<option value={jurisdiction.id}>{jurisdiction.abbreviation}</option>
 		{/each}
 	</datalist>

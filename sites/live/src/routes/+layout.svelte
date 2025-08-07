@@ -7,7 +7,9 @@
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
-	$: browser && injectSpeedInsights();
+	if (browser) {
+		injectSpeedInsights();
+	}
 
 	$: title = $page.data.title || 'pierogis live';
 	$: description = $page.data.description || 'a basecamp for pierogis';

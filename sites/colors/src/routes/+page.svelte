@@ -69,7 +69,7 @@
 </Interactable>
 
 <div class="colors">
-	{#each $colorsStore as color, i}
+	{#each $colorsStore as color, i (color)}
 		<div class="color-container">
 			<div class="color" style:background-color="#{color}">
 				<button class="remove" type="submit" on:click|preventDefault={() => handleRemoveColor(i)}>

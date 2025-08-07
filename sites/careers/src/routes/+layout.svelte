@@ -7,7 +7,9 @@
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
-	$: browser && injectSpeedInsights();
+	if (browser) {
+		injectSpeedInsights();
+	}
 
 	$: title = $page.data.title || 'careers';
 	$: description = $page.data.description || 'a good place to start working with pierogis';
