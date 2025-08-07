@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	export let data;
+	let { data } = $props();
 </script>
 
 <h3 class="tagline">{data.tagline}</h3>
@@ -13,7 +13,7 @@
 				<Interactable>
 					<a class="border inset link-box" href={site.href}>{site.tagline}</a>
 				</Interactable>
-				<iframe title={site.title} src={site.href} />
+				<iframe title={site.title} src={site.href}></iframe>
 				<br />
 			</Card>
 		</div>
