@@ -1,28 +1,28 @@
 ---
-import { getCollection } from "astro:content";
-import Base from "../../layouts/Base.astro";
-import TagCard from "../../components/TagCard.astro";
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import TagCard from '../../components/TagCard.astro';
 
-const allLoafs = await getCollection("loafs");
+const allLoafs = await getCollection('loafs');
 const tags = [...new Set(allLoafs.map((loaf) => loaf.data.tags).flat())];
-const pageTitle = "stale tags";
+const pageTitle = 'stale tags';
 ---
 
 <Base
-  canonical={`https://stale.pierogis.live/tags`}
-  title={pageTitle}
-  description={"stale loafs by tags"}
+	canonical={`https://stale.pierogis.live/tags`}
+	title={pageTitle}
+	description={'stale loafs by tags'}
 >
-  <div class="tags">
-    {tags.map((tag) => <TagCard tag={tag} />)}
-  </div>
+	<div class="tags">
+		{tags.map((tag) => <TagCard tag={tag} />)}
+	</div>
 </Base>
 
 <style>
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 1rem;
-  }
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 1rem;
+	}
 </style>

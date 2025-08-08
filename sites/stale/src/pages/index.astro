@@ -1,19 +1,15 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection } from 'astro:content';
 
-import Base from "../layouts/Base.astro";
-import LoafGrid from "../components/LoafGrid.astro";
+import Base from '../layouts/Base.astro';
+import LoafGrid from '../components/LoafGrid.astro';
 
-const allLoafs = await getCollection("loafs");
+const allLoafs = await getCollection('loafs');
 
-const description = "well beyond the pale";
+const description = 'well beyond the pale';
 ---
 
-<Base
-  canonical={`https://stale.pierogis.live`}
-  title="stale"
-  description={description}
->
-  <i>{description}</i>
-  <LoafGrid loafs={allLoafs} />
+<Base canonical={`https://stale.pierogis.live`} title="stale" description={description}>
+	<i>{description}</i>
+	<LoafGrid loafs={allLoafs} />
 </Base>

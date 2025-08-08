@@ -1,25 +1,21 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection } from 'astro:content';
 
-import Base from "../../layouts/Base.astro";
-import LoafGrid from "../../components/LoafGrid.astro";
+import Base from '../../layouts/Base.astro';
+import LoafGrid from '../../components/LoafGrid.astro';
 
 export async function getStaticPaths() {
-  const allLoafs = await getCollection("loafs");
+	const allLoafs = await getCollection('loafs');
 
-  const uniqueTags = [
-    ...new Set(allLoafs.map((loaf) => loaf.data.tags).flat()),
-  ];
+	const uniqueTags = [...new Set(allLoafs.map((loaf) => loaf.data.tags).flat())];
 
-  return uniqueTags.map((tag) => {
-    const filteredLoafs = allLoafs.filter((loaf) =>
-      loaf.data.tags.includes(tag)
-    );
-    return {
-      params: { tag },
-      props: { loafs: filteredLoafs },
-    };
-  });
+	return uniqueTags.map((tag) => {
+		const filteredLoafs = allLoafs.filter((loaf) => loaf.data.tags.includes(tag));
+		return {
+			params: { tag },
+			props: { loafs: filteredLoafs }
+		};
+	});
 }
 
 const { tag } = Astro.params;
@@ -27,10 +23,10 @@ const { loafs } = Astro.props;
 ---
 
 <Base
-  canonical={`https://stale.pierogis.live/tags/${tag}`}
-  title={`${tag} loafs`}
-  description={`loafs with tag ${tag}`}
+	canonical={`https://stale.pierogis.live/tags/${tag}`}
+	title={`${tag} loafs`}
+	description={`loafs with tag ${tag}`}
 >
-  <p>Posts tagged with {tag}</p>
-  <LoafGrid {loafs} />
+	<p>Posts tagged with {tag}</p>
+	<LoafGrid {loafs} />
 </Base>
