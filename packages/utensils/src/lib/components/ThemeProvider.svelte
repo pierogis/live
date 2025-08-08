@@ -1,8 +1,13 @@
 <script lang="ts">
-	import { setContext } from 'svelte';
+	import { setContext, type Snippet } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
 
 	import { themeKey, syncThemeAction, Theme } from '../theme';
+	interface Props {
+		children?: Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	const storedTheme: Writable<Theme | null> = writable();
 
@@ -28,4 +33,4 @@
 
 <svelte:window use:syncThemeAction={{ storedTheme }} />
 
-<slot />
+{@render children?.()}

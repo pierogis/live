@@ -1,3 +1,16 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		title?: Snippet;
+		nav?: Snippet;
+		children?: Snippet;
+		footer?: Snippet;
+	}
+
+	let { title, nav, children, footer }: Props = $props();
+</script>
+
 <svelte:head>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
@@ -9,15 +22,15 @@
 
 <header>
 	<a href="/">
-		<slot name="title" />
+		{@render title?.()}
 	</a>
 </header>
 
-<slot name="nav" />
+{@render nav?.()}
 
-<div class="content"><slot /></div>
+<div class="content">{@render children?.()}</div>
 
-<slot name="footer" />
+{@render footer?.()}
 
 <style>
 	.content {

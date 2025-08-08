@@ -1,6 +1,16 @@
 <script lang="ts">
-	export let clickable = true;
-	export let hoverable = true;
+	import type { Snippet } from 'svelte';
+	import type { MouseEventHandler, KeyboardEventHandler } from 'svelte/elements';
+
+	interface Props {
+		clickable?: boolean;
+		hoverable?: boolean;
+		children?: Snippet;
+		onclick?: MouseEventHandler<HTMLDivElement>;
+		onkeypress?: KeyboardEventHandler<HTMLDivElement>;
+	}
+
+	let { clickable = true, hoverable = true, children, onclick, onkeypress }: Props = $props();
 </script>
 
 <div
@@ -9,10 +19,10 @@
 	tabindex="0"
 	class:clickable
 	class:hoverable
-	on:click
-	on:keypress
+	{onclick}
+	{onkeypress}
 >
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

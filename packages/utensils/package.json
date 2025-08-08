@@ -16,15 +16,9 @@
     "ui",
     "components"
   ],
-  "scripts": {
-    "dev": "svelte-kit sync && svelte-package --watch",
-    "build": "npm run package",
-    "prepare": "npm run build",
-    "package": "svelte-kit sync && svelte-package && publint",
-    "prepublishOnly": "npm run package",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
-  },
+  "type": "module",
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -45,20 +39,25 @@
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*"
   ],
+  "scripts": {
+    "dev": "svelte-kit sync && svelte-package --watch",
+    "build": "npm run package",
+    "prepare": "npm run build",
+    "package": "svelte-kit sync && svelte-package && publint",
+    "prepublishOnly": "npm run package",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
   "peerDependencies": {
-    "svelte": "^4.0.0"
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
-    "@sveltejs/kit": "^2.0.6",
-    "@sveltejs/vite-plugin-svelte": "^3.0.1",
-    "@sveltejs/package": "^2.2.5",
-    "publint": "^0.1.16",
-    "svelte": "^4.2.8",
-    "svelte-check": "^3.4.6",
-    "tslib": "^2.6.0",
-    "typescript": "^5.1.6"
-  },
-  "svelte": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module"
+    "@sveltejs/kit": "2.27.3",
+    "@sveltejs/vite-plugin-svelte": "6.1.1",
+    "@sveltejs/package": "2.4.1",
+    "publint": "0.3.12",
+    "svelte": "5.38.0",
+    "svelte-check": "4.3.1",
+    "typescript": "5.9.2"
+  }
 }

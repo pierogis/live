@@ -90,7 +90,7 @@
 </Interactable>
 
 <div class="colors">
-	{#each $colorsStore as color, i (color)}
+	{#each $colorsStore as color, i (i)}
 		<div class="color-container">
 			<div class="color" style:background-color="#{color}">
 				<button

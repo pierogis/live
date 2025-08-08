@@ -1,8 +1,17 @@
 <script lang="ts">
-	export let horizontal = false;
-	export let size: string = '4px';
-	export let margin = '1rem';
-	export let backgroundColor = 'var(--accent-color)';
+	interface Props {
+		horizontal?: boolean;
+		size?: string;
+		margin?: string;
+		backgroundColor?: string;
+	}
+
+	let {
+		horizontal = false,
+		size = '4px',
+		margin = '1rem',
+		backgroundColor = 'var(--accent-color)'
+	}: Props = $props();
 </script>
 
 <div
@@ -11,7 +20,7 @@
 	style:--size={size}
 	style:--margin={margin}
 	style:--background-color={backgroundColor}
-/>
+></div>
 
 <style>
 	.divider {

@@ -1,14 +1,15 @@
 <script lang="ts">
-	export let inset = true;
-	export let shadow = false;
+	interface Props {
+		inset?: boolean;
+		shadow?: boolean;
+		width: string;
+		height: string;
+		urls: string[];
+		alt: string;
+		style?: string;
+	}
 
-	export let width: string;
-	export let height: string;
-
-	export let urls: string[];
-	export let alt: string;
-
-	export let style = '';
+	let { inset = true, shadow = false, width, height, urls, alt, style = '' }: Props = $props();
 </script>
 
 <div class:inset class:shadow>
