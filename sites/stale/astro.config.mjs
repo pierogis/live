@@ -4,12 +4,12 @@ import svelte from '@astrojs/svelte';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-import vercel from '@astrojs/vercel';
+import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
 	output: 'static',
 	integrations: [svelte(), mdx(), sitemap()],
 	site: 'https://stale.pierogis.live',
-	adapter: vercel()
+	adapter: cloudflare()
 });
