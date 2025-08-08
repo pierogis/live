@@ -8,10 +8,12 @@ node_modules
 # testing
 coverage
 
-# next.js
-.next/
-out/
-build
+# astro
+.astro/
+
+# svelte
+.svelte-kit/
+dist/
 
 # misc
 .DS_Store
@@ -34,6 +36,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# cloudflare
+.wrangler
 
 # ide
 .vscode

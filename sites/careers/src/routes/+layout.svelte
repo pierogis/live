@@ -14,7 +14,9 @@
 	}
 
 	let title = $derived($page.data.title || 'careers');
-	let description = $derived($page.data.description || 'a good place to start working with pierogis');
+	let description = $derived(
+		$page.data.description || 'a good place to start working with pierogis'
+	);
 	let canonical = $derived(new URL($page.url.pathname, 'https://careers.pierogis.live').toString());
 	let og = $derived({
 		image: new URL(`pierogis-live-og.webp`, $page.url.origin).toString(),

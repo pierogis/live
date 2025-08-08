@@ -1,17 +1,17 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".svelte-kit/**", ".astro/**", ".vercel/**", "dist/**"]
-    },
-    "lint": {},
-    "format": {},
-    "check": {},
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
-  }
+	"$schema": "https://turbo.build/schema.json",
+	"globalDependencies": ["**/.env.*local"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": [".svelte-kit/**", ".astro/**", ".vercel/**", "dist/**"]
+		},
+		"lint": {},
+		"format": {},
+		"check": {},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		}
+	}
 }

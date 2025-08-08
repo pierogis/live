@@ -31,12 +31,12 @@
 
 <ThemeProvider>
 	<Layout title="pierogis live" github={{ repo: 'https://github.com/pierogis/live' }}>
-    	{@render children()}
+		{@render children()}
 
-    	{#snippet footer()}
-    		<Interactable>
-    			<a class="border inset link-box" href="https://careers.pierogis.live">careers</a>
-    		</Interactable>
-    	{/snippet}
+		{#snippet footer()}
+			<Interactable>
+				<a class="border inset link-box" href="https://careers.pierogis.live">careers</a>
+			</Interactable>
+		{/snippet}
 	</Layout>
 </ThemeProvider>

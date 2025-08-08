@@ -1,75 +1,64 @@
 {
-	"name": "@pierogis/utensils",
-	"version": "0.9.0",
-	"description": "a set of utensils to aid consumption",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/pierogis/live.git"
-	},
-	"license": "AGPL-3.0",
-	"bugs": {
-		"url": "https://github.com/pierogis/live/issues"
-	},
-	"homepage": "https://utensils.pierogis.live",
-	"keywords": [
-		"svelte",
-		"ui",
-		"components"
-	],
-	"scripts": {
-		"dev": "svelte-kit sync && svelte-package --watch",
-		"build": "npm run package",
-		"prepare": "npm run build",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
-	},
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		},
-		"./styles/*": "./dist/styles/*",
-		"./theme": {
-			"types": "./dist/theme/index.d.ts",
-			"import": "./dist/theme/index.js"
-		},
-		"./utils/*": {
-			"types": "./dist/utils/*/index.d.ts",
-			"import": "./dist/utils/*/index.js"
-		}
-	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
-	],
-	"peerDependencies": {
-		"svelte": "^4.0.0"
-	},
-	"devDependencies": {
-		"@eslint/compat": "1.3.1",
-		"@eslint/js": "9.32.0",
-		"@sveltejs/kit": "^2.0.6",
-		"@sveltejs/vite-plugin-svelte": "^3.0.1",
-		"@sveltejs/package": "^2.2.5",
-		"eslint": "9.32.0",
-		"eslint-config-prettier": "10.1.8",
-		"eslint-plugin-svelte": "3.11.0",
-		"globals": "16.3.0",
-		"prettier": "3.6.2",
-		"prettier-plugin-svelte": "3.4.0",
-		"publint": "^0.1.16",
-		"svelte": "^4.2.8",
-		"svelte-check": "^3.4.6",
-		"tslib": "^2.6.0",
-		"typescript": "^5.1.6",
-		"typescript-eslint": "8.39.0"
-	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module"
+  "name": "@pierogis/utensils",
+  "version": "0.9.0",
+  "description": "a set of utensils to aid consumption",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pierogis/live.git"
+  },
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/pierogis/live/issues"
+  },
+  "homepage": "https://utensils.pierogis.live",
+  "keywords": [
+    "svelte",
+    "ui",
+    "components"
+  ],
+  "scripts": {
+    "dev": "svelte-kit sync && svelte-package --watch",
+    "build": "npm run package",
+    "prepare": "npm run build",
+    "package": "svelte-kit sync && svelte-package && publint",
+    "prepublishOnly": "npm run package",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    },
+    "./styles/*": "./dist/styles/*",
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js"
+    },
+    "./utils/*": {
+      "types": "./dist/utils/*/index.d.ts",
+      "import": "./dist/utils/*/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "peerDependencies": {
+    "svelte": "^4.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "^2.0.6",
+    "@sveltejs/vite-plugin-svelte": "^3.0.1",
+    "@sveltejs/package": "^2.2.5",
+    "publint": "^0.1.16",
+    "svelte": "^4.2.8",
+    "svelte-check": "^3.4.6",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
+  },
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module"
 }
