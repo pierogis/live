@@ -1,29 +1,44 @@
 <script lang="ts">
-	export let canonical: string;
-	export let title: string;
-	export let description: string;
-	export let type: string | undefined;
-	export let og:
-		| {
-				/* should url to a 1200x600 image */
-				image: string;
-				alt: string;
-		  }
-		| undefined = undefined;
-	export let twitter:
-		| {
-				/* `summary` should be url to a 600x600 square, `summary_large_image` should be a url to 1200x600 */
-				card: 'summary' | 'summary_large_image';
-				/* path to the card image */
-				image: string;
-				/* alt text */
-				alt: string;
-				/* `a twitter handle for the site */
-				site?: string;
-				/* a twitter handle for the content creator */
-				handle?: string;
-		  }
-		| undefined = undefined;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		canonical: string;
+		title: string;
+		description: string;
+		type: string | undefined;
+		og?:
+			| {
+					/* should url to a 1200x600 image */
+					image: string;
+					alt: string;
+			  }
+			| undefined;
+		twitter?:
+			| {
+					/* `summary` should be url to a 600x600 square, `summary_large_image` should be a url to 1200x600 */
+					card: 'summary' | 'summary_large_image';
+					/* path to the card image */
+					image: string;
+					/* alt text */
+					alt: string;
+					/* `a twitter handle for the site */
+					site?: string;
+					/* a twitter handle for the content creator */
+					handle?: string;
+			  }
+			| undefined;
+		children?: Snippet;
+	}
+
+	let {
+		canonical,
+		title,
+		description,
+		type,
+		og = undefined,
+		twitter = undefined,
+		children
+	}: Props = $props();
 </script>
 
 <svelte:head>
@@ -55,4 +70,4 @@
 	{/if}
 </svelte:head>
 
-<slot />
+{@render children?.()}
