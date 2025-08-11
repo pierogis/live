@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@pierogis/utensils": "workspace:*",
-    "@vercel/speed-insights": "^1.0.2",
     "ui": "workspace:*"
   },
   "type": "module"

@@ -22,10 +22,8 @@
     "@astrojs/svelte": "7.1.0",
     "@astrojs/cloudflare": "12.6.3",
     "@pierogis/utensils": "workspace:*",
-    "@vercel/speed-insights": "^1.0.2",
     "astro": "5.12.8",
-    "sharp": "^0.34.3",
-    "sharp-ico": "^0.1.5",
+    "sharp": "0.34.3",
     "svelte": "5.38.0",
     "typescript": "5.9.2",
     "ui": "workspace:*"
