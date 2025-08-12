@@ -82,12 +82,15 @@
 	</form>
 {/if}
 
-<form id="logout" action="/logout" method="post" hidden />
+<form id="logout" action="/logout" method="post" hidden></form>
 
 <Divider horizontal={true} size="0.4rem"></Divider>
 
 <Section column>
-	<h3 slot="title">reviews</h3>
+	{#snippet title()}
+		<h3>reviews</h3>
+	{/snippet}
+
 	{#if user.reviews.length > 0}
 		<CardsGrid>
 			{#each user.reviews as review (review.id)}

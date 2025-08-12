@@ -1,17 +1,10 @@
 <script lang="ts">
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-
-	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 
 	import { Interactable, ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
 	let { children } = $props();
-
-	if (browser) {
-		injectSpeedInsights();
-	}
 
 	let title = $derived($page.data.title || 'pierogis live');
 	let description = $derived($page.data.description || 'a basecamp for pierogis');
@@ -31,7 +24,7 @@
 
 <ThemeProvider>
 	<Layout title="pierogis live" github={{ repo: 'https://github.com/pierogis/live' }}>
-		{@render children()}
+		{@render children?.()}
 
 		{#snippet footer()}
 			<Interactable>

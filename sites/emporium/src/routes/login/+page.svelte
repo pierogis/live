@@ -21,7 +21,7 @@
 	$: actionName = form?.generated ? 'login' : 'generate';
 </script>
 
-<form id={loginFormId} action="/login?/{actionName}" method="POST" />
+<form id={loginFormId} action="/login?/{actionName}" method="POST"></form>
 <Card>
 	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
 	<input type="hidden" name="generated" form={loginFormId} value={!form?.generated} />

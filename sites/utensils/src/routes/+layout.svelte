@@ -1,17 +1,10 @@
 <script lang="ts">
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-
-	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
 	let { children } = $props();
-
-	if (browser) {
-		injectSpeedInsights();
-	}
 
 	let title = $derived(page.data.title || 'utensils');
 	let description = $derived(page.data.description || 'a demonstration of table manners');
@@ -34,6 +27,6 @@
 		title="utensils"
 		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/utensils' }}
 	>
-		{@render children()}
+		{@render children?.()}
 	</Layout>
 </ThemeProvider>

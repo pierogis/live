@@ -33,7 +33,7 @@
     "redis": "5.8.0",
     "sveltekit-superforms": "2.27.1",
     "ui": "workspace:*",
-    "zod": "^4.0.15"
+    "valibot": "1.1.0"
   },
   "type": "module"
 }

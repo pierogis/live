@@ -26,7 +26,7 @@
 <Card>
 	<h3>hi!</h3>
 
-	<Interactable on:click={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
+	<Interactable onclick={() => (!rotateImage ? (rotateImage = true) : (rotateImage = false))}>
 		<Shine borderRadius="10px">
 			<ImageDisplay
 				width="200px"

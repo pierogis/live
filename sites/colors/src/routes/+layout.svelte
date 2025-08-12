@@ -1,17 +1,10 @@
 <script lang="ts">
-	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
-
-	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout } from 'ui';
 
 	let { children } = $props();
-
-	if (browser) {
-		injectSpeedInsights();
-	}
 </script>
 
 <svelte:head>
@@ -26,6 +19,6 @@
 		title="colors"
 		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/colors' }}
 	>
-		{@render children()}
+		{@render children?.()}
 	</Layout>
 </ThemeProvider>

@@ -29,7 +29,7 @@ export const decrypt = async <T>(encryptedData: string): Promise<T> => {
 	const ct = encodedbuffer.subarray(12); // decode base64 ciphertext
 
 	try {
-		const plainBuffer = await crypto.subtle.decrypt(alg, key, ct); // decrypt ciphertext using key
+		const plainBuffer = await crypto.subtle.decrypt(alg, key, new Uint8Array(ct).buffer); // decrypt ciphertext using key
 		const plaintext = decoder.decode(plainBuffer); // plaintext from ArrayBuffer
 		return JSON.parse(plaintext); // return the plaintext
 	} catch {

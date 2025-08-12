@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { superValidate } from 'sveltekit-superforms/client';
+import { valibot } from 'sveltekit-superforms/adapters';
 
 import type { Category } from '$db/schema';
 import { getCategories } from '$lib/server/database/categories';
@@ -22,7 +23,7 @@ export const actions = {
 			event.locals.sessionUser.serial == event.params.serial ||
 			event.locals.sessionUser.isAdmin
 		) {
-			const form = await superValidate(event, userSchema);
+			const form = await superValidate(event, valibot(userSchema));
 			if (!form.valid) {
 				return fail(400, form);
 			}

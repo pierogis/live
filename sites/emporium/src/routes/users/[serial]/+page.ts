@@ -1,5 +1,6 @@
 import type { Writable } from 'svelte/store';
 import { superValidate } from 'sveltekit-superforms/client';
+import { valibot } from 'sveltekit-superforms/adapters';
 
 import type { Score } from '$db/schema';
 import { storeScores } from '$lib/api/scores';
@@ -27,7 +28,7 @@ export const load = async (event) => {
 		return previous;
 	}, {});
 
-	const form = await superValidate({ serial: user.serial }, userSchema);
+	const form = await superValidate({ serial: user.serial }, valibot(userSchema));
 
 	const canonical = `https://emporium.pierogis.live/users/${event.params.serial}`;
 	const title = `user: ${user.serial.toUpperCase()}`;

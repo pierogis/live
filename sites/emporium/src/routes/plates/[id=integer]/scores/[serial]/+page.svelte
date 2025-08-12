@@ -7,26 +7,26 @@
 
 	import { PlateCard } from '$lib/components';
 
-	export let data;
+	let { data } = $props();
 
-	$: ({ categories, scores, plate, isUser } = data);
-
-	$: scoreSet = scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
-		previous[score.categoryId] = score.value;
-		return previous;
-	}, {});
+	let scoreSet = $derived(
+		data.scores.reduce<{ [categoryId: number]: number }>((previous, score) => {
+			previous[score.categoryId] = score.value;
+			return previous;
+		}, {})
+	);
 
 	const scoreFormId = 'scoreForm';
 </script>
 
-<PlateCard {plate} small={true} />
+<PlateCard plate={data.plate} small={true} />
 
 <div class="grid">
-	{#each categories as category (category.id)}
+	{#each data.categories as category (category.id)}
 		<Card>
 			<span><u>{category.name}</u> {category.symbol}</span>
-			{#if isUser}
-				<form hidden method="post" id={scoreFormId} use:enhance />
+			{#if data.isUser}
+				<form hidden method="post" id={scoreFormId} use:enhance></form>
 
 				<input hidden form={scoreFormId} name={categoryIdInputName} value={category.id} />
 
