@@ -1,15 +1,16 @@
 import { eq, and } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 
 import { type Score, scores, type NewScore } from '$db/schema';
-
-import { db } from '.';
+import type { DrizzleClient } from '.';
 
 export const getScores = async (
+	db: DrizzleClient,
 	params: Partial<Score>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.scores.findMany({
+) => {
+	return await db.query.scores.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -20,9 +21,10 @@ export const getScores = async (
 		limit: take,
 		offset: skip
 	});
+};
 
-export const upsertScore = async (params: NewScore) =>
-	(
+export const upsertScore = async (db: DrizzleClient, params: NewScore) => {
+	return (
 		await db
 			.insert(scores)
 			.values(params)
@@ -32,9 +34,13 @@ export const upsertScore = async (params: NewScore) =>
 			})
 			.returning()
 	)[0];
+};
 
-export const deleteScore = async (params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>) =>
-	(
+export const deleteScore = async (
+	db: DrizzleClient,
+	params: Pick<Score, 'modelId' | 'userId' | 'categoryId'>
+) => {
+	return (
 		await db
 			.delete(scores)
 			.where(
@@ -46,3 +52,4 @@ export const deleteScore = async (params: Pick<Score, 'modelId' | 'userId' | 'ca
 			)
 			.returning()
 	)[0];
+};

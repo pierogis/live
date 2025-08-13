@@ -33,7 +33,7 @@ export const requestMailerSend = async (
 	});
 
 	if (response.status !== 202) {
-		const { message } = await response.json();
+		const { message } = (await response.json()) as { message: string };
 		console.error(message);
 		throw 'error sending one time passphrase';
 	}

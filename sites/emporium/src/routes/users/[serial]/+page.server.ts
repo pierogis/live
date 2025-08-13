@@ -8,8 +8,8 @@ import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
 import { userSchema } from '$lib/forms/user';
 
-export const load = async () => {
-	const categories: Category[] = await getCategories({ ware: 'plate' });
+export const load = async (event) => {
+	const categories: Category[] = await getCategories(event.locals.db, { ware: 'plate' });
 
 	return { categories };
 };
@@ -28,7 +28,7 @@ export const actions = {
 				return fail(400, form);
 			}
 
-			const user = await updateUserBySerial(event.params.serial, {
+			const user = await updateUserBySerial(event.locals.db, event.params.serial, {
 				serial: form.data.serial.toUpperCase()
 			});
 

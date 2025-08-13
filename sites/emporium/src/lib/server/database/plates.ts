@@ -1,15 +1,15 @@
 import { eq, like, and, sql, notInArray, desc } from 'drizzle-orm';
 
 import { type Plate, plates, type NewPlate, models, images, type Image } from '$db/schema';
-
-import { db } from '.';
+import type { DrizzleClient } from '.';
 
 export const getPlates = async (
+	db: DrizzleClient,
 	params: Partial<Plate>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.plates.findMany({
+) => {
+	return await db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -21,9 +21,10 @@ export const getPlates = async (
 		offset: skip,
 		orderBy: [desc(plates.modelId)]
 	});
+};
 
-export const getFullPlate = async (params: Partial<Plate>) =>
-	await db.query.plates.findFirst({
+export const getFullPlate = async (db: DrizzleClient, params: Partial<Plate>) => {
+	return await db.query.plates.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -47,13 +48,15 @@ export const getFullPlate = async (params: Partial<Plate>) =>
 			}
 		}
 	});
+};
 
 export const getFullPlates = async (
+	db: DrizzleClient,
 	params: Partial<Plate>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.plates.findMany({
+) => {
+	return await db.query.plates.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.modelId ? eq(table.modelId, params.modelId) : undefined,
@@ -80,8 +83,13 @@ export const getFullPlates = async (
 		offset: skip,
 		orderBy: [desc(plates.modelId)]
 	});
+};
 
-export const getPlatePerJurisdiction = async (take: number | undefined = undefined, skip = 0) => {
+export const getPlatePerJurisdiction = async (
+	db: DrizzleClient,
+	take: number | undefined = undefined,
+	skip = 0
+) => {
 	// one plate per jurisdiction
 	const jurisdictionsWithOnePlate = await db.query.jurisdictions.findMany({
 		columns: {},
@@ -115,8 +123,12 @@ export const getPlatePerJurisdiction = async (take: number | undefined = undefin
 	return fullPlates;
 };
 
-export const updatePlate = async (modelId: Plate['modelId'], data: Omit<NewPlate, 'modelId'>) =>
-	(
+export const updatePlate = async (
+	db: DrizzleClient,
+	modelId: Plate['modelId'],
+	data: Omit<NewPlate, 'modelId'>
+) => {
+	return (
 		await db
 			.update(plates)
 			.set({
@@ -127,17 +139,20 @@ export const updatePlate = async (modelId: Plate['modelId'], data: Omit<NewPlate
 			.where(eq(plates.modelId, modelId))
 			.returning()
 	)[0];
+};
 
-export const deletePlate = async (modelId: Plate['modelId']) =>
-	(await db.delete(models).where(eq(models.id, modelId)).returning())[0];
+export const deletePlate = async (db: DrizzleClient, modelId: Plate['modelId']) => {
+	return (await db.delete(models).where(eq(models.id, modelId)).returning())[0];
+};
 
 export const helpCreatePlate = async (
+	db: DrizzleClient,
 	jurisdictionId: Plate['jurisdictionId'],
 	startYear: Plate['startYear'] | undefined,
 	endYear: Plate['endYear'] | undefined,
 	imageUrls: Image['url'][]
-) =>
-	await db.transaction(async (tx) => {
+) => {
+	return await db.transaction(async (tx) => {
 		const model = (await tx.insert(models).values({ ware: 'plate' }).returning())[0];
 
 		if (!model) {
@@ -173,15 +188,17 @@ export const helpCreatePlate = async (
 
 		return plate;
 	});
+};
 
 export const helpUpdatePlate = async (
+	db: DrizzleClient,
 	modelId: Plate['modelId'],
 	jurisdictionId: Plate['jurisdictionId'],
 	startYear: Plate['startYear'] | undefined,
 	endYear: Plate['endYear'] | undefined,
 	imageUrls: Image['url'][]
-) =>
-	await db.transaction(async (tx) => {
+) => {
+	return await db.transaction(async (tx) => {
 		const plate = (
 			await tx
 				.update(plates)
@@ -219,3 +236,4 @@ export const helpUpdatePlate = async (
 
 		return plate;
 	});
+};

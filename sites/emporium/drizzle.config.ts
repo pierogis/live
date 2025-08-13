@@ -1,16 +1,10 @@
-import type { Config } from 'drizzle-kit';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { defineConfig } from 'drizzle-kit';
 
-if (process.env.DATABASE_URL === undefined) {
-	throw 'missing DATABASE_URL in .env';
-}
-
-export default {
+export default defineConfig({
 	out: './migrations',
 	schema: './src/db/schema.ts',
-	driver: 'pg',
+	dialect: 'sqlite',
 	dbCredentials: {
-		connectionString: process.env.DATABASE_URL
+		url: 'file:.wrangler/state/v3/d1/miniflare-D1DatabaseObject/e7352547963de7050bd7d94658afc4fe78b61811b7815da12d90be8e863abf4d.sqlite'
 	}
-} satisfies Config;
+});

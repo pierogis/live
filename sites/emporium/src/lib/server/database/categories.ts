@@ -1,12 +1,13 @@
 import type { Category } from '$db/schema';
-import { db } from '.';
+import type { DrizzleClient } from '.';
 
 export const getCategories = async (
+	db: DrizzleClient,
 	params: Partial<Category>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.categories.findMany({
+) => {
+	return await db.query.categories.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -17,3 +18,4 @@ export const getCategories = async (
 		limit: take,
 		offset: skip
 	});
+};

@@ -1,15 +1,16 @@
 import { eq, and, ne } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 
 import { type User, users, type NewUser } from '$db/schema';
-
-import { db } from '.';
+import type { DrizzleClient } from '.';
 
 export const getUsers = async (
+	db: DrizzleClient,
 	params: Partial<Omit<User, 'isAdmin'>>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.users.findMany({
+) => {
+	return await db.query.users.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -19,9 +20,10 @@ export const getUsers = async (
 		limit: take,
 		offset: skip
 	});
+};
 
-export const getUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
-	await db.query.users.findFirst({
+export const getUser = async (db: DrizzleClient, params: Partial<Omit<User, 'isAdmin'>>) => {
+	return await db.query.users.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -29,9 +31,13 @@ export const getUser = async (params: Partial<Omit<User, 'isAdmin'>>) =>
 				params.serial ? eq(table.serial, params.serial) : undefined
 			)
 	});
+};
 
-export const getUserWithInteractions = async (params: Partial<Omit<User, 'isAdmin'>>) =>
-	await db.query.users.findFirst({
+export const getUserWithInteractions = async (
+	db: DrizzleClient,
+	params: Partial<Omit<User, 'isAdmin'>>
+) => {
+	return await db.query.users.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -52,22 +58,33 @@ export const getUserWithInteractions = async (params: Partial<Omit<User, 'isAdmi
 			}
 		}
 	});
+};
 
-export const createUser = async (partial: NewUser) =>
-	(await db.insert(users).values(partial).returning())[0];
+export const createUser = async (db: DrizzleClient, partial: NewUser) => {
+	return (await db.insert(users).values(partial).returning())[0];
+};
 
-export const updateUserById = async (id: User['id'], data: Partial<Omit<User, 'isAdmin' | 'id'>>) =>
-	(await db.update(users).set(data).where(eq(users.id, id)).returning())[0];
+export const updateUserById = async (
+	db: DrizzleClient,
+	id: User['id'],
+	data: Partial<Omit<User, 'isAdmin' | 'id'>>
+) => {
+	return (await db.update(users).set(data).where(eq(users.id, id)).returning())[0];
+};
 
 export const updateUserBySerial = async (
+	db: DrizzleClient,
 	serial: User['serial'],
 	data: Partial<Omit<User, 'isAdmin' | 'id'>>
-) => (await db.update(users).set(data).where(eq(users.serial, serial)).returning())[0];
+) => {
+	return (await db.update(users).set(data).where(eq(users.serial, serial)).returning())[0];
+};
 
-export const deleteUser = async (id: number) =>
-	(
+export const deleteUser = async (db: DrizzleClient, id: number) => {
+	return (
 		await db
 			.delete(users)
 			.where(and(eq(users.id, id), ne(users.isAdmin, true)))
 			.returning()
 	)[0];
+};

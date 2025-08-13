@@ -3,13 +3,13 @@ import { json, error } from '@sveltejs/kit';
 import { deleteReview, updateReview } from '$lib/server/database/reviews';
 
 import type { RequestHandler } from './$types';
-export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (locals.sessionUser !== null) {
-		const { description }: { description: string } = await request.json();
+export const PUT: RequestHandler = async (event) => {
+	if (event.locals.sessionUser !== null) {
+		const { description }: { description: string } = await event.request.json();
 
-		const modelId = parseInt(params.id);
-		const reviewId = parseInt(params.reviewId);
-		const userId: number = locals.sessionUser.id;
+		const modelId = parseInt(event.params.id);
+		const reviewId = parseInt(event.params.reviewId);
+		const userId: number = event.locals.sessionUser.id;
 
 		const data = {
 			id: reviewId,
@@ -18,7 +18,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			description: description
 		};
 
-		const review = await updateReview(data);
+		const review = await updateReview(event.locals.db, data);
 
 		return json(review);
 	} else {
@@ -26,17 +26,17 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (locals.sessionUser !== null) {
-		const modelId = parseInt(params.id);
-		const userId: number = locals.sessionUser.id;
+export const DELETE: RequestHandler = async (event) => {
+	if (event.locals.sessionUser !== null) {
+		const modelId = parseInt(event.params.id);
+		const userId: number = event.locals.sessionUser.id;
 
 		const reviewParams = {
 			modelId,
 			userId
 		};
 
-		const review = await deleteReview(reviewParams);
+		const review = await deleteReview(event.locals.db, reviewParams);
 
 		return json(review);
 	} else {

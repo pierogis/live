@@ -9,14 +9,17 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "tsx ./scripts/migrate.ts",
-    "db:seed": "tsx ./scripts/seed/index.ts"
+    "cf:generate-types": "wrangler types",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "drizzle-kit migrate",
+    "db:migrate:prod": "wrangler d1 migrations apply DB --remote",
+    "db:seed:local": "wrangler d1 execute emporium --local --file seeds/base.sql"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "7.1.3",
     "@sveltejs/kit": "2.27.3",
     "@sveltejs/vite-plugin-svelte": "6.1.1",
+    "@types/node": "^24.2.1",
     "dotenv": "17.2.1",
     "drizzle-kit": "0.31.4",
     "svelte": "5.38.0",
@@ -27,10 +30,9 @@
     "wrangler": "4.28.1"
   },
   "dependencies": {
+    "@libsql/client": "0.15.10",
     "@pierogis/utensils": "workspace:*",
     "drizzle-orm": "0.44.4",
-    "postgres": "3.4.7",
-    "redis": "5.8.0",
     "sveltekit-superforms": "2.27.1",
     "ui": "workspace:*",
     "valibot": "1.1.0"

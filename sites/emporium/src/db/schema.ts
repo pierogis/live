@@ -1,48 +1,42 @@
 import {
-	pgTable,
-	serial,
-	varchar,
-	boolean,
+	sqliteTable,
 	integer,
+	text,
 	uniqueIndex,
 	primaryKey,
-	check,
-	pgEnum
-} from 'drizzle-orm/pg-core';
+	check
+} from 'drizzle-orm/sqlite-core';
 
-import { type InferModel, sql, relations } from 'drizzle-orm';
+import { type InferSelectModel, sql, relations, type InferInsertModel } from 'drizzle-orm';
 
-export const wareEnum = pgEnum('ware', ['plate']);
+export type Ware = 'plate';
+const ware = text('ware').$type<Ware>().notNull();
 
-export const models = pgTable('models', {
-	id: serial('id').primaryKey(),
-	ware: wareEnum('ware').notNull()
+export const models = sqliteTable('models', {
+	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+	ware: ware
 });
 
-export type Model = InferModel<typeof models>;
+export type Model = InferSelectModel<typeof models>;
 
-export const categories = pgTable(
+export const categories = sqliteTable(
 	'categories',
 	{
-		id: serial('id').primaryKey(),
-		name: varchar('name', { length: 256 }).notNull(),
-		ware: wareEnum('ware').notNull(),
-		symbol: varchar('symbol', { length: 4 })
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		name: text('name', { length: 256 }).notNull(),
+		ware: ware,
+		symbol: text('symbol', { length: 4 })
 	},
-	(table) => {
-		return {
-			nameWareUnique: uniqueIndex('categories_name_ware_unique').on(table.name, table.ware)
-		};
-	}
+	(table) => [uniqueIndex('categories_name_ware_unique').on(table.name, table.ware)]
 );
 
-export type Category = InferModel<typeof categories>;
-export type NewCategory = InferModel<typeof categories, 'insert'>;
+export type Category = InferSelectModel<typeof categories>;
+export type NewCategory = InferInsertModel<typeof categories>;
 
-export const reviews = pgTable(
+export const reviews = sqliteTable(
 	'reviews',
 	{
-		id: serial('id').primaryKey(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 		modelId: integer('model_id')
 			.notNull()
 			.references(() => models.id, {
@@ -55,22 +49,15 @@ export const reviews = pgTable(
 				onDelete: 'cascade',
 				onUpdate: 'no action'
 			}),
-		description: varchar('description', { length: 2048 }).notNull()
+		description: text('description', { length: 2048 }).notNull()
 	},
-	(table) => {
-		return {
-			userIdModelIdUnique: uniqueIndex('reviews_user_id_model_id_unique').on(
-				table.modelId,
-				table.userId
-			)
-		};
-	}
+	(table) => [uniqueIndex('reviews_user_id_model_id_unique').on(table.modelId, table.userId)]
 );
 
-export type Review = InferModel<typeof reviews>;
-export type NewReview = InferModel<typeof reviews, 'insert'>;
+export type Review = InferSelectModel<typeof reviews>;
+export type NewReview = InferInsertModel<typeof reviews>;
 
-export const scores = pgTable(
+export const scores = sqliteTable(
 	'scores',
 	{
 		modelId: integer('model_id')
@@ -93,59 +80,49 @@ export const scores = pgTable(
 			}),
 		value: integer('value').notNull()
 	},
-	(table) => {
-		return {
-			scoresPkey: primaryKey(table.modelId, table.userId, table.categoryId),
-			valueCheck: check('value_within_0_10', sql`${table.value} >= 0 AND ${table.value} <= 10`)
-		};
-	}
+	(table) => [
+		primaryKey({ columns: [table.modelId, table.userId, table.categoryId] }),
+		check('value_within_0_10', sql`${table.value} >= 0 AND ${table.value} <= 10`)
+	]
 );
 
-export type Score = InferModel<typeof scores>;
-export type NewScore = InferModel<typeof scores, 'insert'>;
+export type Score = InferSelectModel<typeof scores>;
+export type NewScore = InferInsertModel<typeof scores>;
 
-export const images = pgTable(
+export const images = sqliteTable(
 	'images',
 	{
-		id: serial('id').primaryKey(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 		modelId: integer('model_id')
 			.notNull()
 			.references(() => models.id, {
 				onDelete: 'cascade',
 				onUpdate: 'no action'
 			}),
-		url: varchar('url', { length: 256 }).notNull()
+		url: text('url', { length: 256 }).notNull()
 	},
-	(images) => {
-		return {
-			urlUnique: uniqueIndex('images_url_unique').on(images.url)
-		};
-	}
+	(images) => [uniqueIndex('images_url_unique').on(images.url)]
 );
 
-export type Image = InferModel<typeof images>;
-export type NewImage = InferModel<typeof images, 'insert'>;
+export type Image = InferSelectModel<typeof images>;
+export type NewImage = InferInsertModel<typeof images>;
 
-export const jurisdictions = pgTable(
+export const jurisdictions = sqliteTable(
 	'jurisdictions',
 	{
-		id: serial('id').primaryKey(),
-		abbreviation: varchar('abbreviation', { length: 2 }).notNull(),
-		name: varchar('name', { length: 256 }).notNull()
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		abbreviation: text('abbreviation', { length: 2 }).notNull(),
+		name: text('name', { length: 256 }).notNull()
 	},
-	(table) => {
-		return {
-			abrreviationUnique: uniqueIndex('jurisdictions_abbreviation_unique').on(table.abbreviation)
-		};
-	}
+	(table) => [uniqueIndex('jurisdictions_abbreviation_unique').on(table.abbreviation)]
 );
 
-export type Jurisdiction = InferModel<typeof jurisdictions>;
-export type NewJurisdiction = InferModel<typeof jurisdictions, 'insert'>;
+export type Jurisdiction = InferSelectModel<typeof jurisdictions>;
+export type NewJurisdiction = InferInsertModel<typeof jurisdictions>;
 
-export const plates = pgTable('plates', {
-	modelId: integer('model_id')
-		.primaryKey()
+export const plates = sqliteTable('plates', {
+	modelId: integer('model_id', { mode: 'number' })
+		.primaryKey({ autoIncrement: true })
 		.references(() => models.id, {
 			onDelete: 'cascade',
 			onUpdate: 'no action'
@@ -160,27 +137,25 @@ export const plates = pgTable('plates', {
 	endYear: integer('end_year')
 });
 
-export type Plate = InferModel<typeof plates>;
-export type NewPlate = InferModel<typeof plates, 'insert'>;
+export type Plate = InferSelectModel<typeof plates>;
+export type NewPlate = InferInsertModel<typeof plates>;
 
-export const users = pgTable(
+export const users = sqliteTable(
 	'users',
 	{
-		id: serial('id').primaryKey(),
-		email: varchar('email', { length: 256 }).notNull(),
-		serial: varchar('serial', { length: 256 }).notNull(),
-		isAdmin: boolean('is_admin').notNull().default(false)
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		email: text('email', { length: 256 }).notNull(),
+		serial: text('serial', { length: 256 }).notNull(),
+		isAdmin: integer('is_admin', { mode: 'boolean' }).notNull().default(false)
 	},
-	(table) => {
-		return {
-			emailUnique: uniqueIndex('users_email_unique').on(table.email),
-			serialUnique: uniqueIndex('users_serial_unique').on(table.serial)
-		};
-	}
+	(table) => [
+		uniqueIndex('users_email_unique').on(table.email),
+		uniqueIndex('users_serial_unique').on(table.serial)
+	]
 );
 
-export type User = InferModel<typeof users>;
-export type NewUser = InferModel<typeof users, 'insert'>;
+export type User = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
 
 export type FullPlate = Plate & {
 	jurisdiction: Jurisdiction;

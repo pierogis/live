@@ -6,7 +6,9 @@ import { deleteScore, upsertScore } from '$lib/server/database/scores';
 import { valueInputName, categoryIdInputName } from './_form';
 
 export const load = async (event) => {
-	const user = await getUserWithInteractions({ serial: event.params.serial });
+	const user = await getUserWithInteractions(event.locals.db, {
+		serial: event.params.serial
+	});
 
 	if (user === undefined) {
 		error(404, "user doesn't exist");
@@ -48,7 +50,7 @@ export const actions = {
 				value: value
 			};
 
-			const score = await upsertScore(data);
+			const score = await upsertScore(event.locals.db, data);
 
 			return { score };
 		} else {
@@ -74,7 +76,7 @@ export const actions = {
 				categoryId
 			};
 
-			const score = await deleteScore(scoreParams);
+			const score = await deleteScore(event.locals.db, scoreParams);
 
 			return { score };
 		} else {

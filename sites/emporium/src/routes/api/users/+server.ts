@@ -8,7 +8,7 @@ export const GET: RequestHandler = async (event) => {
 	if (!serial) {
 		error(403, 'user serial param not provided');
 	}
-	const user = await getUser({ serial });
+	const user = await getUser(event.locals.db, { serial });
 
 	if (user) {
 		const maskedUser = {

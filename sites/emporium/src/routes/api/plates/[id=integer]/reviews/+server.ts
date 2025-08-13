@@ -16,7 +16,7 @@ export const POST: RequestHandler = async (event) => {
 			description: description
 		};
 
-		const review = await upsertReview(data);
+		const review = await upsertReview(event.locals.db, data);
 
 		return json(review);
 	} else {

@@ -14,7 +14,7 @@ export const load: PageServerLoad = async (event) => {
 
 	await protectAdmin(event.locals.sessionUser);
 
-	const jurisdictions = await getJurisdictions({});
+	const jurisdictions = await getJurisdictions(event.locals.db, {});
 
 	return {
 		canonical,
@@ -43,7 +43,13 @@ export const actions = {
 			const endYear = endYearEntry ? parseInt(endYearEntry.toString()) : undefined;
 			const imageUrls = imageUrlEntry ? [imageUrlEntry.toString()] : [];
 
-			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
+			const plate = await helpCreatePlate(
+				event.locals.db,
+				jurisdictionId,
+				startYear,
+				endYear,
+				imageUrls
+			);
 
 			if (plate === undefined) {
 				return fail(403, { message: `couldn't create plate` });

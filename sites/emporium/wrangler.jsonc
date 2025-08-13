@@ -8,6 +8,20 @@
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
 	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "emporium",
+			"database_id": "bf04db7e-7b7c-45dd-a9f0-e8becfbc26c2",
+			"migrations_dir": "migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "98f1e079cec344c6a2560cd9c73f4df8"
+		}
+	],
 	"observability": {
 		"enabled": true
 	}

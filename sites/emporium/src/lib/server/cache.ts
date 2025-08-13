@@ -1,36 +1,28 @@
-import { createClient, type RedisClientType } from 'redis';
-
-import { CACHE_URL } from '$env/static/private';
-
 import { encrypt, decrypt } from './encryption';
 
-export let cache: RedisClientType;
-
 const keyPrefix = 'emporium:';
-
-export async function setupCache() {
-	cache = createClient({
-		url: CACHE_URL
-	});
-
-	cache.on('error', (err) => console.error(err));
-
-	await cache.connect();
-}
 
 function getPassphraseKey(email: string) {
 	return `${keyPrefix}passphrases:${email}`;
 }
 
-export async function setEmailPassphrase(email: string, passphrase: string) {
+export async function setEmailPassphrase(
+	kv_binding: KVNamespace,
+	email: string,
+	passphrase: string
+) {
 	const key = getPassphraseKey(email);
 	const value = await encrypt(passphrase);
-	await cache.multi().set(key, value).expire(key, 120).exec();
+	await kv_binding.put(key, value, { expirationTtl: 120 });
 }
 
-export async function getEmailPassphrase(email: string): Promise<string | undefined> {
+export async function getEmailPassphrase(
+	kv_binding: KVNamespace,
+	email: string
+): Promise<string | undefined> {
 	const key = getPassphraseKey(email);
-	const value = await cache.getDel(key);
+	const value = await kv_binding.get(key);
+	await kv_binding.delete(key);
 	if (value != null) {
 		return await decrypt(value);
 	} else {

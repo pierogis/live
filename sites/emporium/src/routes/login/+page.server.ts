@@ -53,7 +53,7 @@ export const actions: Actions = {
 			// only send email in prod
 			if (!dev) await requestMailerSend(originalEmail, content, event.fetch);
 
-			await setEmailPassphrase(originalEmail, generatedPassphrase);
+			await setEmailPassphrase(event.locals.kv_binding, originalEmail, generatedPassphrase);
 
 			return {
 				redirectUrl,
@@ -80,16 +80,19 @@ export const actions: Actions = {
 			return fail(400);
 		}
 
-		const correctPassphrase = await getEmailPassphrase(email);
+		const correctPassphrase = await getEmailPassphrase(event.locals.kv_binding, email);
 
 		const redirectUrlEntry = formData.get('redirectUrl');
 		const redirectUrl = redirectUrlEntry ? redirectUrlEntry.toString() : '/';
 
 		if (correctPassphrase) {
 			if (correctPassphrase == passphrase.toString()) {
-				let user = await getUser({ email });
+				let user = await getUser(event.locals.db, { email });
 				if (!user) {
-					user = await createUser({ email, serial: generateSerial().toUpperCase() });
+					user = await createUser(event.locals.db, {
+						email,
+						serial: generateSerial().toUpperCase()
+					});
 				}
 
 				await setSessionCookie(event.cookies, { userId: user.id });

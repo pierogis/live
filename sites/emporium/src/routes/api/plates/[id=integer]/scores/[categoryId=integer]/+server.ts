@@ -3,13 +3,13 @@ import { error, json } from '@sveltejs/kit';
 import { deleteScore, upsertScore } from '$lib/server/database/scores';
 
 import type { RequestHandler } from './$types';
-export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (locals.sessionUser !== null) {
-		const modelId = parseInt(params.id);
-		const userId: number = locals.sessionUser.id;
-		const categoryId = parseInt(params.categoryId);
+export const PUT: RequestHandler = async (event) => {
+	if (event.locals.sessionUser !== null) {
+		const modelId = parseInt(event.params.id);
+		const userId: number = event.locals.sessionUser.id;
+		const categoryId = parseInt(event.params.categoryId);
 
-		const body: { value: number } = await request.json();
+		const body: { value: number } = await event.request.json();
 
 		if (body.value < 0 || body.value > 10) {
 			error(400, 'score value less than 0 or greater than 10');
@@ -22,7 +22,7 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			value: body.value
 		};
 
-		const score = await upsertScore(data);
+		const score = await upsertScore(event.locals.db, data);
 
 		return json(score);
 	} else {
@@ -30,11 +30,11 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (locals.sessionUser !== null) {
-		const modelId = parseInt(params.id);
-		const userId: number = locals.sessionUser.id;
-		const categoryId = parseInt(params.categoryId);
+export const DELETE: RequestHandler = async (event) => {
+	if (event.locals.sessionUser !== null) {
+		const modelId = parseInt(event.params.id);
+		const userId: number = event.locals.sessionUser.id;
+		const categoryId = parseInt(event.params.categoryId);
 
 		const scoreParams = {
 			modelId,
@@ -42,7 +42,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			categoryId
 		};
 
-		const score = await deleteScore(scoreParams);
+		const score = await deleteScore(event.locals.db, scoreParams);
 
 		return json(score);
 	} else {

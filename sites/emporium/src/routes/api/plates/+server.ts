@@ -8,26 +8,26 @@ import {
 } from '$lib/server/database/plates';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async ({ url, setHeaders }) => {
-	const distinct = url.searchParams.get('distinct');
+export const GET: RequestHandler = async (event) => {
+	const distinct = event.url.searchParams.get('distinct');
 
 	let plates: FullPlate[];
 
 	if (distinct == 'jurisdictionId') {
-		plates = await getPlatePerJurisdiction();
+		plates = await getPlatePerJurisdiction(event.locals.db);
 	} else {
-		plates = await getFullPlates({});
+		plates = await getFullPlates(event.locals.db, {});
 	}
 
-	setHeaders({
+	event.setHeaders({
 		'cache-control': 'no-store'
 	});
 
 	return json(plates);
 };
 
-export const POST: RequestHandler = async ({ locals, request }) => {
-	if (locals.sessionUser?.isAdmin) {
+export const POST: RequestHandler = async (event) => {
+	if (event.locals.sessionUser?.isAdmin) {
 		const {
 			jurisdictionId,
 			startYear,
@@ -38,14 +38,20 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			startYear?: Plate['startYear'];
 			endYear?: Plate['endYear'];
 			imageUrls: Image['url'][];
-		} = await request.json();
+		} = await event.request.json();
 
 		if (!jurisdictionId) {
 			error(400, 'jurisdiction not provided');
 		}
 
 		try {
-			const plate = await helpCreatePlate(jurisdictionId, startYear, endYear, imageUrls);
+			const plate = await helpCreatePlate(
+				event.locals.db,
+				jurisdictionId,
+				startYear,
+				endYear,
+				imageUrls
+			);
 
 			return json(plate);
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

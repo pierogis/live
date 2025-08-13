@@ -14,7 +14,7 @@ export const load: PageServerLoad = async (event) => {
 	})`;
 	const description = title;
 
-	const jurisdictions = await getJurisdictions({});
+	const jurisdictions = await getJurisdictions(event.locals.db, {});
 
 	await protectAdmin(event.locals.sessionUser);
 
@@ -27,9 +27,9 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	update: async ({ locals, request, params }) => {
-		if (locals.sessionUser?.isAdmin) {
-			const formData: FormData = await request.formData();
+	update: async (event) => {
+		if (event.locals.sessionUser?.isAdmin) {
+			const formData: FormData = await event.request.formData();
 
 			const jurisdictionEntry = formData.get('jurisdiction')!;
 			const startYearEntry = formData.get('startYear')!;
@@ -41,17 +41,24 @@ export const actions: Actions = {
 			const endYear = endYearEntry != '' ? parseInt(endYearEntry.toString()) : null;
 			const imageUrls = imageUrlEntry != '' ? [imageUrlEntry.toString()] : [];
 
-			await helpUpdatePlate(parseInt(params.id), jurisdictionId, startYear, endYear, imageUrls);
+			await helpUpdatePlate(
+				event.locals.db,
+				parseInt(event.params.id),
+				jurisdictionId,
+				startYear,
+				endYear,
+				imageUrls
+			);
 
-			redirect(303, `/plates/${params.id}/edit`);
+			redirect(303, `/plates/${event.params.id}/edit`);
 		} else {
 			return fail(403, { message: `not admin` });
 		}
 	},
-	delete: async ({ locals, params }) => {
-		if (locals.sessionUser?.isAdmin) {
-			const modelId = parseInt(params.id);
-			await deletePlate(modelId);
+	delete: async (event) => {
+		if (event.locals.sessionUser?.isAdmin) {
+			const modelId = parseInt(event.params.id);
+			await deletePlate(event.locals.db, modelId);
 
 			redirect(303, `/plates`);
 		} else {

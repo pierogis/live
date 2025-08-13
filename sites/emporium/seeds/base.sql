@@ -1,0 +1,68 @@
+-- categories
+INSERT INTO categories (id, name, ware, symbol) VALUES (1, 'overall', 'plate', '🌡️');
+INSERT INTO categories (id, name, ware, symbol) VALUES (2, 'identifiability', 'plate', '👁️');
+INSERT INTO categories (id, name, ware, symbol) VALUES (3, 'colors', 'plate', '🎨');
+INSERT INTO categories (id, name, ware, symbol) VALUES (4, 'symbols', 'plate', '💫');
+INSERT INTO categories (id, name, ware, symbol) VALUES (5, 'typeface', 'plate', '🔤');
+INSERT INTO categories (id, name, ware, symbol) VALUES (6, 'clarity', 'plate', '👓');
+
+-- jurisdictions
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (1, 'al', 'alabama');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (2, 'ak', 'alaska');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (3, 'as', 'american samoa');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (4, 'az', 'arizona');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (5, 'ar', 'arkansas');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (6, 'ca', 'california');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (7, 'co', 'colorado');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (8, 'ct', 'connecticut');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (9, 'de', 'delaware');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (10, 'dc', 'district of columbia');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (11, 'fl', 'florida');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (12, 'ga', 'georgia');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (13, 'gu', 'guam');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (14, 'hi', 'hawaii');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (15, 'id', 'idaho');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (16, 'il', 'illinois');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (17, 'in', 'indiana');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (18, 'ia', 'iowa');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (19, 'ks', 'kansas');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (20, 'ky', 'kentucky');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (21, 'la', 'louisiana');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (22, 'me', 'maine');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (23, 'md', 'maryland');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (24, 'ma', 'massachussetts');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (25, 'mi', 'michigan');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (26, 'mn', 'minnesota');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (27, 'ms', 'mississippi');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (28, 'mo', 'missouri');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (29, 'mt', 'montana');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (30, 'ne', 'nebraska');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (31, 'nv', 'nevada');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (32, 'nh', 'new hampshire');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (33, 'nj', 'new jersey');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (34, 'nm', 'new mexico');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (35, 'ny', 'new york');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (36, 'nc', 'north carolina');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (37, 'nd', 'north dakota');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (38, 'mp', 'northern mariana islands');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (39, 'oh', 'ohio');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (40, 'ok', 'oklahoma');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (41, 'or', 'oregon');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (42, 'pa', 'pennsylvania');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (43, 'pr', 'puerto rico');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (44, 'ri', 'rhode island');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (45, 'sc', 'south carolina');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (46, 'sd', 'south dakota');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (47, 'tn', 'tennessee');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (48, 'tx', 'texas');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (49, 'ut', 'utah');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (50, 'vt', 'vermont');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (51, 'vi', 'us virgin islands');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (52, 'va', 'virginia');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (53, 'wa', 'washington');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (54, 'wv', 'west virginia');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (55, 'wi', 'wisconsin');
+INSERT INTO jurisdictions (id, abbreviation, name) VALUES (56, 'wy', 'wyoming');
+
+-- users
+INSERT INTO users (id, email, serial, is_admin) VALUES (1, 'karl@pierogis.live', 'KARL1', 1);
