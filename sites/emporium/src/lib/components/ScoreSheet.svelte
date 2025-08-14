@@ -6,14 +6,25 @@
 	import { Interactable } from '@pierogis/utensils';
 	import { ScoreDisplay, ScoreGraph } from '.';
 
-	export let interactive = true;
-	export let categories: Category[];
+	interface Props {
+		interactive?: boolean;
+		categories: Category[];
 
-	export let editorialScores: { [categoryId: number]: Readable<Score> } | null = null;
-	export let userScores: { [categoryId: number]: Writable<Score> } | null = null;
-	export let graphScores: { [categoryId: number]: Readable<Score>[] } | null = null;
+		editorialScores?: { [categoryId: number]: Readable<Score> } | null;
+		userScores?: { [categoryId: number]: Writable<Score> } | null;
+		graphScores?: { [categoryId: number]: Readable<Score>[] } | null;
 
-	export let scoreUrl: string | null = null;
+		scoreUrl?: string | null;
+	}
+
+	let {
+		interactive = true,
+		categories,
+		editorialScores = null,
+		userScores = null,
+		graphScores = null,
+		scoreUrl = null
+	}: Props = $props();
 </script>
 
 <Interactable clickable={false}>
@@ -39,7 +50,8 @@
 						type="submit"
 						formaction="{scoreUrl}?/delete"
 						formmethod="post"
-						on:click|preventDefault={() => {
+						onclick={(e) => {
+							e.preventDefault();
 							categoryUserScore.update((score) => {
 								score.value = -1;
 								return score;

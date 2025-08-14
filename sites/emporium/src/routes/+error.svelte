@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 </script>
 
-{$page.status}: {$page.error?.message}
+{page.status}: {page.error?.message}

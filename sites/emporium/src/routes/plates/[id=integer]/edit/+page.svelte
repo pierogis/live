@@ -1,14 +1,11 @@
 <script lang="ts">
 	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
 
-	export let data;
-	$: ({ plate, jurisdictions } = data);
-
-	export let form;
+	let { data, form } = $props();
 </script>
 
-<form action="/plates/{plate.modelId}/edit?/update" method="post">
-	<PlateTemplate {jurisdictions} {plate} />
+<form action="/plates/{data.plate.modelId}/edit?/update" method="post">
+	<PlateTemplate jurisdictions={data.jurisdictions} plate={data.plate} />
 </form>
 
 {#if form?.message}

@@ -3,8 +3,12 @@
 
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	export let jurisdictions: Jurisdiction[];
-	export let plate: FullPlate | null = null;
+	interface Props {
+		jurisdictions: Jurisdiction[];
+		plate?: FullPlate | null;
+	}
+
+	let { jurisdictions, plate = null }: Props = $props();
 </script>
 
 <Card>

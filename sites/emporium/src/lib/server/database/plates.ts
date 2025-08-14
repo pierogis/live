@@ -198,42 +198,27 @@ export const helpUpdatePlate = async (
 	endYear: Plate['endYear'] | undefined,
 	imageUrls: Image['url'][]
 ) => {
-	return await db.transaction(async (tx) => {
-		const plate = (
-			await tx
-				.update(plates)
-				.set({
-					jurisdictionId: jurisdictionId,
-					startYear: startYear,
-					endYear: endYear
-				})
-				.where(eq(plates.modelId, modelId))
-				.returning()
-		)[0];
-
-		if (!plate) {
-			tx.rollback();
-			return;
-		}
-
+	return await db.batch([
+		db
+			.update(plates)
+			.set({
+				jurisdictionId: jurisdictionId,
+				startYear: startYear,
+				endYear: endYear
+			})
+			.where(eq(plates.modelId, modelId)),
 		// delete images that are not in the put array
-		await tx
-			.delete(images)
-			.where(and(eq(images.modelId, modelId), notInArray(images.url, imageUrls)));
+		db.delete(images).where(and(eq(images.modelId, modelId), notInArray(images.url, imageUrls))),
 
 		// insert images that are not a duplicate modelId-url
-		if (imageUrls.length > 0) {
-			await tx
-				.insert(images)
-				.values(
-					imageUrls.map((url) => ({
-						modelId: modelId,
-						url: url
-					}))
-				)
-				.onConflictDoNothing({ target: images.url });
-		}
-
-		return plate;
-	});
+		db
+			.insert(images)
+			.values(
+				imageUrls.map((url) => ({
+					modelId: modelId,
+					url: url
+				}))
+			)
+			.onConflictDoNothing({ target: images.url })
+	]);
 };

@@ -7,11 +7,20 @@
 
 	import { Interactable } from '@pierogis/utensils';
 
-	export let plate: FullPlate;
+	interface Props {
+		plate: FullPlate;
+		data: SuperValidated<Infer<typeof schema>>;
+		// allow parent to watch
+		description?: string;
+	}
 
-	export let data: SuperValidated<Infer<typeof schema>>;
+	let { plate, data, description = $bindable() }: Props = $props();
 
 	const { form, errors, enhance, constraints, capture, restore } = superForm(data);
+
+	$effect(() => {
+		description = $form.description;
+	});
 
 	export const snapshot = {
 		capture,
@@ -21,10 +30,7 @@
 	const reviewFormId = 'userReview';
 	const reviewTextareaId = 'review';
 
-	// allow parent to watch
-	export let description = $form.description;
-
-	$: submitMessage = $form.id ? 'update' : 'submit';
+	let submitMessage = $derived($form.id ? 'update' : 'submit');
 </script>
 
 <form
@@ -72,7 +78,7 @@
 			class="border inset good no-select"
 			type="submit"
 			form={reviewFormId}
-			on:click={() => {
+			onclick={() => {
 				description = $form.description;
 			}}
 		>

@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { PlateTemplate } from '$lib/components';
 
-	export let data;
-	$: ({ jurisdictions } = data);
-
-	export let form;
+	let { data, form } = $props();
 </script>
 
 <form method="post">
-	<PlateTemplate {jurisdictions} />
+	<PlateTemplate jurisdictions={data.jurisdictions} />
 </form>
 
 {#if form?.message}
