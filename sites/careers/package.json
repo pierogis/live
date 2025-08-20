@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "postinstall": "svelte-kit sync",
-    "dev": "vite dev",
+    "dev": "vite dev --port 5173",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
