@@ -1,6 +1,5 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
-import { SESSION_NAME } from '$env/static/private';
 import { env } from '$env/dynamic/private';
 
 import { createD1Client, createLibSqlClient } from '$lib/server/database';
@@ -23,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.kv_binding = event.platform.env.KV;
 
 	event.locals.sessionUser = null;
-	const sessionCookie = event.cookies.get(SESSION_NAME);
+	const sessionCookie = event.cookies.get(env.SESSION_NAME);
 
 	let deleteCookie = false;
 
@@ -45,7 +44,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (deleteCookie) {
-		event.cookies.delete(SESSION_NAME, { path: '/' });
+		event.cookies.delete(env.SESSION_NAME, { path: '/' });
 	}
 
 	return await resolve(event);
