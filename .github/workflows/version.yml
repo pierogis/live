@@ -21,3 +21,4 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
           version: pnpm changeset:version
+          publish: pnpm changeset:publish
