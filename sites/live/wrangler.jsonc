@@ -8,6 +8,7 @@
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
 	},
+	"routes": [{ "pattern": "pierogis.live", "custom_domain": true }],
 	"observability": {
 		"enabled": true
 	}

@@ -8,6 +8,10 @@
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
 	},
+	"routes": [{ "pattern": "emporium.pierogis.live", "custom_domain": true }],
+	"observability": {
+		"enabled": true
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -22,9 +26,6 @@
 			"id": "98f1e079cec344c6a2560cd9c73f4df8"
 		}
 	],
-	"observability": {
-		"enabled": true
-	},
 	"vars": {
 		"SESSION_LENGTH": "604800000",
 		"SESSION_NAME": "session"
