@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 1.0.0
+
+### Major Changes
+
+- cf08196: migrate to svelte 5
+
 ## 0.9.0
 
 ### Minor Changes
