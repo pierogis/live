@@ -6,8 +6,12 @@
 	let { data } = $props();
 </script>
 
-<CardsGrid>
-	{#each data.plates as plate (plate)}
-		<PlateCard {plate} showYears={false} small={true} />
-	{/each}
-</CardsGrid>
+{#await data.plates}
+	<div>...loading</div>
+{:then plates}
+	<CardsGrid>
+		{#each plates as plate (plate)}
+			<PlateCard {plate} showYears={false} small={true} />
+		{/each}
+	</CardsGrid>
+{/await}

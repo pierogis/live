@@ -15,9 +15,11 @@
 
 	let { plate, isAdmin = false, showYears = true, small, children }: Props = $props();
 
-	const alt = `${plate.startYear || '?'}-${plate.endYear || '?'} ${
-		plate.jurisdiction.abbreviation
-	} license plate`;
+	let alt = $derived(
+		`${plate.startYear || '?'}-${plate.endYear || '?'} ${
+			plate.jurisdiction.abbreviation
+		} license plate`
+	);
 </script>
 
 <Interactable clickable={false}>

@@ -7,7 +7,7 @@ export const load: PageServerLoad = async (event) => {
 	const title = `jurisdictions`;
 	const description = `plates by jurisdiction`;
 
-	const plates = await getPlatePerJurisdiction(event.locals.db);
+	const plates = getPlatePerJurisdiction(event.locals.db);
 
 	return { canonical, title, description, plates };
 };

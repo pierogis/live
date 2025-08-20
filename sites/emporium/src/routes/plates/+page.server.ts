@@ -1,9 +1,11 @@
 import { getFullPlates } from '$lib/server/database/plates';
 
 export const load = async (event) => {
-	const plates = await getFullPlates(event.locals.db, {});
+	const canonical = `https://emporium.pierogis.live/plates`;
+	const title = `plates`;
+	const description = `plates in the emporium`;
 
-	return {
-		plates
-	};
+	const plates = getFullPlates(event.locals.db, {});
+
+	return { canonical, title, description, plates };
 };
