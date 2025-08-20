@@ -1,4 +1,6 @@
 import { superValidate } from 'sveltekit-superforms/server';
+import { valibot } from 'sveltekit-superforms/adapters';
+
 import { schema } from '$lib/forms/review';
 
 export const load = async ({ locals, parent }) => {
@@ -11,7 +13,7 @@ export const load = async ({ locals, parent }) => {
 		description: ''
 	};
 
-	const reviewForm = await superValidate(userReview, schema);
+	const reviewForm = await superValidate(userReview, valibot(schema));
 
 	return {
 		reviewForm,

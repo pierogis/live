@@ -1,40 +1,37 @@
 ---
-import type { CollectionEntry } from "astro:content";
-import { Card, Shine } from "@pierogis/utensils";
+import type { CollectionEntry } from 'astro:content';
+import { Card, Shine } from '@pierogis/utensils';
 
 interface Props {
-  loaf: CollectionEntry<"loafs">["data"];
+	loaf: CollectionEntry<'loafs'>['data'];
 }
 
 const { loaf } = Astro.props;
 ---
 
 <Card border inset>
-  <Shine
-    randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }}
-    borderRadius="16px"
-  >
-    <img
-      src={loaf.image["300x300"].src}
-      width={loaf.image["300x300"].width}
-      height={loaf.image["300x300"].height}
-      class="border"
-      alt={loaf.alt}
-    />
-  </Shine>
-  <h1>{loaf.title}</h1>
-  <h2>{loaf.subtitle}</h2>
-  <span>{loaf.description}</span>
+	<Shine randomLength={{ x: { min: 2, max: 8 }, y: { min: 2, max: 8 } }} borderRadius="16px">
+		<img
+			src={loaf.image['300x300'].src}
+			width={loaf.image['300x300'].width}
+			height={loaf.image['300x300'].height}
+			class="border"
+			alt={loaf.alt}
+		/>
+	</Shine>
+	<h1>{loaf.title}</h1>
+	<h2>{loaf.subtitle}</h2>
+	<span>{loaf.description}</span>
 </Card>
 
 <style>
-  img {
-    border-radius: 16px;
-    image-rendering: pixelated;
-  }
+	img {
+		border-radius: 16px;
+		image-rendering: pixelated;
+	}
 
-  h1,
-  h3 {
-    margin: 0;
-  }
+	h1,
+	h3 {
+		margin: 0;
+	}
 </style>

@@ -3,8 +3,12 @@
 
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	export let jurisdictions: Jurisdiction[];
-	export let plate: FullPlate | null = null;
+	interface Props {
+		jurisdictions: Jurisdiction[];
+		plate?: FullPlate | null;
+	}
+
+	let { jurisdictions, plate = null }: Props = $props();
 </script>
 
 <Card>
@@ -30,7 +34,7 @@
 	/>
 
 	<datalist id="jurisdictions">
-		{#each jurisdictions as jurisdiction}
+		{#each jurisdictions as jurisdiction (jurisdiction.id)}
 			<option value={jurisdiction.id}>{jurisdiction.abbreviation}</option>
 		{/each}
 	</datalist>

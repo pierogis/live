@@ -3,7 +3,10 @@
 
 	import type { Score } from '$db/schema';
 
-	export let scoreStores: Readable<Score>[];
+	interface Props {
+		scoreStores: Readable<Score>[];
+	}
+	let { scoreStores }: Props = $props();
 
 	// maximum is 10
 	// minimum is 0
@@ -62,7 +65,7 @@
 </script>
 
 <svg height="22px" width="20px">
-	{#each Object.values($quotients) as count, i}
+	{#each Object.values($quotients) as count, i (i)}
 		<g class="bar" transform={`translate(${i * (barWidth + dividerWidth)},0)`}>
 			<rect
 				height={1 + (count / $total || 0) * 12}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { get, type Readable } from 'svelte/store';
 
 	import type { Category, Review, Score, User } from '$db/schema';
@@ -7,12 +8,18 @@
 
 	import { ScoreSheet } from '.';
 
-	export let review: Readable<
-		Review & {
-			user: Omit<User, 'email'>;
-		}
-	>;
-	export let scores: { [categoryId: number]: Readable<Score>[] };
+	interface Props {
+		review: Readable<
+			Review & {
+				user: Omit<User, 'email'>;
+			}
+		>;
+		scores: { [categoryId: number]: Readable<Score>[] };
+		categories: Category[];
+		children?: Snippet;
+	}
+
+	let { review, scores, categories, children }: Props = $props();
 
 	const editorialScores = Object.entries(scores).reduce<{
 		[categoryId: number]: Readable<Score>;
@@ -23,8 +30,6 @@
 		}
 		return previous;
 	}, {});
-
-	export let categories: Category[];
 </script>
 
 <Interactable clickable={false}>
@@ -36,7 +41,7 @@
 				</a>
 			</Interactable>
 		{/if}
-		<slot />
+		{@render children?.()}
 		<textarea readonly class="inset" cols="40" rows="8">{$review.description}</textarea>
 		<ScoreSheet interactive={false} {categories} {editorialScores} graphScores={scores} />
 	</Card>

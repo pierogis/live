@@ -1,12 +1,20 @@
 <script lang="ts">
-	export let columnGap = '2rem';
-	export let rowGap = '1rem';
-	export let column = false;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		columnGap?: string;
+		rowGap?: string;
+		column?: boolean;
+		title?: Snippet;
+		children?: Snippet;
+	}
+
+	let { columnGap = '2rem', rowGap = '1rem', column = false, title, children }: Props = $props();
 </script>
 
 <section class:column style:--row-gap={rowGap} style:--column-gap={columnGap}>
-	<slot name="title" />
-	<slot />
+	{@render title?.()}
+	{@render children?.()}
 </section>
 
 <style>

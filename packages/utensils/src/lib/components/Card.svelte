@@ -1,11 +1,18 @@
 <script lang="ts">
-	export let border = true;
-	export let inset = true;
-	export let shadow = false;
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		border?: boolean;
+		inset?: boolean;
+		shadow?: boolean;
+		children?: Snippet;
+	}
+
+	let { border = true, inset = true, shadow = false, children }: Props = $props();
 </script>
 
 <div class="card" class:border class:inset class:shadow>
-	<slot />
+	{@render children?.()}
 </div>
 
 <style>

@@ -1,151 +1,146 @@
 ---
-import { ViewTransitions } from "astro:transitions";
-import { getImage } from "astro:assets";
+import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
 
-import { Interactable } from "@pierogis/utensils";
-import { themeKey, Theme } from "@pierogis/utensils/theme";
+import { Interactable } from '@pierogis/utensils';
+import { themeKey, Theme } from '@pierogis/utensils/theme';
 
-import { Layout } from "ui";
+import { Layout } from 'ui';
 
-import fallbackOpenGraphImageSrc from "../images/og.webp";
-import fallbackTwitterImageSrc from "../images/twitter.webp";
-import faviconSrc from "../images/favicon.png";
-import faviconSvgSrc from "../images/favicon.svg";
+import fallbackOpenGraphImageSrc from '../images/og.webp';
+import fallbackTwitterImageSrc from '../images/twitter.webp';
+import faviconSrc from '../images/favicon.png';
+import faviconSvgSrc from '../images/favicon.svg';
 
-import SpeedInsights from "../components/SpeedInsights.astro";
-import ThemeComponent from "../components/Theme.svelte";
-import SEO from "../components/SEO.svelte";
+import ThemeComponent from '../components/Theme.svelte';
+import SEO from '../components/SEO.svelte';
 
 interface Props {
-  canonical: string;
-  title: string;
-  description: string;
-  type?: string;
-  og?: {
-    image: string;
-    alt: string;
-  };
-  twitter?: {
-    card: "summary" | "summary_large_image";
-    image: string;
-    alt: string;
-    handle?: string;
-  };
+	canonical: string;
+	title: string;
+	description: string;
+	type?: string;
+	og?: {
+		image: string;
+		alt: string;
+	};
+	twitter?: {
+		card: 'summary' | 'summary_large_image';
+		image: string;
+		alt: string;
+		handle?: string;
+	};
 }
 
 const {
-  canonical,
-  title,
-  description,
-  type = "website",
-  og = {
-    image: fallbackOpenGraphImageSrc.src,
-    alt: "stale",
-  },
-  twitter = {
-    card: "summary_large_image",
-    image: fallbackTwitterImageSrc.src,
-    alt: "stale",
-  },
+	canonical,
+	title,
+	description,
+	type = 'website',
+	og = {
+		image: fallbackOpenGraphImageSrc.src,
+		alt: 'stale'
+	},
+	twitter = {
+		card: 'summary_large_image',
+		image: fallbackTwitterImageSrc.src,
+		alt: 'stale'
+	}
 } = Astro.props;
 
 const ogImageSrc = new URL(og.image, Astro.url.origin).toString();
 const twitterImageSrc = new URL(twitter.image, Astro.url.origin).toString();
 
 const appleTouchIcon = await getImage({
-  src: faviconSrc,
-  width: 180,
-  height: 180,
-  format: "png",
+	src: faviconSrc,
+	width: 180,
+	height: 180,
+	format: 'png'
 });
-const faviconSvg = await getImage({ src: faviconSvgSrc, format: "svg" });
+const faviconPng = await getImage({ src: faviconSrc, width: 32, height: 32, format: 'png' });
+const faviconSvg = await getImage({ src: faviconSvgSrc, format: 'svg' });
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <link rel="icon" href={faviconSvg.src} type="image/svg+xml" />
-    <link rel="apple-touch-icon" href={appleTouchIcon.src} />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-    <SEO
-      {canonical}
-      {title}
-      {description}
-      {type}
-      og={{
-        image: ogImageSrc,
-        alt: og.alt,
-      }}
-      twitter={{
-        card: twitter.card,
-        domain: "stale.pierogis.live",
-        site: "@pierogis_live",
-        handle: twitter?.handle ? "@" + twitter.handle : undefined,
-        image: twitterImageSrc,
-        alt: twitter.alt,
-      }}
-    />
-    <ViewTransitions />
-    <script
-      is:inline
-      transition:persist
-      define:vars={{ themeKey, dark: Theme.Dark, light: Theme.Light }}
-    >
-      function setTheme(document) {
-        let theme = (() => {
-          if (
-            typeof localStorage !== "undefined" &&
-            localStorage.getItem(themeKey)
-          ) {
-            return localStorage.getItem(themeKey);
-          }
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            return dark;
-          }
-          return light;
-        })();
-        document.documentElement.dataset.theme = theme;
-      }
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href={faviconPng.src} sizes="32x32" />
+		<link rel="icon" href={faviconSvg.src} type="image/svg+xml" />
+		<link rel="apple-touch-icon" href={appleTouchIcon.src} />
+		<link rel="manifest" href="/manifest.json" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<SEO
+			{canonical}
+			{title}
+			{description}
+			{type}
+			og={{
+				image: ogImageSrc,
+				alt: og.alt
+			}}
+			twitter={{
+				card: twitter.card,
+				domain: 'stale.pierogis.live',
+				site: '@pierogis_live',
+				handle: twitter?.handle ? '@' + twitter.handle : undefined,
+				image: twitterImageSrc,
+				alt: twitter.alt
+			}}
+		/>
+		<ClientRouter />
+		<script
+			is:inline
+			transition:persist
+			define:vars={{ themeKey, dark: Theme.Dark, light: Theme.Light }}
+		>
+			function setTheme(document) {
+				let theme = (() => {
+					if (typeof localStorage !== 'undefined' && localStorage.getItem(themeKey)) {
+						return localStorage.getItem(themeKey);
+					}
+					if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+						return dark;
+					}
+					return light;
+				})();
+				document.documentElement.dataset.theme = theme;
+			}
 
-      setTheme(document);
+			setTheme(document);
 
-      document.addEventListener("astro:before-swap", (ev) => {
-        ev.newDocument.documentElement.dataset.theme =
-          document.documentElement.dataset.theme;
-      });
-    </script>
-    <SpeedInsights />
-  </head>
-  <body>
-    <div style="display: contents;">
-      <Layout
-        title="stale"
-        github={{
-          repo: "https://github.com/pierogis/live/tree/main/sites/stale",
-        }}
-      >
-        <nav slot="nav">
-          <Interactable>
-            <a href="/tags" class="link-box border inset">tags</a>
-          </Interactable>
+			document.addEventListener('astro:before-swap', (ev) => {
+				ev.newDocument.documentElement.dataset.theme = document.documentElement.dataset.theme;
+			});
+		</script>
+	</head>
+	<body>
+		<div style="display: contents;">
+			<Layout
+				title="stale"
+				github={{
+					repo: 'https://github.com/pierogis/live/tree/main/sites/stale'
+				}}
+			>
+				<nav slot="nav">
+					<Interactable>
+						<a href="/tags" class="link-box border inset">tags</a>
+					</Interactable>
 
-          <Interactable>
-            <a href="/about" class="border inset link-box">about</a>
-          </Interactable>
+					<Interactable>
+						<a href="/about" class="border inset link-box">about</a>
+					</Interactable>
 
-          <!-- <Interactable>
+					<!-- <Interactable>
             <a href="/newsletter" class="border inset link-box">newsletter</a>
           </Interactable> -->
-        </nav>
+				</nav>
 
-        <slot />
+				<slot />
 
-        <ThemeComponent slot="theme" client:load />
-      </Layout>
-    </div>
-  </body>
+				<ThemeComponent slot="theme" client:load />
+			</Layout>
+		</div>
+	</body>
 </html>

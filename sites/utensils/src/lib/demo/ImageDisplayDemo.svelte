@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Card, ImageDisplay } from '@pierogis/utensils';
 
-	let width = 200;
-	let height = 100;
-	let widthUnit = 'px';
-	let heightUnit = 'px';
+	let width = $state(200);
+	let height = $state(100);
+	let widthUnit = $state('px');
+	let heightUnit = $state('px');
 </script>
 
 <Card>
@@ -27,12 +27,12 @@
 
 		<div class="radio-group">
 			<label>
-				<input type="radio" bind:group={widthUnit} name="widthUnit" value={'rem'} />
+				<input type="radio" bind:group={widthUnit} name="widthUnit" value="rem" />
 				rem
 			</label>
 
 			<label>
-				<input type="radio" bind:group={widthUnit} name="widthUnit" value={'px'} />
+				<input type="radio" bind:group={widthUnit} name="widthUnit" value="px" />
 				px
 			</label>
 		</div>
@@ -46,12 +46,12 @@
 
 		<div class="radio-group">
 			<label>
-				<input type="radio" bind:group={heightUnit} name="heightUnit" value={'rem'} />
+				<input type="radio" bind:group={heightUnit} name="heightUnit" value="rem" />
 				rem
 			</label>
 
 			<label>
-				<input type="radio" bind:group={heightUnit} name="heightUnit" value={'px'} />
+				<input type="radio" bind:group={heightUnit} name="heightUnit" value="px" />
 				px
 			</label>
 		</div>
@@ -72,7 +72,7 @@
 		gap: 10px;
 	}
 
-	label:has(input) {
+	label:has(:global(input)) {
 		display: flex;
 		justify-content: right;
 		align-items: center;

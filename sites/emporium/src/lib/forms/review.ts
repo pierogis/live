@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
-export const schema = z.object({
-	id: z.number().optional(),
-	userId: z.number(),
-	description: z.string()
+export const schema = v.object({
+	id: v.optional(v.number()),
+	userId: v.number(),
+	description: v.string()
 });

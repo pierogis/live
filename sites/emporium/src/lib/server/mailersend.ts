@@ -1,4 +1,4 @@
-import { MAILERSEND_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 type Fetch = typeof fetch;
 
@@ -28,12 +28,12 @@ export const requestMailerSend = async (
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${MAILERSEND_API_KEY}`
+			Authorization: `Bearer ${env.MAILERSEND_API_KEY}`
 		}
 	});
 
 	if (response.status !== 202) {
-		const { message } = await response.json();
+		const { message } = (await response.json()) as { message: string };
 		console.error(message);
 		throw 'error sending one time passphrase';
 	}

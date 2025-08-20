@@ -3,16 +3,15 @@
 
 	import { PlateCard, ScoreSheet } from '$lib/components';
 
-	export let data;
-	$: ({ categories, platesInfo } = data);
+	let { data } = $props();
 </script>
 
 <div class="top">
 	<CardsGrid>
-		{#each platesInfo as info}
+		{#each data.platesInfo as info (info)}
 			<PlateCard plate={info.plate} small={true}>
 				<ScoreSheet
-					{categories}
+					categories={data.categories}
 					userScores={info.userScores}
 					editorialScores={info.editorialScores}
 					graphScores={info.allScores}

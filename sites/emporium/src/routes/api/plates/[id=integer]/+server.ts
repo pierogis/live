@@ -5,22 +5,22 @@ import type { Jurisdiction } from '$db/schema';
 import { deletePlate, getFullPlate, helpUpdatePlate } from '$lib/server/database/plates';
 
 import type { RequestHandler } from './$types';
-export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const plate = await getFullPlate({ modelId: parseInt(params.id) });
+export const GET: RequestHandler = async (event) => {
+	const plate = await getFullPlate(event.locals.db, { modelId: parseInt(event.params.id) });
 
 	if (plate) {
-		setHeaders({
+		event.setHeaders({
 			'cache-control': 'no-cache, max-age=3600'
 		});
 
 		return json(plate);
 	} else {
-		error(404, `plate ${params.id} not found`);
+		error(404, `plate ${event.params.id} not found`);
 	}
 };
 
-export const PUT: RequestHandler = async ({ locals, request, params }) => {
-	if (locals.sessionUser?.isAdmin) {
+export const PUT: RequestHandler = async (event) => {
+	if (event.locals.sessionUser?.isAdmin) {
 		const {
 			jurisdiction,
 			startYear,
@@ -31,11 +31,18 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 			startYear?: number;
 			endYear?: number;
 			imageUrls: string[];
-		} = await request.json();
+		} = await event.request.json();
 
-		const modelId: number = parseInt(params.id);
+		const modelId: number = parseInt(event.params.id);
 
-		const plate = helpUpdatePlate(modelId, jurisdiction.id, startYear, endYear, imageUrls);
+		const plate = helpUpdatePlate(
+			event.locals.db,
+			modelId,
+			jurisdiction.id,
+			startYear,
+			endYear,
+			imageUrls
+		);
 
 		return json(plate);
 	} else {
@@ -43,10 +50,10 @@ export const PUT: RequestHandler = async ({ locals, request, params }) => {
 	}
 };
 
-export const DELETE: RequestHandler = async ({ locals, params }) => {
-	if (locals.sessionUser?.isAdmin) {
-		const modelId = parseInt(params.id);
-		const plate = await deletePlate(modelId);
+export const DELETE: RequestHandler = async (event) => {
+	if (event.locals.sessionUser?.isAdmin) {
+		const modelId = parseInt(event.params.id);
+		const plate = await deletePlate(event.locals.db, modelId);
 
 		return json(plate);
 	} else {

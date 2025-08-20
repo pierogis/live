@@ -1,41 +1,13 @@
 {
-	"version": "5",
-	"dialect": "pg",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "5",
-			"when": 1683922291679,
-			"tag": "0000_long_dagger",
-			"breakpoints": false
-		},
-		{
-			"idx": 1,
-			"version": "5",
-			"when": 1683923229960,
-			"tag": "0001_sturdy_violations",
-			"breakpoints": false
-		},
-		{
-			"idx": 2,
-			"version": "5",
-			"when": 1689288559389,
-			"tag": "0002_bumpy_frank_castle",
-			"breakpoints": false
-		},
-		{
-			"idx": 3,
-			"version": "5",
-			"when": 1689358923241,
-			"tag": "0003_new_mandroid",
-			"breakpoints": false
-		},
-		{
-			"idx": 4,
-			"version": "5",
-			"when": 1689532827601,
-			"tag": "0004_lowly_expediter",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1755108755679,
+      "tag": "0000_ancient_nomad",
+      "breakpoints": true
+    }
+  ]
 }

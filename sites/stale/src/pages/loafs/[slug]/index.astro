@@ -1,19 +1,19 @@
 ---
-import { getCollection } from "astro:content";
-import Loaf from "../../../layouts/Loaf.astro";
+import { getCollection, render } from 'astro:content';
+import Loaf from '../../../layouts/Loaf.astro';
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection("loafs");
-  return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+	const allLoafs = await getCollection('loafs');
+	return allLoafs.map((entry) => ({
+		params: { slug: entry.id },
+		props: { entry }
+	}));
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 ---
 
 <Loaf loaf={entry}>
-  <Content />
+	<Content />
 </Loaf>

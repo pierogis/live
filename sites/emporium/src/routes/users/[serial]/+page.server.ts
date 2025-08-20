@@ -1,14 +1,15 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { superValidate } from 'sveltekit-superforms/client';
+import { valibot } from 'sveltekit-superforms/adapters';
 
 import type { Category } from '$db/schema';
 import { getCategories } from '$lib/server/database/categories';
 import { updateUserBySerial } from '$lib/server/database/users';
 import { userSchema } from '$lib/forms/user';
 
-export const load = async () => {
-	const categories: Category[] = await getCategories({ ware: 'plate' });
+export const load = async (event) => {
+	const categories: Category[] = await getCategories(event.locals.db, { ware: 'plate' });
 
 	return { categories };
 };
@@ -22,12 +23,12 @@ export const actions = {
 			event.locals.sessionUser.serial == event.params.serial ||
 			event.locals.sessionUser.isAdmin
 		) {
-			const form = await superValidate(event, userSchema);
+			const form = await superValidate(event, valibot(userSchema));
 			if (!form.valid) {
 				return fail(400, form);
 			}
 
-			const user = await updateUserBySerial(event.params.serial, {
+			const user = await updateUserBySerial(event.locals.db, event.params.serial, {
 				serial: form.data.serial.toUpperCase()
 			});
 

@@ -4,7 +4,12 @@
 
 	import { Theme, themeKey } from '../theme';
 
-	export let storedTheme: Writable<Theme | null> = getContext(themeKey) || writable();
+	interface Props {
+		// eslint-disable-next-line svelte/require-store-reactive-access
+		storedTheme?: Writable<Theme | null>;
+	}
+
+	let { storedTheme = getContext(themeKey) || writable() }: Props = $props();
 
 	function toggleTheme(theme: Theme) {
 		$storedTheme = theme;
@@ -20,26 +25,26 @@
 		class="light"
 		class:stored={$storedTheme == Theme.Light}
 		aria-label="light"
-		on:click={() => {
+		onclick={() => {
 			if ($storedTheme == Theme.Light) {
 				removeTheme();
 			} else {
 				toggleTheme(Theme.Light);
 			}
 		}}
-	/>
+	></button>
 	<button
 		class="dark"
 		class:stored={$storedTheme == Theme.Dark}
 		aria-label="dark"
-		on:click={() => {
+		onclick={() => {
 			if ($storedTheme == Theme.Dark) {
 				removeTheme();
 			} else {
 				toggleTheme(Theme.Dark);
 			}
 		}}
-	/>
+	></button>
 </div>
 
 <style>

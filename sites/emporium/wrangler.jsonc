@@ -1,0 +1,33 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "emporium",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2025-08-07",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	"routes": [{ "pattern": "emporium.pierogis.live", "custom_domain": true }],
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "emporium",
+			"database_id": "bf04db7e-7b7c-45dd-a9f0-e8becfbc26c2",
+			"migrations_dir": "migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "98f1e079cec344c6a2560cd9c73f4df8"
+		}
+	],
+	"vars": {
+		"SESSION_LENGTH": "604800000",
+		"SESSION_NAME": "session"
+	}
+}

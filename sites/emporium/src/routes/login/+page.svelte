@@ -1,27 +1,24 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { FlowCode, flowStatuses } from './_flow';
 
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	export let data;
-	$: ({ sampleEmail, samplePhrase } = data);
+	let { data, form } = $props();
 
-	export let form;
-
-	$: redirectUrl = form?.redirectUrl || $page.url.searchParams.get('redirectUrl');
-
-	let email = form?.originalEmail;
-	let passphrase = '';
+	let email = $state(form?.originalEmail);
+	let passphrase = $state('');
 
 	const flowStatus = flowStatuses[form?.flowCode || FlowCode.Default];
 
 	const loginFormId = 'login';
-	$: actionName = form?.generated ? 'login' : 'generate';
+	let { sampleEmail, samplePhrase } = $derived(data);
+	let redirectUrl = $derived(form?.redirectUrl || page.url.searchParams.get('redirectUrl'));
+	let actionName = $derived(form?.generated ? 'login' : 'generate');
 </script>
 
-<form id={loginFormId} action="/login?/{actionName}" method="POST" />
+<form id={loginFormId} action="/login?/{actionName}" method="POST"></form>
 <Card>
 	<input type="hidden" name="redirectUrl" form={loginFormId} value={redirectUrl} />
 	<input type="hidden" name="generated" form={loginFormId} value={!form?.generated} />
@@ -70,11 +67,11 @@
 
 	{#if form?.generated}
 		<Interactable>
-			<!-- svelte-ignore a11y-accesskey -->
+			<!-- svelte-ignore a11y_accesskey -->
 			<button
 				type="submit"
 				form={loginFormId}
-				formaction={'/login?/need'}
+				formaction="/login?/need"
 				class="border inset no-select"
 				accesskey="g"
 			>
@@ -83,11 +80,11 @@
 		</Interactable>
 	{:else}
 		<Interactable>
-			<!-- svelte-ignore a11y-accesskey -->
+			<!-- svelte-ignore a11y_accesskey -->
 			<button
 				type="submit"
 				form={loginFormId}
-				formaction={'/login?/already'}
+				formaction="/login?/already"
 				class="border inset no-select"
 				accesskey="r"
 			>

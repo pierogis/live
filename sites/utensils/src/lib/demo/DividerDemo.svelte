@@ -4,11 +4,11 @@
 
 <Card>
 	<span>a <code>Divider</code></span>
-	<Divider size={'4px'} horizontal />
+	<Divider size="4px" horizontal />
 	<div class="horizontal-divider-flexbox">
 		<span>can separate horizontally</span>
 
-		<Divider size={'4px'} margin="0px" />
+		<Divider size="4px" margin="0px" />
 
 		<span>or vertically</span>
 	</div>

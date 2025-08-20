@@ -1,184 +1,173 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { CollectionEntry } from 'astro:content';
 
-import { Divider } from "@pierogis/utensils";
-import Base from "./Base.astro";
+import { Divider } from '@pierogis/utensils';
+import Base from './Base.astro';
 
 interface Props {
-  loaf: CollectionEntry<"loafs">;
+	loaf: CollectionEntry<'loafs'>;
 }
 
 const { loaf } = Astro.props;
-const { slug, data } = loaf;
+const { id, data } = loaf;
 
-const {
-  title,
-  publishedDate,
-  subtitle,
-  description,
-  author,
-  image,
-  alt,
-  tags,
-} = data;
+const { title, publishedDate, subtitle, description, author, image, alt, tags } = data;
 
-const canonical = `https://stale.pierogis.live/loafs/${slug}`;
+const canonical = `https://stale.pierogis.live/loafs/${id}`;
 
-const shareUrl = new URL("/intent/tweet", "https://twitter.com");
-shareUrl.searchParams.append("original_referer", Astro.url.origin);
-shareUrl.searchParams.append("text", title);
-shareUrl.searchParams.append("url", canonical);
+const shareUrl = new URL('/intent/tweet', 'https://twitter.com');
+shareUrl.searchParams.append('original_referer', Astro.url.origin);
+shareUrl.searchParams.append('text', title);
+shareUrl.searchParams.append('url', canonical);
 ---
 
 <html lang="en">
-  <Base
-    canonical={canonical}
-    title={title}
-    description={description}
-    type="article"
-    og={{
-      image: image.og.src,
-      alt: alt,
-    }}
-    twitter={{
-      card: "summary_large_image",
-      image: image.twitter.src,
-      alt: alt,
-      handle: author.twitterHandle,
-    }}
-  >
-    <article>
-      <div class="lead">
-        <h1 class="title">
-          {title}
-        </h1>
-        <i>{subtitle}</i>
-        <div class="metadata">
-          <p class="author">
-            {
-              author.twitterHandle ? (
-                <a href={`https://twitter.com/${author.twitterHandle}`}>
-                  {author.name}
-                </a>
-              ) : (
-                author.name
-              )
-            }
-          </p>
-          <p class="date">
-            {publishedDate.toISOString().slice(0, 10)}
-          </p>
-        </div>
-        <Divider horizontal margin="0" />
-      </div>
+	<Base
+		canonical={canonical}
+		title={title}
+		description={description}
+		type="article"
+		og={{
+			image: image.og.src,
+			alt: alt
+		}}
+		twitter={{
+			card: 'summary_large_image',
+			image: image.twitter.src,
+			alt: alt,
+			handle: author.twitterHandle
+		}}
+	>
+		<article>
+			<div class="lead">
+				<h1 class="title">
+					{title}
+				</h1>
+				<i>{subtitle}</i>
+				<div class="metadata">
+					<p class="author">
+						{
+							author.twitterHandle ? (
+								<a href={`https://twitter.com/${author.twitterHandle}`}>{author.name}</a>
+							) : (
+								author.name
+							)
+						}
+					</p>
+					<p class="date">
+						{publishedDate.toISOString().slice(0, 10)}
+					</p>
+				</div>
+				<Divider horizontal margin="0" />
+			</div>
 
-      <!-- <Image
+			<!-- <Image
         src={image[1200]}
         widths={[300, 600, image[1200].width]}
         sizes={`(max-width: 360px) 300px, (max-width: 720px) 600px, ${image[1200].width}px`}
         {alt}
       /> -->
 
-      <picture>
-        <source
-          srcset={image["300x300"].src}
-          width={image["300x300"].width}
-          height={image["300x300"].height}
-          media="(orientation: portrait), (max-width: 768px)"
-        />
-        <source
-          srcset={image["600x300"].src}
-          width={image["600x300"].width}
-          height={image["600x300"].height}
-          media="(max-width: 1500px)"
-        />
-        <img
-          src={image["1200x600"].src}
-          width={image["1200x600"].width}
-          height={image["1200x600"].height}
-          {alt}
-          class="border"
-        />
-      </picture>
+			<picture>
+				<source
+					srcset={image['300x300'].src}
+					width={image['300x300'].width}
+					height={image['300x300'].height}
+					media="(orientation: portrait), (max-width: 768px)"
+				/>
+				<source
+					srcset={image['600x300'].src}
+					width={image['600x300'].width}
+					height={image['600x300'].height}
+					media="(max-width: 1500px)"
+				/>
+				<img
+					src={image['1200x600'].src}
+					width={image['1200x600'].width}
+					height={image['1200x600'].height}
+					{alt}
+					class="border"
+				/>
+			</picture>
 
-      <div class="content">
-        <slot />
-      </div>
-      <div class="tags">
-        {
-          tags.map((tag) => {
-            return (
-              <i>
-                <a href={`/tags/${tag}`}>#{tag}</a>
-              </i>
-            );
-          })
-        }
-      </div>
-      <a href={shareUrl.toString()} target="_blank">share</a>
-    </article>
-  </Base>
+			<div class="content">
+				<slot />
+			</div>
+			<div class="tags">
+				{
+					tags.map((tag) => {
+						return (
+							<i>
+								<a href={`/tags/${tag}`}>#{tag}</a>
+							</i>
+						);
+					})
+				}
+			</div>
+			<a href={shareUrl.toString()} target="_blank">share</a>
+		</article>
+	</Base>
 
-  <style>
-    img {
-      image-rendering: pixelated;
-    }
+	<style>
+		img {
+			image-rendering: pixelated;
+		}
 
-    .lead {
-      display: flex;
-      gap: 0.5em;
-      flex-direction: column;
-      justify-content: center;
-      max-width: 768px;
-    }
+		.lead {
+			display: flex;
+			gap: 0.5em;
+			flex-direction: column;
+			justify-content: center;
+			max-width: 768px;
+		}
 
-    .metadata {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      gap: 8px;
-    }
+		.metadata {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+			gap: 8px;
+		}
 
-    .author {
-      font-weight: 700;
-    }
+		.author {
+			font-weight: 700;
+		}
 
-    .author,
-    .date,
-    .title {
-      margin: 0;
-    }
+		.author,
+		.date,
+		.title {
+			margin: 0;
+		}
 
-    .content {
-      max-width: max(700px, 70%);
-      display: flex;
-      flex-direction: column;
-      gap: 1em;
-    }
+		.content {
+			max-width: max(700px, 70%);
+			display: flex;
+			flex-direction: column;
+			gap: 1em;
+		}
 
-    @media (orientation: portait) {
-      img {
-        max-width: 90vw;
-      }
-    }
+		@media (orientation: portait) {
+			img {
+				max-width: 90vw;
+			}
+		}
 
-    @media (max-width: 768px) {
-      .title {
-        text-align: center;
-      }
-      .content {
-        margin: 0;
-      }
-    }
+		@media (max-width: 768px) {
+			.title {
+				text-align: center;
+			}
+			.content {
+				margin: 0;
+			}
+		}
 
-    a {
-      text-decoration: none;
-    }
+		a {
+			text-decoration: none;
+		}
 
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+		a:hover {
+			text-decoration: underline;
+		}
+	</style>
 
 
 </html>

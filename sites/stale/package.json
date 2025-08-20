@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "postinstall": "astro sync",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
@@ -12,20 +13,21 @@
     "astro": "astro"
   },
   "type": "module",
+  "devDependencies": {
+    "@astrojs/check": "0.9.4",
+    "wrangler": "4.31.0"
+  },
   "dependencies": {
-    "@astrojs/check": "^0.3.4",
-    "@astrojs/mdx": "^2.0.3",
-    "@astrojs/rss": "^4.0.1",
-    "@astrojs/sitemap": "^3.0.4",
-    "@astrojs/svelte": "^5.0.3",
-    "@astrojs/vercel": "^6.1.1",
+    "@astrojs/mdx": "4.3.3",
+    "@astrojs/rss": "4.0.12",
+    "@astrojs/sitemap": "3.4.2",
+    "@astrojs/svelte": "7.1.0",
+    "@astrojs/cloudflare": "12.6.3",
     "@pierogis/utensils": "workspace:*",
-    "@vercel/speed-insights": "^1.0.2",
-    "astro": "^4.0.8",
-    "sharp": "^0.33.1",
-    "sharp-ico": "^0.1.5",
-    "svelte": "^4.2.8",
-    "typescript": "^5.3.3",
+    "astro": "5.12.8",
+    "sharp": "0.34.3",
+    "svelte": "5.38.0",
+    "typescript": "5.9.2",
     "ui": "workspace:*"
   }
 }

@@ -1,15 +1,19 @@
+import { drizzle } from 'drizzle-orm/d1';
+
 import { jurisdictions, type Jurisdiction } from '$db/schema';
+import type { DrizzleClient } from '.';
 
-import { db } from '.';
-
-export const listJurisdictions = async () => await db.select().from(jurisdictions);
+export const listJurisdictions = async (db: DrizzleClient) => {
+	return await db.select().from(jurisdictions);
+};
 
 export const getJurisdictions = async (
+	db: DrizzleClient,
 	params: Partial<Jurisdiction>,
 	take: number | undefined = undefined,
 	skip = 0
-) =>
-	await db.query.jurisdictions.findMany({
+) => {
+	return await db.query.jurisdictions.findMany({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -19,9 +23,13 @@ export const getJurisdictions = async (
 		limit: take,
 		offset: skip
 	});
+};
 
-export const getJurisdictionWithPlates = async (params: Partial<Jurisdiction>) =>
-	await db.query.jurisdictions.findFirst({
+export const getJurisdictionWithPlates = async (
+	db: DrizzleClient,
+	params: Partial<Jurisdiction>
+) => {
+	return await db.query.jurisdictions.findFirst({
 		where: (table, { and, eq }) =>
 			and(
 				params.id ? eq(table.id, params.id) : undefined,
@@ -48,9 +56,10 @@ export const getJurisdictionWithPlates = async (params: Partial<Jurisdiction>) =
 			}
 		}
 	});
+};
 
-export const getJurisdiction = async (params: Partial<Jurisdiction>) =>
-	await db.query.jurisdictions.findFirst({
+export const getJurisdiction = async (db: DrizzleClient, params: Partial<Jurisdiction>) => {
+	return await db.query.jurisdictions.findFirst({
 		where: (table, { or, eq }) =>
 			or(
 				params.id !== undefined ? eq(table.id, params.id) : undefined,
@@ -58,3 +67,4 @@ export const getJurisdiction = async (params: Partial<Jurisdiction>) =>
 				params.name !== undefined ? eq(table.name, params.name) : undefined
 			)
 	});
+};

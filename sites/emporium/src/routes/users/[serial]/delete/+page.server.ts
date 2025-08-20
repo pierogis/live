@@ -20,23 +20,26 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-	default: async ({ locals, params, request }) => {
-		if (locals.sessionUser === null) {
+	default: async (event) => {
+		if (event.locals.sessionUser === null) {
 			return fail(401, { message: `not signed in` });
 		}
-		if (locals.sessionUser?.serial == params.serial || locals.sessionUser?.isAdmin) {
-			const formData = await request.formData();
+		if (
+			event.locals.sessionUser?.serial == event.params.serial ||
+			event.locals.sessionUser?.isAdmin
+		) {
+			const formData = await event.request.formData();
 			const userId = formData.get(userIdInputName);
 
 			if (!userId) {
 				return fail(400, { message: 'userId missing' });
 			} else {
-				await deleteUser(parseInt(userId.toString()));
+				await deleteUser(event.locals.db, parseInt(userId.toString()));
 			}
 
 			redirect(303, '/');
 		} else {
-			return fail(403, { message: `not user ${params.serial} or admin` });
+			return fail(403, { message: `not user ${event.params.serial} or admin` });
 		}
 	}
 };

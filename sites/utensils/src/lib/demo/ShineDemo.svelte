@@ -1,22 +1,22 @@
 <script lang="ts">
 	import { Card, Divider, ImageDisplay, Shine } from '@pierogis/utensils';
 
-	let usingRandomLength = true;
-	let usingRandomStart = true;
+	let usingRandomLength = $state(true);
+	let usingRandomStart = $state(true);
 
-	let maxXLength = 8;
-	let maxYLength = 8;
-	let minXLength = 6;
-	let minYLength = 6;
-	let offsetX = 0;
-	let offsetY = 0;
-	let lengthX = 6;
-	let lengthY = 6;
-	let blur = 50;
-	let color = '#ffffff';
-	let unhoverOpacity = 0.5;
+	let maxXLength = $state(8);
+	let maxYLength = $state(8);
+	let minXLength = $state(6);
+	let minYLength = $state(6);
+	let offsetX = $state(0);
+	let offsetY = $state(0);
+	let lengthX = $state(6);
+	let lengthY = $state(6);
+	let blur = $state(50);
+	let color = $state('#ffffff');
+	let unhoverOpacity = $state(0.5);
 
-	$: {
+	$effect(() => {
 		if (minXLength > maxXLength) {
 			minXLength = maxXLength;
 		}
@@ -35,7 +35,7 @@
 		if (offsetY > lengthY && !usingRandomLength) {
 			offsetY = lengthY;
 		}
-	}
+	});
 </script>
 
 <Card>
@@ -183,13 +183,13 @@
 		height: 3em;
 	}
 
-	label:has(input) {
+	label:has(:global(input)) {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px;
 	}
-	label:has(input[type='checkbox']) {
+	label:has(:global(input[type='checkbox'])) {
 		justify-content: center;
 	}
 

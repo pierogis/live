@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	export let data;
+	let { data } = $props();
 </script>
 
 <h3 class="tagline">{data.tagline}</h3>
 
 <div class="grid">
-	{#each data.sites as site}
+	{#each data.sites as site (site)}
 		<div class="tile">
 			<Card border={false} inset={false}>
 				<Interactable>
 					<a class="border inset link-box" href={site.href}>{site.tagline}</a>
 				</Interactable>
-				<iframe title={site.title} src={site.href} />
+				<iframe title={site.title} src={site.href}></iframe>
 				<br />
 			</Card>
 		</div>

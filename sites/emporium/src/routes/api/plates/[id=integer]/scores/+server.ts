@@ -10,7 +10,7 @@ export const GET: RequestHandler = async (event) => {
 		event.locals.sessionUser?.id || userIdParam === null ? null : parseInt(userIdParam);
 	if (userId) {
 		const parsedParams = { modelId: parseInt(event.params.id), userId: userId };
-		const scores = await getScores(parsedParams);
+		const scores = await getScores(event.locals.db, parsedParams);
 
 		return json(scores);
 	} else {

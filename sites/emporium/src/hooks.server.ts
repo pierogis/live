@@ -1,17 +1,28 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 
-import { SESSION_NAME } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-import { cache, setupCache } from '$lib/server/cache';
-
+import { createD1Client, createLibSqlClient } from '$lib/server/database';
 import { decryptSessionCookie } from '$lib/server/session';
 import { getUser } from '$lib/server/database/users';
 
+const db = env.DATABASE_URL ? createLibSqlClient(env.DATABASE_URL) : null;
+
 export const handle: Handle = async ({ event, resolve }) => {
-	if (!cache) setupCache();
+	if (event.platform?.env.DB) {
+		event.locals.db = createD1Client(event.platform.env.DB);
+	} else if (db) {
+		event.locals.db = db;
+	} else {
+		throw new Error('No database found');
+	}
+	if (!event.platform) {
+		throw 'platform not found';
+	}
+	event.locals.kv_binding = event.platform.env.KV;
 
 	event.locals.sessionUser = null;
-	const sessionCookie = event.cookies.get(SESSION_NAME);
+	const sessionCookie = event.cookies.get(env.SESSION_NAME);
 
 	let deleteCookie = false;
 
@@ -20,7 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const { userId } = await decryptSessionCookie<{ userId: number }>(sessionCookie);
 
 			if (userId) {
-				const sessionUser = await getUser({ id: userId });
+				const sessionUser = await getUser(event.locals.db, { id: userId });
 
 				if (!sessionUser) {
 					throw 'cookie user not in database';
@@ -33,7 +44,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (deleteCookie) {
-		event.cookies.delete(SESSION_NAME, { path: '/' });
+		event.cookies.delete(env.SESSION_NAME, { path: '/' });
 	}
 
 	return await resolve(event);

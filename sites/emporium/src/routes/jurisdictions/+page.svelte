@@ -3,12 +3,11 @@
 
 	import { PlateCard } from '$lib/components';
 
-	export let data;
-	$: ({ plates } = data);
+	let { data } = $props();
 </script>
 
 <CardsGrid>
-	{#each plates as plate}
+	{#each data.plates as plate (plate)}
 		<PlateCard {plate} showYears={false} small={true} />
 	{/each}
 </CardsGrid>

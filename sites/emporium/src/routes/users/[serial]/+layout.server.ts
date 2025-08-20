@@ -3,7 +3,9 @@ import { error } from '@sveltejs/kit';
 import { getUserWithInteractions } from '$lib/server/database/users';
 
 export const load = async (event) => {
-	const user = await getUserWithInteractions({ serial: event.params.serial });
+	const user = await getUserWithInteractions(event.locals.db, {
+		serial: event.params.serial
+	});
 
 	if (user === undefined) {
 		error(404, "user doesn't exist");

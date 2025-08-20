@@ -1,59 +1,71 @@
 <script lang="ts">
-	/**
-	 * maximum value in seconds for random animation length
-	 * `min` must be less than `max`
-	 * defaults to 6-8s
-	 */
-	export let randomLength = {
-		x: { min: 6, max: 8 },
-		y: { min: 6, max: 8 }
-	};
+	import type { Snippet } from 'svelte';
 
-	$: {
+	interface Props {
+		/**
+		 * maximum value in seconds for random animation length
+		 * `min` must be less than `max`
+		 * defaults to 6-8s
+		 */
+		randomLength?: any;
+		/**
+		 * offset in seconds for start of animation
+		 */
+		offset?: any;
+		/**
+		 * specify length in seconds
+		 * defaults to uniform distribution from `min` to `max` in `randomLength`
+		 */
+		length?: { x?: number; y?: number } | undefined;
+		/**
+		 * blur filter applied over shine gradient (use 0 for no blur)
+		 * defaults to 50px
+		 */
+		blur?: string;
+		/**
+		 * main color of the shine
+		 * defaults to white with 40% opacity
+		 */
+		color?: string;
+		/**
+		 * opacity when not hovering (combines with alpha in the color)
+		 */
+		unhoverOpacity?: number;
+		borderRadius?: string;
+		children?: Snippet;
+	}
+
+	let {
+		randomLength = {
+			x: { min: 6, max: 8 },
+			y: { min: 6, max: 8 }
+		},
+		offset = {
+			x: Math.random() * (randomLength.x.max - 0) + 0,
+			y: Math.random() * (randomLength.y.max - 0) + 0
+		},
+		length = undefined,
+		blur = '50px',
+		color = 'rgba(255, 255, 255, 0.4)',
+		unhoverOpacity = 0.4,
+		borderRadius = '0px',
+		children
+	}: Props = $props();
+	$effect(() => {
 		if (randomLength.x.min > randomLength.x.max || randomLength.y.min > randomLength.y.max) {
 			throw 'Shine random length min must not be greater than max';
 		}
-	}
-
-	/**
-	 * offset in seconds for start of animation
-	 */
-	export let offset = {
-		x: Math.random() * (randomLength.x.max - 0) + 0,
-		y: Math.random() * (randomLength.y.max - 0) + 0
-	};
-
-	/**
-	 * specify length in seconds
-	 * defaults to uniform distribution from `min` to `max` in `randomLength`
-	 */
-	export let length: { x?: number; y?: number } | undefined = undefined;
-
-	$: realLengthX = length?.x
-		? length.x
-		: Math.random() * (randomLength.x.max - randomLength.x.min) + randomLength.x.min;
-
-	$: realLengthY = length?.y
-		? length.y
-		: Math.random() * (randomLength.y.max - randomLength.y.min) + randomLength.y.min;
-
-	/**
-	 * blur filter applied over shine gradient (use 0 for no blur)
-	 * defaults to 50px
-	 */
-	export let blur = '50px';
-
-	/**
-	 * main color of the shine
-	 * defaults to white with 40% opacity
-	 */
-	export let color = 'rgba(255, 255, 255, 0.4)';
-
-	/**
-	 * opacity when not hovering (combines with alpha in the color)
-	 */
-	export let unhoverOpacity = 0.4;
-	export let borderRadius = '0px';
+	});
+	let realLengthX = $derived(
+		length?.x
+			? length.x
+			: Math.random() * (randomLength.x.max - randomLength.x.min) + randomLength.x.min
+	);
+	let realLengthY = $derived(
+		length?.y
+			? length.y
+			: Math.random() * (randomLength.y.max - randomLength.y.min) + randomLength.y.min
+	);
 </script>
 
 <div class="shine" style:border-radius={borderRadius}>
@@ -66,8 +78,8 @@
 		style:--blur={blur}
 		style:--color={color}
 		style:--unhoverOpacity={unhoverOpacity}
-	/>
-	<slot />
+	></div>
+	{@render children?.()}
 </div>
 
 <style>

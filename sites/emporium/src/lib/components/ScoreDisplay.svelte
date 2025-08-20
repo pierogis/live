@@ -3,31 +3,33 @@
 
 	import type { Score } from '$db/schema';
 	import { goto } from '$app/navigation';
+	import { PointStatus } from './model';
 
-	export let interactive = true;
-	export let editorialScore: Readable<Score> | null = null;
-	export let userScore: Writable<Score> | null = null;
-
-	$: displayScore = userScore || editorialScore;
-
-	$: placeholder = $displayScore == null || $displayScore.value < 0;
-
-	$: displayValue = $displayScore == null || $displayScore?.value < 0 ? 0 : $displayScore?.value;
-
-	$: halfScores = displayValue % 2;
-	$: fullScores = (displayValue - halfScores) / 2;
-	$: emptyScores = 5 - (fullScores + halfScores);
-
-	enum PointStatus {
-		full = '●',
-		half = '◐',
-		empty = '○'
+	interface Props {
+		interactive?: boolean;
+		editorialScore: Readable<Score> | null;
+		userScore: Writable<Score> | null;
 	}
-	let pointStatuses: PointStatus[];
-	$: pointStatuses = Array(fullScores)
-		.fill(PointStatus.full)
-		.concat(Array(halfScores).fill(PointStatus.half))
-		.concat(Array(emptyScores).fill(PointStatus.empty));
+	let { interactive = true, editorialScore = null, userScore = null }: Props = $props();
+
+	let displayScore = $derived(userScore || editorialScore);
+
+	let placeholder = $derived($displayScore == null || $displayScore.value < 0);
+
+	let displayValue = $derived(
+		$displayScore == null || $displayScore?.value < 0 ? 0 : $displayScore?.value
+	);
+
+	let halfScores = $derived(displayValue % 2);
+	let fullScores = $derived((displayValue - halfScores) / 2);
+	let emptyScores = $derived(5 - (fullScores + halfScores));
+
+	let pointStatuses: PointStatus[] = $derived(
+		Array(fullScores)
+			.fill(PointStatus.full)
+			.concat(Array(halfScores).fill(PointStatus.half))
+			.concat(Array(emptyScores).fill(PointStatus.empty))
+	);
 
 	function handlePointerDown(event: PointerEvent, i: number) {
 		if (event.button == 0) {
@@ -56,7 +58,10 @@
 			class:user={userScore !== null}
 			class:placeholder
 			class:interactive
-			on:pointerdown|preventDefault={(e) => handlePointerDown(e, i)}
+			onpointerdown={(e) => {
+				e.preventDefault();
+				handlePointerDown(e, i);
+			}}
 		>
 			{pointStatus}
 		</span>

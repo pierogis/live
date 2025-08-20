@@ -6,19 +6,30 @@
 	import { Interactable } from '@pierogis/utensils';
 	import { ScoreDisplay, ScoreGraph } from '.';
 
-	export let interactive = true;
-	export let categories: Category[];
+	interface Props {
+		interactive?: boolean;
+		categories: Category[];
 
-	export let editorialScores: { [categoryId: number]: Readable<Score> } | null = null;
-	export let userScores: { [categoryId: number]: Writable<Score> } | null = null;
-	export let graphScores: { [categoryId: number]: Readable<Score>[] } | null = null;
+		editorialScores?: { [categoryId: number]: Readable<Score> } | null;
+		userScores?: { [categoryId: number]: Writable<Score> } | null;
+		graphScores?: { [categoryId: number]: Readable<Score>[] } | null;
 
-	export let scoreUrl: string | null = null;
+		scoreUrl?: string | null;
+	}
+
+	let {
+		interactive = true,
+		categories,
+		editorialScores = null,
+		userScores = null,
+		graphScores = null,
+		scoreUrl = null
+	}: Props = $props();
 </script>
 
 <Interactable clickable={false}>
 	<div class="inner">
-		{#each categories as category}
+		{#each categories as category (category.id)}
 			{@const categoryEditorialScore = editorialScores ? editorialScores[category.id] : null}
 			{@const categoryUserScore = userScores !== null ? userScores[category.id] : null}
 			<div class="category">
@@ -39,7 +50,8 @@
 						type="submit"
 						formaction="{scoreUrl}?/delete"
 						formmethod="post"
-						on:click|preventDefault={() => {
+						onclick={(e) => {
+							e.preventDefault();
 							categoryUserScore.update((score) => {
 								score.value = -1;
 								return score;
@@ -51,7 +63,7 @@
 				<br />
 			</div>
 			{#if category.name == 'overall'}
-				<div class="overall-seperator" />
+				<div class="overall-seperator"></div>
 			{/if}
 		{/each}
 	</div>

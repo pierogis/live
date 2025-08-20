@@ -3,29 +3,27 @@
 
 	import { PlateCard, ReviewCard, ScoreSheet, ReviewForm } from '$lib/components';
 
-	export let data;
-	$: ({
-		categories,
-		plate,
-		userReview,
-		reviewForm,
-		editorialReview,
-		allReviews,
-		userScores,
-		editorialScores,
-		allScores,
-		sessionUser
-	} = data);
+	let { data } = $props();
 
-	$: scoreUrl = `/plates/${plate.modelId}/scores/`;
+	let scoreUrl = $derived(`/plates/${data.plate.modelId}/scores/`);
 
-	$: allReviewsStores = allReviews.map((review) => review);
+	let allReviewsStores = $derived(data.allReviews.map((review) => review));
+
+	let userReview = $derived(data.userReview);
+	let editorialReview = $derived(data.editorialReview);
+
+	let description = $state($userReview.description);
 </script>
 
 <Section>
-	<PlateCard {plate} isAdmin={sessionUser?.isAdmin} small={false} />
+	<PlateCard plate={data.plate} isAdmin={data.sessionUser?.isAdmin} small={false} />
 
-	<ScoreSheet interactive={false} {categories} {editorialScores} graphScores={allScores} />
+	<ScoreSheet
+		interactive={false}
+		categories={data.categories}
+		editorialScores={data.editorialScores}
+		graphScores={data.allScores}
+	/>
 
 	{#if $editorialReview.description}
 		<div class="break-container">
@@ -34,28 +32,33 @@
 	{/if}
 </Section>
 
-<Divider horizontal={true} size={'0.4rem'} />
+<Divider horizontal={true} size="0.4rem" />
 
-<Section column rowGap={'0.5rem'}>
-	<h3 slot="title">user review</h3>
-	{#if sessionUser !== null}
-		<ScoreSheet {categories} {userScores} {scoreUrl} />
-		<ReviewForm {plate} data={reviewForm} bind:description={$userReview.description} />
+<Section column rowGap="0.5rem">
+	{#snippet title()}
+		<h3>user review</h3>
+	{/snippet}
+	{#if data.sessionUser !== null}
+		<ScoreSheet categories={data.categories} userScores={data.userScores} {scoreUrl} />
+		<ReviewForm plate={data.plate} data={data.reviewForm} bind:description />
 	{:else}
-		{@const loginUrl = `/login?redirectUrl=/plates/${plate.modelId}`}
+		{@const loginUrl = `/login?redirectUrl=/plates/${data.plate.modelId}`}
 		<Interactable>
 			<a class="border inset good no-select link-box" href={loginUrl}>login</a>
 		</Interactable>
 	{/if}
 </Section>
 
-<Divider horizontal={true} size={'0.4rem'} />
+<Divider horizontal={true} size="0.4rem" />
 
 <Section column>
-	<h3 slot="title">reviews</h3>
+	{#snippet title()}
+		<h3>reviews</h3>
+	{/snippet}
+
 	<CardsGrid>
-		{#each allReviewsStores as review}
-			<ReviewCard {categories} {review} scores={allScores} />
+		{#each allReviewsStores as review (review)}
+			<ReviewCard categories={data.categories} {review} scores={data.allScores} />
 		{/each}
 	</CardsGrid>
 </Section>

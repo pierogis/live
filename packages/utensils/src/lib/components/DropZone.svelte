@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let inputElement: HTMLInputElement;
+	interface Props {
+		inputElement: HTMLInputElement;
+	}
+
+	let { inputElement = $bindable() }: Props = $props();
 
 	function dropAction(element: HTMLElement) {
 		const dropHandler = (event: DragEvent) => {
@@ -24,22 +28,24 @@
 			}
 		};
 	}
-	let thumbnailSrc = '#';
+	let thumbnailSrc = $state('#');
 
-	let files: FileList;
+	let files: FileList | undefined = $state();
 
-	const reader = new FileReader();
+	const reader = $state(new FileReader());
 	reader.onload = (e) => {
 		if (e.target?.result) {
 			thumbnailSrc = e.target.result.toString();
 		}
 	};
 
-	$: {
-		let image = files[0];
+	$effect(() => {
+		if (files) {
+			let image = files[0];
 
-		reader.readAsDataURL(image);
-	}
+			reader.readAsDataURL(image);
+		}
+	});
 </script>
 
 <div class="zone inset" use:dropAction>

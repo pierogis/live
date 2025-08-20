@@ -3,19 +3,16 @@
 
 	import { userIdInputName } from '$lib/forms/user';
 
-	export let data;
-	$: ({ isUser, isAdmin, user } = data);
-
-	export let form;
+	let { data, form } = $props();
 </script>
 
-{#if isUser || isAdmin}
+{#if data.isUser || data.isAdmin}
 	<Card>
 		<span>Are you sure you want to delete this account?</span>
-		<b>{user.serial}</b>
+		<b>{data.user.serial}</b>
 		<div class="buttons">
 			<Interactable>
-				<a class="link-box border inset no-select" href={`/users/${user.serial}`}>cancel</a>
+				<a class="link-box border inset no-select" href={`/users/${data.user.serial}`}>cancel</a>
 			</Interactable>
 
 			<Interactable>
@@ -32,7 +29,7 @@
 {/if}
 
 <form id="delete" method="post">
-	<input hidden name={userIdInputName} value={user.id} />
+	<input hidden name={userIdInputName} value={data.user.id} />
 </form>
 
 <style>

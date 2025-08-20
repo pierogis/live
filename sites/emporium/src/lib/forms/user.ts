@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import * as v from 'valibot';
 
 export const userIdInputName = 'user-id';
 
-export const userSchema = z.object({
-	serial: z.string().max(7).toUpperCase()
+export const userSchema = v.object({
+	serial: v.pipe(v.string(), v.maxLength(7), v.toUpperCase())
 });

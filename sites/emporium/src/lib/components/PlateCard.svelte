@@ -1,14 +1,19 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
+
 	import type { FullPlate } from '$db/schema';
 
 	import { Card, Interactable, ImageDisplay, Shine } from '@pierogis/utensils';
 
-	export let plate: FullPlate;
+	interface Props {
+		plate: FullPlate;
+		isAdmin?: boolean;
+		showYears?: boolean;
+		small: boolean;
+		children?: Snippet;
+	}
 
-	export let isAdmin = false;
-	export let showYears = true;
-
-	export let small: boolean;
+	let { plate, isAdmin = false, showYears = true, small, children }: Props = $props();
 
 	const alt = `${plate.startYear || '?'}-${plate.endYear || '?'} ${
 		plate.jurisdiction.abbreviation
@@ -50,7 +55,7 @@
 			</a>
 		{/if}
 
-		<slot />
+		{@render children?.()}
 	</Card>
 </Interactable>
 

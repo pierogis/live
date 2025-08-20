@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 
 import { message, superValidate } from 'sveltekit-superforms/server';
+import { valibot } from 'sveltekit-superforms/adapters';
 
 import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
 import { schema } from '$lib/forms/review';
@@ -19,7 +20,7 @@ export const load: PageServerLoad = async (event) => {
 		redirect(302, `/login`);
 	}
 
-	const review = (await getReview({
+	const review = (await getReview(event.locals.db, {
 		modelId: parseInt(event.params.id),
 		userId: event.locals.sessionUser.id
 	})) || {
@@ -29,7 +30,7 @@ export const load: PageServerLoad = async (event) => {
 		description: ''
 	};
 
-	const form = await superValidate(review, schema);
+	const form = await superValidate(review, valibot(schema));
 
 	return { canonical, title, description, form };
 };
@@ -40,7 +41,7 @@ export const actions: Actions = {
 			const modelId = parseInt(event.params.id);
 			const userId = event.locals.sessionUser.id;
 
-			const form = await superValidate(event.request, schema);
+			const form = await superValidate(event.request, valibot(schema));
 
 			if (!form.valid) {
 				// Again, always return { form } and things will just work.
@@ -53,7 +54,7 @@ export const actions: Actions = {
 			}
 
 			if (!form.data.description || (form.data.description == '' && form.data.id)) {
-				await deleteReview({ modelId, userId: form.data.userId });
+				await deleteReview(event.locals.db, { modelId, userId: form.data.userId });
 
 				redirect(303, `/plates/${modelId}`);
 			} else {
@@ -64,7 +65,7 @@ export const actions: Actions = {
 					description: form.data.description
 				};
 
-				await upsertReview(data);
+				await upsertReview(event.locals.db, data);
 
 				redirect(303, `/plates/${modelId}`);
 			}
@@ -77,7 +78,7 @@ export const actions: Actions = {
 			const modelId = parseInt(event.params.id);
 			const userId = event.locals.sessionUser.id;
 
-			const form = await superValidate(event.request, schema);
+			const form = await superValidate(event.request, valibot(schema));
 
 			if (!form.valid) {
 				// Again, always return { form } and things will just work.
@@ -94,7 +95,7 @@ export const actions: Actions = {
 				userId: form.data.userId
 			};
 
-			await deleteReview(reviewParams);
+			await deleteReview(event.locals.db, reviewParams);
 			redirect(303, `/plates/${modelId}`);
 		} else {
 			redirect(302, `/login`);

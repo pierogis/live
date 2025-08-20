@@ -12,21 +12,21 @@ pnpm add -D @pierogis/utensils
 
 ```svelte title="src/+page.ts"
 <script lang="ts">
-	import {
-		Card,
-		CardsGrid,
-		Divider,
-		ImageDisplay,
-		Layout,
-		Section,
-		ThemeToggle
-	} from '@pierogis/utensils';
+  import {
+    Card,
+    CardsGrid,
+    Divider,
+    ImageDisplay,
+    Layout,
+    Section,
+    ThemeToggle
+  } from '@pierogis/utensils';
 </script>
 
 ...
 
 <style>
-	@import '@pierogis/utensils/styles/pierogis.css';
+  @import '@pierogis/utensils/styles/pierogis.css';
 </style>
 ```
 

@@ -8,11 +8,10 @@
     "format": "prettier --write --ignore-path=../../.prettierignore ."
   },
   "devDependencies": {
-    "@pierogis/utensils": "workspace:*",
-    "eslint-config-custom": "workspace:*",
-    "prettier": "^3.1.0",
-    "prettier-plugin-svelte": "^3.1.2",
-    "svelte": "^4.2.7"
+    "svelte": "5.38.0"
+  },
+  "dependencies": {
+    "@pierogis/utensils": "workspace:*"
   },
   "type": "module",
   "module": "index.ts",

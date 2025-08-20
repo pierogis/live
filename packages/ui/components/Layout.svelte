@@ -1,37 +1,57 @@
 <script lang="ts">
-  import { Interactable, Layout, ThemeToggle } from "@pierogis/utensils";
-  import "@pierogis/utensils/styles/pierogis.css";
+	import type { Snippet } from 'svelte';
 
-  export let title: string;
-  export let github: { repo: string };
+	import { Interactable, Layout, ThemeToggle } from '@pierogis/utensils';
+	import '@pierogis/utensils/styles/pierogis.css';
+
+	interface Props {
+		title: string;
+		github: { repo: string };
+		nav?: Snippet;
+		children?: Snippet;
+		footer?: Snippet;
+		theme?: Snippet;
+	}
+
+	let { title, github, nav: nav_render, children, footer: footer_render, theme }: Props = $props();
 </script>
 
-<Layout>
-  <Interactable slot="title">
-    <div class="link-box border inset">{title}</div>
-  </Interactable>
+{#snippet title_snippet()}
+	<Interactable>
+		<div class="link-box border inset">{title}</div>
+	</Interactable>
+{/snippet}
 
-  <slot name="nav" slot="nav" />
+<Layout title={title_snippet}>
+	{#snippet nav()}
+		{@render nav_render?.()}
+	{/snippet}
 
-  <slot />
+	{@render children?.()}
 
-  <footer slot="footer">
-    <slot name="footer">
-      <Interactable>
-        <a class="border inset link-box" href="https://pierogis.live">live</a>
-      </Interactable>
-    </slot>
-    <Interactable>
-      <a class="border inset link-box" href={github.repo}>github</a>
-    </Interactable>
-    <Interactable>
-      <a class="border inset link-box" href="https://twitter.com/pierogis_live">
-        @pierogis_live
-      </a>
-    </Interactable>
+	{#snippet footer()}
+		<footer>
+			{#if footer_render}
+				{@render footer_render()}
+			{:else}
+				<Interactable>
+					<a class="border inset link-box" href="https://pierogis.live">live</a>
+				</Interactable>
+			{/if}
+			<Interactable>
+				<a class="border inset link-box" href={github.repo}>github</a>
+			</Interactable>
+			<Interactable>
+				<a class="border inset link-box" href="https://twitter.com/pierogis_live">
+					@pierogis_live
+				</a>
+			</Interactable>
 
-    <slot name="theme">
-      <ThemeToggle />
-    </slot>
-  </footer>
+			{#if theme}
+				{@render theme()}
+			{:else}
+				<ThemeToggle />
+			{/if}
+		</footer>
+	{/snippet}
 </Layout>
