@@ -7,5 +7,9 @@
 	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
+	"privatePackages": {
+		"tag": false,
+		"version": false
+	},
 	"ignore": ["careers", "colors", "emporium", "live", "stale", "utensils"]
 }
