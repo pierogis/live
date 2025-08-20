@@ -14,7 +14,8 @@
   },
   "type": "module",
   "devDependencies": {
-    "@astrojs/check": "0.9.4"
+    "@astrojs/check": "0.9.4",
+    "wrangler": "4.31.0"
   },
   "dependencies": {
     "@astrojs/mdx": "4.3.3",

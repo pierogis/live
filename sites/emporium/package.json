@@ -28,7 +28,7 @@
     "tsx": "4.20.3",
     "typescript": "5.9.2",
     "vite": "7.1.1",
-    "wrangler": "4.28.1"
+    "wrangler": "4.31.0"
   },
   "dependencies": {
     "@libsql/client": "0.15.10",
