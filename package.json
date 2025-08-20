@@ -7,6 +7,7 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "check": "turbo run check",
+    "changeset:version": "changeset version && pnpm install --no-frozen-lockfile",
     "changeset:publish": "changeset publish"
   },
   "devDependencies": {
