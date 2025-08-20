@@ -40,6 +40,7 @@
     "!dist/**/*.spec.*"
   ],
   "scripts": {
+    "postinstall": "svelte-kit sync",
     "dev": "svelte-kit sync && svelte-package --watch",
     "build": "npm run package",
     "prepare": "npm run build",
