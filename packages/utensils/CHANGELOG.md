@@ -1,5 +1,11 @@
 # @pierogis/utensils
 
+## 1.0.1
+
+### Patch Changes
+
+- 5e729f7: put theme provider script in literal html
+
 ## 1.0.0
 
 ### Major Changes
