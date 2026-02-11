@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import rss from '@astrojs/rss';
 
 export const GET: APIRoute = async (context) => {
-	const loafs = await getCollection('loafs');
+	const loafs = await getCollection('loafs', ({ data }) => import.meta.env.DEV ||  || !data.draft);
 	return rss({
 		title: 'stale',
 		description: 'well beyond the pale',

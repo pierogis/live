@@ -287,7 +287,7 @@ blockquote > blockquote {
 	margin: 0;
 }
 
-blockquote p {
+blockquote * {
 	margin: 0;
 	font-family: Courier, monospace;
 	font-weight: 600;
