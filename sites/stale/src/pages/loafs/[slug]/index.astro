@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Loaf from '../../../layouts/Loaf.astro';
 
 export async function getStaticPaths() {
-	const allLoafs = await getCollection('loafs', ({ data }) => import.meta.env.DEV || !data.draft);
+	const allLoafs = await getCollection('loafs');
 	return allLoafs.map((entry) => ({
 		params: { slug: entry.id },
 		props: { entry }

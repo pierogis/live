@@ -54,8 +54,7 @@ const loafsCollection = defineCollection({
 				// }),
 			}),
 			alt: z.string(),
-			tags: z.array(z.string()),
-			draft: z.optional(z.boolean())
+			tags: z.array(z.string())
 		})
 });
 // Export a single `collections` object to register your collection(s)

@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import LoafGrid from '../../components/LoafGrid.astro';
 
 export async function getStaticPaths() {
-	const allLoafs = await getCollection('loafs', ({ data }) => import.meta.env.DEV || !data.draft);
+	const allLoafs = await getCollection('loafs');
 
 	const uniqueTags = [...new Set(allLoafs.map((loaf) => loaf.data.tags).flat())];
 

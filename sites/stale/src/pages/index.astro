@@ -4,10 +4,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import LoafGrid from '../components/LoafGrid.astro';
 
-const allLoafs = await getCollection(
-	'loafs',
-	({ data }) => import.meta.env.DEV || data.draft !== true
-);
+const allLoafs = await getCollection('loafs');
 
 const description = 'well beyond the pale';
 ---
