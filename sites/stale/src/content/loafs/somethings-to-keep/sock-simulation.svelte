@@ -65,96 +65,105 @@
 	);
 </script>
 
-<div class="parameters">
-	<div>
-		Washes:
-		<input type="number" bind:value={numberOfWashes} min="100" max="1500" step={100} />
-	</div>
-
-	<div>
-		Left:
-		<input type="number" bind:value={left} min="1" max="20" step={1} />
-	</div>
-
-	<div>
-		Right:
-		<input type="number" bind:value={right} min="1" max="20" step={1} />
-	</div>
-
-	<div>Pairs per Wash: {pairsPerWash}</div>
-
-	<div>
-		Same-footed pair frequency: {sameFootedPairFrequency.toFixed(2)}
-	</div>
-</div>
-
-{#snippet yAxisLabels()}
-	<span>1</span>
-	<span>0.9</span>
-	<span>0.8</span>
-	<span>0.7</span>
-	<span>0.6</span>
-	<span>0.5</span>
-	<span>0.4</span>
-	<span>0.3</span>
-	<span>0.2</span>
-	<span>0.1</span>
-	<span>0</span>
-{/snippet}
-{#snippet yAxisMarkers()}
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-	<div class="axis-marker y"></div>
-{/snippet}
-
-<div class="wrapper">
-	<div class="chart" style:--chart-height="200px">
-		<div class="axis y left">
-			<div class="axis-labels y left">
-				{@render yAxisLabels()}
-			</div>
+<div class="sock-simulation">
+	<div class="parameters">
+		<div>
+			Washes:
+			<input type="number" bind:value={numberOfWashes} min="100" max="1500" step={100} />
 		</div>
 
 		<div>
-			<div class="bars">
-				<div class="axis-markers y left">
-					{@render yAxisMarkers()}
-				</div>
-				{#each runningFrequency as frequency}
-					<div class="bar" style:--frequency={frequency}></div>
-				{/each}
-				<div class="axis-markers y right">
-					{@render yAxisMarkers()}
-				</div>
-
-				<div class="axis-markers x">
-					<div class="axis-marker x"></div>
-					<div class="axis-marker x"></div>
-					<div class="axis-marker x"></div>
-					<div class="axis-marker x"></div>
-				</div>
-			</div>
+			Left:
+			<input type="number" bind:value={left} min="1" max="20" step={1} />
 		</div>
 
-		<div class="axis y right">
-			<div class="axis-labels y right">
-				{@render yAxisLabels()}
-			</div>
+		<div>
+			Right:
+			<input type="number" bind:value={right} min="1" max="20" step={1} />
+		</div>
+
+		<div>Pairs per Wash: {pairsPerWash}</div>
+
+		<div>
+			Same-footed pair frequency (y–axis): {sameFootedPairFrequency.toFixed(2)}
 		</div>
 	</div>
 
-	<span>Cumulative Washes</span>
+	{#snippet yAxisLabels()}
+		<span>1</span>
+		<span>0.9</span>
+		<span>0.8</span>
+		<span>0.7</span>
+		<span>0.6</span>
+		<span>0.5</span>
+		<span>0.4</span>
+		<span>0.3</span>
+		<span>0.2</span>
+		<span>0.1</span>
+		<span>0</span>
+	{/snippet}
+	{#snippet yAxisMarkers()}
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+		<div class="axis-marker y"></div>
+	{/snippet}
+
+	<div class="wrapper">
+		<div class="chart" style:--chart-height="200px">
+			<div class="axis y left">
+				<div class="axis-labels y left">
+					{@render yAxisLabels()}
+				</div>
+			</div>
+
+			<div>
+				<div class="bars">
+					<div class="axis-markers y left">
+						{@render yAxisMarkers()}
+					</div>
+					{#each runningFrequency as frequency}
+						<div class="bar" style:--frequency={frequency}></div>
+					{/each}
+					<div class="axis-markers y right">
+						{@render yAxisMarkers()}
+					</div>
+
+					<div class="axis-markers x">
+						<div class="axis-marker x"></div>
+						<div class="axis-marker x"></div>
+						<div class="axis-marker x"></div>
+						<div class="axis-marker x"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="axis y right">
+				<div class="axis-labels y right">
+					{@render yAxisLabels()}
+				</div>
+			</div>
+		</div>
+
+		<span>Cumulative Washes</span>
+	</div>
 </div>
 
 <style>
+	.sock-simulation {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		gap: 16px;
+	}
 	.parameters {
 		display: flex;
 		flex-direction: column;

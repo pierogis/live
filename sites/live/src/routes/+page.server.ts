@@ -10,8 +10,8 @@ export const load: PageServerLoad = async () => {
 	const tagline = taglines[Math.floor(Math.random() * taglines.length)];
 
 	const sites = [
-		{ href: 'https://emporium.pierogis.live', tagline: 'a place for plates', title: 'emporium' },
 		{ href: 'https://stale.pierogis.live', tagline: 'well beyond the pale', title: 'stale' },
+		{ href: 'https://emporium.pierogis.live', tagline: 'a place for plates', title: 'emporium' },
 		{ href: 'https://kitchen.pierogis.live', tagline: 'work on a recipe', title: 'kitchen' },
 		{ href: 'https://colors.pierogis.live', tagline: 'refine your palette', title: 'colors' },
 		{
