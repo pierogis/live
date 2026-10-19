@@ -16,7 +16,6 @@ export async function setSessionCookie(
 		maxAge: parseInt(SESSION_LENGTH) / 1000, // maxAge is in seconds. Divide by 1000 to convert from milliseconds to seconds.
 		expires: new Date(Date.now() + parseInt(SESSION_LENGTH)),
 		httpOnly: true,
-		secure: process.env['NODE_ENV'] === 'production',
 		path: '/',
 		sameSite: 'lax'
 	});

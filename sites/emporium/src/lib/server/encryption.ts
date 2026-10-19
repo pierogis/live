@@ -2,12 +2,21 @@ import { ENCRYPTION_SECRET } from '$app/env/private';
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8');
 
+// The key of every session cookie: a missing or short secret would let anyone
+// make a cookie for any user.
+function encryptionSecret() {
+	if (ENCRYPTION_SECRET.length < 16) {
+		throw new Error('ENCRYPTION_SECRET must be at least 16 characters');
+	}
+	return encoder.encode(ENCRYPTION_SECRET);
+}
+
 export const encrypt = async <T>(data: T): Promise<string> => {
 	const iv = crypto.getRandomValues(new Uint8Array(12)); // get 96-bit random iv
 
 	const alg = { name: 'AES-GCM', iv }; // specify algorithm to use
 
-	const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
+	const encryptionSecretUtf8 = encryptionSecret();
 	const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
 	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['encrypt']); // generate key from pw
@@ -24,7 +33,7 @@ export const decrypt = async <T>(encryptedData: string): Promise<T> => {
 
 	const alg = { name: 'AES-GCM', iv }; // specify algorithm to use
 
-	const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
+	const encryptionSecretUtf8 = encryptionSecret();
 	const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
 	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['decrypt']); // generate key from pw
