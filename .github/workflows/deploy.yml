@@ -1,0 +1,130 @@
+name: deploy
+
+# Each push to main deploys the affected sites with wrangler and their
+# wrangler.jsonc. Deploys run beside CI and do not wait for it. A manual run
+# deploys every checked site at one ref, which also rolls a site back.
+#
+# The deploy job runs only when the CLOUDFLARE_ACCOUNT_ID repository variable
+# is set. It also needs the CLOUDFLARE_API_TOKEN secret, with the scopes
+# Workers Scripts Edit, Workers Routes Edit and Account Settings Read, and Zone
+# Read for the custom domains.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      careers:
+        description: 'deploy careers'
+        type: boolean
+        default: false
+      colors:
+        description: 'deploy colors'
+        type: boolean
+        default: false
+      emporium:
+        description: 'deploy emporium'
+        type: boolean
+        default: false
+      live:
+        description: 'deploy live'
+        type: boolean
+        default: false
+      stale:
+        description: 'deploy stale'
+        type: boolean
+        default: false
+      utensils:
+        description: 'deploy utensils'
+        type: boolean
+        default: false
+      ref:
+        description: 'tag, branch or sha to build (default: the head of the selected branch)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      sites: ${{ steps.affected.outputs.sites || steps.checked.outputs.sites }}
+      ref: ${{ steps.commit.outputs.ref }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      # The deploy jobs check out this sha, so they build the commit that this
+      # job read, also when the branch moves after this job.
+      - name: select the commit
+        id: commit
+        run: echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: list the sites
+        id: all
+        run: echo "sites=$(ls -d sites/*/wrangler.jsonc | cut -d/ -f2 | jq -Rnc '[inputs]')" >> "$GITHUB_OUTPUT"
+
+      - name: compute affected sites
+        id: affected
+        if: github.event_name == 'push'
+        uses: ./.github/actions/affected-sites
+        with:
+          base: ${{ github.event.before }}
+          sites: ${{ steps.all.outputs.sites }}
+
+      - name: list the checked sites
+        id: checked
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          INPUTS: ${{ toJSON(inputs) }}
+          SITES: ${{ steps.all.outputs.sites }}
+        run: |
+          sites=$(jq -nc --argjson inputs "$INPUTS" --argjson sites "$SITES" '[$sites[] | select($inputs[.] == true)]')
+          if [ "$sites" = '[]' ]; then
+            echo "::error::no site is checked: check one site or more"
+            exit 1
+          fi
+          echo "sites: $sites"
+          echo "sites=$sites" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: plan
+    if: vars.CLOUDFLARE_ACCOUNT_ID != '' && needs.plan.outputs.sites != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        site: ${{ fromJSON(needs.plan.outputs.sites) }}
+    # One deploy of a site at a time. A newer pending run replaces an older
+    # pending run.
+    concurrency:
+      group: deploy-${{ matrix.site }}
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.plan.outputs.ref }}
+
+      - name: setup toolchain and dependencies
+        uses: ./.github/actions/toolchain
+        with:
+          filter: ${{ matrix.site }}...
+
+      - name: build
+        run: pnpm --filter "${{ matrix.site }}" run build
+
+      # emporium's D1 migrations are not applied here: run
+      # `pnpm -F emporium db:migrate:prod` before a deploy that needs them.
+      - name: deploy
+        run: pnpm -C "sites/${{ matrix.site }}" exec wrangler deploy

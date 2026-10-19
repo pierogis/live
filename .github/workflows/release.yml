@@ -1,0 +1,31 @@
+name: release
+
+# Opens the Version Packages PR from the pending changesets, and publishes
+# @pierogis/utensils to npm when that PR merges. The sites are ignored by
+# changesets and deploy from deploy.yml.
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: setup toolchain and dependencies
+        uses: ./.github/actions/toolchain
+
+      - name: create release pull request or publish packages
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          version: pnpm changeset:version
+          publish: pnpm changeset:publish

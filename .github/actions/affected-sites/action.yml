@@ -1,0 +1,50 @@
+name: affected sites
+description: 'lists the sites that the diff from a base commit affects'
+inputs:
+  base:
+    description: 'commit to diff against (the commit before the push)'
+    required: true
+  sites:
+    description: 'JSON list of the site names to consider, e.g. ["live","stale"]'
+    required: true
+outputs:
+  sites:
+    description: 'JSON list of the affected sites, a subset of the sites input'
+    value: ${{ steps.affected.outputs.sites }}
+
+# The pnpm filter "...[base]" gives the packages with changed files since the
+# base commit, and the packages that depend on them, so a change to utensils or
+# ui selects every site that uses it. README and CHANGELOG changes do not
+# count; other markdown does, because the stale posts are markdown. The root
+# package is named pierogis, not live, so that it cannot match the live site.
+# pnpm gives each changed file outside a workspace package to the root project
+# (pnpm-lock.yaml, .node-version, .github/), and the root project selects every
+# site. An unresolvable base commit (force push, new branch) also selects every
+# site. Needs a full clone (fetch-depth: 0) and no dependency install.
+runs:
+  using: 'composite'
+  steps:
+    - name: setup node
+      uses: actions/setup-node@v7
+      with:
+        node-version-file: .node-version
+
+    - name: setup pnpm
+      uses: pnpm/action-setup@v6.1.0
+
+    - name: compute affected sites
+      id: affected
+      shell: bash
+      env:
+        BASE: ${{ inputs.base }}
+        SITES: ${{ inputs.sites }}
+      run: |
+        if git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+          changed=$(pnpm --filter "...[$BASE]" --changed-files-ignore-pattern='**/README.md' --changed-files-ignore-pattern='**/CHANGELOG.md' ls --depth -1 --json | jq -c '[.[].name]')
+          sites=$(jq -nc --argjson changed "$changed" --argjson sites "$SITES" --arg root "$(jq -r .name package.json)" \
+            'if ($changed | any(. == $root)) then $sites else [$sites[] | select(IN($changed[]))] end')
+        else
+          sites=$(jq -c . <<< "$SITES")
+        fi
+        echo "affected sites: $sites"
+        echo "sites=$sites" >> "$GITHUB_OUTPUT"

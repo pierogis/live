@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '.changeset/**'
+      - '**/CHANGELOG.md'
+
+# cancel in-progress runs on new commits to the same PR (github.event.number)
+# or to the same branch (github.ref) for direct pushes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+jobs:
+  lint-check-build:
+    # The Version Packages PR only bumps versions.
+    if: ${{ !startsWith(github.head_ref, 'changeset-release/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: setup toolchain and dependencies
+        uses: ./.github/actions/toolchain
+
+      - name: lint
+        run: pnpm lint
+
+      - name: check
+        run: pnpm check
+
+      - name: build
+        run: pnpm build

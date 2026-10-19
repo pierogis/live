@@ -1,0 +1,45 @@
+name: setup toolchain and install deps
+description: 'sets up node and pnpm, restores the pnpm store, and installs deps'
+inputs:
+  filter:
+    description: 'space-separated pnpm --filter selectors, e.g. "stale..." (default: install the whole workspace)'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: setup node
+      uses: actions/setup-node@v7
+      with:
+        node-version-file: .node-version
+
+    - name: setup pnpm
+      uses: pnpm/action-setup@v6.1.0
+
+    - name: get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - name: setup pnpm cache
+      uses: actions/cache@v6
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ inputs.filter || 'all' }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-${{ inputs.filter || 'all' }}-
+          ${{ runner.os }}-pnpm-store-
+
+    - name: install dependencies
+      shell: bash
+      env:
+        FILTER: ${{ inputs.filter }}
+      run: |
+        args=()
+        read -ra selectors <<< "$FILTER"
+        for selector in "${selectors[@]}"; do
+          args+=(--filter "$selector")
+        done
+        pnpm install "${args[@]}"
