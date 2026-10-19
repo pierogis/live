@@ -4,26 +4,30 @@
   "description": "internal components for sites",
   "private": true,
   "scripts": {
-    "lint": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
-    "format": "prettier --write --ignore-path=../../.prettierignore ."
+    "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "svelte": "5.38.0"
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "dependencies": {
     "@pierogis/utensils": "workspace:*"
   },
   "type": "module",
-  "module": "index.ts",
-  "svelte": "index.ts",
+  "svelte": "./components/index.ts",
   "exports": {
     ".": {
       "svelte": "./components/index.ts",
-      "import": "./components/index.ts"
+      "default": "./components/index.ts"
     },
-    "./**/*.svelte": {
-      "svelte": "./**/*.svelte",
-      "import": "./**/*.svelte"
+    "./*.svelte": {
+      "svelte": "./components/*.svelte",
+      "default": "./components/*.svelte"
     }
+  },
+  "peerDependencies": {
+    "svelte": "^5"
   }
 }

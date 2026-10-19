@@ -1,26 +1,38 @@
-import { fileURLToPath } from 'node:url';
-
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
-import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
-
+import astro from 'eslint-plugin-astro';
 import prettier from 'eslint-config-prettier';
-import ts from 'typescript-eslint';
-import eslintPluginAstro from 'eslint-plugin-astro';
 import svelte from 'eslint-plugin-svelte';
+import ts from 'typescript-eslint';
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
-
-export default ts.config(
-	includeIgnoreFile(gitignorePath),
+export default defineConfig(
+	globalIgnores([
+		'**/.DS_Store',
+		'**/.svelte-kit',
+		'**/.astro',
+		'**/.wrangler',
+		'**/node_modules',
+		'**/build',
+		'**/dist',
+		'**/.env',
+		'**/.env.*',
+		'!**/.env.example',
+		'**/vite.config.js.*',
+		'**/vite.config.ts.*',
+		'**/pnpm-lock.yaml',
+		'**/pnpm-workspace.yaml',
+		'**/.changeset',
+		'**/worker-configuration.d.ts'
+	]),
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
-	...eslintPluginAstro.configs.recommended,
+	astro.configs.recommended,
 	prettier,
 	...svelte.configs.prettier,
-	...eslintPluginAstro.configs.prettier,
+
 	{
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node }
@@ -35,8 +47,16 @@ export default ts.config(
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
 				extraFileExtensions: ['.svelte'],
+				parser: ts.parser
+			}
+		}
+	},
+	{
+		files: ['**/*.astro'],
+		languageOptions: {
+			parserOptions: {
+				extraFileExtensions: ['.astro'],
 				parser: ts.parser
 			}
 		}

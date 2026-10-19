@@ -1,11 +1,9 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "stale",
-	"main": "./dist/_worker.js/index.js",
 	"compatibility_date": "2025-08-07",
-	"compatibility_flags": ["nodejs_compat"],
+	// The site is fully prerendered, so the Worker serves only static assets.
 	"assets": {
-		"binding": "ASSETS",
 		"directory": "./dist"
 	},
 	"routes": [{ "pattern": "stale.pierogis.live", "custom_domain": true }],
