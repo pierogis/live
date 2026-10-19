@@ -6,19 +6,16 @@ Simple reviews and scores for license plates
 
 ### development
 
-- clone repo
-- install dependencies
-  - `cd emporium`
-  - `npm install`
-  - redis
+- install dependencies from the repo root with `pnpm install`
 - set config variables
   - copy `.env.example` as `.env` and change values
-- update database
-  - `npm run db:migrate` to get the latest database scheme
-  - `npm run db:seed` to create initial data in the database
-  - `npm run db:reset` to clear all database schema/data (not necessary) and reseed
-- run server
-  - `npm run dev`
+- run the dev server with `pnpm -F emporium dev` (port 5175)
+  - the cloudflare adapter emulates the `DB` (D1) and `KV` bindings locally in `.wrangler/state`
+- update the local database
+  - `pnpm -F emporium db:migrate:local` to apply the migrations
+  - `pnpm -F emporium db:seed:local` to create initial data
+- after a change to `src/db/schema.ts`, `pnpm -F emporium db:generate` writes a new migration
+- `pnpm -F emporium db:migrate:prod` applies the migrations to the production database
 
 words from:
 
