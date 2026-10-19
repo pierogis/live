@@ -14,7 +14,9 @@ const pageTitle = 'stale tags';
 	description={'stale loafs by tags'}
 >
 	<div class="tags">
-		{tags.map((tag) => <TagCard tag={tag} />)}
+		{tags.map((tag) => (
+			<TagCard tag={tag} />
+		))}
 	</div>
 </Base>
 

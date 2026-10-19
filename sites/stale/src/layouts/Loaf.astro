@@ -40,23 +40,17 @@ shareUrl.searchParams.append('url', canonical);
 	>
 		<article>
 			<div class="lead">
-				<h1 class="title">
-					{title}
-				</h1>
+				<h1 class="title">{title}</h1>
 				<i>{subtitle}</i>
 				<div class="metadata">
 					<p class="author">
-						{
-							author.twitterHandle ? (
-								<a href={`https://twitter.com/${author.twitterHandle}`}>{author.name}</a>
-							) : (
-								author.name
-							)
-						}
+						{author.twitterHandle ? (
+							<a href={`https://twitter.com/${author.twitterHandle}`}>{author.name}</a>
+						) : (
+							author.name
+						)}
 					</p>
-					<p class="date">
-						{publishedDate.toISOString().slice(0, 10)}
-					</p>
+					<p class="date">{publishedDate.toISOString().slice(0, 10)}</p>
 				</div>
 				<Divider horizontal margin="0" />
 			</div>
@@ -94,17 +88,17 @@ shareUrl.searchParams.append('url', canonical);
 				<slot />
 			</div>
 			<div class="tags">
-				{
-					tags.map((tag) => {
-						return (
-							<i>
-								<a href={`/tags/${tag}`}>#{tag}</a>
-							</i>
-						);
-					})
-				}
+				{tags.map((tag) => {
+					return (
+						<i>
+							<a href={`/tags/${tag}`}>#{tag}</a>
+						</i>
+					);
+				})}
 			</div>
-			<a href={shareUrl.toString()} target="_blank">share</a>
+			<a href={shareUrl.toString()} target="_blank">
+				share
+			</a>
 		</article>
 	</Base>
 
@@ -168,6 +162,4 @@ shareUrl.searchParams.append('url', canonical);
 			text-decoration: underline;
 		}
 	</style>
-
-
 </html>

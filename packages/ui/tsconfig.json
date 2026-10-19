@@ -2,25 +2,13 @@
 	"compilerOptions": {
 		"verbatimModuleSyntax": true,
 		"isolatedModules": true,
-		"lib": [
-			"esnext",
-			"DOM",
-			"DOM.Iterable"
-		],
+		"lib": ["esnext", "DOM", "DOM.Iterable"],
 		"moduleResolution": "bundler",
 		"module": "esnext",
 		"noEmit": true,
 		"target": "esnext",
-		"types": [
-			"vite/client"
-		]
+		"types": ["vite/client"]
 	},
-	"include": [
-		"./components/**/*.js",
-		"./components/**/*.ts",
-		"./components/**/*.svelte"
-	],
-	"exclude": [
-		"./node_modules/**"
-	]
+	"include": ["./components/**/*.js", "./components/**/*.ts", "./components/**/*.svelte"],
+	"exclude": ["./node_modules/**"]
 }

@@ -50,8 +50,7 @@
 	name="description"
 	data-invalid={$errors.description}
 	bind:value={$form.description}
-	{...$constraints.description}
-></textarea>
+	{...$constraints.description}></textarea>
 
 <!-- id -->
 <input

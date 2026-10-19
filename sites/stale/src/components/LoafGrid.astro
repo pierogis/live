@@ -11,17 +11,15 @@ const { loafs } = Astro.props;
 ---
 
 <div class="grid">
-	{
-		loafs
-			.sort((a, b) => b.data.publishedDate.getTime() - a.data.publishedDate.getTime())
-			.map((loaf) => (
-				<div class="tile">
-					<a href={`/loafs/${loaf.id}`} class="clickable">
-						<LoafCard loaf={loaf.data} />
-					</a>
-				</div>
-			))
-	}
+	{loafs
+		.sort((a, b) => b.data.publishedDate.getTime() - a.data.publishedDate.getTime())
+		.map((loaf) => (
+			<div class="tile">
+				<a href={`/loafs/${loaf.id}`} class="clickable">
+					<LoafCard loaf={loaf.data} />
+				</a>
+			</div>
+		))}
 </div>
 
 <style>
