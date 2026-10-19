@@ -10,6 +10,11 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+# The changesets action pushes the version commit and opens its pull request.
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   version:
     runs-on: ubuntu-latest
@@ -22,7 +27,7 @@ jobs:
         uses: ./.github/actions/toolchain
 
       - name: create release pull request or publish packages
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
