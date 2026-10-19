@@ -129,7 +129,7 @@
 					<div class="axis-markers y left">
 						{@render yAxisMarkers()}
 					</div>
-					{#each runningFrequency as frequency}
+					{#each runningFrequency as frequency, i (i)}
 						<div class="bar" style:--frequency={frequency}></div>
 					{/each}
 					<div class="axis-markers y right">

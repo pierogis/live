@@ -5,7 +5,6 @@
 	import { Theme, themeKey } from '../theme';
 
 	interface Props {
-		// eslint-disable-next-line svelte/require-store-reactive-access
 		storedTheme?: Writable<Theme | null>;
 	}
 

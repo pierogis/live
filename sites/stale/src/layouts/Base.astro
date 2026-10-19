@@ -96,7 +96,7 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: 'svg' });
 			define:vars={{ themeKey, dark: Theme.Dark, light: Theme.Light }}
 		>
 			function setTheme(document) {
-				let theme = (() => {
+				const theme = (() => {
 					if (typeof localStorage !== 'undefined' && localStorage.getItem(themeKey)) {
 						return localStorage.getItem(themeKey);
 					}
@@ -125,18 +125,24 @@ const faviconSvg = await getImage({ src: faviconSvgSrc, format: 'svg' });
 			>
 				<nav slot="nav">
 					<Interactable>
-						<a href="/tags" class="link-box border inset">tags</a>
+						<a href="/tags" class="link-box border inset">
+							tags
+						</a>
 					</Interactable>
 
 					<Interactable>
-						<a href="/about" class="border inset link-box">about</a>
+						<a href="/about" class="border inset link-box">
+							about
+						</a>
 					</Interactable>
 
 					<Interactable>
 						<a
 							href="mailto:karl@pierogis.live?subject=giancarlo%20lionel&body=put%20me%20on%20the%20list"
-							class="border inset link-box">mailing list</a
+							class="border inset link-box"
 						>
+							mailing list
+						</a>
 					</Interactable>
 
 					<!-- <Interactable>

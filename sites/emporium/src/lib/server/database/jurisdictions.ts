@@ -1,5 +1,3 @@
-import { drizzle } from 'drizzle-orm/d1';
-
 import { jurisdictions, type Jurisdiction } from '$db/schema';
 import type { DrizzleClient } from '.';
 

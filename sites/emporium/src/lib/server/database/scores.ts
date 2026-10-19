@@ -1,5 +1,4 @@
 import { eq, and } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
 
 import { type Score, scores, type NewScore } from '$db/schema';
 import type { DrizzleClient } from '.';

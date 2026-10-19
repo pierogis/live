@@ -1,5 +1,4 @@
 import { eq, like, and, sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
 
 import { type Review, reviews, type NewReview } from '$db/schema';
 import type { DrizzleClient } from '.';

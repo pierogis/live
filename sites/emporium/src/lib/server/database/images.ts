@@ -1,7 +1,5 @@
 import { eq, like, sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
 
-import * as schema from '$db/schema';
 import { type Image, type NewImage, images } from '$db/schema';
 import type { DrizzleClient } from '.';
 

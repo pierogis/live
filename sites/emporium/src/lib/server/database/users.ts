@@ -1,5 +1,4 @@
 import { eq, and, ne } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
 
 import { type User, users, type NewUser } from '$db/schema';
 import type { DrizzleClient } from '.';
