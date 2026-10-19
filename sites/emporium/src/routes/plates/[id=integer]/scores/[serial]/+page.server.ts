@@ -1,7 +1,7 @@
 import { error, fail } from '@sveltejs/kit';
 
-import { getUserWithInteractions } from '$lib/server/database/users';
-import { deleteScore, upsertScore } from '$lib/server/database/scores';
+import { getUserWithInteractions } from '#lib/server/database/users.js';
+import { deleteScore, upsertScore } from '#lib/server/database/scores.js';
 
 import { valueInputName, categoryIdInputName } from './_form';
 

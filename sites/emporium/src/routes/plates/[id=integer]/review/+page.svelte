@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Section } from '@pierogis/utensils';
-	import { ReviewForm, PlateCard } from '$lib/components';
+	import { ReviewForm, PlateCard } from '#lib/components/index.js';
 
 	let { data } = $props();
 </script>

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { CardsGrid } from '@pierogis/utensils';
 
-	import { storeScores } from '$lib/api/scores';
+	import { storeScores } from '#lib/api/scores.js';
 
-	import { PlateCard, ScoreSheet } from '$lib/components';
+	import { PlateCard, ScoreSheet } from '#lib/components/index.js';
 
 	let { data } = $props();
 

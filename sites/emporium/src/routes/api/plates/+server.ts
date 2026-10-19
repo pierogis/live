@@ -1,11 +1,11 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 import type { Image, FullPlate, Plate } from '$db/schema';
 import {
 	getFullPlates,
 	helpCreatePlate,
 	getPlatePerJurisdiction
-} from '$lib/server/database/plates';
+} from '#lib/server/database/plates.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -23,7 +23,7 @@ export const GET: RequestHandler = async (event) => {
 		'cache-control': 'no-store'
 	});
 
-	return json(plates);
+	return Response.json(plates);
 };
 
 export const POST: RequestHandler = async (event) => {
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async (event) => {
 				imageUrls
 			);
 
-			return json(plate);
+			return Response.json(plate);
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			if (err.code == 'P2002') {

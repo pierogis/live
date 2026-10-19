@@ -1,4 +1,4 @@
-import { getPlatePerJurisdiction } from '$lib/server/database/plates';
+import { getPlatePerJurisdiction } from '#lib/server/database/plates.js';
 
 import type { PageServerLoad } from './$types';
 

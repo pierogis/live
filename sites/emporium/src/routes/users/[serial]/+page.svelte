@@ -9,7 +9,7 @@
 		ImageDisplay,
 		Section
 	} from '@pierogis/utensils';
-	import { ReviewCard } from '$lib/components';
+	import { ReviewCard } from '#lib/components/index.js';
 
 	let { data } = $props();
 

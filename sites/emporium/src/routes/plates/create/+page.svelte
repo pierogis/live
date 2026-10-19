@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PlateTemplate } from '$lib/components';
+	import { PlateTemplate } from '#lib/components/index.js';
 
 	let { data, form } = $props();
 </script>

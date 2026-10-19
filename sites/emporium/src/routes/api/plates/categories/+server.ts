@@ -1,5 +1,4 @@
-import { json } from '@sveltejs/kit';
-import { getCategories } from '$lib/server/database/categories';
+import { getCategories } from '#lib/server/database/categories.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -9,5 +8,5 @@ export const GET: RequestHandler = async (event) => {
 		'cache-control': 'public, max-age=3600'
 	});
 
-	return json(categories);
+	return Response.json(categories);
 };

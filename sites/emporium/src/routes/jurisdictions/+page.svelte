@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CardsGrid } from '@pierogis/utensils';
 
-	import { PlateCard } from '$lib/components';
+	import { PlateCard } from '#lib/components/index.js';
 
 	let { data } = $props();
 </script>

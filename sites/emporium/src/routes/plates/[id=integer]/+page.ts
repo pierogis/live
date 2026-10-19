@@ -1,5 +1,5 @@
-import { storeScores } from '$lib/api/scores';
-import { storeReviews } from '$lib/api/reviews';
+import { storeScores } from '#lib/api/scores.js';
+import { storeReviews } from '#lib/api/reviews.js';
 
 import type { PageLoad } from './$types';
 

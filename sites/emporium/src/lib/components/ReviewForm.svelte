@@ -2,7 +2,7 @@
 	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import { superForm } from 'sveltekit-superforms/client';
 
-	import type { schema } from '$lib/forms/review';
+	import type { schema } from '#lib/forms/review.js';
 	import type { FullPlate } from '$db/schema';
 
 	import { Interactable } from '@pierogis/utensils';

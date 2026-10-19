@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { getUserWithInteractions } from '$lib/server/database/users';
+import { getUserWithInteractions } from '#lib/server/database/users.js';
 
 export const load = async (event) => {
 	const user = await getUserWithInteractions(event.locals.db, {

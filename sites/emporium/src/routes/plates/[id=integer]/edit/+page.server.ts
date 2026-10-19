@@ -1,8 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { deletePlate, helpUpdatePlate } from '$lib/server/database/plates';
-import { getJurisdictions } from '$lib/server/database/jurisdictions';
-import { protectAdmin } from '$lib/helpers';
+import { deletePlate, helpUpdatePlate } from '#lib/server/database/plates.js';
+import { getJurisdictions } from '#lib/server/database/jurisdictions.js';
+import { protectAdmin } from '#lib/helpers.js';
 
 import type { Actions, PageServerLoad } from './$types';
 

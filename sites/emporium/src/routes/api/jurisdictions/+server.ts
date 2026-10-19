@@ -1,6 +1,4 @@
-import { json } from '@sveltejs/kit';
-
-import { getJurisdictions } from '$lib/server/database/jurisdictions';
+import { getJurisdictions } from '#lib/server/database/jurisdictions.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -10,5 +8,5 @@ export const GET: RequestHandler = async (event) => {
 		'cache-control': 'public, max-age=3600'
 	});
 
-	return json(jurisdictions);
+	return Response.json(jurisdictions);
 };

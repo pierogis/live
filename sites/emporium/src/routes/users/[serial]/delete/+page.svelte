@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	import { userIdInputName } from '$lib/forms/user';
+	import { userIdInputName } from '#lib/forms/user.js';
 
 	let { data, form } = $props();
 </script>

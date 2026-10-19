@@ -1,6 +1,6 @@
-import { json, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { deleteReview, updateReview } from '$lib/server/database/reviews';
+import { deleteReview, updateReview } from '#lib/server/database/reviews.js';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async (event) => {
@@ -20,7 +20,7 @@ export const PUT: RequestHandler = async (event) => {
 
 		const review = await updateReview(event.locals.db, data);
 
-		return json(review);
+		return Response.json(review);
 	} else {
 		error(401, 'not signed in');
 	}
@@ -38,7 +38,7 @@ export const DELETE: RequestHandler = async (event) => {
 
 		const review = await deleteReview(event.locals.db, reviewParams);
 
-		return json(review);
+		return Response.json(review);
 	} else {
 		error(401, 'not signed in');
 	}

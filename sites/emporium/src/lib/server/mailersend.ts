@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { MAILERSEND_API_KEY } from '$app/env/private';
 
 type Fetch = typeof fetch;
 
@@ -28,7 +28,7 @@ export const requestMailerSend = async (
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${env.MAILERSEND_API_KEY}`
+			Authorization: `Bearer ${MAILERSEND_API_KEY}`
 		}
 	});
 

@@ -1,4 +1,4 @@
-import { storeScores } from '$lib/api/scores';
+import { storeScores } from '#lib/api/scores.js';
 
 import type { PageLoad } from './$types';
 

@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { upsertReview } from '$lib/server/database/reviews';
+import { upsertReview } from '#lib/server/database/reviews.js';
 
 import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async (event) => {
@@ -18,7 +18,7 @@ export const POST: RequestHandler = async (event) => {
 
 		const review = await upsertReview(event.locals.db, data);
 
-		return json(review);
+		return Response.json(review);
 	} else {
 		error(401, 'not signed in');
 	}

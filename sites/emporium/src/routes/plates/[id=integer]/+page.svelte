@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { CardsGrid, Divider, Interactable, Section } from '@pierogis/utensils';
 
-	import { PlateCard, ReviewCard, ScoreSheet, ReviewForm } from '$lib/components';
+	import { PlateCard, ReviewCard, ScoreSheet, ReviewForm } from '#lib/components/index.js';
 
 	let { data } = $props();
 

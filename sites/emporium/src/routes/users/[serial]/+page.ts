@@ -3,8 +3,8 @@ import { superValidate } from 'sveltekit-superforms/client';
 import { valibot } from 'sveltekit-superforms/adapters';
 
 import type { Score } from '$db/schema';
-import { storeScores } from '$lib/api/scores';
-import { userSchema } from '$lib/forms/user';
+import { storeScores } from '#lib/api/scores.js';
+import { userSchema } from '#lib/forms/user.js';
 
 export const load = async (event) => {
 	const { user } = await event.parent();

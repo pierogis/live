@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { getUser, updateUserById, deleteUser } from '$lib/server/database/users';
+import { getUser, updateUserById, deleteUser } from '#lib/server/database/users.js';
 import type { User } from '$db/schema';
 
 import type { RequestHandler } from './$types';
@@ -21,7 +21,7 @@ export const GET: RequestHandler = async (event) => {
 			'cache-control': 'no-cache, max-age=3600'
 		});
 
-		return json(maskedUser);
+		return Response.json(maskedUser);
 	} else {
 		error(404, `user ${event.params.id} not found`);
 	}
@@ -45,7 +45,7 @@ export const PUT: RequestHandler = async (event) => {
 		try {
 			const user = await updateUserById(event.locals.db, parseInt(event.params.id), data);
 
-			return json(user);
+			return Response.json(user);
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			// TODO: fix this for drizzle
@@ -68,7 +68,7 @@ export const DELETE: RequestHandler = async (event) => {
 	) {
 		const user = await deleteUser(event.locals.db, parseInt(event.params.id));
 
-		return json(user);
+		return Response.json(user);
 	} else {
 		error(403, `not user ${event.params.id} or admin`);
 	}

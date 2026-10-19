@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import { valibot } from 'sveltekit-superforms/adapters';
 
-import { schema } from '$lib/forms/review';
+import { schema } from '#lib/forms/review.js';
 
 export const load = async ({ locals, parent }) => {
 	const { plate } = await parent();

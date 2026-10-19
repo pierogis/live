@@ -3,8 +3,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { valibot } from 'sveltekit-superforms/adapters';
 
-import { deleteReview, getReview, upsertReview } from '$lib/server/database/reviews';
-import { schema } from '$lib/forms/review';
+import { deleteReview, getReview, upsertReview } from '#lib/server/database/reviews.js';
+import { schema } from '#lib/forms/review.js';
 
 import type { Actions, PageServerLoad } from './$types';
 

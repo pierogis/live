@@ -1,13 +1,13 @@
-import { env } from '$env/dynamic/private';
+import { ENCRYPTION_SECRET } from '$app/env/private';
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8');
 
 export const encrypt = async <T>(data: T): Promise<string> => {
 	const iv = crypto.getRandomValues(new Uint8Array(12)); // get 96-bit random iv
 
-	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
+	const alg = { name: 'AES-GCM', iv }; // specify algorithm to use
 
-	const encryptionSecretUtf8 = encoder.encode(env.ENCRYPTION_SECRET); // encode password as UTF-8
+	const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
 	const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
 	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['encrypt']); // generate key from pw
@@ -22,9 +22,9 @@ export const decrypt = async <T>(encryptedData: string): Promise<T> => {
 	const encodedbuffer = Buffer.from(encryptedData, 'base64');
 	const iv = encodedbuffer.subarray(0, 12);
 
-	const alg = { name: 'AES-GCM', iv: iv }; // specify algorithm to use
+	const alg = { name: 'AES-GCM', iv }; // specify algorithm to use
 
-	const encryptionSecretUtf8 = encoder.encode(env.ENCRYPTION_SECRET); // encode password as UTF-8
+	const encryptionSecretUtf8 = encoder.encode(ENCRYPTION_SECRET); // encode password as UTF-8
 	const encryptionSecretHash = await crypto.subtle.digest('SHA-256', encryptionSecretUtf8); // hash the password
 
 	const key = await crypto.subtle.importKey('raw', encryptionSecretHash, alg, false, ['decrypt']); // generate key from pw

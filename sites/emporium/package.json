@@ -10,13 +10,14 @@
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "cf:generate-types": "wrangler types",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "drizzle-kit migrate",
     "db:migrate:prod": "wrangler d1 migrations apply DB --remote",
     "db:seed:local": "wrangler d1 execute emporium --local --file seeds/base.sql"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20261016.1",
+    "@libsql/client": "0.18.0",
     "@sveltejs/adapter-cloudflare": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
@@ -29,12 +30,15 @@
     "wrangler": "catalog:"
   },
   "dependencies": {
-    "@libsql/client": "0.18.0",
     "@pierogis/utensils": "workspace:*",
     "drizzle-orm": "0.45.4",
-    "sveltekit-superforms": "2.31.0",
+    "sveltekit-superforms": "3.0.0",
     "ui": "workspace:*",
     "valibot": "1.5.0"
   },
-  "type": "module"
+  "type": "module",
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
+  }
 }

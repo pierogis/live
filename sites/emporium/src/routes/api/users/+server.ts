@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { getUser } from '$lib/server/database/users';
+import { getUser } from '#lib/server/database/users.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -20,7 +20,7 @@ export const GET: RequestHandler = async (event) => {
 			'cache-control': 'public, max-age=3600'
 		});
 
-		return json(maskedUser);
+		return Response.json(maskedUser);
 	}
 	error(404, `user with serial ${serial} not found`);
 };

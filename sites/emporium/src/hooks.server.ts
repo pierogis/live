@@ -1,28 +1,19 @@
-import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { Handle, HandleServerError } from '@sveltejs/kit/hooks';
 
-import { env } from '$env/dynamic/private';
+import { env as cloudflare } from 'cloudflare:workers';
 
-import { createD1Client, createLibSqlClient } from '$lib/server/database';
-import { decryptSessionCookie } from '$lib/server/session';
-import { getUser } from '$lib/server/database/users';
+import { SESSION_NAME } from '$app/env/private';
 
-const db = env.DATABASE_URL ? createLibSqlClient(env.DATABASE_URL) : null;
+import { createD1Client } from '#lib/server/database/index.js';
+import { decryptSessionCookie } from '#lib/server/session.js';
+import { getUser } from '#lib/server/database/users.js';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	if (event.platform?.env.DB) {
-		event.locals.db = createD1Client(event.platform.env.DB);
-	} else if (db) {
-		event.locals.db = db;
-	} else {
-		throw new Error('No database found');
-	}
-	if (!event.platform) {
-		throw 'platform not found';
-	}
-	event.locals.kv_binding = event.platform.env.KV;
+	event.locals.db = createD1Client(cloudflare.DB);
+	event.locals.kv_binding = cloudflare.KV;
 
 	event.locals.sessionUser = null;
-	const sessionCookie = event.cookies.get(env.SESSION_NAME);
+	const sessionCookie = event.cookies.get(SESSION_NAME);
 
 	let deleteCookie = false;
 
@@ -44,14 +35,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (deleteCookie) {
-		event.cookies.delete(env.SESSION_NAME, { path: '/' });
+		event.cookies.delete(SESSION_NAME, { path: '/' });
 	}
 
 	return await resolve(event);
 };
 
-export const handleError: HandleServerError = ({ error }) => {
-	if (error instanceof Error) {
+export const handleError: HandleServerError = ({ kind, error }) => {
+	if (kind === 'unknown') {
 		console.error(error);
 	}
 };

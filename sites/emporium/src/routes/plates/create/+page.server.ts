@@ -1,9 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { protectAdmin } from '$lib/helpers';
-import { getJurisdictions } from '$lib/server/database/jurisdictions';
+import { protectAdmin } from '#lib/helpers.js';
+import { getJurisdictions } from '#lib/server/database/jurisdictions.js';
 
-import { helpCreatePlate } from '$lib/server/database/plates';
+import { helpCreatePlate } from '#lib/server/database/plates.js';
 
 import type { PageServerLoad } from './$types.js';
 

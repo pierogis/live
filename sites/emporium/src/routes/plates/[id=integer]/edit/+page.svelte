@@ -1,5 +1,5 @@
 <script lang="ts">
-	import PlateTemplate from '$lib/components/PlateTemplate.svelte';
+	import PlateTemplate from '#lib/components/PlateTemplate.svelte';
 
 	let { data, form } = $props();
 </script>

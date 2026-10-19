@@ -1,6 +1,4 @@
-import { json } from '@sveltejs/kit';
-
-import { getJurisdictionWithPlates } from '$lib/server/database/jurisdictions';
+import { getJurisdictionWithPlates } from '#lib/server/database/jurisdictions.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -12,5 +10,5 @@ export const GET: RequestHandler = async (event) => {
 		'cache-control': 'no-cache'
 	});
 
-	return json(jurisdiction);
+	return Response.json(jurisdiction);
 };

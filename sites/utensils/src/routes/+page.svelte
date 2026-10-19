@@ -18,7 +18,7 @@
 		SectionDemo,
 		ShineDemo,
 		ThemeToggleDemo
-	} from '$lib/demo';
+	} from '#lib/demo/index.js';
 
 	let rotateImage = $state(false);
 </script>

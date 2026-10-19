@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 
-import { getFullPlate } from '$lib/server/database/plates';
+import { getFullPlate } from '#lib/server/database/plates.js';
 
 export const load = async (event) => {
 	const plate = await getFullPlate(event.locals.db, { modelId: parseInt(event.params.id) });

@@ -1,8 +1,8 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 import type { Jurisdiction } from '$db/schema';
 
-import { deletePlate, getFullPlate, helpUpdatePlate } from '$lib/server/database/plates';
+import { deletePlate, getFullPlate, helpUpdatePlate } from '#lib/server/database/plates.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -13,7 +13,7 @@ export const GET: RequestHandler = async (event) => {
 			'cache-control': 'no-cache, max-age=3600'
 		});
 
-		return json(plate);
+		return Response.json(plate);
 	} else {
 		error(404, `plate ${event.params.id} not found`);
 	}
@@ -44,7 +44,7 @@ export const PUT: RequestHandler = async (event) => {
 			imageUrls
 		);
 
-		return json(plate);
+		return Response.json(plate);
 	} else {
 		error(403, 'not admin');
 	}
@@ -55,7 +55,7 @@ export const DELETE: RequestHandler = async (event) => {
 		const modelId = parseInt(event.params.id);
 		const plate = await deletePlate(event.locals.db, modelId);
 
-		return json(plate);
+		return Response.json(plate);
 	} else {
 		error(403, 'not admin');
 	}

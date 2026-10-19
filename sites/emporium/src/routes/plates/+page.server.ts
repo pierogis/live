@@ -1,4 +1,4 @@
-import { getFullPlates } from '$lib/server/database/plates';
+import { getFullPlates } from '#lib/server/database/plates.js';
 
 export const load = async (event) => {
 	const canonical = `https://emporium.pierogis.live/plates`;

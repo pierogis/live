@@ -1,9 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
 
-import { deleteUser } from '$lib/server/database/users';
+import { deleteUser } from '#lib/server/database/users.js';
 
-import { userIdInputName } from '$lib/forms/user';
-import { protectUserOrAdmin } from '$lib/helpers';
+import { userIdInputName } from '#lib/forms/user.js';
+import { protectUserOrAdmin } from '#lib/helpers.js';
 
 import type { PageServerLoad } from './$types.js';
 

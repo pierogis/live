@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 
-import { getJurisdictionWithPlates } from '$lib/server/database/jurisdictions';
-import { getCategories } from '$lib/server/database/categories';
+import { getJurisdictionWithPlates } from '#lib/server/database/jurisdictions.js';
+import { getCategories } from '#lib/server/database/categories.js';
 
 import type { PageServerLoad } from './$types';
 

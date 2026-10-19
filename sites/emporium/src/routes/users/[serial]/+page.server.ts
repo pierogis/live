@@ -4,9 +4,9 @@ import { superValidate } from 'sveltekit-superforms/client';
 import { valibot } from 'sveltekit-superforms/adapters';
 
 import type { Category } from '$db/schema';
-import { getCategories } from '$lib/server/database/categories';
-import { updateUserBySerial } from '$lib/server/database/users';
-import { userSchema } from '$lib/forms/user';
+import { getCategories } from '#lib/server/database/categories.js';
+import { updateUserBySerial } from '#lib/server/database/users.js';
+import { userSchema } from '#lib/forms/user.js';
 
 export const load = async (event) => {
 	const categories: Category[] = await getCategories(event.locals.db, { ware: 'plate' });

@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { deleteScore, upsertScore } from '$lib/server/database/scores';
+import { deleteScore, upsertScore } from '#lib/server/database/scores.js';
 
 import type { RequestHandler } from './$types';
 export const PUT: RequestHandler = async (event) => {
@@ -24,7 +24,7 @@ export const PUT: RequestHandler = async (event) => {
 
 		const score = await upsertScore(event.locals.db, data);
 
-		return json(score);
+		return Response.json(score);
 	} else {
 		error(401, 'not signed in');
 	}
@@ -44,7 +44,7 @@ export const DELETE: RequestHandler = async (event) => {
 
 		const score = await deleteScore(event.locals.db, scoreParams);
 
-		return json(score);
+		return Response.json(score);
 	} else {
 		error(401, 'not signed in');
 	}

@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 
-import { expireSessionCookie } from '$lib/server/session';
+import { expireSessionCookie } from '#lib/server/session.js';
 
 import type { Actions, PageServerLoad } from './$types';
 

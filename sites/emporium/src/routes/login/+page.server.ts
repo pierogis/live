@@ -1,19 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
-
-import { dev } from '$app/environment';
-import { env } from '$env/dynamic/private';
-
+import { dev } from '$app/env';
+import { DEV_PASSPHRASE } from '$app/env/private';
 import {
 	generatePhrase,
 	generateEmailAddress,
 	generateSerial
 } from '@pierogis/utensils/utils/words';
-
-import { createUser, getUser } from '$lib/server/database/users';
-import { createPassphraseEmail } from '$lib/server/email';
-import { requestMailerSend } from '$lib/server/mailersend';
-import { setSessionCookie } from '$lib/server/session';
-import { getEmailPassphrase, setEmailPassphrase } from '$lib/server/cache';
+import { createUser, getUser } from '#lib/server/database/users.js';
+import { createPassphraseEmail } from '#lib/server/email.js';
+import { requestMailerSend } from '#lib/server/mailersend.js';
+import { setSessionCookie } from '#lib/server/session.js';
+import { getEmailPassphrase, setEmailPassphrase } from '#lib/server/cache.js';
 
 import { FlowCode } from './_flow';
 import type { Actions, PageServerLoad } from './$types';
@@ -48,7 +45,7 @@ export const actions: Actions = {
 			const originalEmail = emailEntry.toString();
 
 			// use dev passphrase in dev
-			const generatedPassphrase = (dev && env.DEV_PASSPHRASE) || generatePhrase();
+			const generatedPassphrase = (dev && DEV_PASSPHRASE) || generatePhrase();
 			const content = createPassphraseEmail(originalEmail, generatedPassphrase);
 			// only send email in prod
 			if (!dev) await requestMailerSend(originalEmail, content, event.fetch);

@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
 	import { ThemeProvider } from '@pierogis/utensils';
 	import { Layout, SEO } from 'ui';
 
 	let { children } = $props();
-
-	let title = $derived($page.data.title || 'careers');
+	let title = $derived(page.data.title || 'careers');
 	let description = $derived(
-		$page.data.description || 'a good place to start working with pierogis'
+		page.data.description || 'a good place to start working with pierogis'
 	);
-	let canonical = $derived(new URL($page.url.pathname, 'https://careers.pierogis.live').toString());
+	let canonical = $derived(new URL(page.url.pathname, 'https://careers.pierogis.live').toString());
+
 	let og = $derived({
-		image: new URL(`pierogis-live-og.webp`, $page.url.origin).toString(),
+		image: new URL(`pierogis-live-og.webp`, page.url.origin).toString(),
 		alt: 'pierogis live'
 	});
 	let twitter = $derived({
 		card: 'summary_large_image' as const,
-		image: new URL(`pierogis-live-twitter.webp`, $page.url.origin).toString(),
+		image: new URL(`pierogis-live-twitter.webp`, page.url.origin).toString(),
 		alt: 'pierogis live'
 	});
 </script>

@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
-import { getScores } from '$lib/server/database/scores';
+import { getScores } from '#lib/server/database/scores.js';
 
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async (event) => {
@@ -12,7 +12,7 @@ export const GET: RequestHandler = async (event) => {
 		const parsedParams = { modelId: parseInt(event.params.id), userId: userId };
 		const scores = await getScores(event.locals.db, parsedParams);
 
-		return json(scores);
+		return Response.json(scores);
 	} else {
 		error(401, 'not signed in and userId not specified');
 	}
