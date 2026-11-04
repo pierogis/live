@@ -30,6 +30,10 @@ on:
         description: 'deploy live'
         type: boolean
         default: false
+      parlor:
+        description: 'deploy parlor'
+        type: boolean
+        default: false
       stale:
         description: 'deploy stale'
         type: boolean

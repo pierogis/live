@@ -1,0 +1,24 @@
+<script lang="ts">
+	import { page } from '$app/state';
+
+	import { ThemeProvider } from '@pierogis/utensils';
+	import { Layout } from 'ui';
+
+	let { children } = $props();
+</script>
+
+<svelte:head>
+	<title>{page.data.title}</title>
+	<link rel="canonical" href={page.data.canonical} />
+	<meta name="description" content={page.data.description} />
+	<meta name="robots" content="index, follow" />
+</svelte:head>
+
+<ThemeProvider>
+	<Layout
+		title="parlor"
+		github={{ repo: 'https://github.com/pierogis/live/tree/main/sites/parlor' }}
+	>
+		{@render children?.()}
+	</Layout>
+</ThemeProvider>
