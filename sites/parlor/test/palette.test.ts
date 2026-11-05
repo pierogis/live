@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { closePairs } from '../src/lib/mosaic/palette.ts';
+import { closePairs } from '../src/lib/shared/palette.ts';
 import { loadPacks } from './levels.ts';
 
 for (const pack of loadPacks()) {

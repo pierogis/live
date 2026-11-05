@@ -7,6 +7,11 @@
 			name: 'mosaic',
 			about: 'lift dots off a picture, sort them by color, and fill it back in',
 			extra: { href: '/mosaic/edit', label: 'level editor' }
+		},
+		{
+			href: '/forage',
+			name: 'forage',
+			about: 'send ant colonies to eat a picture away, color by color, from the outside in'
 		}
 	];
 </script>

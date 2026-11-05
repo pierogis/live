@@ -1,0 +1,64 @@
+/*
+ * A board and the tab under it drawn as one piece: a single outline around two
+ * joined rectangles, the tab narrower than the board, with curved inside corners
+ * where they meet. So whatever moves between them (ants, dots) stays in one space.
+ *
+ *   .joined-top  the board's well: its own 2px ring all round
+ *   .joined-tab  sits right under it, overlapping the board's bottom ring so the
+ *                joint is open; it draws its sides and bottom, and each top corner
+ *                gets a curve (::before, ::after) that bends the board's bottom
+ *                line down into the tab's side
+ *
+ * The tab must be narrower than the board by at least 2 * (--joint-r + 10px), so
+ * the curves clear the board's rounded corners; each game sizes for that.
+ *
+ * Set on a parent: --well (the fill) and, to recolor the outline, --edge.
+ */
+.joined-top,
+.joined-tab {
+	--edge-c: var(--edge, var(--text-color-st));
+	--joint-r: 10px;
+	background: var(--well);
+}
+.joined-top {
+	border-radius: 10px;
+	box-shadow: inset 0 0 0 2px var(--edge-c);
+}
+.joined-tab {
+	box-sizing: border-box;
+	position: relative;
+	z-index: 1;
+	margin-top: -2px;
+	border: 2px solid var(--edge-c);
+	border-top: 0;
+	border-radius: 0 0 10px 10px;
+}
+.joined-tab::before,
+.joined-tab::after {
+	--r: var(--joint-r);
+	content: '';
+	position: absolute;
+	top: 0;
+	width: calc(var(--r) + 2px);
+	height: calc(var(--r) + 2px);
+	pointer-events: none;
+	/*
+	 * The outline color can be see-through, so the well goes down first (hiding the
+	 * board's line and the tab's side under the curve), then the 2px line on top.
+	 */
+	--line:
+		transparent calc(var(--r) - 0.25px), var(--edge-c) calc(var(--r) + 0.25px),
+		var(--edge-c) calc(var(--r) + 1.75px), transparent calc(var(--r) + 2.25px);
+	--fill: transparent calc(var(--r) - 0.25px), var(--well) calc(var(--r) + 0.25px);
+}
+.joined-tab::before {
+	left: calc(-2px - var(--r));
+	background:
+		radial-gradient(circle at 0 100%, var(--line)), radial-gradient(circle at 0 100%, var(--fill));
+}
+.joined-tab::after {
+	right: calc(-2px - var(--r));
+	background:
+		radial-gradient(circle at 100% 100%, var(--line)),
+		radial-gradient(circle at 100% 100%, var(--fill));
+}

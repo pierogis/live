@@ -11,7 +11,9 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "node --test \"test/**/*.test.ts\"",
-    "levels": "node scripts/check-levels.ts"
+    "levels": "node scripts/check-levels.ts",
+    "forage:tune": "node scripts/tune-forage.ts",
+    "forage:pictures": "node scripts/make-forage-pictures.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "catalog:",

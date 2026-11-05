@@ -14,17 +14,24 @@
  * spots closest to the one you tapped. Diagonal spots count as touching.
  */
 
+import {
+	hashStr,
+	makeRng,
+	parseArt,
+	shuffle,
+	type Art,
+	type Color,
+	type Rng
+} from '../shared/engine.ts';
+
+export { hashStr, makeRng, parseArt, type Art, type Color, type Rng };
+
 /** A level as stored: rows of color letters, '.' for an empty pixel. */
 export interface Level {
 	id: string;
 	name: string;
 	palette: Record<string, string>;
 	art: string[];
-}
-
-export interface Color {
-	key: string;
-	hex: string;
 }
 
 export interface Gem {
@@ -107,70 +114,7 @@ export interface Solution {
 	peak: number;
 }
 
-export type Rng = () => number;
-
-export function hashStr(s: string): number {
-	let h = 2166136261;
-	for (let i = 0; i < s.length; i++) {
-		h ^= s.charCodeAt(i);
-		h = Math.imul(h, 16777619);
-	}
-	return h >>> 0;
-}
-
 /** mulberry32: small, fast, seeded. */
-export function makeRng(seed: number): Rng {
-	let a = seed >>> 0;
-	return function () {
-		a = (a + 0x6d2b79f5) >>> 0;
-		let t = a;
-		t = Math.imul(t ^ (t >>> 15), t | 1);
-		t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-	};
-}
-
-function shuffle<T>(arr: T[], rng: Rng): T[] {
-	for (let i = arr.length - 1; i > 0; i--) {
-		const j = Math.floor(rng() * (i + 1));
-		const t = arr[i];
-		arr[i] = arr[j];
-		arr[j] = t;
-	}
-	return arr;
-}
-
-export interface Art {
-	w: number;
-	h: number;
-	target: number[];
-	colors: Color[];
-}
-
-export function parseArt(level: Level): Art {
-	const h = level.art.length;
-	const w = level.art[0].length;
-	const keys: string[] = [];
-	const target: number[] = new Array(w * h).fill(-1);
-	level.art.forEach((row, y) => {
-		if (row.length !== w) {
-			throw new Error(`${level.id}: row ${y} is ${row.length} wide, expected ${w}`);
-		}
-		for (let x = 0; x < w; x++) {
-			const ch = row[x];
-			if (ch === '.') continue;
-			if (!(ch in level.palette)) throw new Error(`${level.id}: no color for "${ch}"`);
-			let k = keys.indexOf(ch);
-			if (k < 0) {
-				k = keys.length;
-				keys.push(ch);
-			}
-			target[y * w + x] = k;
-		}
-	});
-	const colors = keys.map((key) => ({ key, hex: level.palette[key] }));
-	return { w, h, target, colors };
-}
 
 /** The 8 spots around `i`, corners included: diagonal spots count as touching. */
 export function neighbors(w: number, h: number, i: number): number[] {
@@ -645,16 +589,6 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 			peak = Math.max(peak, s.tray.length);
 		}
 		if (isWon(s)) return { path, peak };
-	}
-	return null;
-}
-
-/** A next action from which the solver can still finish, or null. */
-export function hint(s: State): Action | null {
-	for (const a of actions(s).slice(0, 12)) {
-		const t = clone(s);
-		if (!move(t, a.sel, a.dst).ok) continue;
-		if (isWon(t) || solve(t, 4, 7)) return a;
 	}
 	return null;
 }

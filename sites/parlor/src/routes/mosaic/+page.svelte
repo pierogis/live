@@ -3,4 +3,11 @@
 	import { LEVELS } from '#lib/mosaic/levels/index.js';
 </script>
 
-<Mosaic levels={LEVELS} />
+<!-- Arrives as level 1, then moves to the saved level. -->
+<Mosaic
+	levels={LEVELS}
+	start={0}
+	resume
+	levelHref={(i) => `/mosaic/${i + 1}`}
+	picturesHref="/mosaic/pictures"
+/>

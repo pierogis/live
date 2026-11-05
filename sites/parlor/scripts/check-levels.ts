@@ -1,5 +1,8 @@
-// Check every Mosaic level and print its stats: pnpm -F parlor levels [--order]
-// Fails when a level can't be solved with the standard tray or has colors that look alike.
+// Check every level of every game and print its stats: pnpm -F parlor levels [--order] [--measure]
+// Fails when a Mosaic level can't be solved with the standard tray or has colors that look
+// alike, or when a Forage level's built-in winning play doesn't win.
+import type { Level as ForageLevel } from '../src/lib/forage/engine.ts';
+import { reportForage } from '../src/lib/forage/report.ts';
 import { reportLevel, type LevelReport } from '../src/lib/mosaic/report.ts';
 import { loadPacks } from '../test/levels.ts';
 
@@ -55,6 +58,27 @@ if (process.argv.includes('--order')) {
 	}
 }
 
-const bad = rows.filter((r) => r.problems.length);
-console.log(bad.length ? `\n${bad.length} level(s) need work` : `\nall ${rows.length} levels ok`);
+// Forage: the built-in play wins, and how often random players win against the target.
+console.log('\nforage');
+const pct = (x: number) => `${Math.round(100 * x)}%`;
+const forage: { problems: string[] }[] = [];
+let forageIndex = 0;
+for (const pack of loadPacks<ForageLevel>('forage')) {
+	for (const lv of pack.levels) {
+		// Measuring every level takes minutes; by default trust what forage:tune saved.
+		const r = reportForage(lv, forageIndex++, process.argv.includes('--measure') ? 20 : 0);
+		if (!process.argv.includes('--measure') && lv.wins !== undefined) {
+			r.difficulty = { careless: lv.wins, careful: NaN };
+		}
+		forage.push(r);
+		console.log(
+			`  ${pack.id.padEnd(13)} ${lv.id.padEnd(22)} ${r.w}x${r.h}  colonies ${r.colonies}  links ${r.links}  locks ${r.locks}  mystery ${r.mystery}  careless wins ${pct(r.difficulty.careless)} (target ${pct(r.target)})`
+		);
+		for (const p of r.problems) console.log(`    problem: ${p}`);
+	}
+}
+
+const bad = [...rows, ...forage].filter((r) => r.problems.length);
+const total = rows.length + forage.length;
+console.log(bad.length ? `\n${bad.length} level(s) need work` : `\nall ${total} levels ok`);
 process.exitCode = bad.length ? 1 : 0;

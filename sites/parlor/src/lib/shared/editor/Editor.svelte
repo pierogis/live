@@ -1,18 +1,23 @@
 <!--
-	Mosaic level editor: paint pixels, pick colors, see live checks, play-test, and save.
-	On the dev server, "Save to pack" writes straight into src/lib/mosaic/levels/*.json.
-	Everywhere, the level can be downloaded or copied as JSON.
+	The picture editor, shared by every game: paint pixels, pick colors, import an image,
+	see the game's live checks, play-test, and save. The game comes in as `game` (see
+	types.ts). On the dev server, "save to pack" writes straight into
+	src/lib/<game>/levels/*.json; everywhere, a level can be downloaded or copied as JSON.
 -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
-	import Mosaic from './Mosaic.svelte';
-	import type { Level } from './engine';
 	import * as G from './grid';
-	import { LEVELS, PACKS } from './levels/index';
-	import { MIN_DELTA, deltaE, lab } from './palette';
 	import { quantize } from './quantize';
-	import { reportLevel, type LevelReport } from './report';
+	import type { Check, EditorGame, Picture } from './types';
+	import { MIN_DELTA, deltaE, lab } from '../palette';
+
+	let { game }: { game: EditorGame } = $props();
+
+	const PACKS = $derived(game.packs);
+	const LEVELS = $derived(PACKS.flatMap((p) => p.levels));
+	/** A level's own fields beyond its picture (like a game's tuning), kept as they were. */
+	type Extras = Record<string, unknown>;
 
 	type Tool = 'brush' | 'fill' | 'pick' | 'erase';
 	interface Snapshot {
@@ -29,8 +34,8 @@
 		origin: { pack: string; id: string } | null;
 	}
 
-	const DRAFT_KEY = 'mosaic:editor';
-	const NOTE_KEY = 'mosaic:editor:note';
+	const DRAFT_KEY = untrack(() => `parlor:editor:${game.id}`);
+	const NOTE_KEY = `${DRAFT_KEY}:note`;
 	const DEV = import.meta.env.DEV;
 	const PRESETS = [
 		'#e63946',
@@ -49,10 +54,10 @@
 		'#f2c46d'
 	];
 	const TOOLS: { tool: Tool; key: string; label: string }[] = [
-		{ tool: 'brush', key: 'b', label: 'Brush' },
-		{ tool: 'fill', key: 'f', label: 'Fill' },
-		{ tool: 'pick', key: 'i', label: 'Pick' },
-		{ tool: 'erase', key: 'e', label: 'Erase' }
+		{ tool: 'brush', key: 'b', label: 'brush' },
+		{ tool: 'fill', key: 'f', label: 'fill' },
+		{ tool: 'pick', key: 'i', label: 'pick' },
+		{ tool: 'erase', key: 'e', label: 'erase' }
 	];
 
 	let name = $state('');
@@ -61,7 +66,8 @@
 	let idFromName = $state(true);
 	let palette: Record<string, string> = $state({});
 	let grid: G.Grid = $state.raw(G.blank(24, 20));
-	let pack = $state(PACKS[0]?.id ?? '01-new');
+	let pack = $state(untrack(() => game.packs[0]?.id ?? '01-new'));
+	let extras: Extras = $state.raw({});
 	let newPackName = $state('');
 	let origin: Draft['origin'] = $state(null);
 	let brush = $state('A');
@@ -88,7 +94,8 @@
 	let stageWidth = $state(600);
 
 	// ---------- the level as the game sees it ----------
-	const draft: Level = $derived({
+	const draft: Picture = $derived({
+		...extras,
 		id,
 		name,
 		palette: $state.snapshot(palette),
@@ -120,7 +127,7 @@
 		return list;
 	});
 
-	let report = $state.raw<LevelReport | null>(null);
+	let report = $state.raw<Check | null>(null);
 	let checking = $state(false);
 	$effect(() => {
 		const lv = draft;
@@ -128,7 +135,7 @@
 		checking = true;
 		const timer = setTimeout(() => {
 			try {
-				report = reportLevel(lv, at);
+				report = game.check(lv, at);
 			} catch (err) {
 				report = null;
 				message = `Check failed: ${err}`;
@@ -190,7 +197,18 @@
 	}
 
 	// ---------- loading ----------
-	function load(lv: Level, from: Draft['origin'], packId: string) {
+	function load(lv: Picture, from: Draft['origin'], packId: string) {
+		// Keep a level's own fields; a measured win rate is stale once the picture changes.
+		const {
+			id: _id,
+			name: _name,
+			palette: _palette,
+			art: _art,
+			wins: _wins,
+			...rest
+		} = lv as Picture & Extras;
+		void [_id, _name, _palette, _art, _wins];
+		extras = rest;
 		name = lv.name;
 		id = lv.id;
 		idFromName = !from;
@@ -470,12 +488,13 @@
 		const replaces = origin && origin.pack === pack ? origin.id : undefined;
 		origin = target;
 		idFromName = false;
-		persistDraft(`Saved to levels/${pack}.json.`);
+		persistDraft(`Saved to ${game.id}/levels/${pack}.json.`);
 		try {
-			const res = await fetch('/__mosaic/save', {
+			const res = await fetch('/__levels/save', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
+					game: game.id,
 					pack,
 					packName: newPackName || pack,
 					level: draft,
@@ -484,7 +503,7 @@
 			});
 			const body = await res.json();
 			if (!res.ok) throw new Error(body.error);
-			message = `Saved to levels/${pack}.json.`;
+			message = `Saved to ${game.id}/levels/${pack}.json.`;
 		} catch (err) {
 			origin = before.origin;
 			idFromName = before.idFromName;
@@ -546,7 +565,7 @@
 	// ---------- the draft survives reloads ----------
 	/** Save the draft for reloads; `note` is shown once after the next reload. */
 	function persistDraft(note?: string) {
-		const keep: Draft = { ...draft, pack, origin };
+		const keep = { ...draft, pack, origin, extras };
 		try {
 			localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...keep, idFromName, newPackName }));
 			if (note) sessionStorage.setItem(NOTE_KEY, note);
@@ -572,6 +591,7 @@
 			const d = raw && JSON.parse(raw);
 			if (d && Array.isArray(d.art) && d.art.length && d.palette) {
 				load(d, d.origin ?? null, d.pack ?? pack);
+				extras = d.extras ?? {};
 				idFromName = !!d.idFromName;
 				newPackName = d.newPackName ?? '';
 				restored = true;
@@ -589,6 +609,8 @@
 		loaded = true;
 	});
 
+	const Play = $derived(game.play);
+
 	const nextPackId = $derived.by(() => {
 		const n = PACKS.length + 1;
 		return `${String(n).padStart(2, '0')}-${G.slug(newPackName) || 'new-pack'}`;
@@ -600,7 +622,7 @@
 <div class="editor">
 	<div class="bar">
 		<div class="titles">
-			<div class="brand">Mosaic editor</div>
+			<h2 class="brand">{game.id} editor</h2>
 			<div class="sub">
 				{name || 'Untitled'} · {grid.w}x{grid.h}
 				{#if origin}· levels/{origin.pack}.json{:else}· not saved yet{/if}
@@ -622,26 +644,32 @@
 				{/each}
 			</select>
 		</label>
-		<button class="btn" onclick={newLevel}>New</button>
-		<button class="btn" onclick={() => (importing = !importing)} aria-expanded={importing}>
-			Import image
+		<button class="btn border inset link-box" onclick={newLevel}>new</button>
+		<button
+			class="btn border inset link-box"
+			onclick={() => (importing = !importing)}
+			aria-expanded={importing}
+		>
+			import image
 		</button>
-		<button class="btn primary" disabled={!playable} onclick={() => (playing = true)}
-			>Play-test</button
+		<button class="btn border inset link-box" disabled={!playable} onclick={() => (playing = true)}
+			>play-test</button
 		>
 	</div>
 
 	{#if importing}
-		<div class="panel import">
-			<label>Width <input type="number" min="4" max="48" bind:value={importWidth} /></label>
-			<label>Colors <input type="number" min="2" max="16" bind:value={importColors} /></label>
+		<div class="panel inset import">
+			<label>width <input type="number" min="4" max="48" bind:value={importWidth} /></label>
+			<label>colors <input type="number" min="2" max="16" bind:value={importColors} /></label>
 			<label class="check"
 				><input type="checkbox" bind:checked={importSharp} /> Pixel art (keep hard edges)</label
 			>
 			<label class="check"
 				><input type="checkbox" bind:checked={importDespeckle} /> Clean up lone pixels</label
 			>
-			<button class="btn primary" onclick={() => fileInput?.click()}>Choose image…</button>
+			<button class="btn border inset link-box" onclick={() => fileInput?.click()}
+				>choose image…</button
+			>
 			<input
 				class="sr"
 				type="file"
@@ -664,12 +692,12 @@
 	{#if message}<p class="message" aria-live="polite">{message}</p>{/if}
 
 	<div class="layout">
-		<aside class="panel tools-panel">
-			<h3>Tools</h3>
+		<aside class="panel inset tools-panel">
+			<h3>tools</h3>
 			<div class="tools">
 				{#each TOOLS as t (t.tool)}
 					<button
-						class="tool"
+						class="tool inset"
 						class:on={tool === t.tool}
 						aria-pressed={tool === t.tool}
 						title="{t.label} ({t.key.toUpperCase()})"
@@ -678,15 +706,18 @@
 				{/each}
 			</div>
 			<div class="tools">
-				<button class="tool" disabled={!undoStack.length} onclick={undo} title="Undo (Ctrl+Z)"
-					>Undo</button
+				<button class="tool inset" disabled={!undoStack.length} onclick={undo} title="Undo (Ctrl+Z)"
+					>undo</button
 				>
-				<button class="tool" disabled={!redoStack.length} onclick={redo} title="Redo (Ctrl+Shift+Z)"
-					>Redo</button
+				<button
+					class="tool inset"
+					disabled={!redoStack.length}
+					onclick={redo}
+					title="Redo (Ctrl+Shift+Z)">redo</button
 				>
 			</div>
 
-			<h3>Colors</h3>
+			<h3>colors</h3>
 			<ul class="palette">
 				{#each Object.keys(palette) as k, n (k)}
 					<li class:on={brush === k} class:bad={lookAlikes[k]?.length}>
@@ -731,7 +762,11 @@
 					</li>
 				{/each}
 			</ul>
-			<button class="btn small" onclick={addColor} disabled={!G.nextKey(palette)}>+ Color</button>
+			<button
+				class="btn small border inset link-box"
+				onclick={addColor}
+				disabled={!G.nextKey(palette)}>+ color</button
+			>
 			<p class="hint">
 				Alt-click a pixel to pick its color. Empty pixels are left out of the picture.
 			</p>
@@ -752,26 +787,26 @@
 				oncontextmenu={(e) => e.preventDefault()}
 			></canvas>
 			<div class="stage-tools">
-				<button class="tool" onclick={() => transform(G.flip)} title="Mirror left to right"
-					>Mirror</button
+				<button class="tool inset" onclick={() => transform(G.flip)} title="Mirror left to right"
+					>mirror</button
 				>
 				<button
-					class="tool"
+					class="tool inset"
 					onclick={() => transform((g) => G.shift(g, -1, 0))}
 					aria-label="Shift left">←</button
 				>
 				<button
-					class="tool"
+					class="tool inset"
 					onclick={() => transform((g) => G.shift(g, 1, 0))}
 					aria-label="Shift right">→</button
 				>
 				<button
-					class="tool"
+					class="tool inset"
 					onclick={() => transform((g) => G.shift(g, 0, -1))}
 					aria-label="Shift up">↑</button
 				>
 				<button
-					class="tool"
+					class="tool inset"
 					onclick={() => transform((g) => G.shift(g, 0, 1))}
 					aria-label="Shift down">↓</button
 				>
@@ -783,10 +818,10 @@
 			</div>
 		</section>
 
-		<aside class="panel info">
-			<h3>Level</h3>
+		<aside class="panel inset info">
+			<h3>level</h3>
 			<label
-				>Name <input
+				>name <input
 					value={name}
 					oninput={(e) => {
 						name = e.currentTarget.value;
@@ -795,7 +830,7 @@
 				/></label
 			>
 			<label
-				>Id <input
+				>id <input
 					value={id}
 					oninput={(e) => {
 						id = G.slug(e.currentTarget.value);
@@ -804,10 +839,10 @@
 				/></label
 			>
 			{#if origin && origin.id !== id}
-				<p class="hint warn">A new id gives this level a new shuffle.</p>
+				<p class="hint warn">A new id changes how this level is dealt.</p>
 			{/if}
 			<label>
-				Pack
+				pack
 				<select bind:value={pack}>
 					{#each PACKS as p (p.id)}
 						<option value={p.id}>{p.name} ({p.id})</option>
@@ -819,7 +854,7 @@
 			</label>
 			{#if isNewPack}
 				<label
-					>New pack name <input
+					>new pack name <input
 						value={newPackName}
 						oninput={(e) => {
 							newPackName = e.currentTarget.value;
@@ -829,17 +864,17 @@
 				>
 			{/if}
 			<div class="size">
-				<label>W <input type="number" min="4" max="48" bind:value={sizeW} /></label>
-				<label>H <input type="number" min="4" max="48" bind:value={sizeH} /></label>
+				<label>w <input type="number" min="4" max="48" bind:value={sizeW} /></label>
+				<label>h <input type="number" min="4" max="48" bind:value={sizeH} /></label>
 				<button
-					class="btn small"
+					class="btn small border inset link-box"
 					onclick={applySize}
-					disabled={sizeW === grid.w && sizeH === grid.h}>Resize</button
+					disabled={sizeW === grid.w && sizeH === grid.h}>resize</button
 				>
 			</div>
 
 			<h3>
-				Checks {#if checking}<span class="muted">· checking…</span>{/if}
+				checks {#if checking}<span class="muted">· checking…</span>{/if}
 			</h3>
 			{#if report}
 				{#if report.problems.length}
@@ -847,7 +882,7 @@
 						{#each report.problems as p (p)}<li>{p}</li>{/each}
 					</ul>
 				{:else}
-					<p class="ok">Solvable with the 20-slot tray.</p>
+					<p class="ok">{report.summary}</p>
 				{/if}
 				{#if report.warnings.length}
 					<ul class="issues">
@@ -856,33 +891,25 @@
 				{/if}
 				{#if !report.problems.length}
 					<dl class="stats">
-						<dt>Dots</dt>
-						<dd>{report.dots} in {report.colors} colors</dd>
-						<dt>Solver</dt>
-						<dd>{report.moves} moves, {report.parks} to the tray</dd>
-						<dt>Tray used</dt>
-						<dd>{report.minTray} / 20</dd>
-						<dt>Groups</dt>
-						<dd>{report.groups}, biggest {report.biggestGroup}</dd>
-						<dt>On one color</dt>
-						<dd>{report.cleanGroups} / {report.groups} groups</dd>
-						<dt>Difficulty</dt>
-						<dd>{report.score}</dd>
-						<dt>Play order</dt>
+						{#each report.stats as stat (stat.label)}
+							<dt>{stat.label}</dt>
+							<dd>{stat.value}</dd>
+						{/each}
+						<dt>play order</dt>
 						<dd>#{slot + 1}</dd>
 					</dl>
 				{/if}
 			{/if}
 
-			<h3>Save</h3>
+			<h3>save</h3>
 			<div class="save">
 				{#if DEV}
-					<button class="btn primary" disabled={!playable || saving} onclick={save}>
-						{saving ? 'Saving…' : 'Save to pack'}
+					<button class="btn border inset link-box" disabled={!playable || saving} onclick={save}>
+						{saving ? 'saving…' : 'save to pack'}
 					</button>
 				{/if}
-				<button class="btn" onclick={download}>Download</button>
-				<button class="btn" onclick={copy}>Copy JSON</button>
+				<button class="btn border inset link-box" onclick={download}>download</button>
+				<button class="btn border inset link-box" onclick={copy}>copy JSON</button>
 			</div>
 			{#if !DEV}
 				<p class="hint">
@@ -896,10 +923,12 @@
 {#if playing}
 	<div class="play" role="dialog" aria-modal="true" aria-label="Play-test">
 		<div class="play-bar">
-			<button class="btn primary" onclick={() => (playing = false)}>← Back to editing</button>
+			<button class="btn border inset link-box" onclick={() => (playing = false)}
+				>← back to editing</button
+			>
 			<span class="muted">Play-test: progress isn't saved.</span>
 		</div>
-		<Mosaic levels={playLevels} start={slot} sandbox />
+		<Play levels={playLevels} start={slot} sandbox />
 	</div>
 {/if}
 
@@ -907,20 +936,15 @@
 	.editor,
 	.play {
 		--bg: var(--primary-color);
-		--panel: color-mix(in srgb, var(--input-color) 60%, var(--primary-color));
+		--panel: var(--primary-color);
 		--ink: var(--text-color);
 		--muted: color-mix(in srgb, var(--text-color) 70%, var(--primary-color));
 		--line: var(--text-color-st);
 		--accent: var(--accent-color);
-		--bad: #d93a3f;
-		--good: #2f9e5b;
+		--bad: var(--accent-color);
+		--good: var(--link-color);
 		--check-a: color-mix(in srgb, var(--text-color) 10%, var(--primary-color));
 		--check-b: color-mix(in srgb, var(--text-color) 4%, var(--primary-color));
-	}
-	:global([data-theme='dark']) .editor,
-	:global([data-theme='dark']) .play {
-		--bad: #ff8f93;
-		--good: #7ee2a8;
 	}
 	.editor {
 		width: 100%;
@@ -940,8 +964,8 @@
 		min-width: 180px;
 	}
 	.brand {
-		font-weight: 700;
-		font-size: 18px;
+		margin: 0;
+		font-size: 20px;
 	}
 	.sub,
 	.muted,
@@ -971,8 +995,7 @@
 	}
 	.panel {
 		background: var(--panel);
-		border-radius: 14px;
-		box-shadow: 0 0 0 2px var(--line);
+		border-radius: 10px;
 		padding: 12px;
 	}
 	h3 {
@@ -998,8 +1021,8 @@
 	select {
 		background: var(--input-color);
 		color: var(--text-color);
-		border-radius: 8px;
-		box-shadow: inset 0 0 0 1px var(--line);
+		border-radius: 10px;
+		box-shadow: var(--inset);
 		padding: 6px 8px;
 		width: 100%;
 	}
@@ -1016,30 +1039,22 @@
 		overflow: hidden;
 		clip: rect(0 0 0 0);
 	}
-	.btn,
-	.tool {
-		border-radius: 10px;
-		box-shadow: inset 0 0 0 1px var(--line);
-		background: var(--panel);
-		padding: 8px 12px;
-		cursor: pointer;
-		font-weight: 600;
-	}
+	/* Buttons use the site's border inset link-box; tool chips use its inset ring. */
 	.btn:disabled,
 	.tool:disabled {
 		opacity: 0.45;
 		cursor: default;
 	}
-	.btn.primary {
-		background: var(--accent);
-		color: #fff;
-		box-shadow: none;
-	}
 	.btn.small {
-		padding: 6px 10px;
 		font-size: 13px;
 	}
-	.btn:focus-visible,
+	.tool {
+		border-radius: 10px;
+		background: var(--panel);
+		cursor: pointer;
+		font-family: Courier, monospace;
+		font-weight: 700;
+	}
 	.tool:focus-visible,
 	.swatch-pick:focus-visible,
 	.x:focus-visible {
@@ -1079,6 +1094,7 @@
 	.tool.on {
 		background: var(--ink);
 		color: var(--bg);
+		box-shadow: none;
 	}
 	.palette {
 		list-style: none;

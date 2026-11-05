@@ -1,12 +1,16 @@
 import type { Attachment } from 'svelte/attachments';
 
-import type { Level } from './engine';
+/** Anything drawn as a pixel picture: rows of palette letters, '.' for empty. */
+export interface Picture {
+	palette: Record<string, string>;
+	art: string[];
+}
 
 /**
  * Draw a level as a small pixel picture: in its colors when `done`, otherwise
  * as a silhouette in the canvas's CSS `--silhouette` color.
  */
-export function drawArt(canvas: HTMLCanvasElement, lv: Level, done: boolean, size: number) {
+export function drawArt(canvas: HTMLCanvasElement, lv: Picture, done: boolean, size: number) {
 	const w = lv.art[0].length;
 	const h = lv.art.length;
 	const silhouette = getComputedStyle(canvas).getPropertyValue('--silhouette').trim() || '#ccc';
@@ -30,7 +34,7 @@ export function drawArt(canvas: HTMLCanvasElement, lv: Level, done: boolean, siz
 
 /** `{@attach art(level, done, size)}` on a canvas. */
 export const art =
-	(lv: Level, done: boolean, size: number): Attachment<HTMLCanvasElement> =>
+	(lv: Picture, done: boolean, size: number): Attachment<HTMLCanvasElement> =>
 	(canvas) => {
 		drawArt(canvas, lv, done, size);
 	};

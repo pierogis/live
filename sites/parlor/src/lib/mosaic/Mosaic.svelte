@@ -4,16 +4,20 @@
 	change and everything derived from the state reads it.
 -->
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { Attachment } from 'svelte/attachments';
 
 	import * as E from './engine';
-	import type { Action, Dst, Level, MoveResult, Sel, State } from './engine';
-	import { art, drawArt } from './art';
+	import type { Dst, Level, MoveResult, Sel, State } from './engine';
+	import LevelEnd from '../shared/game/LevelEnd.svelte';
+	import GameBar from '../shared/game/GameBar.svelte';
+	import '../shared/game/joined.css';
 	import { loadSave, persist, type Save } from './save';
+	import { blank } from '../shared/save';
 	import { Flights, snapshotRects } from './flights';
-	import { blip } from './sound';
+	import { blip } from '../shared/sound';
 
 	interface Props {
 		levels: Level[];
@@ -21,20 +25,22 @@
 		start?: number;
 		/** Play without reading or writing saved progress, e.g. to play-test a draft. */
 		sandbox?: boolean;
+		/** Where the list of all pictures lives; omit to hide the link. */
+		picturesHref?: string;
+		/** Each level's own page. When given, moving to another level navigates there. */
+		levelHref?: (index: number) => string;
+		/** On a page without a level in its URL: go to the saved level once it's known. */
+		resume?: boolean;
 	}
 
-	let { levels, start, sandbox = false }: Props = $props();
+	let { levels, start, sandbox = false, picturesHref, levelHref, resume = false }: Props = $props();
 
 	const STAGGER = 40;
-	const BOARD_PAD = 12;
+	/** Whether the last tap was a finger, which gets a wider reach than a mouse. */
+	let touchTap = false;
 	const MAX_ZOOM = 4;
-	const TIPS = [
-		'Tap a dot to pick up its group. Then tap where it goes: an empty tray slot, or an open spot of the same color.',
-		'The color around each dot is what that spot needs. Lift dots off to open spots up.',
-		'If there isn’t room for the whole group, the dots closest to the one you tapped go first.'
-	];
 
-	let save: Save = $state({ completed: {}, level: 0, relaxed: false, muted: false });
+	let save: Save = $state(blank());
 	let levelIndex = $state(0);
 	/** Bumps on each new level, so the board is rebuilt rather than reused. */
 	let levelKey = $state(0);
@@ -44,20 +50,20 @@
 	let history: State[] = [];
 	let historyLen = $state(0);
 	let sel: Sel | null = $state.raw(null);
-	let hintMove: Action | null = $state.raw(null);
 	let hoverCell = $state(-1);
 	let trayHover: { color: number } | { slot: true } | null = $state(null);
 	let focusCell = $state(-1);
+	/** Read out to screen readers only; the game shows what happens instead of narrating it. */
 	let status = $state('');
-	let statusTimer: ReturnType<typeof setTimeout> | undefined;
-	let overlay: 'levels' | 'win' | 'stuck' | null = $state(null);
+	let overlay: 'win' | 'stuck' | null = $state(null);
 	let won = $state(false);
-	let trayBump = $state(false);
+	/** A still outline on the tray for a moment, when a move doesn't fit. */
+	let trayFlash = $state(false);
+	let trayTimer: ReturnType<typeof setTimeout> | undefined;
 	let winText = $state('');
 
 	const pendingCells = new SvelteSet<number>();
 	const pendingTray = new SvelteSet<number>();
-	const popping = new SvelteSet<number>();
 	const flights = new Flights();
 
 	let rootEl: HTMLElement | undefined = $state();
@@ -65,12 +71,15 @@
 	let boardEl: HTMLElement | undefined = $state();
 	let trayEl: HTMLElement | undefined = $state();
 	let fxEl: HTMLElement | undefined = $state();
-	let winNextEl: HTMLButtonElement | undefined = $state();
 	let reduceMotion: MediaQueryList | null = null;
 
-	let grid = $state({ cell: 24, gap: 2, slot: 30 });
-	let zoom = $state({ scale: 1, tx: 0, ty: 0, w: 0, h: 0 });
-	const zoomed = $derived(zoom.scale > 1.01);
+	/**
+	 * Zooming makes the cells bigger rather than scaling the board, so every size
+	 * and offset stays a whole pixel. `cell` is the zoomed cell size (0 = fit);
+	 * `scale` is how many times the fitted size that is.
+	 */
+	let zoom = $state({ cell: 0, scale: 1, tx: 0, ty: 0 });
+	const zoomed = $derived(zoom.cell > 0);
 
 	const level = $derived(levels[levelIndex]);
 	const title = $derived(
@@ -123,10 +132,6 @@
 		const s = game;
 		if (!s) return [];
 		const color = selColor();
-		const hintSrc = new Set(
-			hintMove?.sel.from === 'board' ? (E.groupAt(s, hintMove.sel.cell)?.cells ?? []) : []
-		);
-		const hintDst = hintMove?.dst.to === 'spot' ? hintMove.dst.cell : -1;
 		return s.target.map((c, i) => {
 			if (c < 0) return null;
 			const dot = s.top[i];
@@ -143,8 +148,7 @@
 				label = 'Open spot';
 				if (c === color && !pendingCells.has(i)) cls += ' target';
 			}
-			if (i === hintDst) cls += ' hint-dst';
-			let dotCls = picked.has(i) ? 'sel' : hintSrc.has(i) ? 'hint' : '';
+			let dotCls = picked.has(i) ? 'sel' : '';
 			if (sel?.from === 'board' && sel.cell === i) dotCls += ' center';
 			return {
 				hex: s.colors[c].hex,
@@ -200,7 +204,6 @@
 			let cls = '';
 			if (g && pendingTray.has(g.id)) cls = 'ghost';
 			else if (g && g.c === traySel) cls = 'sel';
-			else if (g && hintMove?.sel.from === 'tray' && hintMove.sel.color === g.c) cls = 'hint';
 			if (g && g.c === hoverColor) cls += ' hl';
 			const prev = s.tray[k - 1];
 			out.push({
@@ -218,24 +221,19 @@
 	const trayState = $derived.by(() => {
 		void version;
 		const s = game;
-		if (!s) return { used: 0, cap: 0, warn: false, nofit: false, hintDst: false };
+		if (!s) return { used: 0, cap: 0, warn: false, nofit: false };
 		const free = s.trayCap - s.tray.length;
 		return {
 			used: s.tray.length,
 			cap: s.trayCap,
 			warn: free <= 2,
-			nofit: sel?.from === 'board' && free === 0,
-			hintDst: hintMove?.dst.to === 'tray'
+			nofit: sel?.from === 'board' && free === 0
 		};
 	});
 
 	// ---------- messages ----------
-	const defaultStatus = () => TIPS[levelIndex] || '';
-
-	function say(msg: string, sticky = false) {
-		clearTimeout(statusTimer);
+	function say(msg: string) {
 		status = msg;
-		if (!sticky) statusTimer = setTimeout(() => (status = defaultStatus()), 4000);
 	}
 
 	function sound(i: number, soft = false) {
@@ -243,70 +241,124 @@
 	}
 
 	// ---------- level setup ----------
-	async function startLevel(i: number) {
+	/**
+	 * Set up level i. No saving and no page access, so it also runs on the server:
+	 * the page arrives with its board already drawn.
+	 */
+	function buildLevel(i: number) {
 		cancelFlights();
 		overlay = null;
 		levelIndex = i;
-		save.level = i;
-		keep();
 		game = E.buildPuzzle(levels[i], i, { relaxed: save.relaxed });
 		initial = E.clone(game);
 		history = [];
 		historyLen = 0;
 		sel = null;
-		hintMove = null;
 		hoverCell = -1;
 		won = false;
 		focusCell = game.target.findIndex((c) => c >= 0);
 		levelKey++;
 		sync();
-		say(defaultStatus(), true);
-		await tick();
-		fit();
+		say(`${levels[i].name}.`);
 	}
 
-	/** Size the board and tray so everything fits the screen. */
-	function fit() {
-		const s = game;
-		if (!s || !rootEl || !viewEl) return;
-		const avail = Math.min(rootEl.clientWidth, 1000) - 2 * BOARD_PAD;
-		const slotGuess = 30;
-		const perRow = Math.max(1, Math.floor((avail - 16) / (slotGuess * 1.14)));
-		const trayRows = Math.ceil(s.trayCap / perRow);
-		const top = viewEl.getBoundingClientRect().top + window.scrollY;
-		// Below the board: tray rows, the tray's padding and heading, and some margin.
-		const room =
-			window.innerHeight - top - trayRows * slotGuess * 1.14 - 16 - 30 - 28 - 2 * BOARD_PAD;
-		// Pick the biggest cell that fits both ways, with thinner gaps on big pictures.
-		let cell = 44;
-		let gap = 2;
-		for (; cell > 9; cell--) {
-			gap = cell >= 22 ? 2 : 1;
-			const w = cell * s.w + gap * (s.w - 1);
-			const h = cell * s.h + gap * (s.h - 1);
-			if (w <= avail && h <= Math.max(room, 200)) break;
-		}
-		grid = { cell, gap, slot: Math.max(22, Math.min(36, Math.floor(cell * 0.9))) };
-		// The view window is the board's fitted size; zooming happens inside it.
-		zoom.w = s.w * cell + gap * (s.w - 1) + 2 * BOARD_PAD;
-		zoom.h = s.h * cell + gap * (s.h - 1) + 2 * BOARD_PAD;
-		setZoom(1, 0, 0);
+	async function startLevel(i: number) {
+		buildLevel(i);
+		save.level = i;
+		keep();
+		await tick();
+		resetZoom();
+	}
+
+	/** Another level: its own page when there is one, else in place. */
+	function goLevel(i: number) {
+		if (levelHref) goto(levelHref(i));
+		else startLevel(i);
+	}
+
+	// Moving between level pages reuses this component with a new `start`.
+	$effect(() => {
+		const next = start;
+		untrack(() => {
+			if (next !== undefined && next !== levelIndex) startLevel(next);
+		});
+	});
+
+	/**
+	 * The board's sizes as laid out. CSS sizes the board (see .stage in the styles);
+	 * taps and zoom read the result here instead of keeping their own copy.
+	 */
+	function metrics() {
+		const style = getComputedStyle(boardEl!);
+		const cell = boardEl!.querySelector<HTMLElement>('.cell')?.offsetWidth ?? 0;
+		const gap = parseFloat(style.columnGap) || 0;
+		return {
+			pad: parseFloat(style.paddingLeft) || 0,
+			cell,
+			gap,
+			step: cell + gap,
+			w: viewEl!.clientWidth,
+			h: viewEl!.clientHeight
+		};
 	}
 
 	// ---------- zoom and pan ----------
-	function setZoom(scale: number, tx: number, ty: number) {
-		const k = Math.max(1, Math.min(MAX_ZOOM, scale));
-		// Keep the board covering the window: no empty edges when zoomed in.
-		zoom.scale = k;
-		zoom.tx = Math.min(0, Math.max(zoom.w - zoom.w * k, tx));
-		zoom.ty = Math.min(0, Math.max(zoom.h - zoom.h * k, ty));
+	/** The fitted (unzoomed) cell size, from the window, which CSS keeps at the fitted board's size. */
+	function fitCell() {
+		const m = metrics();
+		const w = game?.w ?? 1;
+		return Math.max(1, Math.round((m.w - 2 * m.pad - (w - 1) * m.gap) / w));
 	}
 
-	/** Zoom to `scale`, keeping the point (px, py) inside the window fixed under the finger. */
-	function zoomAt(scale: number, px: number, py: number) {
-		const next = Math.max(1, Math.min(MAX_ZOOM, scale));
-		const k = next / zoom.scale;
-		setZoom(next, px - (px - zoom.tx) * k, py - (py - zoom.ty) * k);
+	function resetZoom() {
+		zoom = { cell: 0, scale: 1, tx: 0, ty: 0 };
+	}
+
+	/** Zoom to a `cell` size in whole pixels, panned to (tx, ty), keeping the window covered. */
+	function setZoom(cell: number, tx: number, ty: number) {
+		const s = game;
+		if (!s || !viewEl) return resetZoom();
+		const fit = fitCell();
+		const c = Math.min(Math.round(fit * MAX_ZOOM), Math.round(cell));
+		if (c <= fit) return resetZoom();
+		const m = metrics();
+		const bw = 2 * m.pad + s.w * c + (s.w - 1) * m.gap;
+		const bh = 2 * m.pad + s.h * c + (s.h - 1) * m.gap;
+		zoom = {
+			cell: c,
+			scale: c / fit,
+			tx: Math.round(Math.min(0, Math.max(m.w - bw, tx))),
+			ty: Math.round(Math.min(0, Math.max(m.h - bh, ty)))
+		};
+	}
+
+	/** The cell size now, zoomed or not. */
+	const cellNow = () => zoom.cell || fitCell();
+
+	/**
+	 * Zoom so cells are `cell` pixels, keeping the point (px, py) inside the window
+	 * fixed under the finger. `from` is the zoom the point was measured in.
+	 */
+	function zoomTo(
+		cell: number,
+		px: number,
+		py: number,
+		from: { cell: number; tx: number; ty: number } = { cell: cellNow(), tx: zoom.tx, ty: zoom.ty }
+	) {
+		const m = metrics();
+		// The point in cells from the board's padding edge, which stays put.
+		const u = (px - from.tx - m.pad) / (from.cell + m.gap);
+		const v = (py - from.ty - m.pad) / (from.cell + m.gap);
+		const step = Math.round(cell) + m.gap;
+		setZoom(cell, px - m.pad - u * step, py - m.pad - v * step);
+	}
+
+	/** Zoom in or out by a factor, at least one pixel per cell. */
+	function zoomBy(factor: number, px: number, py: number) {
+		const now = cellNow();
+		let next = Math.round(now * factor);
+		if (next === now) next = now + (factor > 1 ? 1 : -1);
+		zoomTo(next, px, py);
 	}
 
 	function viewPoint(clientX: number, clientY: number): [number, number] {
@@ -319,7 +371,7 @@
 	const gesture: {
 		pts: Map<number, Pt>;
 		moved: boolean;
-		start: { mid: Pt; dist: number; scale: number; tx: number; ty: number; n: number } | null;
+		start: { mid: Pt; dist: number; cell: number; tx: number; ty: number; n: number } | null;
 	} = { pts: new Map(), moved: false, start: null };
 	let dragging = $state(false);
 
@@ -328,10 +380,11 @@
 		const mid: Pt =
 			pts.length > 1 ? [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2] : pts[0];
 		const dist = pts.length > 1 ? Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]) : 0;
-		gesture.start = { mid, dist, scale: zoom.scale, tx: zoom.tx, ty: zoom.ty, n: pts.length };
+		gesture.start = { mid, dist, cell: cellNow(), tx: zoom.tx, ty: zoom.ty, n: pts.length };
 	}
 
 	function onPointerDown(e: PointerEvent) {
+		touchTap = e.pointerType !== 'mouse';
 		if ((e.target as Element).closest('.zoom-ctl')) return;
 		if (gesture.pts.size === 0) gesture.moved = false;
 		gesture.pts.set(e.pointerId, viewPoint(e.clientX, e.clientY));
@@ -347,19 +400,22 @@
 			// Pinch: scale by finger spread, keep the content under the fingers' midpoint.
 			const mid = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2];
 			const dist = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
-			const scale = Math.max(1, Math.min(MAX_ZOOM, g.scale * (dist / Math.max(1, g.dist))));
-			const cx = (g.mid[0] - g.tx) / g.scale;
-			const cy = (g.mid[1] - g.ty) / g.scale;
-			setZoom(scale, mid[0] - cx * scale, mid[1] - cy * scale);
+			// Measured from where the pinch started, so rounding never builds up.
+			const cell = g.cell * (dist / Math.max(1, g.dist));
+			const m = metrics();
+			const u = (g.mid[0] - g.tx - m.pad) / (g.cell + m.gap);
+			const v = (g.mid[1] - g.ty - m.pad) / (g.cell + m.gap);
+			const step = Math.round(cell) + m.gap;
+			setZoom(cell, mid[0] - m.pad - u * step, mid[1] - m.pad - v * step);
 			gesture.moved = true;
 		} else if (pts.length === 1 && g.n === 1) {
 			const dx = pts[0][0] - g.mid[0];
 			const dy = pts[0][1] - g.mid[1];
 			if (!gesture.moved && Math.hypot(dx, dy) < 8) return; // still a tap
-			if (zoom.scale <= 1.01) return; // nothing to pan at full view
+			if (!zoomed) return; // nothing to pan at full view
 			gesture.moved = true;
 			dragging = true;
-			setZoom(zoom.scale, g.tx + dx, g.ty + dy);
+			setZoom(zoom.cell, g.tx + dx, g.ty + dy);
 		}
 	}
 
@@ -376,10 +432,10 @@
 			if (e.ctrlKey || e.metaKey) {
 				e.preventDefault();
 				const [px, py] = viewPoint(e.clientX, e.clientY);
-				zoomAt(zoom.scale * Math.exp(-e.deltaY * 0.01), px, py);
-			} else if (zoom.scale > 1.01) {
+				zoomBy(Math.exp(-e.deltaY * 0.01), px, py);
+			} else if (zoomed) {
 				e.preventDefault();
-				setZoom(zoom.scale, zoom.tx - e.deltaX, zoom.ty - e.deltaY);
+				setZoom(zoom.cell, zoom.tx - e.deltaX, zoom.ty - e.deltaY);
 			}
 		};
 		node.addEventListener('wheel', onWheel, { passive: false });
@@ -391,21 +447,26 @@
 	function cellCenter(i: number): Pt {
 		const s = game!;
 		const r = viewEl!.getBoundingClientRect();
-		const step = grid.cell + grid.gap;
-		const x = BOARD_PAD + (i % s.w) * step + grid.cell / 2;
-		const y = BOARD_PAD + Math.floor(i / s.w) * step + grid.cell / 2;
-		return [r.left + zoom.tx + x * zoom.scale, r.top + zoom.ty + y * zoom.scale];
+		const m = metrics();
+		const x = m.pad + (i % s.w) * m.step + m.cell / 2;
+		const y = m.pad + Math.floor(i / s.w) * m.step + m.cell / 2;
+		return [r.left + zoom.tx + x, r.top + zoom.ty + y];
 	}
 
 	/** Nearest cell to (x, y) passing `ok`, within about a fingertip; -1 if none. */
-	function nearestCell(x: number, y: number, ok: (i: number) => boolean): number {
+	function nearestCell(
+		x: number,
+		y: number,
+		ok: (i: number) => boolean
+	): { cell: number; d: number } | null {
 		const s = game!;
-		const cellPx = (grid.cell + grid.gap) * zoom.scale;
-		const reach = Math.max(22, cellPx * 0.75);
+		const m = metrics();
+		const cellPx = m.step;
+		// About a fingertip: wider for a finger than for a mouse.
+		const reach = Math.max(touchTap ? 30 : 22, cellPx * (touchTap ? 0.95 : 0.75));
 		const r = viewEl!.getBoundingClientRect();
-		const step = grid.cell + grid.gap;
-		const col = Math.floor(((x - r.left - zoom.tx) / zoom.scale - BOARD_PAD) / step);
-		const row = Math.floor(((y - r.top - zoom.ty) / zoom.scale - BOARD_PAD) / step);
+		const col = Math.floor((x - r.left - zoom.tx - m.pad) / m.step);
+		const row = Math.floor((y - r.top - zoom.ty - m.pad) / m.step);
 		const k = Math.ceil(reach / cellPx) + 1;
 		let best = -1;
 		let bestD = Infinity;
@@ -424,7 +485,7 @@
 				}
 			}
 		}
-		return best;
+		return best < 0 ? null : { cell: best, d: bestD };
 	}
 
 	/**
@@ -436,26 +497,19 @@
 		const s = game!;
 		const isDot = (i: number) => !!s.top[i];
 		const isDrop = (i: number) => !!sel && !s.top[i] && !s.filled[i] && s.target[i] === selColor();
-		if (hit >= 0 && (isDot(hit) || isDrop(hit))) return hit;
+		// The useful target nearest the finger wins, not whatever cell it happened to land on.
+		// Holding dots, an open spot gets a little preference over a dot beside it.
+		const dot = nearestCell(x, y, isDot);
 		if (sel) {
-			const d = nearestCell(x, y, isDrop);
-			if (d >= 0) return d;
+			const drop = nearestCell(x, y, isDrop);
+			if (drop && (!dot || drop.d * 0.65 <= dot.d)) return drop.cell;
 		}
-		const d = nearestCell(x, y, isDot);
-		return d >= 0 ? d : hit;
+		return dot ? dot.cell : hit;
 	}
 
 	// ---------- selecting and moving ----------
-	function sameSel(a: Sel, b: Sel) {
-		if (a.from === 'tray' || b.from === 'tray') {
-			return a.from === 'tray' && b.from === 'tray' && a.color === b.color;
-		}
-		return a.cell === b.cell;
-	}
-
 	function select(next: Sel | null) {
 		sel = next;
-		hintMove = hintMove && next && sameSel(hintMove.sel, next) ? hintMove : null;
 		sync();
 		if (!sel || !game) return;
 		const dots = E.selectionDots(game, sel)!;
@@ -465,8 +519,7 @@
 				? 'an empty tray slot, or an open spot of this color'
 				: 'an open spot of this color';
 		say(
-			`Picked up ${plural(dots.length, 'dot', 'dots')}. Tap ${where}. ${plural(open, 'spot is', 'spots are')} open for it.`,
-			true
+			`Picked up ${plural(dots.length, 'dot', 'dots')}. Tap ${where}. ${plural(open, 'spot is', 'spots are')} open for it.`
 		);
 	}
 
@@ -493,18 +546,14 @@
 				sel.from === 'tray' ? sel : { from: 'board', cell: res.leftCell, cells: res.leftCells };
 		}
 		sel = keep;
-		hintMove = null;
 		sync();
 		if (keep) {
 			const n = res.left;
 			const where = keep.from === 'tray' ? 'in the tray' : 'picked up';
 			const them = n === 1 ? 'it' : 'them';
 			say(
-				`${plural(n, 'dot didn’t', 'dots didn’t')} fit, so ${n === 1 ? 'it is' : 'they are'} still ${where}. Tap another spot, or tap ${them} to put ${them} down.`,
-				true
+				`${plural(n, 'dot didn’t', 'dots didn’t')} fit, so ${n === 1 ? 'it is' : 'they are'} still ${where}. Tap another spot, or tap ${them} to put ${them} down.`
 			);
-		} else {
-			say(defaultStatus(), true);
 		}
 		await tick();
 		animate(res, rects);
@@ -520,10 +569,10 @@
 		}
 	}
 
-	async function bumpTray() {
-		trayBump = false;
-		await tick();
-		requestAnimationFrame(() => (trayBump = true));
+	function bumpTray() {
+		trayFlash = true;
+		clearTimeout(trayTimer);
+		trayTimer = setTimeout(() => (trayFlash = false), 900);
 	}
 
 	function onCell(i: number) {
@@ -616,7 +665,6 @@
 
 	function landCell(i: number, k: number) {
 		pendingCells.delete(i);
-		popping.add(i);
 		sound(k);
 	}
 
@@ -629,7 +677,6 @@
 		flights.cancel();
 		pendingCells.clear();
 		pendingTray.clear();
-		popping.clear();
 	}
 
 	function afterSettle() {
@@ -643,17 +690,15 @@
 		save.completed[lv.id] = true;
 		keep();
 		won = true;
-		say('Picture complete!', true);
-		setTimeout(async () => {
+		say('Picture complete.');
+		setTimeout(() => {
 			if (!game || !E.isWon(game)) return;
 			winText = `${lv.name}, finished in ${plural(game.moves, 'move', 'moves')}.`;
 			overlay = 'win';
-			await tick();
-			winNextEl?.focus();
 		}, 900);
 	}
 
-	// ---------- undo, restart, hint ----------
+	// ---------- undo, restart ----------
 	function undo() {
 		if (!history.length || (overlay && overlay !== 'stuck')) return;
 		cancelFlights();
@@ -661,7 +706,6 @@
 		game = history.pop()!;
 		historyLen = history.length;
 		sel = null;
-		hintMove = null;
 		won = false;
 		sync();
 		say('Undone.');
@@ -676,37 +720,15 @@
 		}
 		game = E.clone(initial);
 		sel = null;
-		hintMove = null;
 		won = false;
 		sync();
-		say('Fresh start. Undo brings your last game back.');
-	}
-
-	function showHint() {
-		if (!game || overlay || E.isWon(game)) return;
-		const m = E.hint(game);
-		if (!m) {
-			say('No safe move from here. Try Undo.');
-			return;
-		}
-		sel = m.sel.from === 'board' ? pickBoard(m.sel.cell) : m.sel;
-		hintMove = m;
-		sync();
-		const what = m.sel.from === 'tray' ? 'these tray dots' : 'this group';
-		const where = m.dst.to === 'tray' ? 'the tray' : 'the marked spot';
-		say(`Hint: ${what} is picked up. Tap ${where} to move it.`, true);
+		say('Started over.');
 	}
 
 	function toggleSound() {
 		save.muted = !save.muted;
 		keep();
 		if (!save.muted) blip(4);
-	}
-
-	function setRelaxed(on: boolean) {
-		save.relaxed = on;
-		keep();
-		startLevel(levelIndex).then(() => (overlay = 'levels'));
 	}
 
 	// ---------- events ----------
@@ -727,9 +749,28 @@
 		if (i >= 0) onCell(i);
 	}
 
+	/**
+	 * The cell under the pointer, worked out from where it is rather than which
+	 * element it's over, so the thin gaps between cells belong to the nearest cell.
+	 */
+	function cellAtPoint(clientX: number, clientY: number): number {
+		const s = game;
+		if (!s || !viewEl) return -1;
+		const r = viewEl.getBoundingClientRect();
+		const m = metrics();
+		const bx = clientX - r.left - zoom.tx - m.pad + m.gap / 2;
+		const by = clientY - r.top - zoom.ty - m.pad + m.gap / 2;
+		const col = Math.floor(bx / m.step);
+		const row = Math.floor(by / m.step);
+		if (col < 0 || row < 0 || col >= s.w || row >= s.h) return -1;
+		const i = row * s.w + col;
+		return s.target[i] >= 0 ? i : -1;
+	}
+
 	function onBoardHover(e: PointerEvent) {
-		if (e.pointerType !== 'mouse') return;
-		hoverCell = cellFrom(e);
+		if (e.pointerType !== 'mouse' || gesture.pts.size) return;
+		const i = cellAtPoint(e.clientX, e.clientY);
+		if (i !== hoverCell) hoverCell = i;
 	}
 
 	function onBoardKey(e: KeyboardEvent) {
@@ -760,8 +801,7 @@
 
 	function onKey(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
-			if (overlay === 'levels') overlay = null;
-			else if (sel) select(null);
+			if (sel) select(null);
 			return;
 		}
 		if ((e.target as Element).closest?.('input, textarea')) return;
@@ -774,30 +814,40 @@
 		}
 		const key = e.key.toLowerCase();
 		if (key === 'z') undo();
-		else if (key === 'h') showHint();
 		else if (key === 'r') restart();
 		else if (key === 't' && sel?.from === 'board' && !overlay) tryMove({ to: 'tray' });
 	}
 
-	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+	/** The board resizes itself in CSS; a zoomed-in view just keeps its edges covered. */
 	function onResize() {
-		clearTimeout(resizeTimer);
-		resizeTimer = setTimeout(fit, 80);
+		if (zoomed) setZoom(zoom.cell, zoom.tx, zoom.ty);
 	}
 
-	const winArt: Attachment<HTMLCanvasElement> = (canvas) => {
-		drawArt(canvas, levels[levelIndex], true, 220);
-	};
+	// The page's own level, built right away (on the server too). Later changes to
+	// `start` come through the effect above.
+	untrack(() => {
+		if (start !== undefined) buildLevel(Math.min(Math.max(0, start), levels.length - 1));
+	});
 
 	onMount(() => {
 		reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		if (!sandbox) save = loadSave();
-		const first = start ?? save.level;
-		startLevel(Math.min(Math.max(0, first | 0), levels.length - 1));
+		const saved = Math.min(Math.max(0, save.level | 0), levels.length - 1);
+		if (resume && levelHref && saved !== levelIndex) {
+			goto(levelHref(saved), { replace: true });
+		} else if (start === undefined) {
+			startLevel(saved);
+		} else {
+			// The page's level was built already (also on the server). Relaxed mode
+			// changes the tray, so rebuild for it; then remember this level.
+			if (save.relaxed) buildLevel(levelIndex);
+			save.level = levelIndex;
+			keep();
+			resetZoom();
+		}
 		return () => {
 			cancelFlights();
-			clearTimeout(statusTimer);
-			clearTimeout(resizeTimer);
+			clearTimeout(trayTimer);
 		};
 	});
 </script>
@@ -810,317 +860,202 @@
 />
 <svelte:document onkeydown={onKey} />
 
-<div
-	class="mosaic"
-	bind:this={rootEl}
-	style:--cell="{grid.cell}px"
-	style:--gap="{grid.gap}px"
-	style:--slot="{grid.slot}px"
->
-	<div class="bar">
-		<div class="titles">
-			<div class="brand">Mosaic</div>
-			<div class="level-title">{title}</div>
-		</div>
-		<nav class="tools" aria-label="Game controls">
-			<button
-				class="icon-btn"
-				title="Undo (Z)"
-				aria-label="Undo"
-				disabled={!historyLen}
-				onclick={undo}
-			>
-				<svg viewBox="0 0 24 24"
-					><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></svg
-				>
-			</button>
-			<button class="icon-btn" title="Hint (H)" aria-label="Hint" onclick={showHint}>
-				<svg viewBox="0 0 24 24">
-					<path d="M9 18h6M10 21h4" />
-					<path
-						d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"
-					/>
-				</svg>
-			</button>
-			<button class="icon-btn" title="Restart (R)" aria-label="Restart level" onclick={restart}>
-				<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8" /><path d="M3 3v5h5" /></svg>
-			</button>
-			<button
-				class="icon-btn"
-				title="Sound"
-				aria-label={save.muted ? 'Turn sound on' : 'Turn sound off'}
-				onclick={toggleSound}
-			>
-				{#if save.muted}
-					<svg viewBox="0 0 24 24"
-						><path d="M11 5 6 9H3v6h3l5 4z" /><path d="m16 9 6 6M22 9l-6 6" /></svg
-					>
-				{:else}
-					<svg viewBox="0 0 24 24">
-						<path d="M11 5 6 9H3v6h3l5 4z" />
-						<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
-					</svg>
-				{/if}
-			</button>
-			<button
-				class="icon-btn"
-				title="Pictures"
-				aria-label="All pictures"
-				onclick={() => (overlay = 'levels')}
-			>
-				<svg viewBox="0 0 24 24">
-					<rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
-					<rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
-					<rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
-					<rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
-				</svg>
-			</button>
-		</nav>
-	</div>
+<div class="mosaic" bind:this={rootEl} style:--w={game?.w ?? 1} style:--h={game?.h ?? 1}>
+	<GameBar
+		game="mosaic"
+		label={title}
+		canUndo={historyLen > 0}
+		muted={save.muted}
+		{picturesHref}
+		onundo={undo}
+		onrestart={restart}
+		onsound={toggleSound}
+	/>
 
-	<div class="stage">
-		<p class="status" aria-live="polite">{status}</p>
+	<div class="stage" class:won>
+		<p class="sr-only" aria-live="polite">{status}</p>
 
-		<!-- Cells take Enter and Space; this handler adds forgiving taps and zoom gestures. -->
-		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-		<div
-			class="board-view"
-			class:zoomed
-			class:dragging
-			bind:this={viewEl}
-			style:width="{zoom.w}px"
-			style:height="{zoom.h}px"
-			onclick={onViewClick}
-			onpointerdown={onPointerDown}
-			{@attach wheelZoom}
-		>
-			{#key levelKey}
-				<div
-					class="board"
-					class:won
-					bind:this={boardEl}
-					role="grid"
-					aria-label="Picture"
-					tabindex="-1"
-					style:--w={game?.w ?? 1}
-					style:transform="translate({zoom.tx}px, {zoom.ty}px) scale({zoom.scale})"
-					onkeydown={onBoardKey}
-					onpointerover={onBoardHover}
-					onpointerleave={() => (hoverCell = -1)}
-				>
-					{#each boardView as v, i (i)}
-						{#if v}
-							<div
-								class="cell {v.cls}"
-								class:pop={popping.has(i)}
-								class:region-hover={hover.region.has(i)}
-								class:fill-preview={hover.fill.has(i)}
-								data-i={i}
-								role="gridcell"
-								tabindex={i === focusCell ? 0 : -1}
-								aria-label={v.label}
-								style:--c={v.hex}
-								onanimationend={() => popping.delete(i)}
-							>
-								{#if v.dot}
-									<div
-										class="gem {v.dotCls}"
-										class:hl={hover.hl.has(i)}
-										data-id={v.dot.id}
-										style:--c={v.dotHex}
-									></div>
-								{/if}
-							</div>
-						{:else}
-							<div class="cell void"></div>
-						{/if}
-					{/each}
-				</div>
-			{/key}
-			<div class="zoom-ctl" aria-label="Zoom">
-				<button
-					class="zoom-btn"
-					aria-label="Zoom in"
-					title="Zoom in"
-					disabled={zoom.scale >= MAX_ZOOM - 0.01}
-					onclick={() => zoomAt(zoom.scale * 1.6, zoom.w / 2, zoom.h / 2)}>+</button
-				>
-				<button
-					class="zoom-btn"
-					aria-label="Zoom out"
-					title="Zoom out"
-					disabled={!zoomed}
-					onclick={() => zoomAt(zoom.scale / 1.6, zoom.w / 2, zoom.h / 2)}>&minus;</button
-				>
-				<button
-					class="zoom-btn"
-					aria-label="Show whole picture"
-					title="Show whole picture"
-					disabled={!zoomed}
-					onclick={() => setZoom(1, 0, 0)}
-				>
-					<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
-				</button>
-			</div>
-		</div>
-
-		<div class="tray-wrap" style:max-width="{Math.max(zoom.w, 10 * grid.slot * 1.14 + 16)}px">
-			<div class="tray-head">
-				<span>Tray</span>
-				<span class:warn={trayState.warn}>{trayState.used} / {trayState.cap}</span>
-			</div>
-			<!-- Tray dots and slots are reached by pointer; the keyboard sends picked-up dots here with T. -->
+		<div class="board-wrap">
+			<!-- Cells take Enter and Space; this handler adds forgiving taps and zoom gestures. -->
 			<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 			<div
-				class="tray"
-				class:warn={trayState.warn}
-				class:nofit={trayState.nofit}
-				class:hint-dst={trayState.hintDst}
-				class:bump={trayBump}
-				bind:this={trayEl}
-				onclick={onTray}
-				onpointerover={onTrayHover}
-				onpointerleave={() => (trayHover = null)}
-				onanimationend={() => (trayBump = false)}
+				class="board-view joined-top"
+				class:zoomed
+				class:dragging
+				bind:this={viewEl}
+				onclick={onViewClick}
+				onpointerdown={onPointerDown}
+				{@attach wheelZoom}
 			>
-				{#each trayView as t, k (k)}
+				{#key levelKey}
 					<div
-						class="slot"
-						class:drop={t.drop}
-						class:fill-preview={t.fill}
-						class:group-start={t.groupStart}
+						class="board"
+						class:won
+						bind:this={boardEl}
+						role="grid"
+						aria-label="Picture"
+						tabindex="-1"
+						style:--cell={zoomed ? `${zoom.cell}px` : null}
+						style:transform={zoomed ? `translate(${zoom.tx}px, ${zoom.ty}px)` : null}
+						onkeydown={onBoardKey}
+						onpointermove={onBoardHover}
+						onpointerleave={() => (hoverCell = -1)}
 					>
-						{#if t.g}
-							<div class="gem {t.cls}" data-id={t.g.id} style:--c={t.hex}></div>
-						{/if}
+						{#each boardView as v, i (i)}
+							{#if v}
+								<div
+									class="cell {v.cls}"
+									class:region-hover={hover.region.has(i)}
+									class:fill-preview={hover.fill.has(i)}
+									data-i={i}
+									role="gridcell"
+									tabindex={i === focusCell ? 0 : -1}
+									aria-label={v.label}
+									style:--c={v.hex}
+								>
+									{#if v.dot}
+										<div
+											class="gem {v.dotCls}"
+											class:hl={hover.hl.has(i)}
+											data-id={v.dot.id}
+											style:--c={v.dotHex}
+										></div>
+									{/if}
+								</div>
+							{:else}
+								<div class="cell void"></div>
+							{/if}
+						{/each}
 					</div>
-				{/each}
+				{/key}
+			</div>
+
+			<!-- The tray hangs under the board; a level's end panel shows in its place. -->
+			<div class="tray-tab joined-tab" class:nofit={trayState.nofit || trayFlash}>
+				<!-- Tray dots and slots are reached by pointer; the keyboard sends picked-up dots here with T. -->
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+				<div
+					class="tray"
+					class:warn={trayState.warn}
+					class:hidden={!!overlay}
+					bind:this={trayEl}
+					style:--n={trayView.length}
+					onclick={onTray}
+					onpointerover={onTrayHover}
+					onpointerleave={() => (trayHover = null)}
+				>
+					{#each trayView as t, k (k)}
+						<div
+							class="slot"
+							class:drop={t.drop}
+							class:fill-preview={t.fill}
+							class:group-start={t.groupStart}
+						>
+							{#if t.g}
+								<div class="gem {t.cls}" data-id={t.g.id} style:--c={t.hex}></div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				{#if overlay}
+					<LevelEnd
+						plain
+						state={overlay === 'win' ? 'won' : 'stuck'}
+						text={overlay === 'win' ? winText : 'no group fits in the tray or in an open spot'}
+						nextHref={levelHref?.((levelIndex + 1) % levels.length)}
+						onnext={() => goLevel((levelIndex + 1) % levels.length)}
+						{picturesHref}
+						onundo={undo}
+						onrestart={() => {
+							overlay = null;
+							restart();
+						}}
+					/>
+				{/if}
+			</div>
+			<div class="under">
+				<span class="count"
+					>tray <b class:warn={trayState.warn}>{trayState.used} / {trayState.cap}</b></span
+				>
+				<div class="zoom-ctl" aria-label="Zoom">
+					<button
+						class="zoom-btn border inset link-box"
+						aria-label="Zoom in"
+						title="Zoom in"
+						disabled={zoom.scale >= MAX_ZOOM - 0.05}
+						onclick={() => zoomBy(1.6, metrics().w / 2, metrics().h / 2)}>+</button
+					>
+					<button
+						class="zoom-btn border inset link-box"
+						aria-label="Zoom out"
+						title="Zoom out"
+						disabled={!zoomed}
+						onclick={() => zoomBy(1 / 1.6, metrics().w / 2, metrics().h / 2)}>&minus;</button
+					>
+					<button
+						class="zoom-btn border inset link-box"
+						aria-label="Show whole picture"
+						title="Show whole picture"
+						disabled={!zoomed}
+						onclick={() => resetZoom()}
+					>
+						<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="fx" bind:this={fxEl} aria-hidden="true"></div>
-
-	{#if overlay === 'levels'}
-		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-		<div class="overlay" onclick={(e) => e.target === e.currentTarget && (overlay = null)}>
-			<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="levels-h">
-				<div class="sheet-head">
-					<h2 id="levels-h">Pictures</h2>
-					<button class="icon-btn" aria-label="Close" onclick={() => (overlay = null)}>
-						<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
-					</button>
-				</div>
-				<label class="toggle">
-					<input
-						type="checkbox"
-						checked={save.relaxed}
-						onchange={(e) => setRelaxed(e.currentTarget.checked)}
-					/>
-					<span>
-						<b>Relaxed mode</b><br /><small>A much bigger tray, so you can lift dots freely.</small>
-					</span>
-				</label>
-				<div class="grid">
-					{#each levels as lv, i (lv.id)}
-						{@const done = !!save.completed[lv.id]}
-						<button
-							class="card"
-							class:current={i === levelIndex}
-							aria-label="{i + 1}. {lv.name}{done ? ', complete' : ''}"
-							onclick={() => startLevel(i)}
-						>
-							<span class="thumb"><canvas {@attach art(lv, done, 72)}></canvas></span>
-							<span>{i + 1}. {lv.name}</span>
-							{#if done}<span class="done" aria-hidden="true">✓</span>{/if}
-						</button>
-					{/each}
-				</div>
-			</div>
-		</div>
-	{:else if overlay === 'win'}
-		<div class="overlay">
-			<div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="win-h">
-				<h2 id="win-h">Picture complete</h2>
-				<p class="muted">{winText}</p>
-				<canvas class="win-art" {@attach winArt}></canvas>
-				<div class="row">
-					<button class="btn" onclick={() => (overlay = 'levels')}>All pictures</button>
-					<button
-						class="btn primary"
-						bind:this={winNextEl}
-						onclick={() => startLevel((levelIndex + 1) % levels.length)}
-					>
-						{levelIndex === levels.length - 1 ? 'Back to the first' : 'Next picture'}
-					</button>
-				</div>
-			</div>
-		</div>
-	{:else if overlay === 'stuck'}
-		<div class="overlay">
-			<div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="stuck-h">
-				<h2 id="stuck-h">Out of room</h2>
-				<p class="muted">
-					No group fits in the tray or in open spots. Undo a few moves, or start the picture over.
-				</p>
-				<div class="row">
-					<button
-						class="btn"
-						onclick={() => {
-							overlay = null;
-							restart();
-						}}>Start over</button
-					>
-					<button class="btn primary" onclick={undo}>Undo</button>
-				</div>
-			</div>
-		</div>
-	{/if}
 </div>
 
 <style>
-	/* Game colors follow the site theme (light and dark come from data-theme on <html>). */
+	/* Mosaic follows the site's look: flat colors, 2px inset rings, Courier for labels. */
 	.mosaic {
-		--bg: var(--primary-color);
-		--panel: color-mix(in srgb, var(--input-color) 60%, var(--primary-color));
-		--ink: var(--text-color);
-		--muted: color-mix(in srgb, var(--text-color) 70%, var(--primary-color));
-		--line: var(--text-color-st);
-		--accent: var(--accent-color);
-		--good: #2f9e5b;
-		--bad: #e5484d;
-		--slotbg: color-mix(in srgb, var(--text-color) 10%, var(--primary-color));
+		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
+		--well: color-mix(in srgb, var(--text-color) 7%, var(--primary-color));
+		--slotbg: color-mix(in srgb, var(--text-color) 12%, var(--primary-color));
 		--silhouette: color-mix(in srgb, var(--text-color) 22%, var(--primary-color));
-		--shadow: 0 0 0 2px var(--text-color-st);
 		--gem: 30px;
 
+		/*
+		 * The page centers its content, which can land on half a pixel. So the game
+		 * spans the content and centers itself with whole-pixel padding; everything
+		 * inside sits on whole pixels too (see --snap below).
+		 */
+		box-sizing: border-box;
 		width: 100%;
-		max-width: 1200px;
-		color: var(--ink);
+		padding-inline: max(0px, round(down, calc((100% - 1200px) / 2), 1px));
+		/* Quick taps are moves, so a double tap shouldn't zoom the page. Pinch still does. */
+		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
-	button {
-		color: inherit;
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		white-space: nowrap;
 	}
 
-	/* Game bar */
+	/* Bar */
 	.bar {
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		padding: 0 0 6px;
+		padding: 0 0 10px;
 	}
 	.titles {
 		flex: 1;
 		min-width: 0;
 	}
 	.brand {
-		font-weight: 700;
-		font-size: 18px;
+		margin: 0;
+		font-size: 20px;
 	}
 	.level-title {
 		color: var(--muted);
-		font-weight: 600;
 		font-size: 13px;
 		white-space: nowrap;
 		overflow: hidden;
@@ -1129,34 +1064,22 @@
 	.tools {
 		display: flex;
 		gap: 6px;
-	}
-	.icon-btn {
-		width: 40px;
-		height: 40px;
-		border-radius: 12px;
-		border: 1px solid var(--line);
-		background: var(--panel);
-		display: grid;
-		place-items: center;
-		cursor: pointer;
 		padding: 0;
 	}
-	.icon-btn:hover:not(:disabled) {
-		border-color: var(--muted);
+	.tool {
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		display: grid;
+		place-items: center;
 	}
-	.icon-btn:disabled {
+	.tool:disabled {
 		opacity: 0.4;
 		cursor: default;
 	}
-	.icon-btn:focus-visible,
-	.zoom-btn:focus-visible,
-	.btn:focus-visible,
-	.card:focus-visible {
-		box-shadow: 0 0 0 3px var(--accent);
-	}
 	svg {
-		width: 20px;
-		height: 20px;
+		width: 18px;
+		height: 18px;
 		fill: none;
 		stroke: currentColor;
 		stroke-width: 2;
@@ -1164,46 +1087,76 @@
 		stroke-linejoin: round;
 	}
 
-	/* Layout */
+	/*
+	 * The board sizes itself: a cell is as big as fits the row's width (container
+	 * units) and the small viewport height (steady while a phone's address bar comes
+	 * and goes), less room for the bar, tray and controls, between 9px and 44px.
+	 */
+	.mosaic {
+		container-type: inline-size;
+	}
 	.stage {
+		--pad: 12px;
+		--gap: 2px;
+		--fit-w: calc((min(100cqw, 1000px) - 2 * var(--pad) - (var(--w) - 1) * var(--gap)) / var(--w));
+		--fit-h: calc(
+			(max(100svh - 340px, 200px) - 2 * var(--pad) - (var(--h) - 1) * var(--gap)) / var(--h)
+		);
+		/* Whole pixels, so dots and their rings sit exactly centered in their cells. */
+		--cell: round(down, clamp(9px, min(var(--fit-w), var(--fit-h)), 44px), 1px);
+		--slot: round(down, clamp(22px, calc(var(--cell) * 0.9), 36px), 1px);
+		--board-w: calc(var(--w) * var(--cell) + (var(--w) - 1) * var(--gap) + 2 * var(--pad));
+		--board-h: calc(var(--h) * var(--cell) + (var(--h) - 1) * var(--gap) + 2 * var(--pad));
+
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		/* Centered by whole-pixel margins rather than by flex, which can split a pixel. */
+		align-items: flex-start;
 		gap: 12px;
 	}
-	.status {
-		margin: 0;
-		min-height: 2.8em;
-		max-width: 44ch;
+	.board-wrap {
+		margin-left: max(0px, round(down, calc((100cqw - var(--snap-w)) / 2), 1px));
+	}
+	/* Phones: the board takes the full width (the page scrolls if the tray ends up below). */
+	@media (max-width: 500px) {
+		.stage {
+			--pad: 4px;
+			--gap: 1px;
+			--cell: round(down, clamp(9px, var(--fit-w), 44px), 1px);
+		}
+	}
+	.stage.won {
+		--edge: var(--secondary-color);
+	}
+	/* The board and the tray under it are one piece (see joined.css), so dots fly within it. */
+	.board-wrap {
+		--snap-w: var(--board-w);
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		color: var(--muted);
+		flex-direction: column;
+		align-items: flex-start;
+		width: var(--board-w);
+		max-width: 100%;
 	}
 
 	/* Picture: two layers. Bottom = the color each spot needs. Top = the dot sitting on it. */
 	.board {
 		display: grid;
 		grid-template-columns: repeat(var(--w), var(--cell));
-		gap: var(--gap, 2px);
-		padding: 12px;
-		background: var(--panel);
-		border-radius: 18px;
+		gap: var(--gap);
+		padding: var(--pad);
 		user-select: none;
 		-webkit-user-select: none;
 		transform-origin: 0 0;
-		transition: none;
 	}
 	/* The board sits inside a fixed-size window that can be zoomed and dragged. */
 	.board-view {
 		position: relative;
 		overflow: hidden;
-		border-radius: 18px;
-		box-shadow: var(--shadow);
-		background: var(--panel);
+		width: var(--board-w);
+		height: var(--board-h);
 		touch-action: none;
-		transition: none;
+		/* Raised dots stay under the tray where the two meet. */
+		isolation: isolate;
 	}
 	.board-view.zoomed {
 		cursor: grab;
@@ -1211,49 +1164,58 @@
 	.board-view.dragging {
 		cursor: grabbing;
 	}
+	/* The tray's count and the zoom sit under the tray, so they never cover the picture. */
+	.under {
+		align-self: stretch;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		margin-top: 8px;
+	}
+	.count {
+		font-family: Courier, monospace;
+		font-size: 12px;
+		font-weight: 700;
+		color: var(--muted);
+		padding: 0 4px;
+	}
+	.count .warn {
+		color: var(--accent-color);
+	}
 	.zoom-ctl {
-		position: absolute;
-		right: 8px;
-		bottom: 8px;
 		display: flex;
 		gap: 6px;
-		z-index: 5;
 	}
 	.zoom-btn {
-		width: 36px;
-		height: 36px;
-		border-radius: 10px;
-		border: 1px solid var(--line);
-		background: color-mix(in srgb, var(--panel) 88%, transparent);
-		font-size: 20px;
-		font-weight: 700;
-		line-height: 1;
+		width: 34px;
+		height: 34px;
+		padding: 0;
 		display: grid;
 		place-items: center;
-		cursor: pointer;
-		padding: 0;
-		box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+		font-size: 18px;
+		font-weight: 700;
+		line-height: 1;
 	}
 	.zoom-btn svg {
-		width: 18px;
-		height: 18px;
+		width: 16px;
+		height: 16px;
 	}
 	.zoom-btn:disabled {
-		opacity: 0.35;
+		opacity: 0.4;
 		cursor: default;
 	}
 	.cell {
 		position: relative;
 		width: var(--cell);
 		height: var(--cell);
-		border-radius: 22%;
+		border-radius: 3px;
 		outline: none;
-		transition: none;
 	}
 	.cell.void {
 		background: transparent;
 	}
-	/* Covered: the needed color shows clearly around the dot. */
+	/* Covered: the needed color shows around the dot. */
 	.cell.covered {
 		background: var(--c);
 		cursor: pointer;
@@ -1266,68 +1228,34 @@
 	.cell.open::after {
 		content: '';
 		position: absolute;
-		inset: 20%;
+		inset: round(calc(var(--cell) * 0.22), 1px);
 		border-radius: 50%;
-		background: rgb(0 0 0 / 0.32);
-		/* Dark hole shows on light colors; light rim shows on dark colors. */
-		box-shadow:
-			inset 0 2px 4px rgb(0 0 0 / 0.45),
-			0 0 0 1.5px rgb(255 255 255 / 0.45);
+		background: rgb(0 0 0 / 0.28);
+		/* A dark hole shows on light colors; the light rim shows on dark colors. */
+		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.45);
 	}
-	/* Filled: solid pixel. */
 	.cell.filled {
 		background: var(--c);
-		border-radius: 3px;
 	}
-	/* Open spots your dots could go to: a calm, brighter socket rim. */
+	/* Open spots your dots could go to: a brighter socket rim. */
 	.cell.target::after {
-		box-shadow:
-			inset 0 2px 4px rgb(0 0 0 / 0.45),
-			0 0 0 2px rgb(255 255 255 / 0.75);
+		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.8);
 	}
-	/* Hovering an open area: outline it, and ghost dots show exactly which spots would fill. */
+	/* Hovering an open area: outline it; the spots that would fill show a pale dot. */
+	/* Outlines are drawn inside the cell, so they never spill into the gaps or neighbors. */
 	.cell.region-hover,
 	.cell.fill-preview {
-		box-shadow: 0 0 0 2px var(--ink);
-		z-index: 1;
+		box-shadow: inset 0 0 0 2px var(--text-color);
 	}
 	.cell.fill-preview::after {
-		background: color-mix(in srgb, var(--c) 65%, #fff);
-		box-shadow:
-			0 0 0 2px rgb(0 0 0 / 0.5),
-			0 0 0 3.5px rgb(255 255 255 / 0.8);
-		opacity: 0.9;
-	}
-	.cell.hint-dst {
-		box-shadow: 0 0 0 3px var(--accent);
+		background: color-mix(in srgb, var(--c) 60%, #fff);
+		box-shadow: 0 0 0 2px var(--text-color);
 	}
 	.cell:focus-visible {
-		box-shadow: 0 0 0 3px var(--accent);
-		z-index: 2;
+		box-shadow: inset 0 0 0 3px var(--accent-color);
 	}
-	.cell.pop {
-		z-index: 1;
-		animation: pop 0.32s ease-out;
-	}
-	@keyframes pop {
-		0% {
-			transform: scale(0.5);
-			filter: brightness(1.5);
-		}
-		70% {
-			transform: scale(1.15);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
-	.board.won {
-		animation: glow 1.1s ease;
-	}
-	@keyframes glow {
-		40% {
-			box-shadow: inset 0 0 0 4px var(--accent);
-		}
+	.board.won .cell {
+		border-radius: 0;
 	}
 
 	/* Dots (on the board, in the tray, and flying). Flyers are made in script, so they're global. */
@@ -1336,25 +1264,19 @@
 		width: var(--gem);
 		height: var(--gem);
 		border-radius: 50%;
-		/* True color, with only a small shine, so a dot looks exactly like the spot it belongs on. */
-		background:
-			radial-gradient(circle at 34% 30%, rgb(255 255 255 / 0.55) 0 9%, transparent 26%), var(--c);
-		--ring: max(1px, calc(var(--cell) * 0.06));
+		background: var(--c);
+		--ring: max(1px, round(calc(var(--cell) * 0.06), 1px));
 		box-shadow:
-			0 0 0 var(--ring) rgb(0 0 0 / 0.5),
-			0 0 0 calc(var(--ring) * 1.8) rgb(255 255 255 / 0.55),
-			0 calc(var(--ring) * 1.5) calc(var(--ring) * 2.5) rgb(0 0 0 / 0.4);
-		transition:
-			transform 0.14s ease,
-			box-shadow 0.14s ease;
+			0 0 0 var(--ring) rgb(0 0 0 / 0.45),
+			0 0 0 calc(var(--ring) * 2) rgb(255 255 255 / 0.5);
 	}
 	.slot .gem,
 	.fx :global(.flyer) {
-		--ring: max(1px, calc(var(--slot) * 0.06));
+		--ring: max(1px, round(calc(var(--slot) * 0.04), 1px));
 	}
 	.cell .gem {
 		position: absolute;
-		inset: 22%;
+		inset: round(calc(var(--cell) * 0.2), 1px);
 		width: auto;
 		height: auto;
 		z-index: 1;
@@ -1362,130 +1284,91 @@
 	.gem.ghost {
 		visibility: hidden;
 	}
+	/* Picked up: a dark ring; the dot it's centered on gets the site's pink. */
+	/* Hovering a dot outlines its group with a dashed ring, unlike the solid ring of a picked-up group. */
 	.gem.hl {
-		transform: scale(1.12);
+		outline: max(2px, round(calc(var(--ring) * 1.5), 1px)) dashed var(--text-color);
+		outline-offset: var(--ring);
 	}
+	/* Picked up: a light ring inside a dark one, so it reads on any color. */
 	.gem.sel {
-		transform: scale(1.15) translateY(-5%);
 		box-shadow:
-			0 0 0 var(--ring) rgb(0 0 0 / 0.5),
-			0 0 0 calc(var(--ring) * 2) var(--ink),
-			0 calc(var(--ring) * 2) calc(var(--ring) * 3) rgb(0 0 0 / 0.45);
+			0 0 0 var(--ring) rgb(255 255 255 / 0.9),
+			0 0 0 calc(var(--ring) * 3) var(--text-color);
 		z-index: 3;
 	}
-	.gem.hint {
-		animation: hint 0.9s ease-in-out infinite;
-	}
 	.gem.sel.center {
-		transform: scale(1.3) translateY(-8%);
 		box-shadow:
-			0 0 0 var(--ring) rgb(0 0 0 / 0.5),
-			0 0 0 calc(var(--ring) * 2.6) var(--accent),
-			0 calc(var(--ring) * 2) calc(var(--ring) * 3.5) rgb(0 0 0 / 0.5);
+			0 0 0 var(--ring) rgb(255 255 255 / 0.9),
+			0 0 0 calc(var(--ring) * 3) var(--accent-color);
 		z-index: 4;
 	}
-	@keyframes hint {
-		50% {
-			transform: scale(1.25);
-			box-shadow:
-				0 0 0 3px var(--accent),
-				0 4px 10px rgb(0 0 0 / 0.35);
-		}
+	/*
+	 * Tray: a tab 24px in from each side of the board. Its slots' rows hold as many
+	 * whole slots as fit, or all of them if they fit on one row, centered by a
+	 * whole-pixel left padding.
+	 */
+	.tray-tab {
+		--tray-gap: round(calc(var(--slot) * 0.14), 1px);
+		--tab-w: calc(var(--board-w) - 48px);
+		--room: calc(var(--tab-w) - 20px);
+		width: var(--tab-w);
+		margin-left: 24px;
+		display: grid;
 	}
-
-	/* Tray */
-	.tray-wrap {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		width: 100%;
-	}
-	.tray-head {
-		display: flex;
-		justify-content: space-between;
-		font-size: 11px;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--muted);
-		padding: 0 4px;
-	}
-	.tray-head .warn {
-		color: var(--bad);
+	/* The tray and the end panel share one spot, so the panel never moves the page. */
+	.tray-tab > :global(*) {
+		grid-area: 1 / 1;
 	}
 	.tray {
+		--row-w: min(
+			calc(
+				round(down, calc(var(--room) + var(--tray-gap)), calc(var(--slot) + var(--tray-gap))) -
+					var(--tray-gap)
+			),
+			calc(var(--n) * var(--slot) + (var(--n) - 1) * var(--tray-gap))
+		);
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: center;
-		gap: calc(var(--slot) * 0.14);
+		gap: var(--tray-gap);
 		padding: 8px;
-		background: var(--panel);
-		border-radius: 14px;
-		box-shadow: var(--shadow);
+		padding-left: calc(8px + round(down, calc((var(--room) - var(--row-w)) / 2), 1px));
 		cursor: default;
-		transition: box-shadow 0.15s;
 	}
 	.slot {
 		width: var(--slot);
 		height: var(--slot);
 		border-radius: 50%;
 		background: var(--slotbg);
-		box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.14);
 		position: relative;
-		transition: none;
 	}
+	/* Room around each tray dot for its selection ring, so neighbors don't paint over it. */
 	.slot .gem {
 		position: absolute;
-		inset: 8%;
+		inset: round(calc(var(--slot) * 0.16), 1px);
 		width: auto;
 		height: auto;
 		cursor: pointer;
 	}
 	.tray.warn .slot:empty {
-		background: color-mix(in srgb, var(--bad) 16%, var(--slotbg));
+		background: color-mix(in srgb, var(--accent-color) 25%, var(--slotbg));
 	}
 	.slot.drop {
 		cursor: pointer;
-		box-shadow:
-			inset 0 1px 3px rgb(0 0 0 / 0.14),
-			0 0 0 1.5px rgb(255 255 255 / 0.35);
 	}
 	.slot.fill-preview {
-		box-shadow: 0 0 0 2px var(--ink);
-		background: color-mix(in srgb, var(--ink) 30%, var(--slotbg));
+		box-shadow: 0 0 0 2px var(--text-color);
 	}
 	.slot.group-start {
-		margin-left: calc(var(--slot) * 0.35);
+		margin-left: round(calc(var(--slot) * 0.35), 1px);
 	}
-	.tray.nofit {
-		box-shadow:
-			0 0 0 3px var(--bad),
-			var(--shadow);
+	.tray.hidden {
+		visibility: hidden;
 	}
-	.tray.hint-dst {
-		box-shadow:
-			0 0 0 3px var(--accent),
-			var(--shadow);
+	.tray-tab.nofit {
+		--edge: var(--accent-color);
 	}
-	.tray.bump {
-		animation: bump 0.35s;
-	}
-	@keyframes bump {
-		20% {
-			transform: translateX(-6px);
-		}
-		40% {
-			transform: translateX(5px);
-		}
-		60% {
-			transform: translateX(-3px);
-		}
-		80% {
-			transform: translateX(2px);
-		}
-	}
-
-	/* Flying gems */
+	/* Flying dots */
 	.fx {
 		position: fixed;
 		inset: 0;
@@ -1498,139 +1381,10 @@
 		will-change: transform;
 	}
 
-	/* Overlays */
-	.overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 100;
-		display: grid;
-		place-items: center;
-		padding: 16px;
-		background: rgb(12 10 22 / 0.45);
-		backdrop-filter: blur(3px);
-	}
-	.sheet {
-		width: 100%;
-		max-width: 600px;
-		max-height: calc(100vh - 32px);
-		overflow: auto;
-		padding: 20px;
-		border-radius: 20px;
-		background: var(--bg);
-		box-shadow: 0 20px 60px rgb(0 0 0 / 0.3);
-	}
-	.sheet.small {
-		max-width: 400px;
-		text-align: center;
-	}
-	.sheet h2 {
-		margin: 0 0 4px;
-		font-size: 20px;
-	}
-	.sheet-head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.muted {
-		color: var(--muted);
-		margin: 4px 0 0;
-	}
-	.toggle {
-		display: flex;
-		gap: 10px;
-		align-items: flex-start;
-		margin-top: 12px;
-		padding: 12px;
-		border-radius: 12px;
-		background: var(--panel);
-		cursor: pointer;
-	}
-	.toggle input {
-		margin-top: 3px;
-		width: 18px;
-		height: 18px;
-		accent-color: var(--accent);
-	}
-	.toggle small {
-		color: var(--muted);
-	}
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
-		gap: 10px;
-		margin-top: 14px;
-	}
-	.card {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 8px 10px;
-		border-radius: 14px;
-		border: 1px solid var(--line);
-		background: var(--panel);
-		cursor: pointer;
-		font-size: 13px;
-		font-weight: 600;
-	}
-	.card:hover {
-		border-color: var(--muted);
-	}
-	.card.current {
-		border-color: var(--accent);
-		box-shadow: 0 0 0 1px var(--accent);
-	}
-	.thumb {
-		height: 72px;
-		display: grid;
-		place-items: center;
-	}
-	canvas {
-		image-rendering: pixelated;
-		--silhouette: color-mix(in srgb, var(--text-color) 22%, var(--primary-color));
-	}
-	.done {
-		position: absolute;
-		top: 6px;
-		right: 8px;
-		color: var(--good);
-		font-weight: 800;
-	}
-	.win-art {
-		display: block;
-		margin: 16px auto 4px;
-		border-radius: 6px;
-	}
-	.row {
-		display: flex;
-		gap: 10px;
-		justify-content: center;
-		margin-top: 16px;
-		flex-wrap: wrap;
-	}
-	.btn {
-		padding: 10px 16px;
-		border-radius: 12px;
-		border: 1px solid var(--line);
-		background: var(--panel);
-		font-weight: 700;
-		cursor: pointer;
-	}
-	.btn.primary {
-		background: var(--accent);
-		border-color: transparent;
-		color: #fff;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.mosaic :global(*),
-		.mosaic :global(*::before),
-		.mosaic :global(*::after) {
-			animation-duration: 0.01ms !important;
-			animation-iteration-count: 1 !important;
-			transition: none !important;
+	@media (max-width: 500px) {
+		:global(body .content:has(> .mosaic)) {
+			padding-left: 6px;
+			padding-right: 6px;
 		}
 	}
 </style>

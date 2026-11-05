@@ -1,30 +1,24 @@
-/* Saved progress. Browser only, and never required: storage can be missing or blocked. */
+/* Mosaic's saved progress: one small cookie, so the server can resume your level too. */
+import { decode, readSave, writeSave, type Save } from '../shared/save';
+import { LEVELS } from './levels/index';
 
-export interface Save {
-	completed: Record<string, boolean>;
-	level: number;
-	relaxed: boolean;
-	muted: boolean;
-}
+export type { Save };
+export { cookieName } from '../shared/save';
 
-const KEY = 'mosaic:v1';
+const GAME = 'mosaic';
+const ids = () => LEVELS.map((l) => l.id);
 
+/** In the browser. */
 export function loadSave(): Save {
-	const save: Save = { completed: {}, level: 0, relaxed: false, muted: false };
-	try {
-		const raw = localStorage.getItem(KEY);
-		const v = raw && JSON.parse(raw);
-		if (v && typeof v === 'object') Object.assign(save, v);
-	} catch {
-		/* private mode, blocked storage */
-	}
-	return save;
+	return readSave(GAME, ids(), 'mosaic:v1');
 }
 
+/** In the browser. */
 export function persist(save: Save) {
-	try {
-		localStorage.setItem(KEY, JSON.stringify(save));
-	} catch {
-		/* private mode, blocked storage */
-	}
+	writeSave(GAME, ids(), save);
+}
+
+/** On the server: the save from the request's cookie. */
+export function saveFromCookie(value: string | undefined): Save {
+	return decode(value, ids());
 }

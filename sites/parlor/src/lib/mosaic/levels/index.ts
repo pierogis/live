@@ -1,21 +1,12 @@
-/*
- * Level packs: every `*.json` file in this folder, in file name order.
- * A pack is { name, levels: [{ id, name, palette, art }] }. See README.md.
- */
+/* This game's level packs: every `*.json` file in this folder, in file name order. */
 import type { Level } from '../engine';
+import { packsFrom, type Pack as AnyPack } from '../../shared/levels';
 
-export interface Pack {
-	/** File name without `.json`, like `01-first-light`. */
-	id: string;
-	name: string;
-	levels: Level[];
-}
+export type Pack = AnyPack<Level>;
 
-const files = import.meta.glob<{ default: Omit<Pack, 'id'> }>('./*.json', { eager: true });
+export const PACKS: Pack[] = packsFrom<Level>(
+	import.meta.glob<{ default: { name: string; levels: Level[] } }>('./*.json', { eager: true })
+);
 
-export const PACKS: Pack[] = Object.keys(files)
-	.sort()
-	.map((path) => ({ id: path.slice(2, -'.json'.length), ...files[path].default }));
-
-/** Every level, in play order. A level's place in this list sets its blob sizes. */
+/** Every level, in play order. A level's place in this list feeds its difficulty. */
 export const LEVELS: Level[] = PACKS.flatMap((p) => p.levels);

@@ -1,8 +1,9 @@
 /*
- * Dev server only: lets the Mosaic editor save levels straight into
- * src/lib/mosaic/levels/*.json. Never part of a build or a deploy.
+ * Dev server only: lets the picture editor save levels straight into
+ * src/lib/<game>/levels/*.json. Never part of a build or a deploy.
  *
- * POST /__mosaic/save  { pack, level, replaces? }
+ * POST /__levels/save  { game, pack, level, replaces? }
+ *   game      which game's packs, like "mosaic" or "forage"
  *   pack      pack file id like "01-first-light"; a new id creates the pack (needs `packName`)
  *   level     { id, name, palette, art }
  *   replaces  id of the level being edited, when it was saved before (it may have been renamed)
@@ -14,7 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 import type { Plugin } from 'vite';
 
-const DIR = fileURLToPath(new URL('../src/lib/mosaic/levels/', import.meta.url));
+const LIB = fileURLToPath(new URL('../src/lib/', import.meta.url));
+/** Fields a level may carry beyond its picture, like a game's tuning. */
+const EXTRAS = ['seed', 'tuning', 'wins'];
 
 interface LevelIn {
 	id: string;
@@ -49,12 +52,12 @@ function check(level: LevelIn): string | null {
 	return null;
 }
 
-export function mosaicLevels(): Plugin {
+export function levelsPlugin(): Plugin {
 	return {
-		name: 'mosaic-levels',
+		name: 'parlor-levels',
 		apply: 'serve',
 		configureServer(server) {
-			server.middlewares.use('/__mosaic/save', async (req, res) => {
+			server.middlewares.use('/__levels/save', async (req, res) => {
 				const reply = (status: number, body: object) => {
 					res.statusCode = status;
 					res.setHeader('content-type', 'application/json');
@@ -62,7 +65,14 @@ export function mosaicLevels(): Plugin {
 				};
 				if (req.method !== 'POST') return reply(405, { error: 'POST only' });
 				try {
-					const { pack, packName, level, replaces } = JSON.parse(await readBody(req));
+					const { game, pack, packName, level, replaces } = JSON.parse(await readBody(req));
+					if (
+						typeof game !== 'string' ||
+						!/^[a-z]+$/.test(game) ||
+						!existsSync(`${LIB}${game}/levels`)
+					) {
+						return reply(400, { error: 'unknown game' });
+					}
 					if (typeof pack !== 'string' || !/^[a-z0-9-]+$/.test(pack)) {
 						return reply(400, { error: 'pack must be lowercase letters, numbers and dashes' });
 					}
@@ -74,8 +84,10 @@ export function mosaicLevels(): Plugin {
 						palette: level.palette,
 						art: level.art
 					};
+					for (const k of EXTRAS)
+						if (k in level) (clean as unknown as Record<string, unknown>)[k] = level[k];
 
-					const file = `${DIR}${pack}.json`;
+					const file = `${LIB}${game}/levels/${pack}.json`;
 					const data = existsSync(file)
 						? JSON.parse(await readFile(file, 'utf8'))
 						: { name: String(packName || pack), levels: [] };

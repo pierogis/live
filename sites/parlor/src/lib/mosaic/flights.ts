@@ -51,18 +51,14 @@ export class Flights {
 
 		const dx = to.left + to.width / 2 - (from.left + from.width / 2);
 		const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+		// A plain, straight move: the dot slides over and settles to its new size.
 		const scale = (to.width * 0.8) / from.width;
-		const lift = Math.min(70, Math.hypot(dx, dy) * 0.22);
 		const anim = node.animate(
 			[
 				{ transform: 'translate(0,0) scale(1)' },
-				{
-					transform: `translate(${dx * 0.5}px, ${dy * 0.5 - lift}px) scale(${((1 + scale) / 2) * 1.2})`,
-					offset: 0.5
-				},
 				{ transform: `translate(${dx}px, ${dy}px) scale(${scale})` }
 			],
-			{ duration: FLIGHT, delay, easing: 'cubic-bezier(.45,.05,.35,1)', fill: 'both' }
+			{ duration: FLIGHT, delay, easing: 'ease-in-out', fill: 'both' }
 		);
 		const flight = { anim, node };
 		this.#live.add(flight);

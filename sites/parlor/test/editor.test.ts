@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import * as G from '../src/lib/mosaic/grid.ts';
-import { closePairs } from '../src/lib/mosaic/palette.ts';
-import { quantize } from '../src/lib/mosaic/quantize.ts';
+import * as G from '../src/lib/shared/editor/grid.ts';
+import { closePairs } from '../src/lib/shared/palette.ts';
+import { quantize } from '../src/lib/shared/editor/quantize.ts';
 import { reportLevel } from '../src/lib/mosaic/report.ts';
 import { loadLevels } from './levels.ts';
 

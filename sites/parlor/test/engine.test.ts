@@ -24,7 +24,7 @@ function tiny(
 
 for (const relaxed of [false, true]) {
 	LEVELS.forEach((lv, i) => {
-		test(`${lv.id}${relaxed ? ' (relaxed)' : ''}: builds, solves and hints`, () => {
+		test(`${lv.id}${relaxed ? ' (relaxed)' : ''}: builds and solves`, () => {
 			const s = E.buildPuzzle(lv, i, { relaxed });
 
 			// The top layer uses exactly the picture's colors, just moved around.
@@ -44,7 +44,6 @@ for (const relaxed of [false, true]) {
 			const r = E.clone(s);
 			for (const a of sol.path) assert.ok(E.move(r, a.sel, a.dst).ok);
 			assert.ok(E.isWon(r) && r.tray.length === 0, 'picture complete, tray empty');
-			assert.ok(E.hint(s), 'hint available at start');
 		});
 	});
 }

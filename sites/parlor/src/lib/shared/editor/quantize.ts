@@ -3,7 +3,7 @@
  * a palette of a few colors that are easy to tell apart, and rows of color letters.
  * Pure: no DOM, so tests can run it.
  */
-import { MIN_DELTA, deltaE, rgbToHex, rgbToLab, type Lab } from './palette.ts';
+import { MIN_DELTA, deltaE, rgbToHex, rgbToLab, type Lab } from '../palette.ts';
 
 export interface QuantizeOptions {
 	/** Most colors to keep. */

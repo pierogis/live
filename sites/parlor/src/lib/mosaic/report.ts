@@ -4,7 +4,7 @@
  * Imports use `.ts` so node scripts can load this file directly.
  */
 import { boardGroups, buildPuzzle, solve, TRAY, type Level } from './engine.ts';
-import { closePairs } from './palette.ts';
+import { checkPicture } from '../shared/editor/checks.ts';
 
 export interface LevelReport {
 	w: number;
@@ -36,14 +36,9 @@ export interface LevelReport {
 /** Check a level as if it were the `index`th level in play order (that sets its blob sizes). */
 export function reportLevel(lv: Level, index: number): LevelReport {
 	const t0 = performance.now();
-	const problems: string[] = [];
-	const warnings: string[] = [];
-	const h = lv.art.length;
-	const w = lv.art[0]?.length ?? 0;
-	const counts: Record<string, number> = {};
-	for (const row of lv.art)
-		for (const ch of row) if (ch !== '.') counts[ch] = (counts[ch] || 0) + 1;
-	const dots = Object.values(counts).reduce((a, b) => a + b, 0);
+	const picture = checkPicture(lv);
+	const { w, h, counts, problems, warnings } = picture;
+	const dots = picture.pixels;
 	const empty: LevelReport = {
 		w,
 		h,
@@ -63,17 +58,6 @@ export function reportLevel(lv: Level, index: number): LevelReport {
 		problems,
 		warnings
 	};
-
-	if (!lv.id.trim()) problems.push('needs an id');
-	if (!lv.name.trim()) problems.push('needs a name');
-	if (lv.art.some((row) => row.length !== w)) problems.push('rows are not all the same width');
-	for (const k of Object.keys(counts)) if (!(k in lv.palette)) problems.push(`"${k}" has no color`);
-	if (Object.keys(counts).length < 2) problems.push('needs at least 2 colors');
-	for (const p of closePairs(lv.palette, Object.keys(counts))) {
-		problems.push(`${p.a} and ${p.b} look alike (${p.delta.toFixed(0)}, needs 28)`);
-	}
-	for (const k of Object.keys(lv.palette)) if (!counts[k]) warnings.push(`${k} isn't used`);
-	if (w > 30 || h > 32) warnings.push(`${w}x${h} is big for a phone; 30x32 or smaller fits best`);
 	if (problems.length) return { ...empty, ms: performance.now() - t0 };
 
 	const s = buildPuzzle(lv, index);
