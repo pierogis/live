@@ -3,7 +3,7 @@
  * Used by the editor (live, as you paint) and by `pnpm -F parlor levels`.
  * Imports use `.ts` so node scripts can load this file directly.
  */
-import { boardGroups, buildPuzzle, solve, TRAY, type Level } from './engine.ts';
+import { blobSizes, boardGroups, buildSolved, TRAY, type Level } from './engine.ts';
 import { checkPicture } from '../shared/editor/checks.ts';
 
 export interface LevelReport {
@@ -11,19 +11,18 @@ export interface LevelReport {
 	h: number;
 	dots: number;
 	colors: number;
-	/** Pixels per color key. */
-	counts: Record<string, number>;
 	moves: number;
 	parks: number;
+	/** The most tray the solver's path filled: its biggest park, up to the whole tray. */
 	minTray: number;
+	/** The sizes of the scattered blobs at this point in play, like "10-28". */
+	blobs: string;
 	/** Which shuffle the puzzle kept; -1 when no shuffle fit the standard tray. */
 	shuffle: number;
 	groups: number;
 	biggestGroup: number;
 	/** Starting dot groups that sit on spots of a single color. */
 	cleanGroups: number;
-	/** Dots that start on a spot of their own color. */
-	onOwnColor: number;
 	/** Rough difficulty: more parking, more tray use and more moves are harder. */
 	score: number;
 	ms: number;
@@ -36,23 +35,21 @@ export interface LevelReport {
 /** Check a level as if it were the `index`th level in play order (that sets its blob sizes). */
 export function reportLevel(lv: Level, index: number): LevelReport {
 	const t0 = performance.now();
-	const picture = checkPicture(lv);
-	const { w, h, counts, problems, warnings } = picture;
-	const dots = picture.pixels;
+	const { w, h, counts, pixels: dots, problems, warnings } = checkPicture(lv);
+	const blobs = blobSizes(index);
 	const empty: LevelReport = {
 		w,
 		h,
 		dots,
 		colors: Object.keys(counts).length,
-		counts,
 		moves: 0,
 		parks: 0,
 		minTray: 0,
+		blobs: `${blobs.min}-${blobs.max}`,
 		shuffle: -1,
 		groups: 0,
 		biggestGroup: 0,
 		cleanGroups: 0,
-		onOwnColor: 0,
 		score: 0,
 		ms: 0,
 		problems,
@@ -60,10 +57,11 @@ export function reportLevel(lv: Level, index: number): LevelReport {
 	};
 	if (problems.length) return { ...empty, ms: performance.now() - t0 };
 
-	const s = buildPuzzle(lv, index);
-	const sol = solve(s, 1, 1);
-	if (s.attempt! < 0) problems.push(`needs a ${s.trayCap}-slot tray (the game has ${TRAY})`);
-	if (!sol) problems.push('the solver could not finish it');
+	// The same solve that let the build keep its shuffle, so the report agrees with the game.
+	const { state: s, solution: sol } = buildSolved(lv, index);
+	const shuffle = s.attempt ?? -1;
+	const minTray = s.minTray ?? 0;
+	if (shuffle < 0) problems.push(`needs a ${s.trayCap}-slot tray (the game has ${TRAY})`);
 
 	const groups = boardGroups(s);
 	const clean = groups.filter((g) => new Set(g.cells.map((j) => s.target[j])).size === 1).length;
@@ -76,19 +74,18 @@ export function reportLevel(lv: Level, index: number): LevelReport {
 	} else if (onOwnColor) {
 		warnings.push(`${onOwnColor} dot(s) start on their own color`);
 	}
-	const parks = sol ? sol.path.filter((a) => a.dst.to === 'tray').length : 0;
-	const moves = sol ? sol.path.length : 0;
+	const parks = sol.path.filter((a) => a.dst.to === 'tray').length;
+	const moves = sol.path.length;
 	return {
 		...empty,
 		moves,
 		parks,
-		minTray: s.minTray ?? 0,
-		shuffle: s.attempt ?? -1,
+		minTray,
+		shuffle,
 		groups: groups.length,
 		biggestGroup: Math.max(0, ...groups.map((g) => g.cells.length)),
 		cleanGroups: clean,
-		onOwnColor,
-		score: Math.round(parks * 2 + (s.minTray ?? 0) + moves / 2),
+		score: Math.round(parks * 2 + minTray + moves / 2),
 		ms: performance.now() - t0
 	};
 }

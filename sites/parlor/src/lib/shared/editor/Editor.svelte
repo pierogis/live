@@ -4,18 +4,19 @@
 	types.ts). On the dev server, "save to pack" writes straight into
 	src/lib/<game>/levels/*.json; everywhere, a level can be downloaded or copied as JSON.
 -->
-<script lang="ts">
+<script lang="ts" generics="L extends Picture">
 	import { onMount, untrack } from 'svelte';
 
+	import type { CheckReply, CheckRequest } from './check.worker';
 	import * as G from './grid';
 	import { quantize } from './quantize';
-	import type { Check, EditorGame, Picture } from './types';
-	import { MIN_DELTA, deltaE, lab } from '../palette';
+	import type { Check, EditorGame } from './types';
+	import type { Picture } from '../level';
+	import { closePairs, deltaE, lab } from '../palette';
 
-	let { game }: { game: EditorGame } = $props();
+	let { game }: { game: EditorGame<L> } = $props();
 
 	const PACKS = $derived(game.packs);
-	const LEVELS = $derived(PACKS.flatMap((p) => p.levels));
 	/** A level's own fields beyond its picture (like a game's tuning), kept as they were. */
 	type Extras = Record<string, unknown>;
 
@@ -24,14 +25,15 @@
 		grid: G.Grid;
 		palette: Record<string, string>;
 	}
+	/** The pack and id a level was loaded from or last saved as; null for a new level. */
+	type Origin = { pack: string; id: string } | null;
+	/** What survives a reload, in localStorage. */
 	interface Draft {
-		id: string;
-		name: string;
-		palette: Record<string, string>;
-		art: string[];
+		level: L;
 		pack: string;
-		/** The pack and id this draft was loaded from or last saved as. */
-		origin: { pack: string; id: string } | null;
+		origin: Origin;
+		idFromName: boolean;
+		newPackName: string;
 	}
 
 	const DRAFT_KEY = untrack(() => `parlor:editor:${game.id}`);
@@ -53,11 +55,11 @@
 		'#a8dcff',
 		'#f2c46d'
 	];
-	const TOOLS: { tool: Tool; key: string; label: string }[] = [
-		{ tool: 'brush', key: 'b', label: 'brush' },
-		{ tool: 'fill', key: 'f', label: 'fill' },
-		{ tool: 'pick', key: 'i', label: 'pick' },
-		{ tool: 'erase', key: 'e', label: 'erase' }
+	const TOOLS: { tool: Tool; key: string }[] = [
+		{ tool: 'brush', key: 'b' },
+		{ tool: 'fill', key: 'f' },
+		{ tool: 'pick', key: 'i' },
+		{ tool: 'erase', key: 'e' }
 	];
 
 	let name = $state('');
@@ -69,7 +71,7 @@
 	let pack = $state(untrack(() => game.packs[0]?.id ?? '01-new'));
 	let extras: Extras = $state.raw({});
 	let newPackName = $state('');
-	let origin: Draft['origin'] = $state(null);
+	let origin: Origin = $state(null);
 	let brush = $state('A');
 	let tool: Tool = $state('brush');
 	let sizeW = $state(24);
@@ -91,58 +93,125 @@
 	let fileInput: HTMLInputElement | undefined = $state();
 
 	let canvas: HTMLCanvasElement | undefined = $state();
+	/** Drawn over the picture, so moving the mouse redraws only the hover outline. */
+	let hoverCanvas: HTMLCanvasElement | undefined = $state();
 	let stageWidth = $state(600);
 
 	// ---------- the level as the game sees it ----------
-	const draft: Picture = $derived({
+	/** The picture plus the level's own fields (`extras`) as they were loaded. */
+	const draft = $derived({
 		...extras,
 		id,
 		name,
 		palette: $state.snapshot(palette),
 		art: G.toArt(grid)
-	});
+	} as L);
 
 	const packNames = $derived(new Map(PACKS.map((p) => [p.id, p.name])));
 	const isNewPack = $derived(!packNames.has(pack));
 
-	/** Where this level sits in play order: its place if it's saved, else the end of its pack. */
-	const slot = $derived.by(() => {
-		let index = 0;
+	/** Whether `l` in pack `p` is the saved copy of this draft (which saving replaces or moves). */
+	const isOrigin = (p: string, l: Picture) => !!origin && p === origin.pack && l.id === origin.id;
+
+	/**
+	 * Every other level in play order, with this draft in its slot: what play-testing uses.
+	 * The slot is its saved place, or the end of the pack it's going to (saving moves it there).
+	 */
+	const placed = $derived.by(() => {
+		const list: L[] = [];
+		let slot = -1;
 		for (const p of PACKS) {
-			if (origin && p.id === origin.pack && origin.pack === pack) {
-				const at = p.levels.findIndex((l) => l.id === origin!.id);
-				if (at >= 0) return index + at;
+			for (const l of p.levels) {
+				if (isOrigin(p.id, l) && p.id === pack) slot = list.length;
+				if (!isOrigin(p.id, l)) list.push(l);
 			}
-			index += p.levels.length;
-			if (p.id === pack) return index;
+			if (p.id === pack && slot < 0) slot = list.length;
 		}
-		return index;
+		if (slot < 0) slot = list.length; // a new pack, after the others
+		list.splice(slot, 0, draft);
+		return { list, slot };
 	});
+	const slot = $derived(placed.slot);
+	const playLevels = $derived(placed.list);
 
-	/** Every level in play order, with this draft in its slot: what play-testing uses. */
-	const playLevels = $derived.by(() => {
-		const list = LEVELS.slice();
-		const replacing = origin && origin.pack === pack && LEVELS[slot]?.id === origin.id;
-		list.splice(slot, replacing ? 1 : 0, draft);
-		return list;
-	});
-
+	// ---------- live checks, in a worker so painting stays smooth ----------
 	let report = $state.raw<Check | null>(null);
 	let checking = $state(false);
+	/** Counts check requests; a result counts only if it's for the latest one. */
+	let seq = 0;
+	let worker: Worker | null = null;
+	/** The request the worker is working on, if any. */
+	let busy = 0;
+	/** False once a worker can't start or load the rules: then checks run here instead. */
+	let useWorker = typeof Worker !== 'undefined';
+
+	function settle(n: number, result: Check | null, error?: string) {
+		if (n !== seq) return; // a newer draft is on its way
+		report = result;
+		if (error) message = `Check failed: ${error}`;
+		checking = false;
+	}
+
+	function checkHere(n: number, level: L, index: number) {
+		try {
+			settle(n, game.check(level, index));
+		} catch (err) {
+			settle(n, null, String(err));
+		}
+	}
+
+	function startWorker(): Worker | null {
+		try {
+			const w = new Worker(new URL('./check.worker.ts', import.meta.url), { type: 'module' });
+			w.onmessage = (e: MessageEvent<CheckReply>) => {
+				if (e.data.seq === busy) busy = 0;
+				if ('error' in e.data) settle(e.data.seq, null, e.data.error);
+				else settle(e.data.seq, e.data.report);
+			};
+			w.onerror = (e) => {
+				// The worker couldn't load: check on this thread from now on.
+				e.preventDefault();
+				w.terminate();
+				if (worker === w) worker = null;
+				useWorker = false;
+				if (busy) checkHere(busy, $state.snapshot(draft) as L, slot);
+				busy = 0;
+			};
+			return w;
+		} catch {
+			useWorker = false;
+			return null;
+		}
+	}
+
+	/** A check for an older draft is wasted work: stop it, and start a fresh worker loading meanwhile. */
+	function stopStale() {
+		if (!worker || !busy) return;
+		worker.terminate();
+		busy = 0;
+		worker = startWorker();
+	}
+
+	function runCheck(n: number, level: L, index: number) {
+		if (useWorker) worker ??= startWorker();
+		if (!worker) return checkHere(n, level, index);
+		busy = n;
+		worker.postMessage({ seq: n, game: game.id, level, index } satisfies CheckRequest);
+	}
+
 	$effect(() => {
-		const lv = draft;
+		const lv = $state.snapshot(draft) as L;
 		const at = slot;
+		const n = ++seq;
 		checking = true;
-		const timer = setTimeout(() => {
-			try {
-				report = game.check(lv, at);
-			} catch (err) {
-				report = null;
-				message = `Check failed: ${err}`;
-			}
-			checking = false;
-		}, 250);
+		stopStale();
+		const timer = setTimeout(() => runCheck(n, lv, at), 250);
 		return () => clearTimeout(timer);
+	});
+
+	$effect(() => () => {
+		worker?.terminate();
+		worker = null;
 	});
 	const playable = $derived(!!report && !checking && !report.problems.length);
 
@@ -152,12 +221,15 @@
 		return out;
 	});
 
-	/** For each color, the colors that look too much like it. */
+	/** For each color, the colors that look too much like it, in palette order. */
 	const lookAlikes = $derived.by(() => {
-		const out: Record<string, string[]> = {};
+		const close = closePairs(palette);
 		const keys = Object.keys(palette);
+		const out: Record<string, string[]> = {};
 		for (const a of keys) {
-			out[a] = keys.filter((b) => b !== a && deltaE(lab(palette[a]), lab(palette[b])) < MIN_DELTA);
+			out[a] = keys.filter((b) =>
+				close.some((p) => (p.a === a && p.b === b) || (p.a === b && p.b === a))
+			);
 		}
 		return out;
 	});
@@ -197,18 +269,10 @@
 	}
 
 	// ---------- loading ----------
-	function load(lv: Picture, from: Draft['origin'], packId: string) {
-		// Keep a level's own fields; a measured win rate is stale once the picture changes.
-		const {
-			id: _id,
-			name: _name,
-			palette: _palette,
-			art: _art,
-			wins: _wins,
-			...rest
-		} = lv as Picture & Extras;
-		void [_id, _name, _palette, _art, _wins];
-		extras = rest;
+	function load(lv: Picture, from: Origin, packId: string) {
+		// Keep a level's own fields, less any the game says editing makes stale.
+		const drop = new Set<PropertyKey>(['id', 'name', 'palette', 'art', ...(game.forget ?? [])]);
+		extras = Object.fromEntries(Object.entries(lv).filter(([k]) => !drop.has(k)));
 		name = lv.name;
 		id = lv.id;
 		idFromName = !from;
@@ -253,12 +317,18 @@
 		Math.max(8, Math.min(32, Math.floor((stageWidth - 2) / grid.w), Math.floor(560 / grid.h)))
 	);
 
+	/** Size a canvas to the grid, only when it changes (which also clears it). */
+	function fit(c: HTMLCanvasElement, px: number) {
+		if (c.width !== grid.w * px) c.width = grid.w * px;
+		if (c.height !== grid.h * px) c.height = grid.h * px;
+	}
+
 	$effect(() => {
 		const ctx = canvas?.getContext('2d');
 		if (!canvas || !ctx) return;
 		const px = cellPx;
-		canvas.width = grid.w * px;
-		canvas.height = grid.h * px;
+		fit(canvas, px);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const style = getComputedStyle(canvas);
 		const checkA = style.getPropertyValue('--check-a').trim() || '#ddd';
 		const checkB = style.getPropertyValue('--check-b').trim() || '#eee';
@@ -284,6 +354,14 @@
 			for (let x = 1; x < grid.w; x++) ctx.fillRect(x * px, 0, 1, grid.h * px);
 			for (let y = 1; y < grid.h; y++) ctx.fillRect(0, y * px, grid.w * px, 1);
 		}
+	});
+
+	$effect(() => {
+		const ctx = hoverCanvas?.getContext('2d');
+		if (!hoverCanvas || !ctx) return;
+		const px = cellPx;
+		fit(hoverCanvas, px);
+		ctx.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
 		if (hoverCell >= 0 && hoverCell < grid.cells.length) {
 			ctx.strokeStyle = '#000';
 			ctx.lineWidth = 2;
@@ -483,12 +561,11 @@
 		saving = true;
 		// Writing the pack file makes the dev server reload the page, sometimes before the
 		// reply arrives. So record the save first; it's put back if the save fails.
-		const before = { origin, idFromName };
-		const target = { pack, id };
-		const replaces = origin && origin.pack === pack ? origin.id : undefined;
-		origin = target;
+		const from = origin;
+		const fromName = idFromName;
+		origin = { pack, id };
 		idFromName = false;
-		persistDraft(`Saved to ${game.id}/levels/${pack}.json.`);
+		persistDraft(keepDraft(), `Saved to ${game.id}/levels/${pack}.json.`);
 		try {
 			const res = await fetch('/__levels/save', {
 				method: 'POST',
@@ -498,16 +575,16 @@
 					pack,
 					packName: newPackName || pack,
 					level: draft,
-					replaces
+					origin: from
 				})
 			});
 			const body = await res.json();
 			if (!res.ok) throw new Error(body.error);
-			message = `Saved to ${game.id}/levels/${pack}.json.`;
+			message = `Saved to ${game.id}/levels/${pack}.json${body.movedFrom ? ` (moved from ${body.movedFrom}.json)` : ''}.`;
 		} catch (err) {
-			origin = before.origin;
-			idFromName = before.idFromName;
-			persistDraft();
+			origin = from;
+			idFromName = fromName;
+			persistDraft(keepDraft());
 			try {
 				sessionStorage.removeItem(NOTE_KEY);
 			} catch {
@@ -563,11 +640,15 @@
 	}
 
 	// ---------- the draft survives reloads ----------
-	/** Save the draft for reloads; `note` is shown once after the next reload. */
-	function persistDraft(note?: string) {
-		const keep = { ...draft, pack, origin, extras };
+	/** The draft as it is now, to keep for a reload. */
+	function keepDraft(): Draft {
+		return { level: draft, pack, origin, idFromName, newPackName };
+	}
+
+	/** Save `keep` for reloads; `note` is shown once after the next reload. */
+	function persistDraft(keep: Draft, note?: string) {
 		try {
-			localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...keep, idFromName, newPackName }));
+			localStorage.setItem(DRAFT_KEY, JSON.stringify(keep));
 			if (note) sessionStorage.setItem(NOTE_KEY, note);
 		} catch {
 			/* storage blocked: the draft just won't survive a reload */
@@ -576,11 +657,8 @@
 
 	$effect(() => {
 		if (!loaded) return;
-		void draft;
-		void pack;
-		void origin;
-		void newPackName;
-		const timer = setTimeout(() => persistDraft(), 300);
+		const keep = keepDraft();
+		const timer = setTimeout(() => persistDraft(keep), 300);
 		return () => clearTimeout(timer);
 	});
 
@@ -588,10 +666,11 @@
 		let restored = false;
 		try {
 			const raw = localStorage.getItem(DRAFT_KEY);
-			const d = raw && JSON.parse(raw);
-			if (d && Array.isArray(d.art) && d.art.length && d.palette) {
-				load(d, d.origin ?? null, d.pack ?? pack);
-				extras = d.extras ?? {};
+			// A draft in an older shape (the level's fields at the top), or a broken one, is dropped.
+			const d: Partial<Draft> | null = raw && JSON.parse(raw);
+			const lv = d?.level;
+			if (d && lv && Array.isArray(lv.art) && lv.art.length && lv.palette) {
+				load(lv, d.origin ?? null, d.pack ?? pack);
 				idFromName = !!d.idFromName;
 				newPackName = d.newPackName ?? '';
 				restored = true;
@@ -700,8 +779,8 @@
 						class="tool inset"
 						class:on={tool === t.tool}
 						aria-pressed={tool === t.tool}
-						title="{t.label} ({t.key.toUpperCase()})"
-						onclick={() => (tool = t.tool)}>{t.label}</button
+						title="{t.tool} ({t.key.toUpperCase()})"
+						onclick={() => (tool = t.tool)}>{t.tool}</button
 					>
 				{/each}
 			</div>
@@ -773,19 +852,28 @@
 		</aside>
 
 		<section class="stage" bind:clientWidth={stageWidth}>
-			<canvas
-				bind:this={canvas}
-				class="paint"
-				class:picking={tool === 'pick'}
-				style:width="{grid.w * cellPx}px"
-				style:height="{grid.h * cellPx}px"
-				onpointerdown={onPointerDown}
-				onpointermove={onPointerMove}
-				onpointerup={onPointerUp}
-				onpointercancel={onPointerUp}
-				onpointerleave={() => (hoverCell = -1)}
-				oncontextmenu={(e) => e.preventDefault()}
-			></canvas>
+			<div class="paint-wrap">
+				<canvas
+					bind:this={canvas}
+					class="paint"
+					class:picking={tool === 'pick'}
+					style:width="{grid.w * cellPx}px"
+					style:height="{grid.h * cellPx}px"
+					onpointerdown={onPointerDown}
+					onpointermove={onPointerMove}
+					onpointerup={onPointerUp}
+					onpointercancel={onPointerUp}
+					onpointerleave={() => (hoverCell = -1)}
+					oncontextmenu={(e) => e.preventDefault()}
+				></canvas>
+				<canvas
+					bind:this={hoverCanvas}
+					class="hover"
+					style:width="{grid.w * cellPx}px"
+					style:height="{grid.h * cellPx}px"
+					aria-hidden="true"
+				></canvas>
+			</div>
 			<div class="stage-tools">
 				<button class="tool inset" onclick={() => transform(G.flip)} title="Mirror left to right"
 					>mirror</button
@@ -936,11 +1024,10 @@
 	.editor,
 	.play {
 		--bg: var(--primary-color);
-		--panel: var(--primary-color);
 		--ink: var(--text-color);
 		--muted: color-mix(in srgb, var(--text-color) 70%, var(--primary-color));
 		--line: var(--text-color-st);
-		--accent: var(--accent-color);
+		/* Problems, look-alike colors. */
 		--bad: var(--accent-color);
 		--good: var(--link-color);
 		--check-a: color-mix(in srgb, var(--text-color) 10%, var(--primary-color));
@@ -994,7 +1081,7 @@
 		}
 	}
 	.panel {
-		background: var(--panel);
+		background: var(--bg);
 		border-radius: 10px;
 		padding: 12px;
 	}
@@ -1049,16 +1136,18 @@
 		font-size: 13px;
 	}
 	.tool {
+		padding: 6px 10px;
 		border-radius: 10px;
-		background: var(--panel);
+		background: var(--bg);
 		cursor: pointer;
 		font-family: Courier, monospace;
+		font-size: 13px;
 		font-weight: 700;
 	}
 	.tool:focus-visible,
 	.swatch-pick:focus-visible,
 	.x:focus-visible {
-		box-shadow: 0 0 0 3px var(--accent);
+		box-shadow: 0 0 0 3px var(--accent-color);
 	}
 	.message {
 		margin: 0;
@@ -1086,10 +1175,6 @@
 		flex-wrap: wrap;
 		gap: 6px;
 		margin-bottom: 6px;
-	}
-	.tool {
-		padding: 6px 10px;
-		font-size: 13px;
 	}
 	.tool.on {
 		background: var(--ink);
@@ -1176,6 +1261,17 @@
 		align-items: center;
 		gap: 8px;
 		min-width: 0;
+	}
+	.paint-wrap {
+		position: relative;
+	}
+	/* Same box and corners as the picture under it. */
+	.hover {
+		position: absolute;
+		top: 0;
+		left: 0;
+		border-radius: 6px;
+		pointer-events: none;
 	}
 	.paint {
 		display: block;

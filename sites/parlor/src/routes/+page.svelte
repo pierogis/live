@@ -1,31 +1,21 @@
 <script lang="ts">
 	import { Card, Interactable } from '@pierogis/utensils';
 
-	const games = [
-		{
-			href: '/mosaic',
-			name: 'mosaic',
-			about: 'lift dots off a picture, sort them by color, and fill it back in',
-			extra: { href: '/mosaic/edit', label: 'level editor' }
-		},
-		{
-			href: '/forage',
-			name: 'forage',
-			about: 'send ant colonies to eat a picture away, color by color, from the outside in'
-		}
-	];
+	import { GAMES } from '#lib/games.js';
 </script>
 
 <h3 class="tagline">a room for games</h3>
 
 <div class="games">
-	{#each games as game (game.href)}
+	{#each GAMES as game (game.id)}
 		<Card>
 			<Interactable>
-				<a class="border inset link-box" href={game.href}>{game.name}</a>
+				<a class="border inset link-box" href="/{game.id}">{game.name}</a>
 			</Interactable>
 			<p>{game.about}</p>
-			{#if game.extra}<a href={game.extra.href}>{game.extra.label}</a>{/if}
+			<p>
+				<a href="/{game.id}/pictures">pictures</a> · <a href="/{game.id}/edit">level editor</a>
+			</p>
 		</Card>
 	{/each}
 </div>

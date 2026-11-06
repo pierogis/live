@@ -25,8 +25,11 @@
 				"BBCCCCCCCCCCCCCCCCCC",
 				"BCCCCCCCCCCCCCCCCCCC"
 			],
-			"seed": 1,
-			"wins": 0.88
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "dunes",
@@ -62,8 +65,11 @@
 				"KDDDDDDDDDDEEEEEEEEEEEEK",
 				"KKKKKKKKKKKKKKKKKKKKKKKK"
 			],
-			"seed": 10,
-			"wins": 0.94
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "reef-fish",
@@ -101,8 +107,11 @@
 				"TTTQQCQDDDDDDDDQDQDDQQQQTT",
 				"DDDDDQQDDDDDDDDQDQDDDDDQDD"
 			],
-			"seed": 12,
-			"wins": 0.81
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "drifter",
@@ -144,8 +153,11 @@
 				"CCCCCCCCCCCCCCCCCCCC",
 				"CCCCCCCCCCCCCCCCCCCC"
 			],
-			"seed": 6,
-			"wins": 0.81
+			"seed": 1,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "bullseye",
@@ -177,8 +189,11 @@
 				"BBBBBBBBBKKKKKKBBBBBBBBB",
 				"BBBBBBBBBBBBBBBBBBBBBBBB"
 			],
-			"seed": 4,
-			"wins": 0.75
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "pantry-jar",
@@ -220,7 +235,10 @@
 				"BBBBBBBBBBBBBBBBBBBBBB"
 			],
 			"seed": 0,
-			"wins": 0.94
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "beacon",
@@ -263,8 +281,11 @@
 				"SSSSSSSSSSSSSSSSSSSS",
 				"SSSSSSSSSSSSSSSSSSSS"
 			],
-			"seed": 13,
-			"wins": 0.81
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "mushroom",
@@ -303,8 +324,11 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGG",
 				"GGGGGGGGGGGGGGGGGGGGGGGG"
 			],
-			"seed": 8,
-			"wins": 0.75
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "sloop",
@@ -343,8 +367,11 @@
 				"SSSSSSSssssSSSSSSSSssssS",
 				"SSSSSSSSSSSSSSSSSSSSSSSS"
 			],
-			"seed": 13,
-			"wins": 0.69
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "crystal",
@@ -381,8 +408,11 @@
 				"BBBBBBBBBBBBBBBBBBBBBBBB",
 				"BBBBBBBBBBBBBBBBBBBBBBBB"
 			],
-			"seed": 13,
-			"wins": 0.69
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "liftoff",
@@ -428,7 +458,10 @@
 				"KKKKKKKKKKKPPPPPPPPPPP"
 			],
 			"seed": 0,
-			"wins": 0.69
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "night-tree",
@@ -469,8 +502,11 @@
 				"HHHHHHHHHHHHHHHHHHHHHHHH",
 				"HHHHHHHHHHHHHHHHHHHHHHHH"
 			],
-			"seed": 5,
-			"wins": 0.88
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		}
 	]
 }

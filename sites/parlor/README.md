@@ -5,27 +5,31 @@ a room for games
 ```sh
 pnpm -F parlor dev      # http://localhost:5179
 pnpm -F parlor test     # engine and level tests
+pnpm -F parlor check    # svelte-check
 pnpm -F parlor levels   # check every level and print its stats
-pnpm -F parlor forage:pictures  # regenerate the drawn forage pictures (packs 02 on)
+pnpm -F parlor forage:pictures  # regenerate the drawn forage pictures (packs 02 on; --start-pack 6 for 06 on)
 pnpm -F parlor forage:tune      # pick each forage level's deal to hit its difficulty
+pnpm -F parlor mosaic:pictures  # regenerate the drawn mosaic pictures (packs 02 on; --sheet out.png for a contact sheet)
 ```
 
 ## layout
 
-Each game lives in `src/lib/<game>/` and gets a route in `src/routes/<game>/`, with its picture list on its own page at `src/routes/<game>/pictures/`. Every level has its own prerendered page (`/<game>/N`) with its board already in the HTML; the bare `/<game>` page sends you on to your saved level. Progress is saved in one small cookie per game (`parlor-<game>`: the level you're on, the pictures you've cleared, sound and relaxed mode), so the server can send you to the right level and mark cleared pictures before the page loads. Older saves in local storage move over on the first visit. Boards size themselves in CSS from the row's width and the small viewport height, rounded to whole pixels. The games use the site's look from `@pierogis/utensils`: `border inset link-box` buttons, 2px inset rings, Courier for labels, no narration, no hints and no pop-ups; a move that can't go gets a still outline, and a finished or stuck level says so in a panel under the board. A game's rules sit in plain TypeScript with no imports and no DOM, so the page, the node tests in `test/` and the scripts in `scripts/` all run the same code.
+Each game lives in `src/lib/<game>/` and is listed once in `src/lib/games.ts`. The home page and one route tree, `src/routes/[game=game]/`, read that list, so every game gets `/<game>`, `/<game>/N`, `/<game>/pictures` and `/<game>/edit`; `src/params.ts` matches only the listed ids. Every level has its own prerendered page (`/<game>/N`) with its board and starting state already in the HTML; the bare `/<game>` page sends you on to your saved level. Progress is saved in one small cookie per game (`parlor-<game>`: the level you're on, the pictures you've cleared, sound and the game's options, like mosaic's relaxed mode), so the server can send you to the right level and mark cleared pictures before the page loads. Boards size themselves in CSS from the row's width and the small viewport height, rounded to whole pixels. The games use the site's look from `@pierogis/utensils`: `border inset link-box` buttons, 2px inset rings, Courier for labels, no narration, no hints and no pop-ups; a move that can't go gets a still outline, and a finished or stuck level says so in a panel under the board. A game's rules sit in plain TypeScript with no DOM and `.ts` imports, so the page, the node tests in `test/` and the scripts in `scripts/` all run the same code.
 
 `src/lib/shared/` holds what the games share:
 
 - `engine.ts`: seeded random numbers, shuffles and reading a level's picture
-- `levels.ts`: turns a game's `levels/*.json` files into packs
+- `level.ts` and `levels.ts`: the picture and pack types, and turning a game's `levels/*.json` files into packs
 - `save.ts`: the save cookie
 - `difficulty.ts`: the 1 to 5 difficulty labels
-- `palette.ts` (checks that a picture's colors are easy to tell apart), `shapes.ts` (draws a picture from circles, rects and polygons), `art.ts` (draws a level as a small picture) and `sound.ts`
-- `game/`: the title bar with undo, restart, sound and pictures (`GameBar.svelte`), and the panel for a finished or stuck level (`LevelEnd.svelte`)
+- `palette.ts` (checks that a picture's colors are easy to tell apart), `ink.ts` (black or white text on a color), `art.ts` (draws a level as a small picture) and `sound.ts`
+- `game/`: a level's life on its page (`level.svelte.ts`), the title bar with undo, restart, sound and pictures (`GameBar.svelte`), the panel for a finished or stuck level (`LevelEnd.svelte`), difficulty dots, animated sprites and the page styles around the board. The board and its tab are one card, from `ui/joined.css` in `packages/ui`.
 - `Pictures.svelte`: a game's picture list
-- `editor/`: the level editor, its image import and the picture checks every game shares
+- `editor/`: the level editor, its image import, its check worker and the picture checks every game shares
 
-A new game brings its engine, its component, its levels and an `editor.ts` that tells the editor how to check and play a level.
+A new game brings its engine, its component, its levels, a `save.ts`, a `rules.ts` with its level checks and an `editor.ts` that adds the packs and the game to play-test, plus one entry in `src/lib/games.ts`. The routes, the editor, `pnpm -F parlor levels` and the tests find it from there.
+
+`scripts/` holds the level check (`check-levels.ts`), the editor's dev-server save (`levels-plugin.ts`), the picture makers (`make-mosaic-pictures.ts` with its templates in `scripts/mosaic/`, `make-forage-pictures.ts`, both drawing with `shapes.ts`) and `tune-forage.ts`. `test/levels.ts` reads the packs from disk for the tests and scripts.
 
 ## mosaic
 
@@ -35,8 +39,10 @@ Lift dots off a picture, sort them by color, and fill the picture back in. The r
 - `Mosaic.svelte`: the game: board, tray, zoom and pan, forgiving taps
 - `flights.ts`: dots flying between the board and the tray
 - `report.ts`: one level's checks and stats, shared by the editor and `pnpm -F parlor levels`
-- `editor.ts`: what the shared editor checks for a mosaic level
-- `levels/`: the level packs
+- `rules.ts` and `editor.ts`: what the shared editor checks for a mosaic level (`rules.ts` also runs in the editor's worker and in `pnpm -F parlor levels`)
+- `levels/`: the level packs, 200 levels in all. `01-first-light` was drawn by hand; packs 02 to 09 come from `pnpm -F parlor mosaic:pictures`, which draws original pictures from 72 seeded templates in `scripts/mosaic/` (landscapes, weather, sea, towns, animals, plants, vehicles, food, space and still lifes), in big flat areas with no speckle. Play grows from about 22 cells across in 5 colors to 36 in up to 12, with more and smaller parts as it goes; no color covers more than 45% of a picture, and every pair of colors is easy to tell apart. The script then nudges each picture a few places toward its measured difficulty so the solver's score rises through play.
+
+A level can't get stuck: lifting dots to the tray uncovers as many spots as it fills, so open spots always match the dots in the tray, and one of them always fits. Difficulty is effort and planning instead: how many dots and colors there are, how broken up the picture is, and how the scattered blobs compare to the 20-slot tray. Blobs grow through all 200 levels (`blobSizes` in `engine.ts`), from 10 to 28 dots at the start, which often fit the tray whole, to 16 to 48 at the end, which rarely do.
 
 ### editor
 
@@ -44,7 +50,7 @@ Open http://localhost:5179/mosaic/edit or http://localhost:5179/forage/edit with
 
 - Paint with Brush (B), Fill (F), Pick (I, or Alt-click) and Erase (E). Number keys pick colors. Ctrl+Z and Ctrl+Shift+Z undo and redo.
 - Colors that look too alike are flagged; tap the other color's letter to merge them.
-- Checks rerun as you paint. For mosaic: whether the 20-slot tray is enough, solver moves, tray use, group sizes and a difficulty score. For forage: whether a deal can be won and how often careless play wins (run `forage:tune` to save a tuned deal).
+- Checks rerun as you paint. For mosaic: whether the 20-slot tray is enough, solver moves, tray use, group sizes and a difficulty score. For forage: whether a deal can be won, how often the best of several players wins, and its cruxes and rule breaks (run `forage:tune` to save a tuned deal).
 - Play-test plays the draft in the real game, in its place in play order, without touching saved progress.
 - Import image shrinks a picture to the width you pick and reduces it to a few colors that are easy to tell apart. Tiny colors and lone pixels are folded into their neighbors. Each import starts a new level. Use images you have the rights to.
 - Save to pack writes into `levels/*.json` (dev server only, through `scripts/levels-plugin.ts`). Download and Copy JSON work anywhere.
@@ -72,21 +78,22 @@ Every `levels/*.json` file is a pack, played in file name order:
 - `id` must be unique across all packs. It seeds the shuffle, so changing it changes the puzzle.
 - A level's place in the whole list sets how big the color blobs are, so moving a level changes its puzzle too.
 
-`pnpm -F parlor levels` fails when a level can't be solved with the 20-slot tray, or has two colors that look alike. `--order` also prints the levels from easiest to hardest.
+`pnpm -F parlor levels` fails when a picture has two colors that look alike, two levels of a game share an id, a mosaic level can't be solved with the 20-slot tray, or a forage level can't be dealt. `--order` also prints mosaic's levels from easiest to hardest, and `--measure` plays every forage level (minutes) instead of trusting the win share `forage:tune` saved.
 
 ## forage
 
 Ant colonies eat a pixel picture away. Tap the front colony of a column and it goes to work in one of 5 slots, and its first ant leaves right away. A working colony sends one ant every 0.2s to the first exposed food of its color that no ant is heading for yet (bottom row first, left to right); its number counts down as they leave, and it frees its slot as soon as it has sent its last one. Exposed means a side touches empty space that reaches the outside; sealed holes don't count. Each ant finds its way through the grid: out of its slot's door below the picture, around the outside edge and in through cleared space, and the length of that walk is how long it takes, so food deep in a tunnel takes longer to reach and to uncover what's behind it. Food it uncovers can be claimed on a later dispatch. A colony with nothing in reach just waits in its slot, so with every slot busy nothing more can go out. Clear the picture to win. The game doesn't narrate or preview: a tap that can't go outlines what's in the way. The rules are at the top of `src/lib/forage/engine.ts`.
 
-Later levels add linked colonies (marked with the same letter; they go out together once both are at the front, and stay linked in their slots: neither leaves until both have sent all their ants), locks (a tile in a column, in front of the colonies it holds back; once it reaches the front the column waits until the numbered key in the picture touches the outside), and mystery colonies (striped, color hidden until they reach the front).
+Later levels add linked groups of 2 to 4 colonies (joined by a grey rail; they go out together once all are at the front of their columns, and stay linked in their slots: none leaves until all have sent their ants), locks (a tile in a column, ringed in a marker color, in front of the colonies it holds back; once it reaches the front the column waits until the key in the picture, ringed in the same color, touches the outside), and mystery colonies (grey, color hidden until they reach the front).
 
-Each level has a difficulty index from 1 (Easy) to 5 (Very hard), shown in the title and the picture list. It comes from `wins`, the share of careless games won, which `forage:tune` measures and saves with the level (`difficulty.ts`).
+Each level has a difficulty index from 1 (Easy) to 5 (Very hard), shown in the title and the picture list. It comes from `wins`, the share of games won by the best of four players (a look-ahead player, two that follow the rule of thumb "send colonies that finish, park only when you must", and careless random play), capped by the level's cruxes: short stretches where only a few sends still win. A level needs rule breaks (moments where every send that would finish loses, so you must park on purpose) spread across the game to rate 4 or 5. `forage:tune` measures both and saves them with the level (`difficulty.ts`, `cruxes.ts`).
 
 - `engine.ts`: rules, the deal of colonies and solver
 - `Forage.svelte`: the game
-- `report.ts`: plays a deal many times with random players to measure how hard it is
+- `report.ts`: plays a deal many times with several players (`player.ts`) to measure how hard it is
+- `cruxes.ts`: walks a winning line with the solver and finds its cruxes and rule breaks
 - `ants.ts`: the ants running between the slots and the picture
-- `editor.ts`: what the shared editor checks for a forage level
-- `levels/`: the level packs. `01-outlines` was drawn by hand; the rest come from `pnpm -F parlor forage:pictures`, which draws original pictures (flowers, fish, houses, planets, cats, owls and more) from seeded shape templates in `scripts/make-forage-pictures.ts`, outlines their objects so the insides start sealed, and checks every palette
+- `rules.ts` and `editor.ts`: what the shared editor checks for a forage level (`rules.ts` also runs in the editor's worker and in `pnpm -F parlor levels`)
+- `levels/`: the level packs, 200 levels in all. `01-outlines` was drawn by hand; the rest come from `pnpm -F parlor forage:pictures`, which draws original pictures from seeded shape templates in `scripts/make-forage-pictures.ts`, outlines their objects so the insides start sealed, adds shading, small parts and islands of single foods and hatching, and checks every palette. Packs 02 to 05 (88 levels, 27 to 34 foods wide, 7 to 12 colors) use 19 subjects (flowers, fish, houses, planets, cats, owls and more); packs 06 to 10 (100 levels, 33 to 40 wide, 12 to 16 colors) mostly use 34 more (lighthouses, whales, foxes, bicycles, castles, robots, strawberries and more), each twice. Pictures stay at most 40 wide, so a phone still shows each food at 8px or more. A rerun keeps the tuned deal of every level whose picture comes out the same.
 
-Every deal comes from playing the picture out patiently (send a colony, let everything finish eating), so every level can be won that way. The solver, the tests and the difficulty measure play the same way; the game runs the same ticks on a timer. How hard a level is depends on its picture and its deal: `pnpm -F parlor forage:tune` tries many deals for each level, keeps the one whose careless-play win rate is closest to the level's target (about 88% at the start, easing toward 22%, with an easier breather every sixth level), and saves its `seed` and `wins` in the pack. It shares the levels out to worker processes (`--jobs`, all cores but one by default). Run it after adding, regenerating or moving levels.
+Every deal comes from playing the picture out patiently (send a colony, let everything finish eating), so every level can be won that way. The solver, the tests and the difficulty measure play the same way; the game runs the same ticks on a timer. `pnpm -F parlor forage:tune` sets how hard each level is: it tries many seeds, and placements of the colonies in the columns, for the deal closest to the level's target (100% wins and no cruxes for the first five levels, falling to 20% with several spread-out cruxes by level 200, with an easier breather every sixth level; the hardest rating starts around level 157). It saves `seed`, `deal`, `wins`, `breaks`, `cruxes`, `spread` and, when needed, a `push` to the difficulty ramp in the pack. It shares the levels out to worker processes (`--jobs`, all cores but one by default). Run it after adding, regenerating or moving levels.

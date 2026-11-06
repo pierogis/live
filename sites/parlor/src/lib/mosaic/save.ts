@@ -1,24 +1,15 @@
 /* Mosaic's saved progress: one small cookie, so the server can resume your level too. */
-import { decode, readSave, writeSave, type Save } from '../shared/save';
+import { gameSave, type GameOption } from '../shared/save';
 import { LEVELS } from './levels/index';
 
-export type { Save };
-export { cookieName } from '../shared/save';
+/** Mosaic's settings, toggled on its pictures page. */
+const OPTIONS: GameOption[] = [
+	{
+		key: 'relaxed',
+		label: 'relaxed mode',
+		note: 'a much bigger tray, so you can lift dots freely'
+	}
+];
 
-const GAME = 'mosaic';
-const ids = () => LEVELS.map((l) => l.id);
-
-/** In the browser. */
-export function loadSave(): Save {
-	return readSave(GAME, ids(), 'mosaic:v1');
-}
-
-/** In the browser. */
-export function persist(save: Save) {
-	writeSave(GAME, ids(), save);
-}
-
-/** On the server: the save from the request's cookie. */
-export function saveFromCookie(value: string | undefined): Save {
-	return decode(value, ids());
-}
+/** See gameSave in shared/save.ts. */
+export const mosaicSave = gameSave('mosaic', () => LEVELS, OPTIONS);

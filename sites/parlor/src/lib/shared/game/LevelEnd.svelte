@@ -5,7 +5,7 @@
 <script lang="ts">
 	interface Props {
 		state: 'won' | 'stuck';
-		/** A short line, like "cleared in 42 moves". */
+		/** A short line, like "Heart cleared." */
 		text: string;
 		/** The next level's page; without one, `onnext` moves on in place. */
 		nextHref?: string;
@@ -13,23 +13,12 @@
 		picturesHref?: string;
 		onundo: () => void;
 		onrestart: () => void;
-		/** Drawn inside another piece (like a game's tray), so it has no frame of its own. */
-		plain?: boolean;
 	}
 
-	let {
-		state,
-		text,
-		nextHref,
-		onnext,
-		picturesHref,
-		onundo,
-		onrestart,
-		plain = false
-	}: Props = $props();
+	let { state, text, nextHref, onnext, picturesHref, onundo, onrestart }: Props = $props();
 </script>
 
-<div class="end" class:inset={!plain} class:plain class:won={state === 'won'} role="status">
+<div class="end" role="status">
 	<p>{text}</p>
 	<div class="row">
 		{#if state === 'won'}
@@ -47,32 +36,18 @@
 </div>
 
 <style>
+	/* Drawn inside another piece (like a game's tray), so it has no frame of its own. */
 	.end {
 		width: 100%;
-		max-width: 520px;
+		align-self: center;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: center;
 		flex-wrap: wrap;
 		gap: 10px;
-		padding: 12px 14px;
-		border-radius: 10px;
-	}
-	.end.plain {
-		max-width: none;
-		align-self: center;
-		flex-direction: column;
-		justify-content: center;
-		text-align: center;
 		padding: 4px;
-	}
-	.plain .row {
-		justify-content: center;
-	}
-	.end.won:not(.plain) {
-		box-shadow:
-			var(--inset),
-			0 0 0 2px var(--secondary-color);
+		text-align: center;
 	}
 	p {
 		font-family: Courier, monospace;
@@ -80,6 +55,7 @@
 	}
 	.row {
 		display: flex;
+		justify-content: center;
 		gap: 8px;
 		flex-wrap: wrap;
 	}

@@ -1,0 +1,28 @@
+/*
+ * What every game's page shares around its board and tab, which are one card
+ * (`ui/joined.css`).
+ */
+
+/* Read out by screen readers, never seen. */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+/* A cleared level's outline lights up. */
+.stage.won {
+	--edge: var(--secondary-color);
+}
+
+/*
+ * The page centers its content, which can land on half a pixel, so a game's parts
+ * center themselves with whole-pixel margins instead of flex. Put `snapped` on a
+ * part and set --snap-w to its width; it centers in the nearest size container.
+ */
+.snapped {
+	margin-left: max(0px, round(down, calc((100cqw - var(--snap-w)) / 2), 1px));
+}

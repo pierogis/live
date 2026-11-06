@@ -1,7 +1,5 @@
-/*
- * Dots flying between the board and the tray. These are short-lived nodes in an
- * overlay layer that Svelte doesn't render, so they're plain DOM.
- */
+/* Dots flying between the board and the tray, as sprites (see shared/game/sprites.ts). */
+import { canAnimate, Sprites } from '../shared/game/sprites';
 
 const FLIGHT = 420;
 
@@ -16,13 +14,7 @@ export function snapshotRects(roots: (HTMLElement | undefined)[]): Map<number, D
 	return map;
 }
 
-export class Flights {
-	#live = new Set<{ anim: Animation; node: HTMLElement }>();
-
-	get size() {
-		return this.#live.size;
-	}
-
+export class Flights extends Sprites {
 	/**
 	 * Fly a dot of color `hex` from `from` to `target`, then call `onLand`.
 	 * Lands right away when there's nothing to animate or motion is reduced.
@@ -38,8 +30,8 @@ export class Flights {
 		onLand: () => void;
 		onSettle: () => void;
 	}) {
-		const { layer, hex, from, target, delay, onLand, onSettle } = opts;
-		if (!layer || !from || !target || opts.still || !Element.prototype.animate) {
+		const { layer, hex, from, target, delay, still, onLand, onSettle } = opts;
+		if (!layer || !from || !target || still || !canAnimate()) {
 			onLand();
 			return;
 		}
@@ -47,36 +39,24 @@ export class Flights {
 		const node = document.createElement('div');
 		node.className = 'gem flyer';
 		node.style.cssText = `--c:${hex};left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px`;
-		layer.append(node);
+		const flight = this.add(layer, node);
 
 		const dx = to.left + to.width / 2 - (from.left + from.width / 2);
 		const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-		// A plain, straight move: the dot slides over and settles to its new size.
+		// The dot slides straight over and shrinks or grows to fit where it lands.
 		const scale = (to.width * 0.8) / from.width;
-		const anim = node.animate(
+		const anim = this.animate(
+			flight,
 			[
 				{ transform: 'translate(0,0) scale(1)' },
 				{ transform: `translate(${dx}px, ${dy}px) scale(${scale})` }
 			],
 			{ duration: FLIGHT, delay, easing: 'ease-in-out', fill: 'both' }
 		);
-		const flight = { anim, node };
-		this.#live.add(flight);
 		anim.onfinish = () => {
-			node.remove();
-			this.#live.delete(flight);
+			this.drop(flight);
 			onLand();
-			if (!this.#live.size) onSettle();
+			if (!this.size) onSettle();
 		};
-	}
-
-	/** Drop every flight in the air without landing it. */
-	cancel() {
-		this.#live.forEach((f) => {
-			f.anim.onfinish = null;
-			f.anim.cancel();
-			f.node.remove();
-		});
-		this.#live.clear();
 	}
 }

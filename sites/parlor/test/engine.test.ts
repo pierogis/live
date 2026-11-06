@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import * as E from '../src/lib/mosaic/engine.ts';
+import { reportLevel } from '../src/lib/mosaic/report.ts';
 import type { Level, State } from '../src/lib/mosaic/engine.ts';
 import { loadLevels } from './levels.ts';
 
@@ -39,7 +40,8 @@ for (const relaxed of [false, true]) {
 			assert.deepEqual(have, need, 'same colors in both layers');
 			assert.ok(s.attempt! >= 0, 'fits the standard tray without growing it');
 
-			const sol = E.solve(s, 1, 1);
+			// The same solve the build used to keep this shuffle.
+			const sol = E.solve(s, 2, s.attempt! + 1);
 			assert.ok(sol, `solvable with tray ${s.trayCap}`);
 			const r = E.clone(s);
 			for (const a of sol.path) assert.ok(E.move(r, a.sel, a.dst).ok);
@@ -134,4 +136,75 @@ test('same level always gives the same puzzle', () => {
 	const a = E.buildPuzzle(LEVELS[0], 0);
 	const b = E.buildPuzzle(LEVELS[0], 0);
 	assert.deepEqual(a.top, b.top);
+});
+
+test('the report judges a level by the solve that kept its shuffle', () => {
+	LEVELS.slice(0, 3).forEach((lv, i) => {
+		const { state, solution } = E.buildSolved(lv, i);
+		assert.deepEqual(state, E.buildPuzzle(lv, i), 'the same puzzle the game plays');
+		// Replaying the build's own path wins, even if plain greedy play would not.
+		const r = E.clone(state);
+		for (const a of solution.path) assert.ok(E.move(r, a.sel, a.dst).ok);
+		assert.ok(E.isWon(r));
+		const rep = reportLevel(lv, i);
+		assert.deepEqual(rep.problems, []);
+		assert.equal(rep.moves, solution.path.length);
+		assert.equal(rep.parks, solution.path.filter((a) => a.dst.to === 'tray').length);
+		assert.equal(rep.shuffle, state.attempt);
+	});
+});
+
+test('taps: a direct hit wins, a near miss snaps to the nearest useful cell', () => {
+	// One row: a dot, an open spot for the dots in hand, a filled spot, a dot.
+	// Cells are 40px with 4px gaps; centers at 20, 64, 108, 152.
+	const g: E.TapGrid = { w: 4, h: 1, cell: 40, step: 44, reach: 42 };
+	const isDot = (i: number) => i === 0 || i === 3;
+	const isDrop = (i: number) => i === 1;
+	// Inside the dot's square, nearer its edge: the dot, though the open spot is preferred when near.
+	assert.equal(E.tapCell(g, 38, 20, isDot, isDrop), 0);
+	assert.equal(E.tapCell(g, 46, 20, isDot, isDrop), 1, 'a direct hit on the open spot');
+	// In the gap between them: the open spot gets the preference.
+	assert.equal(E.tapCell(g, 42, 20, isDot, isDrop), 1);
+	// Nothing in hand: the open spot isn't useful, so a tap on it snaps to the nearest dot.
+	assert.equal(E.tapCell(g, 50, 20, isDot, null), 0);
+	// A filled spot isn't useful: the nearest useful cell wins.
+	assert.equal(E.tapCell(g, 110, 20, isDot, isDrop), 3);
+	// Off the board and out of reach: nothing.
+	assert.equal(E.tapCell(g, 20, 120, isDot, isDrop), -1);
+});
+
+test('greedy play takes the first listed action, without listing the rest', () => {
+	LEVELS.slice(0, 4).forEach((lv, i) => {
+		const s = E.buildPuzzle(lv, i);
+		for (let step = 0; step < 120 && !E.isWon(s); step++) {
+			const best = E.bestAction(s);
+			assert.deepEqual(best, E.actions(s)[0] ?? null, `${lv.id} step ${step}`);
+			assert.ok(E.move(s, best!.sel, best!.dst).ok);
+		}
+	});
+});
+
+test('the tray always holds as many dots as there are open spots, so play never sticks', () => {
+	const lv = LEVELS[LEVELS.length - 1];
+	const { state, solution } = E.buildSolved(lv, LEVELS.length - 1);
+	const s = E.clone(state);
+	const open = () => s.target.filter((c, k) => c >= 0 && !s.top[k] && !s.filled[k]).length;
+	for (const a of solution.path) {
+		assert.ok(E.move(s, a.sel, a.dst).ok);
+		assert.equal(open(), s.tray.length);
+		assert.equal(E.isStuck(s), false);
+	}
+});
+
+test('blobs grow all through play, from about half the tray to over twice it', () => {
+	let last = E.blobSizes(0);
+	assert.ok(last.max < 2 * E.TRAY && last.min < E.TRAY);
+	for (let i = 1; i <= E.LAST_LEVEL; i++) {
+		const b = E.blobSizes(i);
+		assert.ok(b.min >= last.min && b.max >= last.max && b.min < b.max, `level ${i + 1}`);
+		last = b;
+	}
+	assert.ok(E.blobSizes(E.LAST_LEVEL).max > E.blobSizes(150).max, 'still growing late in play');
+	assert.ok(last.max > 2 * E.TRAY);
+	assert.deepEqual(E.blobSizes(E.LAST_LEVEL + 50), last, 'and stops at the last level');
 });

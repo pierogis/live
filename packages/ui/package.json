@@ -25,7 +25,8 @@
     "./*.svelte": {
       "svelte": "./components/*.svelte",
       "default": "./components/*.svelte"
-    }
+    },
+    "./joined.css": "./styles/joined.css"
   },
   "peerDependencies": {
     "svelte": "^5"

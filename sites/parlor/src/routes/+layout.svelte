@@ -2,17 +2,24 @@
 	import { page } from '$app/state';
 
 	import { ThemeProvider } from '@pierogis/utensils';
-	import { Layout } from 'ui';
+	import { Layout, SEO } from 'ui';
 
 	let { children } = $props();
+
+	// No trailing slash, so the home page is the bare origin.
+	let canonical = $derived(`https://parlor.pierogis.live${page.url.pathname.replace(/\/$/, '')}`);
 </script>
 
 <svelte:head>
-	<title>{page.data.title}</title>
-	<link rel="canonical" href={page.data.canonical} />
-	<meta name="description" content={page.data.description} />
-	<meta name="robots" content="index, follow" />
+	{#if page.error}
+		<title>{page.error.message.toLowerCase()} · parlor</title>
+		<meta name="robots" content="noindex" />
+	{/if}
 </svelte:head>
+<!-- No canonical link on an error page: it isn't a page of the site. -->
+{#if !page.error}
+	<SEO title={page.data.title} description={page.data.description} {canonical} type="website" />
+{/if}
 
 <ThemeProvider>
 	<Layout

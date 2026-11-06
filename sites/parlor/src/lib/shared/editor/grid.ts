@@ -56,9 +56,7 @@ export function replaceAll(g: Grid, from: string, to: string): Grid {
 	return { ...g, cells: g.cells.map((c) => (c === from ? to : c)) };
 }
 
-/**
- * Change the size, keeping the picture centered. New pixels get `pad`.
- */
+/** Change the size, keeping the picture centered. New pixels get `pad`. */
 export function resize(g: Grid, w: number, h: number, pad = '.'): Grid {
 	const ox = Math.floor((w - g.w) / 2);
 	const oy = Math.floor((h - g.h) / 2);
@@ -86,6 +84,7 @@ export function shift(g: Grid, dx: number, dy: number): Grid {
 	return { ...g, cells };
 }
 
+/** Mirror the picture left to right. */
 export function flip(g: Grid): Grid {
 	const cells = new Array(g.w * g.h);
 	for (let y = 0; y < g.h; y++) {

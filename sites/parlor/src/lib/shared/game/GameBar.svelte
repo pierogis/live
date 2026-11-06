@@ -1,6 +1,6 @@
 <!-- The bar every game shares: its name, the level, and undo / restart / sound / pictures. -->
 <script lang="ts">
-	import { LABELS } from '../difficulty';
+	import Pips from './Pips.svelte';
 
 	interface Props {
 		game: string;
@@ -34,14 +34,7 @@
 		<h2 class="brand">{game}</h2>
 		<div class="label">
 			{label}
-			{#if difficulty}
-				<span title="Difficulty {difficulty} of 5">
-					· <span class="pips" aria-hidden="true"
-						>{'●'.repeat(difficulty)}{'○'.repeat(5 - difficulty)}</span
-					>
-					{LABELS[difficulty - 1].toLowerCase()}
-				</span>
-			{/if}
+			{#if difficulty}<Pips {difficulty} label />{/if}
 		</div>
 	</div>
 	<nav class="tools" aria-label="Game controls">
@@ -120,11 +113,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-	}
-	.pips {
-		letter-spacing: 1px;
-		font-size: 11px;
-		color: var(--accent-color);
 	}
 	.tools {
 		display: flex;

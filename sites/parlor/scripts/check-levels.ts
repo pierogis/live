@@ -1,84 +1,78 @@
 // Check every level of every game and print its stats: pnpm -F parlor levels [--order] [--measure]
-// Fails when a Mosaic level can't be solved with the standard tray or has colors that look
-// alike, or when a Forage level's built-in winning play doesn't win.
-import type { Level as ForageLevel } from '../src/lib/forage/engine.ts';
-import { reportForage } from '../src/lib/forage/report.ts';
-import { reportLevel, type LevelReport } from '../src/lib/mosaic/report.ts';
+// Fails when a level's picture has problems (like colors that look alike, from checkPicture,
+// which every game's checks start with), when two levels of a game share an id, when a
+// Mosaic level can't be solved with the standard tray, or when Forage can't build a deal.
+//   --order    also list each game's levels from easiest to hardest, when it rates them
+//   --measure  play each Forage level with every player (minutes) instead of trusting the
+//              win share forage:tune saved
+import { parseArgs } from 'node:util';
+
+import { GAME_IDS } from '../src/lib/games.ts';
+import type { Row, Rules } from '../src/lib/shared/editor/types.ts';
+import type { Picture } from '../src/lib/shared/level.ts';
 import { loadPacks } from '../test/levels.ts';
 
-type Row = LevelReport & { pack: string; id: string; size: string; clean: string };
+const { values: flags } = parseArgs({
+	options: { order: { type: 'boolean' }, measure: { type: 'boolean' } }
+});
 
-const rows: Row[] = [];
-let index = 0;
-for (const pack of loadPacks()) {
-	for (const lv of pack.levels) {
-		const r = reportLevel(lv, index++);
-		rows.push({
-			...r,
-			pack: pack.id,
-			id: lv.id,
-			size: `${r.w}x${r.h}`,
-			clean: `${r.cleanGroups}/${r.groups}`,
-			ms: Math.round(r.ms)
-		});
+// Each game's rules (src/lib/<game>/rules.ts), typed loosely so one loop takes them all.
+const GAMES = await Promise.all(
+	GAME_IDS.map(async (id) => ({
+		id,
+		rules: (await import(`../src/lib/${id}/rules.ts`)).rules as Rules<Picture>
+	}))
+);
+
+type Line = Row & { pack: string; id: string };
+
+let total = 0;
+let bad = 0;
+for (const { id: game, rules } of GAMES) {
+	const lines: Line[] = loadPacks<Picture>(game)
+		.flatMap((pack) => pack.levels.map((lv) => ({ pack: pack.id, lv })))
+		.map(({ pack, lv }, index) => ({ pack, id: lv.id, ...rules.row(lv, index, !!flags.measure) }));
+
+	const seen = new Map<string, string>();
+	for (const l of lines) {
+		const first = seen.get(l.id);
+		if (first) l.problems.push(`id "${l.id}" is also used in ${first}`);
+		else seen.set(l.id, l.pack);
 	}
-}
 
-const cols: (keyof Row)[] = [
-	'pack',
-	'id',
-	'size',
-	'dots',
-	'colors',
-	'moves',
-	'parks',
-	'minTray',
-	'shuffle',
-	'biggestGroup',
-	'clean',
-	'score',
-	'ms'
-];
-const width = (k: keyof Row) => Math.max(k.length, ...rows.map((r) => String(r[k]).length));
-console.log(cols.map((k) => k.padEnd(width(k))).join('  '));
-for (const r of rows) console.log(cols.map((k) => String(r[k]).padEnd(width(k))).join('  '));
-
-for (const r of rows) {
-	if (r.problems.length || r.warnings.length) {
-		console.log(`\n${r.pack}/${r.id}:`);
-		for (const p of r.problems) console.log(`  problem: ${p}`);
-		for (const w of r.warnings) console.log(`  warning: ${w}`);
-	}
-}
-
-if (process.argv.includes('--order')) {
-	console.log('\neasiest to hardest:');
-	for (const r of [...rows].sort((a, b) => a.score - b.score)) {
-		console.log(`  ${r.score}\t${r.pack}/${r.id}`);
-	}
-}
-
-// Forage: the built-in play wins, and how often random players win against the target.
-console.log('\nforage');
-const pct = (x: number) => `${Math.round(100 * x)}%`;
-const forage: { problems: string[] }[] = [];
-let forageIndex = 0;
-for (const pack of loadPacks<ForageLevel>('forage')) {
-	for (const lv of pack.levels) {
-		// Measuring every level takes minutes; by default trust what forage:tune saved.
-		const r = reportForage(lv, forageIndex++, process.argv.includes('--measure') ? 20 : 0);
-		if (!process.argv.includes('--measure') && lv.wins !== undefined) {
-			r.difficulty = { careless: lv.wins, careful: NaN };
-		}
-		forage.push(r);
+	console.log(`\n${game}`);
+	const table = lines.map((l) => ({ pack: l.pack, id: l.id, ...l.cols }));
+	const cols = Object.keys(table[0] ?? {});
+	const width = (k: string) =>
+		Math.max(k.length, ...table.map((r) => String(r[k as keyof typeof r]).length));
+	const print = (cells: string[]) =>
 		console.log(
-			`  ${pack.id.padEnd(13)} ${lv.id.padEnd(22)} ${r.w}x${r.h}  colonies ${r.colonies}  links ${r.links}  locks ${r.locks}  mystery ${r.mystery}  careless wins ${pct(r.difficulty.careless)} (target ${pct(r.target)})`
+			cells
+				.map((c, j) => c.padEnd(width(cols[j])))
+				.join('  ')
+				.trimEnd()
 		);
-		for (const p of r.problems) console.log(`    problem: ${p}`);
+	print(cols);
+	for (const r of table) print(cols.map((k) => String(r[k as keyof typeof r])));
+
+	for (const l of lines) {
+		if (l.problems.length || l.warnings.length) {
+			console.log(`\n${l.pack}/${l.id}:`);
+			for (const p of l.problems) console.log(`  problem: ${p}`);
+			for (const w of l.warnings) console.log(`  warning: ${w}`);
+		}
 	}
+
+	const rated = lines.filter((l) => l.score !== undefined);
+	if (flags.order && rated.length) {
+		console.log(`\n${game}, easiest to hardest:`);
+		for (const l of rated.sort((a, b) => a.score! - b.score!)) {
+			console.log(`  ${l.score}\t${l.pack}/${l.id}`);
+		}
+	}
+	total += lines.length;
+	bad += lines.filter((l) => l.problems.length).length;
 }
 
-const bad = [...rows, ...forage].filter((r) => r.problems.length);
-const total = rows.length + forage.length;
-console.log(bad.length ? `\n${bad.length} level(s) need work` : `\nall ${total} levels ok`);
-process.exitCode = bad.length ? 1 : 0;
+console.log(bad ? `\n${bad} level(s) need work` : `\nall ${total} levels ok`);
+process.exitCode = bad ? 1 : 0;

@@ -41,6 +41,7 @@ export function makeRng(seed: number): Rng {
 	};
 }
 
+/** Shuffle `arr` in place (Fisher-Yates) and return it. */
 export function shuffle<T>(arr: T[], rng: Rng): T[] {
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(rng() * (i + 1));
@@ -51,6 +52,12 @@ export function shuffle<T>(arr: T[], rng: Rng): T[] {
 	return arr;
 }
 
+/** One item, uniformly. */
+export function pickOne<T>(arr: readonly T[], rng: Rng): T {
+	return arr[Math.floor(rng() * arr.length)];
+}
+
+/** One item, with odds in proportion to `weight`. */
 export function pickWeighted<T>(items: T[], weight: (t: T) => number, rng: Rng): T {
 	const total = items.reduce((sum, t) => sum + weight(t), 0);
 	let r = rng() * total;

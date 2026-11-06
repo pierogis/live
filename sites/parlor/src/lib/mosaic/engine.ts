@@ -1,6 +1,6 @@
 /*
- * Mosaic game engine: pure logic, no DOM, no imports.
- * Runs in the browser, in node scripts and in node tests.
+ * Mosaic game engine: pure logic, no DOM. Imports use `.ts` so it runs in the
+ * browser, in node scripts and in node tests.
  *
  * The picture has two layers:
  *   - the bottom layer is the finished picture (target[i] = color the spot needs)
@@ -18,21 +18,17 @@ import {
 	hashStr,
 	makeRng,
 	parseArt,
+	pickOne,
+	pickWeighted,
 	shuffle,
 	type Art,
 	type Color,
 	type Rng
 } from '../shared/engine.ts';
-
-export { hashStr, makeRng, parseArt, type Art, type Color, type Rng };
+import type { Picture } from '../shared/level.ts';
 
 /** A level as stored: rows of color letters, '.' for an empty pixel. */
-export interface Level {
-	id: string;
-	name: string;
-	palette: Record<string, string>;
-	art: string[];
-}
+export type Level = Picture;
 
 export interface Gem {
 	id: number;
@@ -87,11 +83,9 @@ export interface Flight {
 }
 
 export type MoveResult =
-	| { ok: false; reason: 'empty' | 'same' | 'filled' | 'covered' | 'color' }
-	| { ok: false; reason: 'tray-full'; size: number; free: number }
+	| { ok: false; reason: 'empty' | 'same' | 'filled' | 'covered' | 'color' | 'tray-full' }
 	| {
 			ok: true;
-			color: number;
 			toBoard: Required<Flight>[];
 			toTray: (Flight & { from: number })[];
 			fromTray: (Flight & { cell: number })[];
@@ -100,7 +94,6 @@ export type MoveResult =
 			/** The leftover board dot closest to the one picked up, or -1. */
 			leftCell: number;
 			leftCells?: number[];
-			won: boolean;
 	  };
 
 export interface Group {
@@ -113,8 +106,6 @@ export interface Solution {
 	path: Action[];
 	peak: number;
 }
-
-/** mulberry32: small, fast, seeded. */
 
 /** The 8 spots around `i`, corners included: diagonal spots count as touching. */
 export function neighbors(w: number, h: number, i: number): number[] {
@@ -158,20 +149,12 @@ export function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): 
 	const touchesColor = (i: number, c: number, self: number) =>
 		neighbors(w, h, i).some((j) => colorsAt[j] === c && blobOf[j] !== self);
 
+	/** Any color but `avoid`, weighted by dots left; `avoid` when no other has any. */
 	const pickColor = (avoid: number) => {
-		let total = 0;
-		left.forEach((n, c) => {
-			if (c !== avoid) total += n;
-		});
-		if (!total) return avoid;
-		let r = rng() * total;
-		for (let c = 0; c < left.length; c++) {
-			if (c === avoid) continue;
-			r -= left[c];
-			if (r < 0) return c;
-		}
-		return avoid;
+		const others = left.map((_, c) => c).filter((c) => c !== avoid && left[c] > 0);
+		return others.length ? pickWeighted(others, (c) => left[c], rng) : avoid;
 	};
+	/** The 4 spots beside `i` (no corners), in `neighbors` order. */
 	const square4 = (i: number) =>
 		neighbors(w, h, i).filter((j) => j % w === i % w || Math.floor(j / w) === Math.floor(i / w));
 
@@ -186,20 +169,7 @@ export function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): 
 		left.forEach((n, k) => {
 			if (n > 0 && k !== target[seed] && !touchesColor(seed, k, -1)) safe.push(k);
 		});
-		let c: number;
-		if (safe.length) {
-			let r = rng() * safe.reduce((sum, k) => sum + left[k], 0);
-			c = safe[safe.length - 1];
-			for (const k of safe) {
-				r -= left[k];
-				if (r < 0) {
-					c = k;
-					break;
-				}
-			}
-		} else {
-			c = pickColor(target[seed]);
-		}
+		const c = safe.length ? pickWeighted(safe, (k) => left[k], rng) : pickColor(target[seed]);
 		const size = Math.min(left[c], blobMin + Math.floor(rng() * (blobMax - blobMin + 1)));
 		colorsAt[seed] = c;
 		blobOf[seed] = blobId;
@@ -407,7 +377,7 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 	if (dst.to === 'tray') {
 		if (sel.from === 'tray') return { ok: false, reason: 'same' };
 		const free = s.trayCap - s.tray.length;
-		if (free <= 0) return { ok: false, reason: 'tray-full', size, free };
+		if (free <= 0) return { ok: false, reason: 'tray-full' };
 		n = Math.min(free, size);
 		for (let k = 0; k < n; k++) {
 			const d = dots[k];
@@ -442,7 +412,7 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 		leftCells = dots.slice(n).map((d) => d.cell);
 	}
 	s.moves++;
-	return { ok: true, color, toBoard, toTray, fromTray, left, leftCell, leftCells, won: isWon(s) };
+	return { ok: true, toBoard, toTray, fromTray, left, leftCell, leftCells };
 }
 
 /** True when the tray is full and no dot has an open spot of its color. */
@@ -457,30 +427,71 @@ export function isStuck(s: State): boolean {
 	return true;
 }
 
-/** Distinct board groups. */
-export function boardGroups(s: State): Group[] {
-	const seen = new Set<number>();
-	const out: Group[] = [];
-	for (let i = 0; i < s.top.length; i++) {
-		if (!s.top[i] || seen.has(i)) continue;
-		const g = groupAt(s, i)!;
-		g.cells.forEach((j) => seen.add(j));
-		out.push(g);
+/**
+ * Flood-fill every region of cells that pass `inSet`, joining touching cells (corners
+ * count) where `same` says they belong together. Regions come in order of their first
+ * cell, which is their first entry; the rest of each region's cells follow in no set order.
+ */
+function floodAll(
+	w: number,
+	h: number,
+	n: number,
+	inSet: (i: number) => boolean,
+	same: (i: number, j: number) => boolean
+): number[][] {
+	const seen = new Uint8Array(n);
+	const out: number[][] = [];
+	const stack: number[] = [];
+	for (let i = 0; i < n; i++) {
+		if (seen[i] || !inSet(i)) continue;
+		seen[i] = 1;
+		const cells = [i];
+		stack.push(i);
+		while (stack.length) {
+			const k = stack.pop()!;
+			const x = k % w;
+			const y = (k - x) / w;
+			for (let dy = -1; dy <= 1; dy++) {
+				const ny = y + dy;
+				if (ny < 0 || ny >= h) continue;
+				for (let dx = -1; dx <= 1; dx++) {
+					const nx = x + dx;
+					if ((!dx && !dy) || nx < 0 || nx >= w) continue;
+					const j = ny * w + nx;
+					if (seen[j] || !inSet(j) || !same(i, j)) continue;
+					seen[j] = 1;
+					cells.push(j);
+					stack.push(j);
+				}
+			}
+		}
+		out.push(cells);
 	}
 	return out;
 }
 
+/** Distinct board groups. */
+export function boardGroups(s: State): Group[] {
+	const top = s.top;
+	return floodAll(
+		s.w,
+		s.h,
+		top.length,
+		(i) => !!top[i],
+		(i, j) => top[i]!.c === top[j]!.c
+	).map((cells) => ({ color: top[cells[0]]!.c, cells, gems: cells.map((i) => top[i]!) }));
+}
+
 /** Distinct open regions. */
 function openRegions(s: State): { cell: number; color: number; size: number }[] {
-	const seen = new Set<number>();
-	const out: { cell: number; color: number; size: number }[] = [];
-	for (let i = 0; i < s.target.length; i++) {
-		if (seen.has(i) || s.target[i] < 0 || s.top[i] || s.filled[i]) continue;
-		const r = openRegion(s, i);
-		r.forEach((j) => seen.add(j));
-		out.push({ cell: i, color: s.target[i], size: r.length });
-	}
-	return out;
+	const { target, top, filled } = s;
+	return floodAll(
+		s.w,
+		s.h,
+		target.length,
+		(i) => target[i] >= 0 && !top[i] && !filled[i],
+		(i, j) => target[i] === target[j]
+	).map((cells) => ({ cell: cells[0], color: target[cells[0]], size: cells.length }));
 }
 
 /**
@@ -490,8 +501,7 @@ function openRegions(s: State): { cell: number; color: number; size: number }[] 
 export function actions(s: State): Action[] {
 	const out: Action[] = [];
 	const regions = openRegions(s);
-	const inTray: number[] = new Array(s.colors.length).fill(0);
-	s.tray.forEach((q) => inTray[q.c]++);
+	const inTray = trayCounts(s);
 	for (const r of regions) {
 		if (inTray[r.color]) {
 			out.push({
@@ -503,10 +513,10 @@ export function actions(s: State): Action[] {
 		}
 	}
 	const groups = boardGroups(s);
+	const groupsOf = byColor(s, groups);
 	const places: Action[] = [];
 	for (const r of regions) {
-		for (const g of groups) {
-			if (g.color !== r.color) continue;
+		for (const g of groupsOf[r.color]) {
 			places.push({
 				sel: { from: 'board', cell: g.cells[0] },
 				dst: { to: 'spot', cell: r.cell },
@@ -517,29 +527,85 @@ export function actions(s: State): Action[] {
 	}
 	places.sort((x, y) => y.gain! - x.gain!);
 	out.push(...places);
+	const parks = parkings(s, groups, inTray);
+	parks.sort((x, y) => y.score! - x.score!);
+	out.push(...parks);
+	return out;
+}
 
-	// Parking: score each group by how many dots could be placed right after it lifts.
+/**
+ * `actions(s)[0]`, without listing the rest: the move greedy play makes. Parking is only
+ * scored when nothing can be placed.
+ */
+export function bestAction(s: State): Action | null {
+	const regions = openRegions(s);
+	const inTray = trayCounts(s);
+	for (const r of regions) {
+		if (inTray[r.color]) {
+			return {
+				sel: { from: 'tray', color: r.color },
+				dst: { to: 'spot', cell: r.cell },
+				kind: 'place',
+				gain: Math.min(r.size, inTray[r.color])
+			};
+		}
+	}
+	const groups = boardGroups(s);
+	const groupsOf = byColor(s, groups);
+	let best: Action | null = null;
+	for (const r of regions) {
+		for (const g of groupsOf[r.color]) {
+			const gain = Math.min(g.cells.length, r.size);
+			if (best && gain <= best.gain!) continue;
+			best = {
+				sel: { from: 'board', cell: g.cells[0] },
+				dst: { to: 'spot', cell: r.cell },
+				kind: 'place',
+				gain
+			};
+		}
+	}
+	if (best) return best;
+	for (const a of parkings(s, groups, inTray)) if (!best || a.score! > best.score!) best = a;
+	return best;
+}
+
+function trayCounts(s: State): number[] {
+	const inTray: number[] = new Array(s.colors.length).fill(0);
+	s.tray.forEach((q) => inTray[q.c]++);
+	return inTray;
+}
+
+function byColor(s: State, groups: Group[]): Group[][] {
+	const out: Group[][] = s.colors.map(() => []);
+	for (const g of groups) out[g.color].push(g);
+	return out;
+}
+
+/** Parking: score each group by how many dots could be placed right after it lifts. */
+function parkings(s: State, groups: Group[], inTray: number[]): Action[] {
 	const free = s.trayCap - s.tray.length;
 	const open: number[] = new Array(s.colors.length).fill(0);
 	s.target.forEach((c, i) => {
 		if (c >= 0 && !s.top[i] && !s.filled[i]) open[c]++;
 	});
-	const byColor: number[][] = s.colors.map(() => []);
-	groups.forEach((g) => byColor[g.color].push(g.cells.length));
-	byColor.forEach((sizes) => sizes.sort((x, y) => x - y));
+	const sizes: number[][] = s.colors.map(() => []);
+	groups.forEach((g) => sizes[g.color].push(g.cells.length));
+	sizes.forEach((xs) => xs.sort((x, y) => x - y));
 	const parks: Action[] = [];
+	const o = open.slice();
 	for (const g of groups) {
 		if (free <= 0) break;
 		const size = Math.min(free, g.cells.length);
-		const o = open.slice();
-		g.cells.forEach((i) => o[s.target[i]]++);
+		for (let c = 0; c < o.length; c++) o[c] = open[c];
+		for (const i of g.cells) o[s.target[i]]++;
 		let placeable = 0;
 		for (let c = 0; c < o.length; c++) {
 			const fromTray = Math.min(o[c], inTray[c] + (c === g.color ? size : 0));
 			let room = o[c] - fromTray;
 			placeable += fromTray;
 			let skipped = false;
-			for (const n of byColor[c]) {
+			for (const n of sizes[c]) {
 				if (c === g.color && n === size && !skipped) {
 					skipped = true;
 					continue;
@@ -556,9 +622,7 @@ export function actions(s: State): Action[] {
 			score: placeable - size * 1.2
 		});
 	}
-	parks.sort((x, y) => y.score! - x.score!);
-	out.push(...parks);
-	return out;
+	return parks;
 }
 
 /**
@@ -575,14 +639,14 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 		const path: Action[] = [];
 		let peak = s.tray.length;
 		while (!isWon(s) && path.length < limit) {
-			const acts = actions(s);
-			if (!acts.length) break;
-			let a = acts[0];
+			let a = bestAction(s);
+			if (!a) break;
 			if (t > 0 && rng() < 0.35) {
+				const acts = actions(s);
 				const parks = acts.filter((x) => x.kind === 'park');
 				const pool =
 					acts[0].kind === 'place' || !parks.length ? acts.slice(0, 3) : parks.slice(0, 4);
-				a = pool[Math.floor(rng() * pool.length)];
+				a = pickOne(pool, rng);
 			}
 			if (!move(s, a.sel, a.dst).ok) break;
 			path.push(a);
@@ -593,11 +657,40 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 	return null;
 }
 
+/** The standard tray: how many dots it holds. */
 export const TRAY = 20;
+/** The tray in relaxed mode: much bigger, never smaller than the level's own. */
+const RELAXED_TRAY = 40;
+
+/** Give a puzzle the relaxed tray. Changes nothing else, so the level stays the same. */
+export function relax(s: State): State {
+	s.trayCap = Math.max(s.trayCap, RELAXED_TRAY);
+	return s;
+}
 
 export interface BuildOptions {
 	/** A much bigger tray. */
 	relaxed?: boolean;
+}
+
+/** A built puzzle and the solver path that proved it can be finished. */
+export interface Built {
+	state: State;
+	solution: Solution;
+}
+
+/** Where play ends: the last level's index. Blob sizes stop growing there. */
+export const LAST_LEVEL = 199;
+
+/**
+ * How big the scattered blobs of dots are for the `index`th level. They grow all through
+ * play, from about half the tray (10 to 28 dots) at the first level to more than twice
+ * it (16 to 48) at the last, so later groups rarely fit the tray whole. Pictures grow
+ * faster than the blobs, so later levels still have more groups to sort.
+ */
+export function blobSizes(index: number): { min: number; max: number } {
+	const t = Math.min(1, Math.max(0, index / LAST_LEVEL));
+	return { min: Math.round(10 + 6 * t), max: Math.round(28 + 20 * t) };
 }
 
 /**
@@ -606,11 +699,16 @@ export interface BuildOptions {
  * standard tray, so every level is solvable.
  */
 export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
+	const { state } = buildSolved(level, index);
+	if (opts.relaxed) relax(state);
+	return state;
+}
+
+/** `buildPuzzle` (standard tray), plus the solution that let it keep its shuffle. */
+export function buildSolved(level: Level, index: number): Built {
 	const art = parseArt(level);
 	const base = hashStr(level.id);
-	// Blobs grow with the level: early pictures have medium blobs, later ones big ones.
-	const blobMin = Math.min(16, 6 + index);
-	const blobMax = Math.min(48, 16 + index * 3);
+	const { min: blobMin, max: blobMax } = blobSizes(index);
 
 	const make = (attempt: number): State => {
 		const colorsAt = scramble(art, blobMin, blobMax, makeRng(base + attempt * 7919));
@@ -628,25 +726,85 @@ export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}
 		};
 	};
 
-	let best: State | null = null;
 	for (let attempt = 0; attempt < 8; attempt++) {
 		const s = make(attempt);
 		const sol = solve(s, 2, attempt + 1, TRAY);
 		if (sol) {
 			s.minTray = sol.peak;
 			s.attempt = attempt;
-			best = s;
-			break;
+			return { state: s, solution: sol };
 		}
 	}
 	// Fallback (not expected): grow the tray to whatever the first shuffle needs.
-	if (!best) {
-		best = make(0);
-		const sol = solve(best, 1, 1, Infinity)!;
-		best.minTray = sol.peak;
-		best.trayCap = sol.peak + 2;
-		best.attempt = -1;
+	const s = make(0);
+	const sol = solve(s, 1, 1, Infinity)!;
+	s.minTray = sol.peak;
+	s.trayCap = sol.peak + 2;
+	s.attempt = -1;
+	return { state: s, solution: sol };
+}
+
+/** The board as laid out on screen, in pixels from the first cell's top-left corner. */
+export interface TapGrid {
+	w: number;
+	h: number;
+	/** A cell's width and height. */
+	cell: number;
+	/** From one cell to the next: a cell plus the gap. */
+	step: number;
+	/** How far from a cell's center a tap still reaches it: about a fingertip. */
+	reach: number;
+}
+
+/** The cell passing `ok` whose center is nearest (x, y), within `reach`. */
+function nearestTap(
+	g: TapGrid,
+	x: number,
+	y: number,
+	ok: (i: number) => boolean
+): { cell: number; d: number } | null {
+	const col = Math.floor(x / g.step);
+	const row = Math.floor(y / g.step);
+	const k = Math.ceil(g.reach / g.step) + 1;
+	let best = -1;
+	let bestD = Infinity;
+	for (let cy = Math.max(0, row - k); cy <= Math.min(g.h - 1, row + k); cy++) {
+		for (let cx = Math.max(0, col - k); cx <= Math.min(g.w - 1, col + k); cx++) {
+			const i = cy * g.w + cx;
+			if (!ok(i)) continue;
+			const d = Math.hypot(cx * g.step + g.cell / 2 - x, cy * g.step + g.cell / 2 - y);
+			if (d <= g.reach && d < bestD) {
+				bestD = d;
+				best = i;
+			}
+		}
 	}
-	if (opts.relaxed) best.trayCap = Math.max(best.trayCap, 40);
-	return best;
+	return best < 0 ? null : { cell: best, d: bestD };
+}
+
+/**
+ * Which cell a tap at (x, y) means (forgiving taps), or -1 when nothing useful is in reach.
+ * Useful cells are dots, and, with dots in hand, open spots of their color (`isDrop`;
+ * null when nothing is in hand).
+ * A direct hit, inside a useful cell's own square, wins. Otherwise the nearest useful
+ * cell wins; with dots in hand an open spot gets a little preference over a dot beside it.
+ */
+export function tapCell(
+	g: TapGrid,
+	x: number,
+	y: number,
+	isDot: (i: number) => boolean,
+	isDrop: ((i: number) => boolean) | null
+): number {
+	const col = Math.floor(x / g.step);
+	const row = Math.floor(y / g.step);
+	const inside = x - col * g.step < g.cell && y - row * g.step < g.cell;
+	if (inside && col >= 0 && row >= 0 && col < g.w && row < g.h) {
+		const i = row * g.w + col;
+		if (isDot(i) || isDrop?.(i)) return i;
+	}
+	const dot = nearestTap(g, x, y, isDot);
+	const drop = isDrop && nearestTap(g, x, y, isDrop);
+	if (drop && (!dot || drop.d * 0.65 <= dot.d)) return drop.cell;
+	return dot ? dot.cell : -1;
 }

@@ -1,147 +1,190 @@
 <!--
 	Forage: tap the front colony of a column; its ants eat exposed blocks of their color.
-	The engine mutates the state in place, so `version` is bumped after each change and
-	everything derived from the state reads it.
+	The level's life (building, undo, restart, the end panel, saving) is the shared
+	LevelControl; this keeps the picture, the colonies, the clock and the ants.
 -->
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	import * as E from './engine';
 	import type { Colony, Level, State } from './engine';
-	import { difficultyIndex } from '../shared/difficulty';
-	import { loadSave, persist, type Save } from './save';
-	import { blank } from '../shared/save';
+	import { levelDifficulty } from './difficulty';
+	import { forageSave } from './save';
+	import { inkOn, lighten } from '../shared/ink';
 	import LevelEnd from '../shared/game/LevelEnd.svelte';
 	import GameBar from '../shared/game/GameBar.svelte';
-	import { blip } from '../shared/sound';
+	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
+	import { plural } from '../shared/game/text';
 	import { AntLayer } from './ants';
-	import '../shared/game/joined.css';
+	import {
+		L,
+		linkColors,
+		lockColors,
+		rails as layRails,
+		segStyle,
+		type Group,
+		type Seg
+	} from './marks';
+	import 'ui/joined.css';
+	import '../shared/game/stage.css';
 
-	interface Props {
-		levels: Level[];
-		start?: number;
-		/** Play without reading or writing saved progress. */
-		sandbox?: boolean;
-		/** Where the list of all pictures lives; omit to hide the link. */
-		picturesHref?: string;
-		/** Each level's own page. When given, moving to another level navigates there. */
-		levelHref?: (index: number) => string;
-		/** On a page without a level in its URL: go to the saved level once it's known. */
-		resume?: boolean;
-	}
+	const props: LevelProps<Level, State> = $props();
 
-	let { levels, start, sandbox = false, picturesHref, levelHref, resume = false }: Props = $props();
-
+	/** Colonies shown in each lane; a count stands for the rest. */
 	const VISIBLE = 3;
 
-	let save: Save = $state(blank());
-	let levelIndex = $state(0);
-	let levelKey = $state(0);
-	let game: State | null = $state.raw(null);
-	let version = $state(0);
-	let initial: State | null = null;
-	let history: State[] = [];
-	let historyLen = $state(0);
-	/** Read out to screen readers only; the game shows what happens instead of narrating it. */
-	let status = $state('');
-	/** Brief visual cues for a tap that can't go. */
-	let flashId = $state(-1);
-	let flashKey = $state(-1);
-	let flashCol = $state(-1);
-	let slotsFlash = $state(false);
-	let overlay: 'win' | 'stuck' | null = $state(null);
-	let winText = $state('');
-	let won = $state(false);
-	let reduceMotion: MediaQueryList | null = null;
-	let rootEl: HTMLElement | undefined = $state();
+	let ants: AntLayer | null = null;
+	let tickCount = 0;
 
-	const level = $derived(levels[levelIndex]);
-	const title = $derived(level ? `${levelIndex + 1} / ${levels.length} · ${level.name}` : '');
-	const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+	const ctl = new LevelControl<Level, State>(
+		{
+			save: forageSave,
+			build: E.buildPuzzle,
+			clone: E.clone,
+			isWon: E.isWon,
+			isStuck: E.isStuck,
+			reset: () => ants?.clear(),
+			key: (_e, key) => {
+				const n = Number(key);
+				if (game && n >= 1 && n <= game.columns.length) {
+					send(n - 1);
+					return true;
+				}
+			},
+			wonStatus: 'Picture cleared.',
+			winDelay: 1100,
+			stuckDelay: 400,
+			maxHistory: 300
+		},
+		() => props
+	);
+	const game = $derived(ctl.state);
 
-	function keep() {
-		if (!sandbox) persist(save);
-	}
+	/** Brief visual cues for a tap that can't go: a linked group, a locked column (its lane and key), the slots. */
+	const flashGroup = ctl.cue(-1);
+	const flashCol = ctl.cue(-1);
+	const slotsFlash = ctl.cue(false);
 
-	function sound(i: number, soft = false) {
-		if (!save.muted) blip(i, soft);
-	}
-
-	function say(msg: string) {
-		status = msg;
-	}
-
-	/** Mark something for a moment: a still outline, no motion. */
-	const cueTimers: ReturnType<typeof setTimeout>[] = [];
-	function cue(set: (on: boolean) => void, ms = 900) {
-		set(true);
-		cueTimers.push(setTimeout(() => set(false), ms));
-	}
-
-	/** Black or white text, whichever reads better on `hex`. */
-	function inkOn(hex: string) {
-		const n = parseInt(hex.slice(1), 16);
-		const lum = 0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
-		return lum > 150 ? '#1b1b24' : '#ffffff';
-	}
+	/** How far the front colony lightens toward white on hover; its count's ink is picked again for that shade. */
+	const HOVER_LIGHTEN = 0.22;
 
 	// ---------- what to draw ----------
 	/** The parts of the state the template shows, read through `version` so moves redraw them. */
 	const view = $derived.by(() => {
-		void version;
+		void ctl.version;
 		if (!game) return null;
 		return {
 			alive: game.alive.slice(),
 			slots: game.slots.slice(),
-			columns: game.columns.map((col) => col.slice()),
 			left: E.blocksLeft(game)
 		};
 	});
 
 	const board = $derived.by(() => {
-		void version;
+		void ctl.version;
 		const s = game;
 		if (!s) return null;
 		const out = E.outside(s);
 		const keys: Record<number, number> = {};
-		s.locks.forEach((cell, k) => {
-			if (cell >= 0 && E.hasLock(s, k)) keys[cell] = k;
+		/** Per column: whether its lock is still there. */
+		const locked = s.locks.map((cell, k) => cell >= 0 && E.hasLock(s, k, out));
+		locked.forEach((on, k) => {
+			if (on) keys[s.locks[k]] = k;
 		});
 		// Working colonies with nothing of their color to reach are just waiting.
-		const hungry = s.slots.map((e) => !!e && E.isWaiting(s, e));
-		return { out, keys, hungry };
+		const hungry = s.slots.map((e) => !!e && E.isWaiting(s, e, out));
+		return { out, keys, locked, hungry };
 	});
 
 	type Item = { kind: 'colony'; e: Colony; front: boolean } | { kind: 'lock'; key: number };
 	/** Each column top to bottom, with its lock in front of the colony it blocks. */
 	const columnItems = $derived.by(() => {
-		void version;
-		if (!game) return [];
+		void ctl.version;
+		if (!game || !board) return [];
+		const { lockAt } = game;
+		const { locked } = board;
 		return game.columns.map((col, k) => {
 			const items: Item[] = col.map((e) => ({ kind: 'colony', e, front: false }));
-			if (E.hasLock(game!, k)) items.splice(game!.lockAt[k], 0, { kind: 'lock', key: k });
+			if (locked[k]) items.splice(lockAt[k], 0, { kind: 'lock', key: k });
 			if (items[0]?.kind === 'colony') items[0].front = true;
 			return items;
 		});
 	});
 
-	const levelDifficulty = (lv: Level) => difficultyIndex(lv.wins);
+	const difficulty = $derived(ctl.level ? levelDifficulty(ctl.level) : null);
 
-	/** Linked pairs get a letter so you can match them up. */
-	const linkLetter = $derived.by(() => {
-		void version;
-		const letters: Record<number, string> = {};
-		if (!game) return letters;
-		let n = 0;
-		for (const col of [game.slots.filter((e): e is Colony => !!e), ...game.columns]) {
-			for (const e of col) {
-				if (e.link === undefined || e.id in letters) continue;
-				letters[e.id] = letters[e.link] = 'ABCDEFGH'[n++ % 8];
+	/**
+	 * Markers, read from the deal so sends, undo and restart never change them:
+	 * each linked group's color, and each lock's color.
+	 */
+	const marks = $derived.by(() => {
+		const deal = ctl.initial;
+		return {
+			link: deal ? linkColors(deal) : new Map<number, string>(),
+			lock: deal ? lockColors(deal) : {}
+		};
+	});
+	const linkColor = (e: Colony) => (e.link === undefined ? undefined : marks.link.get(e.link));
+
+	/** Each linked group's rails in the slots and in the lanes, and the lanes' counts that hide a member. */
+	const links = $derived.by(() => {
+		void ctl.version;
+		const collect = (
+			put: (add: (e: Colony | null, col: number, depth: number) => void) => void
+		) => {
+			// Built fresh each time and never drawn, so it needn't be reactive.
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			const byGroup = new Map<number, Group>();
+			put((e, col, depth) => {
+				const g = e?.link;
+				if (g === undefined) return;
+				if (!byGroup.has(g)) byGroup.set(g, { g, members: [] });
+				byGroup.get(g)!.members.push({ col, depth });
+			});
+			return [...byGroup.values()];
+		};
+		const inSlots = collect((add) => game?.slots.forEach((e, col) => add(e, col, 0)));
+		const inLanes = collect((add) =>
+			columnItems.forEach((items, col) =>
+				items.forEach((item, depth) => item.kind === 'colony' && add(item.e, col, depth))
+			)
+		);
+		const slots = layRails(inSlots, {
+			cols: view?.slots.length ?? 0,
+			rows: 1,
+			taken: (col) => !!game?.slots[col]
+		});
+		const lanes = layRails(inLanes, {
+			cols: columnItems.length,
+			rows: VISIBLE,
+			taken: (col, depth) => depth < columnItems[col].length,
+			// The lanes' bottom edge, under their counts.
+			floor: L(0, VISIBLE, 0, 14)
+		});
+		// A lane's count takes the color of the nearest group it hides a member of,
+		// when that group shows a member elsewhere.
+		const more: Record<number, string> = {};
+		const nearest: Record<number, number> = {};
+		for (const { g, members } of inLanes) {
+			if (!members.some((m) => m.depth < VISIBLE)) continue;
+			for (const m of members) {
+				if (m.depth < VISIBLE || m.depth >= (nearest[m.col] ?? Infinity)) continue;
+				nearest[m.col] = m.depth;
+				more[m.col] = marks.link.get(g)!;
 			}
 		}
-		return letters;
+		return { slots, lanes, more };
 	});
+
+	/**
+	 * The group whose lane the pointer is over, when that lane's front colony is
+	 * linked: a tap sends the whole group, so every member it can see lightens.
+	 */
+	let hoverGroup = $state<number | undefined>(undefined);
+	function hoverLane(k: number, on: boolean) {
+		const head = columnItems[k]?.[0];
+		hoverGroup = on && head?.kind === 'colony' ? head.e.link : undefined;
+	}
 
 	function colonyLabel(e: Colony, front: boolean) {
 		if (e.mystery && !front) return 'Mystery colony';
@@ -149,74 +192,27 @@
 		return `${name} colony, ${plural(e.n, 'ant', 'ants')}${e.link !== undefined ? ', linked' : ''}`;
 	}
 
-	// ---------- level setup ----------
-	/**
-	 * Set up level i. No saving and no page access, so it also runs on the server:
-	 * the page arrives with its picture and colonies already drawn.
-	 */
-	function buildLevel(i: number) {
-		overlay = null;
-		levelIndex = i;
-		game = E.buildPuzzle(levels[i], i);
-		initial = E.clone(game);
-		history = [];
-		historyLen = 0;
-		won = false;
-		levelKey++;
-		version++;
-		ants?.clear();
-		say(`${levels[i].name}.`);
-	}
-
-	function startLevel(i: number) {
-		buildLevel(i);
-		save.level = i;
-		keep();
-	}
-
-	/** Another level: its own page when there is one, else in place. */
-	function goLevel(i: number) {
-		if (levelHref) goto(levelHref(i));
-		else startLevel(i);
-	}
-
-	// Moving between level pages reuses this component with a new `start`.
-	$effect(() => {
-		const next = start;
-		untrack(() => {
-			if (next !== undefined && next !== levelIndex) startLevel(next);
-		});
-	});
-
 	// ---------- moves ----------
 	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
 	const TICK_MS = 100;
 
 	function send(col: number) {
 		const s = game;
-		if (!s || overlay || E.isWon(s)) return;
+		if (!s || ctl.overlay || E.isWon(s)) return;
 		const before = E.clone(s);
 		const r = E.send(s, col);
 		if (!r.ok) {
 			explain(r.reason, col);
-			sound(0, true);
+			ctl.sound(0, true);
 			return;
 		}
-		history.push(before);
-		if (history.length > 300) history.shift();
-		historyLen = history.length;
-		stuckShown = false;
-		version++;
-		sound(6);
+		ctl.record(before);
+		ctl.touch();
+		ctl.sound(6);
 		launch(r.dispatched);
 	}
 
 	let stageEl: HTMLElement | undefined = $state();
-	let antLayer: HTMLElement | undefined = $state();
-	let ants: AntLayer | null = null;
-	$effect(() => {
-		if (antLayer) ants = new AntLayer(antLayer);
-	});
 
 	let pictureEl: HTMLElement | undefined = $state();
 	/**
@@ -227,7 +223,7 @@
 	 */
 	function launch(list: E.Dispatch[]) {
 		const s = game;
-		if (!ants || !stageEl || !pictureEl || !s || reduceMotion?.matches) return;
+		if (!ants || !stageEl || !pictureEl || !s || ctl.still) return;
 		const box = stageEl.getBoundingClientRect();
 		const first = pictureEl.querySelector<HTMLElement>('.px');
 		if (!first) return;
@@ -239,11 +235,18 @@
 		const y0 = r0.top - box.top + cellPx / 2;
 		const at = (p: { x: number; y: number }) => ({ x: x0 + p.x * pitch, y: y0 + p.y * pitch });
 		const edgeY = at({ x: 0, y: s.h }).y;
+		// Read every slot's place before any ant is added, so the page lays out once.
+		const slotRects = new Map(
+			list.map((d) => [
+				d.slot,
+				stageEl!.querySelector(`[data-slot="${d.slot}"]`)?.getBoundingClientRect()
+			])
+		);
 		for (const d of list) {
-			const slot = stageEl.querySelector(`[data-slot="${d.slot}"]`)?.getBoundingClientRect();
+			const slot = slotRects.get(d.slot);
 			if (!slot) continue;
 			const sx = slot.left + slot.width / 2 - box.left;
-			const pts = E.antPath(s, d.slot, d.cell);
+			const pts = E.antPath(s, d);
 			// Join the path at its bottom-edge point nearest the slot.
 			let j = 0;
 			for (let k = 1; k < pts.length && pts[k].y === s.h; k++) {
@@ -254,177 +257,101 @@
 		}
 	}
 
-	let stuckShown = false;
-	let tickCount = 0;
-	/** One step of time: working colonies eat. Paused while a menu is open or the picture is done. */
+	/** One step of time: working colonies eat. Paused while the end panel shows or the picture is done. */
 	function runTick() {
 		const s = game;
-		if (!s || overlay || won) return;
+		if (!s || ctl.overlay || ctl.won) return;
 		const r = E.tick(s);
 		if (r.dispatched.length) {
-			version++;
+			ctl.touch();
 			launch(r.dispatched);
 		}
 		if (r.eaten.length) {
-			version++;
-			if (tickCount++ % 2 === 0) sound(r.eaten.length + tickCount / 2, true);
+			ctl.touch();
+			if (tickCount++ % 2 === 0) ctl.sound(r.eaten.length + tickCount / 2, true);
 			if (r.unlocked.length) {
-				say(`Column ${r.unlocked.map((k) => k + 1).join(' and ')} opened.`);
-				sound(9);
+				ctl.say(`Column ${r.unlocked.map((k) => k + 1).join(' and ')} opened.`);
+				ctl.sound(9);
 			}
-			if (r.won) win();
-		} else if (!stuckShown && E.isStuck(s)) {
-			stuckShown = true;
-			setTimeout(() => game === s && E.isStuck(s) && (overlay = 'stuck'), 400);
+			if (r.won) ctl.settle();
+		} else {
+			// Nothing eaten: maybe nothing can be, so the stuck panel shows (after a moment).
+			ctl.settle();
 		}
 	}
 
 	/** A tap that can't go: show why with a quick cue, not a message. */
 	function explain(reason: string, col: number) {
 		if (reason === 'locked') {
-			cue((on) => (flashCol = on ? col : -1));
-			cue((on) => (flashKey = on ? col : -1));
-			say(`Column ${col + 1} is locked until its key is uncovered.`);
+			flashCol.show(col);
+			ctl.say(`Column ${col + 1} is locked until its key is uncovered.`);
 		} else if (reason === 'partner') {
-			const link = game?.columns[col][0]?.link ?? -1;
-			cue((on) => (flashId = on ? link : -1));
-			say('Linked: its partner has to be at the front too.');
+			flashGroup.show(game?.columns[col][0]?.link ?? -1);
+			ctl.say('Linked: the rest of its group has to be at the front too.');
 		} else if (reason === 'no-slot') {
-			cue((on) => (slotsFlash = on));
-			say('Every slot is busy.');
+			slotsFlash.show(true);
+			ctl.say('Every slot is busy.');
 		}
 	}
-
-	function win() {
-		const lv = levels[levelIndex];
-		save.completed[lv.id] = true;
-		keep();
-		won = true;
-		say('Picture cleared.');
-		setTimeout(() => {
-			if (!game || !E.isWon(game)) return;
-			winText = `${lv.name}, cleared in ${plural(game.moves, 'move', 'moves')}.`;
-			overlay = 'win';
-		}, 1100);
-	}
-
-	function undo() {
-		if (!history.length || (overlay && overlay !== 'stuck')) return;
-		overlay = null;
-		game = history.pop()!;
-		historyLen = history.length;
-		won = false;
-		stuckShown = false;
-		ants?.clear();
-		version++;
-		say('Undone.');
-	}
-
-	function restart() {
-		if (!game || !initial || overlay) return;
-		if (game.moves > 0) {
-			history.push(game);
-			historyLen = history.length;
-		}
-		game = E.clone(initial);
-		won = false;
-		stuckShown = false;
-		ants?.clear();
-		version++;
-		say('Started over.');
-	}
-
-	function toggleSound() {
-		save.muted = !save.muted;
-		keep();
-		if (!save.muted) blip(4);
-	}
-
-	function onKey(e: KeyboardEvent) {
-		if ((e.target as Element).closest?.('input, textarea, select')) return;
-		if (e.metaKey || e.ctrlKey || e.altKey) {
-			if (e.key.toLowerCase() === 'z' && !e.altKey) {
-				e.preventDefault();
-				undo();
-			}
-			return;
-		}
-		const key = e.key.toLowerCase();
-		const n = Number(e.key);
-		if (game && n >= 1 && n <= game.columns.length) send(n - 1);
-		else if (key === 'z') undo();
-		else if (key === 'r') restart();
-	}
-
-	// The page's own level, built right away (on the server too). Later changes to
-	// `start` come through the effect above.
-	untrack(() => {
-		if (start !== undefined) buildLevel(Math.min(Math.max(0, start), levels.length - 1));
-	});
 
 	onMount(() => {
-		reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-		if (!sandbox) save = loadSave();
-		const saved = Math.min(Math.max(0, save.level | 0), levels.length - 1);
-		if (resume && levelHref && saved !== levelIndex) {
-			goto(levelHref(saved), { replace: true });
-		} else if (start === undefined) {
-			startLevel(saved);
-		} else {
-			// The page's level was built already (also on the server); remember it.
-			save.level = levelIndex;
-			keep();
-		}
+		const unmount = ctl.mount();
 		const clock = setInterval(runTick, TICK_MS);
 		return () => {
+			unmount();
 			clearInterval(clock);
-			cueTimers.forEach(clearTimeout);
 			ants?.clear();
 		};
 	});
 </script>
 
-<svelte:document onkeydown={onKey} />
+<svelte:document onkeydown={ctl.onKey} />
 
-<div class="forage" bind:this={rootEl} style:--w={game?.w ?? 1} style:--h={game?.h ?? 1}>
-	<GameBar
-		game="forage"
-		label={title}
-		difficulty={level ? levelDifficulty(level) : null}
-		canUndo={historyLen > 0}
-		muted={save.muted}
-		{picturesHref}
-		onundo={undo}
-		onrestart={restart}
-		onsound={toggleSound}
-	/>
+<!-- Linked groups' rails: bars in the group's color in the gaps between colonies, never across one. -->
+{#snippet railBars(list: { g: number; segs: Seg[] }[])}
+	{#each list as r (r.g)}
+		{#each r.segs as seg, j (j)}
+			<span
+				class="rail"
+				class:flash={flashGroup.value === r.g}
+				style="{segStyle(seg)};--g:{marks.link.get(r.g)}"
+				aria-hidden="true"
+			></span>
+		{/each}
+	{/each}
+{/snippet}
 
-	<p class="sr-only" aria-live="polite">{status}</p>
+<div class="forage" style:--w={game?.w ?? 1} style:--h={game?.h ?? 1}>
+	<GameBar {...ctl.bar} game="forage" label={ctl.label} {difficulty} />
+
+	<p class="sr-only" aria-live="polite">{ctl.status}</p>
 
 	{#if game && board && view}
 		<div
 			class="stage"
-			class:won
+			class:won={ctl.won}
 			bind:this={stageEl}
 			style:--n={view.slots.length}
 			style:--cols={columnItems.length}
 		>
-			{#key levelKey}
+			{#key ctl.key}
 				<div
-					class="picture joined-top"
+					class="picture joined-top snapped"
 					bind:this={pictureEl}
 					role="img"
-					aria-label="{level.name}: {view.left} food left"
+					aria-label="{ctl.level.name}: {view.left} food left"
 				>
 					{#each game.target as c, i (i)}
 						{#if view.alive[i]}
 							<div class="px food" data-i={i} style:--c={game.colors[c].hex}>
 								{#if i in board.keys}
+									<!-- A key: ringed in its lock's color. -->
 									<span
 										class="key"
-										class:flash={flashKey === board.keys[i]}
-										title="Key for column {board.keys[i] + 1}">{board.keys[i] + 1}</span
-									>
+										class:flash={flashCol.value === board.keys[i]}
+										style:--m={marks.lock[board.keys[i]]}
+										title="Key for column {board.keys[i] + 1}"
+									></span>
 								{/if}
 							</div>
 						{:else if board.out[i]}
@@ -436,102 +363,119 @@
 				</div>
 			{/key}
 
-			<div class="ant-layer" bind:this={antLayer} aria-hidden="true"></div>
+			<div
+				class="ant-layer"
+				{@attach (node) => {
+					ants = new AntLayer(node);
+				}}
+				aria-hidden="true"
+			></div>
 			<!-- One tab under the picture: the working slots, then the colonies' lanes. -->
-			<div class="tab joined-tab">
-				<div class="slots" class:flash={slotsFlash} aria-label="Working slots">
+			<div class="tab joined-tab snapped">
+				<div class="slots" class:flash={slotsFlash.value} aria-label="Working slots">
 					{#each view.slots as e, k (k)}
 						<div class="slot" data-slot={k}>
 							{#if e}
 								{@const done = E.isDone(e)}
+								{@const g = e.link}
 								<div
 									class="colony"
-									class:waiting={board.hungry[k]}
-									class:flash={flashId === e.id}
+									class:linked={g !== undefined}
+									class:flash={g !== undefined && flashGroup.value === g}
+									style:--g={linkColor(e)}
 									style:--c={game.colors[e.c].hex}
 									style:--ink={inkOn(game.colors[e.c].hex)}
 									aria-label="{done
-										? 'Done, waiting for its linked partner'
+										? 'Done, waiting for its linked group'
 										: board.hungry[k]
 											? 'Waiting'
 											: 'Working'}: {colonyLabel(e, true)}"
 								>
 									<!-- Counts down as its ants leave. -->
 									<span class="count">{done ? '✓' : e.n > 0 ? e.n : ''}</span>
-									{#if e.link !== undefined}<span class="link-badge">{linkLetter[e.id]}</span>{/if}
 								</div>
 							{/if}
 						</div>
 					{/each}
+					{@render railBars(links.slots)}
 				</div>
 				<!-- The end panel takes the lanes' place, so nothing on the page moves. -->
 				<div class="lanes-area">
-					<div class="lanes" class:hidden={!!overlay}>
+					<div class="lanes" class:hidden={!!ctl.overlay}>
 						{#each columnItems as items, k (k)}
 							{@const head = items[0]}
 							<!-- A lane is one button: tapping it sends the colony at its front. -->
 							<button
 								class="lane"
-								class:flash={flashCol === k}
+								class:flash={flashCol.value === k}
 								disabled={!head}
 								aria-label="Column {k + 1}: {!head
 									? 'empty'
 									: head.kind === 'lock'
-										? `locked until key ${k + 1} in the picture touches the outside`
+										? 'locked until its key in the picture touches the outside'
 										: colonyLabel(head.e, true)}{items.length > 1
 									? `, ${items.length - 1} more`
 									: ''}"
 								onclick={() => send(k)}
+								onpointerenter={(ev) => ev.pointerType === 'mouse' && hoverLane(k, true)}
+								onpointerleave={() => hoverLane(k, false)}
+								onfocus={(ev) => ev.currentTarget.matches(':focus-visible') && hoverLane(k, true)}
+								onblur={() => hoverLane(k, false)}
 							>
 								{#each items.slice(0, VISIBLE) as item (item.kind === 'lock' ? 'lock' : item.e.id)}
 									{#if item.kind === 'lock'}
+										<!-- Ringed in its key's color. -->
 										<span
 											class="lock"
-											class:behind={head !== item}
-											title="Locked until key {k + 1} in the picture touches the outside"
+											style:--m={marks.lock[k]}
+											title="Locked until its key in the picture touches the outside"
 										>
 											<svg viewBox="0 0 24 24"
 												><rect x="5" y="11" width="14" height="10" rx="2" /><path
 													d="M8 11V7a4 4 0 0 1 8 0v4"
 												/></svg
 											>
-											<span class="key-badge">{k + 1}</span>
 										</span>
 									{:else}
 										{@const e = item.e}
 										{@const hidden = !item.front && !!e.mystery}
+										{@const g = e.link}
+										{@const lights = item.front || g !== undefined}
 										<span
 											class="colony"
-											class:behind={!item.front}
-											class:flash={flashId === e.id}
+											class:front={item.front}
+											class:linked={g !== undefined}
+											class:lit={g !== undefined && hoverGroup === g}
+											class:flash={g !== undefined && flashGroup.value === g}
+											style:--g={linkColor(e)}
 											style:--c={hidden ? 'var(--hole)' : game.colors[e.c].hex}
 											style:--ink={hidden ? 'var(--text-color)' : inkOn(game.colors[e.c].hex)}
+											style:--c-hover={lights && !hidden
+												? lighten(game.colors[e.c].hex, HOVER_LIGHTEN)
+												: undefined}
+											style:--ink-hover={lights && !hidden
+												? inkOn(lighten(game.colors[e.c].hex, HOVER_LIGHTEN))
+												: undefined}
 										>
 											<span class="count">{hidden ? '?' : e.n}</span>
-											{#if e.link !== undefined}<span class="link-badge">{linkLetter[e.id]}</span
-												>{/if}
 										</span>
 									{/if}
 								{/each}
-								{#if items.length > VISIBLE}<span class="more">+{items.length - VISIBLE}</span>{/if}
+								{#if items.length > VISIBLE}<span
+										class="more"
+										class:linked={k in links.more}
+										style:--g={links.more[k]}>+{items.length - VISIBLE}</span
+									>{/if}
 							</button>
 						{/each}
+						{@render railBars(links.lanes)}
 					</div>
-					{#if overlay}
+					{#if ctl.overlay}
 						<LevelEnd
-							plain
-							state={overlay === 'win' ? 'won' : 'stuck'}
-							text={overlay === 'win'
-								? winText
+							{...ctl.end}
+							text={ctl.overlay === 'win'
+								? `${ctl.level.name} cleared.`
 								: 'every slot is busy and no colony at the front can finish'}
-							nextHref={levelHref?.((levelIndex + 1) % levels.length)}
-							onnext={() => goLevel((levelIndex + 1) % levels.length)}
-							{picturesHref}
-							onundo={undo}
-							onrestart={() => {
-								overlay = null;
-								restart();
-							}}
 						/>
 					{/if}
 				</div>
@@ -563,9 +507,9 @@
 			1px
 		);
 		--cell: calc(var(--pitch) - var(--gap));
-		/* The picture with its walking ring: (w + 2) cells and (w + 3) gaps. */
-		--picture-w: calc((var(--w) + 2) * var(--pitch) + var(--gap));
-		--slot-size: 44px;
+		/* The picture with its walking ring, (w + 2) cells and (w + 3) gaps, in the card's bevel. */
+		--picture-w: calc((var(--w) + 2) * var(--pitch) + var(--gap) + 2 * var(--card-bevel));
+		--slot-size: 52px;
 		--colony: 36px;
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		--hole: color-mix(in srgb, var(--text-color) 18%, var(--primary-color));
@@ -587,15 +531,6 @@
 		gap: 10px;
 		-webkit-tap-highlight-color: transparent;
 	}
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip: rect(0 0 0 0);
-		white-space: nowrap;
-	}
-
 	svg {
 		width: 18px;
 		height: 18px;
@@ -607,15 +542,20 @@
 	}
 
 	/*
-	 * The picture and the slots are one piece (see joined.css), so the ants walk out
+	 * The picture and the slots are one card (ui/joined.css), so the ants walk out
 	 * of their slot straight into the picture's margin. The picture is at least
 	 * wide enough for the slots' tab and the curves beside it.
 	 */
 	.stage {
 		/* Slots and lanes share one pitch, so a colony is the same size in both. */
+		--lane-pitch: calc(var(--slot-size) + 8px);
+		--pad: calc((var(--slot-size) - var(--colony)) / 2);
 		--slots-w: calc(var(--n) * var(--slot-size) + (var(--n) - 1) * 8px);
 		--lanes-w: calc(var(--cols) * var(--slot-size) + (var(--cols) - 1) * 8px);
-		--tab-w: calc(max(var(--slots-w), var(--lanes-w)) + 20px);
+		/* The tab's side padding (roomier than its 8px top and bottom) and bevel on each side. */
+		--tab-pad: 14px;
+		--tab-edges: calc(2 * (var(--tab-pad) + var(--card-bevel)));
+		--tab-w: calc(max(var(--slots-w), var(--lanes-w)) + var(--tab-edges));
 		--board-w: min(100cqw, max(var(--picture-w), calc(var(--tab-w) + 48px)));
 		position: relative;
 		align-self: stretch;
@@ -624,17 +564,11 @@
 		align-items: flex-start;
 		margin-top: 4px;
 	}
-	.stage.won {
-		--edge: var(--secondary-color);
-	}
-	.picture,
-	.tab {
-		margin-left: max(0px, round(down, calc((100cqw - var(--snap-w)) / 2), 1px));
-	}
 	/* Inside the tab, the slots and the lanes are each centered on whole pixels. */
 	.slots,
 	.lanes {
-		margin-left: round(down, calc((var(--tab-w) - 20px - var(--row-w)) / 2), 1px);
+		position: relative;
+		margin-left: round(down, calc((var(--tab-w) - var(--tab-edges) - var(--row-w)) / 2), 1px);
 	}
 	.picture {
 		--snap-w: var(--board-w);
@@ -666,22 +600,32 @@
 		background: var(--hole);
 		border-radius: 2px;
 	}
+	/*
+	 * A lock and its key share a marker color, only ever as a ring, never a fill,
+	 * so a marker can't pass for food.
+	 * A key keeps its food's color, ringed in its lock's color with a thin grey edge,
+	 * so it shows on any food.
+	 */
 	.key {
 		position: absolute;
-		inset: -1px;
-		display: grid;
-		place-items: center;
-		border-radius: 50%;
-		background: var(--primary-color);
-		color: var(--text-color);
-		font-family: Courier, monospace;
-		font-size: max(8px, calc(var(--cell) * 0.6));
-		font-weight: 700;
-		box-shadow: 0 0 0 2px var(--text-color);
+		inset: -3px;
+		border-radius: 4px;
 		z-index: 2;
+		box-shadow:
+			inset 0 0 0 2px var(--m),
+			0 0 0 1px var(--text-color-st);
+	}
+	.key::before {
+		content: '';
+		position: absolute;
+		inset: 3px;
+		border-radius: 1px;
+		background: var(--c);
 	}
 	.key.flash {
-		box-shadow: 0 0 0 3px var(--accent-color);
+		box-shadow:
+			inset 0 0 0 2px var(--m),
+			0 0 0 3px var(--accent-color);
 	}
 
 	.ant-layer {
@@ -690,21 +634,16 @@
 		pointer-events: none;
 		z-index: 20;
 	}
-	/* An ant is a pixel of its food's color; carrying, it gets a second ring. */
+	/* An ant is a small round dot of its food's color, ringed like the site's other pieces. */
 	.ant-layer :global(.ant) {
 		position: absolute;
 		width: var(--size);
 		height: var(--size);
 		margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+		border-radius: 50%;
 		background: var(--crumb);
-		box-shadow: 0 0 0 1px var(--primary-color);
+		box-shadow: 0 0 0 1px var(--text-color-st);
 		will-change: transform;
-	}
-	.ant-layer :global(.ant.carrying) {
-		background: var(--crumb);
-		box-shadow:
-			0 0 0 1px var(--text-color),
-			0 0 0 2px var(--primary-color);
 	}
 
 	/* The tab: working slots on top, the colonies' lanes under them. */
@@ -715,7 +654,7 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 8px;
-		padding: 8px;
+		padding: 8px var(--tab-pad);
 	}
 	.slots {
 		--row-w: var(--slots-w);
@@ -761,11 +700,11 @@
 		box-sizing: border-box;
 		width: var(--slot-size);
 		height: calc(var(--slot-size) * 3 + 14px);
-		padding: calc((var(--slot-size) - var(--colony)) / 2) 0;
+		padding: var(--pad) 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: calc(var(--slot-size) - var(--colony));
+		gap: calc(2 * var(--pad));
 		border: 0;
 		border-radius: 10px;
 		background: var(--well);
@@ -773,24 +712,26 @@
 		color: var(--text-color);
 		cursor: pointer;
 	}
-	/* The site's hover ring, on the whole lane. */
-	.lane::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		border-radius: 10px;
-		opacity: 0;
-		box-shadow: var(--shadow);
-		transform: scale(0.92);
-		transition: all 200ms;
+	/*
+	 * The whole lane takes the tap, but only the front colony, what a tap sends,
+	 * shows it: it lightens on hover and presses down when tapped. When it's
+	 * linked, the rest of its group lightens with it (.lit), since they go too.
+	 */
+	.colony.front,
+	.colony.linked {
+		transition: background-color 150ms;
 	}
-	.lane:not(:disabled):hover::before,
-	.lane:focus-visible::before {
-		opacity: 1;
-		transform: scale(1.04);
+	.lane:not(:disabled):hover .colony.front,
+	.lane:focus-visible .colony.front,
+	.colony.lit {
+		background: var(--c-hover, color-mix(in srgb, var(--c), white 22%));
 	}
-	.lane:not(:disabled):active {
+	.lane:not(:disabled):hover .colony.front .count,
+	.lane:focus-visible .colony.front .count,
+	.colony.lit .count {
+		color: var(--ink-hover, var(--ink));
+	}
+	.lane:not(:disabled):active .colony.front {
 		transform: translate(0, 1px);
 	}
 	.lane:disabled {
@@ -802,6 +743,8 @@
 			0 0 0 2px var(--accent-color);
 	}
 	.colony {
+		/* Its own ring; a linked colony adds its group's halo outside it. */
+		--ring: var(--inset);
 		position: relative;
 		flex: none;
 		width: var(--colony);
@@ -812,73 +755,62 @@
 		display: grid;
 		place-items: center;
 		padding: 0;
-		box-shadow: var(--inset);
+		box-shadow: var(--ring);
 		font-family: Courier, monospace;
 		font-weight: 700;
-		font-size: 14px;
+		font-size: 15px;
+	}
+	/* The site styles every element's text and font, so the count sets its own. */
+	.count {
+		color: var(--ink);
+		font: inherit;
+	}
+	/*
+	 * The front colony, what a tap sends, is raised like a key: a solid ring and a
+	 * lip along its bottom. The ones behind lie flat in full color.
+	 */
+	.colony.front {
+		--ring: inset 0 0 0 2px var(--text-color), inset 0 -5px 0 rgb(0 0 0 / 0.22);
+		padding-bottom: 3px;
+	}
+	/*
+	 * A linked colony wears its group's color as a 2px halo just outside, with a
+	 * thin gap so it never runs into the colony's own color. Its rails meet the halo.
+	 */
+	.colony.linked {
+		box-shadow:
+			var(--ring),
+			0 0 0 calc(var(--pad) / 2 - 2px) var(--well),
+			0 0 0 calc(var(--pad) / 2) var(--g);
 	}
 	.colony.flash {
 		box-shadow:
-			var(--inset),
+			var(--ring),
 			0 0 0 3px var(--accent-color);
 	}
-	/* Behind the front, waiting their turn: there, but not what a tap sends. */
-	.colony.behind,
-	.lock.behind {
-		opacity: 0.4;
-	}
-	/* A working colony with nothing it can reach is just waiting. */
-	.colony.waiting {
-		opacity: 0.45;
-	}
-	.count {
-		color: var(--ink);
-		font-family: Courier, monospace;
-	}
-	.link-badge {
-		position: absolute;
-		top: -6px;
-		right: -6px;
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		background: var(--primary-color);
-		color: var(--text-color);
-		font-family: Courier, monospace;
-		font-size: 11px;
-		font-weight: 700;
-		display: grid;
-		place-items: center;
-		box-shadow: 0 0 0 2px var(--text-color);
-	}
-	/* A lock sits in the lane in front of the colonies it holds back. */
+	/* A lock sits in the lane in front of the colonies it holds back, ringed in its key's color. */
 	.lock {
 		position: relative;
 		flex: none;
-		box-sizing: border-box;
 		width: var(--colony);
 		height: var(--colony);
 		border-radius: 10px;
 		display: grid;
 		place-items: center;
-		border: 2px dashed var(--text-color);
 		color: var(--text-color);
+		background: var(--well);
+		box-shadow: inset 0 0 0 3px var(--m);
 	}
-	.key-badge {
+	/* A rail: one bar of a linked group's path, over the lanes, in the group's color. */
+	.rail {
 		position: absolute;
-		right: -7px;
-		top: -7px;
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		background: var(--primary-color);
-		color: var(--text-color);
-		display: grid;
-		place-items: center;
-		font-family: Courier, monospace;
-		font-size: 11px;
-		font-weight: 700;
-		box-shadow: 0 0 0 2px var(--text-color);
+		z-index: 1;
+		pointer-events: none;
+		border-radius: 2px;
+		background: var(--g);
+	}
+	.rail.flash {
+		box-shadow: 0 0 0 2px var(--accent-color);
 	}
 	/* How many more wait behind the three shown, along the lane's bottom. */
 	.more {
@@ -892,6 +824,11 @@
 		font-size: 12px;
 		color: var(--muted);
 	}
+	/* A count hiding a linked colony takes its group's color; that group's rail ends under it. */
+	.more.linked {
+		color: var(--g);
+		font-weight: 700;
+	}
 
 	/* The lanes give way to the level end, keeping their room. */
 	.hidden {
@@ -899,15 +836,18 @@
 	}
 	@media (max-width: 420px) {
 		.forage {
-			--slot-size: 40px;
+			--slot-size: 44px;
 			--colony: 32px;
+		}
+		.colony {
+			font-size: 14px;
 		}
 	}
 	@media (max-width: 500px) {
 		/* Phones: the picture takes the full width (the page scrolls if the colonies end up below). */
 		.forage {
 			--gap: 1px;
-			--room-w: calc(100cqw - 8px);
+			--room-w: calc(100cqw - 8px - 2 * var(--card-bevel));
 			--pitch: round(down, clamp(8px, calc(var(--room-w) / (var(--w) + 2)), 24px), 1px);
 		}
 		:global(body .content:has(> .forage)) {

@@ -3,7 +3,7 @@
  * a palette of a few colors that are easy to tell apart, and rows of color letters.
  * Pure: no DOM, so tests can run it.
  */
-import { MIN_DELTA, deltaE, rgbToHex, rgbToLab, type Lab } from '../palette.ts';
+import { MIN_DELTA, deltaE, lab, rgbToHex, rgbToLab, type Lab } from '../palette.ts';
 
 export interface QuantizeOptions {
 	/** Most colors to keep. */
@@ -97,16 +97,20 @@ export function quantize(
 	}
 
 	// Merge colors that look alike, smaller into bigger, until every pair is far enough apart.
+	// Compare the colors the palette will hold (each cluster's average RGB, rounded to hex),
+	// not the average Lab: the two can differ enough to put a pair just under minDelta.
 	const into = clusters.map((_, j) => j);
 	const find = (j: number): number => (into[j] === j ? j : (into[j] = find(into[j])));
+	const shown = (cl: Cluster) => lab(rgbToHex(...cl.rgb));
 	for (;;) {
+		const labs = clusters.map(shown);
 		let pair: [number, number] | null = null;
 		let pd = minDelta;
 		for (let a = 0; a < clusters.length; a++) {
 			if (find(a) !== a || !clusters[a].n) continue;
 			for (let b = a + 1; b < clusters.length; b++) {
 				if (find(b) !== b || !clusters[b].n) continue;
-				const d = deltaE(clusters[a].lab, clusters[b].lab);
+				const d = deltaE(labs[a], labs[b]);
 				if (d < pd) {
 					pd = d;
 					pair = [a, b];
@@ -129,7 +133,7 @@ export function quantize(
 	// Tiny colors (often soft edges between two areas) make tiny groups: fold them into the nearest color.
 	const minCount = Math.max(3, Math.round(pixels.length * (opts.minShare ?? 0.03)));
 	for (;;) {
-		const live = clusters.map((cl, j) => j).filter((j) => find(j) === j && clusters[j].n > 0);
+		const live = clusters.map((_, j) => j).filter((j) => find(j) === j && clusters[j].n > 0);
 		if (live.length <= 2) break;
 		const small = live
 			.filter((j) => clusters[j].n < minCount)

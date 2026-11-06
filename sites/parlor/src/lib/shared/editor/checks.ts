@@ -3,14 +3,8 @@
  * are easy to tell apart. Each game adds its own checks on top (can it be won, how
  * hard is it). Imports use `.ts` so node scripts can load this file directly.
  */
-import { closePairs } from '../palette.ts';
-
-export interface Picture {
-	id: string;
-	name: string;
-	palette: Record<string, string>;
-	art: string[];
-}
+import type { Picture } from '../level.ts';
+import { closePairs, MIN_DELTA } from '../palette.ts';
 
 export interface PictureCheck {
 	w: number;
@@ -40,10 +34,15 @@ export function checkPicture(lv: Picture): PictureCheck {
 	for (const k of Object.keys(counts)) if (!(k in lv.palette)) problems.push(`"${k}" has no color`);
 	if (Object.keys(counts).length < 2) problems.push('needs at least 2 colors');
 	for (const p of closePairs(lv.palette, Object.keys(counts))) {
-		problems.push(`${p.a} and ${p.b} look alike (${p.delta.toFixed(0)}, needs 28)`);
+		problems.push(`${p.a} and ${p.b} look alike (${p.delta.toFixed(0)}, needs ${MIN_DELTA})`);
 	}
 	for (const k of Object.keys(lv.palette)) if (!counts[k]) warnings.push(`${k} isn't used`);
 	if (w > 40 || h > 44) warnings.push(`${w}x${h} is very big for a phone`);
 	const pixels = Object.values(counts).reduce((a, b) => a + b, 0);
 	return { w, h, counts, pixels, problems, warnings };
+}
+
+/** A 0 to 1 share as a whole percent, like "42%". */
+export function pct(x: number): string {
+	return `${Math.round(100 * x)}%`;
 }

@@ -1,31 +1,32 @@
 // Node-side level loading for tests and scripts (the site uses import.meta.glob instead).
 import { readdirSync, readFileSync } from 'node:fs';
 
+import type { GameId } from '../src/lib/games.ts';
 import type { Level } from '../src/lib/mosaic/engine.ts';
+import type { Pack, Picture } from '../src/lib/shared/level.ts';
+import { levelsFrom, type PackFiles } from '../src/lib/shared/levels.ts';
 
-export type Game = 'mosaic' | 'forage';
+const levelsDir = (game: GameId) => new URL(`../src/lib/${game}/levels/`, import.meta.url);
 
-export const levelsDir = (game: Game) => new URL(`../src/lib/${game}/levels/`, import.meta.url);
-
-export interface PackFile<L = Level> {
-	id: string;
+export interface PackFile<L extends Picture = Level> extends Pack<L> {
 	path: URL;
-	name: string;
-	levels: L[];
 }
 
-export function loadPacks<L = Level>(game: Game = 'mosaic'): PackFile<L>[] {
+/** The game's pack files, read the way its levels/index.ts globs them. */
+function read<L extends Picture>(game: GameId) {
 	const dir = levelsDir(game);
-	return readdirSync(dir)
-		.filter((f) => f.endsWith('.json'))
-		.sort()
-		.map((f) => {
-			const path = new URL(f, dir);
-			const pack = JSON.parse(readFileSync(path, 'utf8'));
-			return { id: f.slice(0, -'.json'.length), path, ...pack };
-		});
+	const files: PackFiles<L> = {};
+	for (const f of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+		files[f] = { default: JSON.parse(readFileSync(new URL(f, dir), 'utf8')) };
+	}
+	return { dir, ...levelsFrom(files) };
 }
 
-export function loadLevels<L = Level>(game: Game = 'mosaic'): L[] {
-	return loadPacks<L>(game).flatMap((p) => p.levels);
+export function loadPacks<L extends Picture = Level>(game: GameId = 'mosaic'): PackFile<L>[] {
+	const { dir, PACKS } = read<L>(game);
+	return PACKS.map((p) => ({ ...p, path: new URL(`${p.id}.json`, dir) }));
+}
+
+export function loadLevels<L extends Picture = Level>(game: GameId = 'mosaic'): L[] {
+	return read<L>(game).LEVELS;
 }

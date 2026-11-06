@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import * as G from '../src/lib/shared/editor/grid.ts';
 import { closePairs } from '../src/lib/shared/palette.ts';
 import { quantize } from '../src/lib/shared/editor/quantize.ts';
+import { makeRng } from '../src/lib/shared/engine.ts';
 import { reportLevel } from '../src/lib/mosaic/report.ts';
 import { loadLevels } from './levels.ts';
 
@@ -41,10 +42,32 @@ test('quantize: keeps distinct colors, merges look-alikes, empties transparent p
 	assert.deepEqual(closePairs(q.palette), []);
 });
 
-test('quantize: lone pixels take their neighbors color', () => {
+test('quantize: the colors it writes are far enough apart, even on a noisy gradient', () => {
+	// Merging by average Lab once let this one through: the written hex colors (average
+	// RGB) of two kept colors came out just under MIN_DELTA.
+	const w = 24;
+	const h = 20;
+	const rng = makeRng(54);
+	const data: number[] = [];
+	const noise = () => (rng() - 0.5) * 60;
+	const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+	for (let y = 0; y < h; y++) {
+		for (let x = 0; x < w; x++) {
+			const t = x / (w - 1);
+			const u = y / (h - 1);
+			data.push(byte(40 + 180 * t + noise()), byte(200 - 120 * u + noise()));
+			data.push(byte(60 + 100 * t * u + noise()), 255);
+		}
+	}
+	const q = quantize(data, w, h, { colors: 8 });
+	assert.ok(Object.keys(q.palette).length >= 4);
+	assert.deepEqual(closePairs(q.palette), []);
+});
+
+test("quantize: lone pixels take their neighbors' color", () => {
 	const rows = ['WWWWW', 'WWKWW', 'WWWWW', 'KKKKK'];
 	const data = pixels(rows, { W: [255, 255, 255, 255], K: [20, 20, 30, 255] });
-	assert.equal(quantize(data, 5, 4, { colors: 2, despeckle: 0 }).art[1], 'AAMAA'.replace('M', 'B'));
+	assert.equal(quantize(data, 5, 4, { colors: 2, despeckle: 0 }).art[1], 'AABAA');
 	assert.equal(quantize(data, 5, 4, { colors: 2, despeckle: 1 }).art[1], 'AAAAA');
 });
 

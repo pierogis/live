@@ -1,10 +1,10 @@
 /*
- * Ants walking between the working slots and the picture. They're short-lived
- * nodes in an overlay layer that Svelte doesn't render, so they're plain DOM,
- * animated with the Web Animations API and timed to the engine's walking ticks.
+ * Ants walking between the working slots and the picture: sprites (see
+ * shared/game/sprites.ts), timed to the engine's walking ticks.
  * Each ant follows the path the engine found for it, so what you see is what
  * takes the time.
  */
+import { canAnimate, Sprites } from '../shared/game/sprites';
 
 type Point = { x: number; y: number };
 
@@ -39,52 +39,32 @@ function frames(path: Point[], origin: Point): Keyframe[] {
 	}));
 }
 
-export class AntLayer {
+/** The ants on the board, drawn into `layer`. */
+export class AntLayer extends Sprites {
 	#layer: HTMLElement;
-	#live = new Set<{ node: HTMLElement; anims: Animation[] }>();
 
 	constructor(layer: HTMLElement) {
+		super();
 		this.#layer = layer;
 	}
 
-	/**
-	 * One ant: along `path` to its food over `ms`, then back the same way carrying
-	 * a bit of the food's color.
-	 */
+	/** One ant: along `path` to its food over `ms`, then back the same way. */
 	run(path: Point[], ms: number, hex: string, size: number) {
-		if (this.#live.size >= MAX_ANTS || path.length < 2 || !Element.prototype.animate) return;
+		if (this.size >= MAX_ANTS || path.length < 2 || !canAnimate()) return;
 		const origin = path[0];
 		const node = document.createElement('div');
 		node.className = 'ant';
 		node.style.cssText = `--size:${size}px;--crumb:${hex};left:${origin.x}px;top:${origin.y}px`;
-		this.#layer.append(node);
-		const ant = { node, anims: [] as Animation[] };
-		this.#live.add(ant);
+		const ant = this.add(this.#layer, node);
 
 		const duration = Math.max(100, ms);
-		const out = node.animate(frames(path, origin), { duration, fill: 'forwards' });
-		ant.anims.push(out);
+		const out = this.animate(ant, frames(path, origin), { duration, fill: 'forwards' });
 		out.onfinish = () => {
-			node.classList.add('carrying');
-			const back = node.animate(frames([...path].reverse(), origin), {
+			const back = this.animate(ant, frames([...path].reverse(), origin), {
 				duration,
 				fill: 'forwards'
 			});
-			ant.anims.push(back);
-			back.onfinish = () => this.#drop(ant);
+			back.onfinish = () => this.drop(ant);
 		};
-	}
-
-	clear() {
-		for (const a of [...this.#live]) this.#drop(a);
-	}
-
-	#drop(a: { node: HTMLElement; anims: Animation[] }) {
-		for (const anim of a.anims) {
-			anim.onfinish = null;
-			anim.cancel();
-		}
-		a.node.remove();
-		this.#live.delete(a);
 	}
 }

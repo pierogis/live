@@ -1,50 +1,125 @@
 /*
- * How hard a Forage deal is: play it many times with random players.
+ * One report per Forage level: is the picture usable, what got dealt, how hard
+ * the deal is, and how much it makes you wait. Used by the editor (live, as you
+ * paint), `pnpm -F parlor levels` and `forage:tune`.
+ * Difficulty is how often a good player wins, measured by playing it many times
+ * with each of these (see player.ts):
+ *   strong: a careful player who thinks a move or two ahead
+ *   clean: the rule of thumb: send a colony that finishes right away when there
+ *     is one, else park the best-looking one
+ *   look: the same rule, choosing among the ones that finish with look ahead
  *   careless: sends any colony that can go
- *   careful: prefers colonies that will finish eating without having to wait
+ * A level's win share is the best of them: a deal whose trap catches one
+ * player's habits isn't hard if another way of playing walks through it.
+ * Then its cruxes (cruxes.ts) say whether it's hard the way a person finds it:
+ * where the rule of thumb breaks, and how often.
  * Imports use `.ts` so node scripts can load this file directly.
  */
+import { checkPicture } from '../shared/editor/checks.ts';
+import { analyze, type Analysis, type Budget } from './cruxes.ts';
 import * as F from './engine.ts';
+import { carelessGame, winsOf } from './player.ts';
 
 export interface Difficulty {
-	/** Share of careless games won, 0 to 1. */
+	/** The best of the players, 0 to 1: what the level's difficulty index comes from. */
+	wins: number;
+	/** Share of strong games won, 0 to 1. */
+	strong: number;
+	/** Share of rule-of-thumb games won, picking at random among sends that finish. */
+	clean: number;
+	/** Share of rule-of-thumb games won, picking among sends that finish with look ahead. */
+	look: number;
+	/** Share of careless (random) games won, 0 to 1. */
 	careless: number;
-	/** Share of careful games won, 0 to 1. */
-	careful: number;
 }
 
-export function playRandom(s0: F.State, seed: number, careful: boolean): boolean {
-	const s = F.clone(s0);
-	const rng = F.makeRng(seed);
-	while (!F.isWon(s)) {
-		const legal = F.legalPicks(s);
-		if (!legal.length) return false;
-		let pool = legal;
-		if (careful) {
-			const clean = legal.filter((c) => F.wouldWait(s, c) === false);
-			if (clean.length) pool = clean;
-		}
-		F.pick(s, pool[Math.floor(rng() * pool.length)]);
-	}
-	return true;
+/** Difficulty not measured. */
+export const UNMEASURED: Difficulty = {
+	wins: NaN,
+	strong: NaN,
+	clean: NaN,
+	look: NaN,
+	careless: NaN
+};
+
+/** Games of each kind per level for `forage:tune` and `pnpm levels --measure`. */
+export const GAMES = 16;
+
+/** Share of `rollouts` careless games won. */
+function winShare(s: F.State, rollouts: number): number {
+	let won = 0;
+	for (let k = 1; k <= rollouts; k++) if (carelessGame(s, k)) won++;
+	return won / rollouts;
 }
 
-export function measure(s: F.State, rollouts = 30): Difficulty {
-	let careless = 0;
-	let careful = 0;
-	for (let k = 1; k <= rollouts; k++) {
-		if (playRandom(s, k, false)) careless++;
-		if (playRandom(s, k * 7 + 3, true)) careful++;
-	}
-	return { careless: careless / rollouts, careful: careful / rollouts };
+/** `games` games by each player. */
+export function measure(s: F.State, games = GAMES): Difficulty {
+	const strong = winsOf('strong', s, games);
+	const clean = winsOf('clean', s, games);
+	const look = winsOf('look', s, games);
+	const careless = winShare(s, games);
+	return { wins: Math.max(strong, clean, look, careless), strong, clean, look, careless };
 }
 
-/** Share of careless games a level at this place in play order should let you win. */
+/** Places in play order the difficulty ramp spans after the teaching levels: to level 200. */
+const RAMP = 195;
+
+/**
+ * Share of games (see Difficulty.wins) a level at this place in play order should let you win.
+ * The first five teach the game, so you basically always win; then it falls
+ * steadily to about 1 in 5 by level 200, with an easier breather every sixth.
+ */
 export function targetWins(index: number): number {
-	// Eases from about 88% down toward 22%, with an easier breather every sixth level.
-	const base = 0.22 + 0.66 * Math.exp(-index / 25);
-	const breather = index % 6 === 5 ? 0.25 : 0;
-	return Math.min(0.92, base + breather);
+	const t = Math.min(1, Math.max(0, index - 4) / RAMP);
+	const base = 1 - 0.8 * t ** 0.8;
+	const breather = index % 6 === 5 ? 0.2 : 0;
+	return Math.min(1, base + breather);
+}
+
+/** How much the built-in play makes you wait: the pressure a deal puts on the slots. */
+export interface Pressure {
+	/** Sends after which a colony sat waiting in its slot for its food to open up. */
+	waits: number;
+	/** Colonies that held their slot through 3 or more later sends. */
+	longWaits: number;
+	/** Linked groups that held their slots through 3 or more later sends, some waiting. */
+	heldPairs: number;
+	/** Sends in the built-in play. */
+	sends: number;
+}
+
+/** How long colonies wait in the built-in play, counted in sends. */
+export function pressure(s0: F.State): Pressure {
+	const s = F.clone(s0);
+	/** Per colony out working: the send it went out on. */
+	const outAt = new Map<number, number>();
+	/** Linked groups already counted as held. */
+	const counted = new Set<number>();
+	const groupOf = new Map(s0.columns.flat().map((e) => [e.id, e.link]));
+	let waits = 0;
+	let longWaits = 0;
+	let heldPairs = 0;
+	const intended = s0.intended ?? [];
+	intended.forEach((col, k) => {
+		const r = F.pick(s, col);
+		if (!r.ok) return;
+		if (r.parked.length) waits++;
+		for (const e of s.slots) if (e && !outAt.has(e.id)) outAt.set(e.id, k);
+		const here = new Set(s.slots.flatMap((e) => (e ? [e.id] : [])));
+		for (const [id, at] of outAt) {
+			if (here.has(id)) continue;
+			outAt.delete(id);
+			if (k - at < 3) continue;
+			// A group counts once: its colonies all leave together.
+			const link = groupOf.get(id);
+			if (link === undefined) longWaits++;
+			else if (!counted.has(link)) {
+				counted.add(link);
+				heldPairs++;
+			}
+		}
+	});
+	return { waits, longWaits, heldPairs, sends: intended.length };
 }
 
 export interface ForageReport {
@@ -56,20 +131,50 @@ export interface ForageReport {
 	links: number;
 	locks: number;
 	mystery: number;
-	/** The built-in winning play works. */
-	intendedWins: boolean;
 	difficulty: Difficulty;
+	/** Where it's hard (see cruxes.ts); null when not asked for. */
+	cruxes: Analysis | null;
+	pressure: Pressure | null;
 	target: number;
+	/** Must fix: the level can't ship like this. */
 	problems: string[];
-	ms: number;
+	/** Worth a look, but playable. */
+	warnings: string[];
 }
 
-export function reportForage(lv: F.Level, index: number, rollouts = 30): ForageReport {
-	const t0 = performance.now();
-	const problems: string[] = [];
+/**
+ * Check a level as if it were the `index`th level in play order. `games` games
+ * by each player measure how hard it is (0 skips that); `budget` finds its
+ * cruxes (none skips that).
+ */
+export function reportForage(
+	lv: F.Level,
+	index: number,
+	games = GAMES,
+	budget?: Budget
+): ForageReport {
+	const picture = checkPicture(lv);
+	const { problems, warnings } = picture;
+	const target = targetWins(index);
+	if (problems.length) {
+		return {
+			w: picture.w,
+			h: picture.h,
+			blocks: picture.pixels,
+			colors: Object.keys(picture.counts).length,
+			colonies: 0,
+			links: 0,
+			locks: 0,
+			mystery: 0,
+			difficulty: UNMEASURED,
+			cruxes: null,
+			pressure: null,
+			target,
+			problems,
+			warnings
+		};
+	}
 	const s = F.buildPuzzle(lv, index);
-	const ok = F.wins(s);
-	if (!ok) problems.push('the built-in winning play does not win');
 	const colonies = s.columns.flat();
 	return {
 		w: s.w,
@@ -77,13 +182,14 @@ export function reportForage(lv: F.Level, index: number, rollouts = 30): ForageR
 		blocks: s.target.filter((c) => c >= 0).length,
 		colors: s.colors.length,
 		colonies: colonies.length,
-		links: colonies.filter((c) => c.link !== undefined).length / 2,
+		links: new Set(colonies.flatMap((c) => (c.link === undefined ? [] : [c.link]))).size,
 		locks: s.locks.filter((k) => k >= 0).length,
 		mystery: colonies.filter((c) => c.mystery).length,
-		intendedWins: ok,
-		difficulty: rollouts ? measure(s, rollouts) : { careless: NaN, careful: NaN },
-		target: targetWins(index),
+		difficulty: games ? measure(s, games) : UNMEASURED,
+		cruxes: budget ? analyze(s, budget) : null,
+		pressure: pressure(s),
+		target,
 		problems,
-		ms: performance.now() - t0
+		warnings
 	};
 }

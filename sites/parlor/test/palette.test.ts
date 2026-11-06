@@ -1,26 +1,25 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { closePairs } from '../src/lib/shared/palette.ts';
+import { GAME_IDS } from '../src/lib/games.ts';
+import { checkPicture } from '../src/lib/shared/editor/checks.ts';
 import { loadPacks } from './levels.ts';
 
-for (const pack of loadPacks()) {
-	for (const lv of pack.levels) {
-		test(`${pack.id}/${lv.id}: colors are easy to tell apart`, () => {
-			const used = new Set(lv.art.join('').replace(/\./g, ''));
-			for (const k of used) assert.ok(k in lv.palette, `"${k}" has a color`);
-			const close = closePairs(lv.palette, used);
-			assert.deepEqual(
-				close.map(
-					(p) => `${p.a} ${lv.palette[p.a]} vs ${p.b} ${lv.palette[p.b]}: ${p.delta.toFixed(1)}`
-				),
-				[]
-			);
-		});
+for (const game of GAME_IDS) {
+	const packs = loadPacks(game);
+	for (const pack of packs) {
+		for (const lv of pack.levels) {
+			test(`${game} ${pack.id}/${lv.id}: every color is there and easy to tell apart`, () => {
+				assert.deepEqual(checkPicture(lv).problems, []);
+			});
+		}
 	}
-}
 
-test('level ids are unique', () => {
-	const ids = loadPacks().flatMap((p) => p.levels.map((l) => l.id));
-	assert.equal(new Set(ids).size, ids.length);
-});
+	test(`${game}: level ids are unique across all packs`, () => {
+		const ids = packs.flatMap((p) => p.levels.map((l) => l.id));
+		assert.deepEqual(
+			ids.filter((id, i) => ids.indexOf(id) !== i),
+			[]
+		);
+	});
+}
