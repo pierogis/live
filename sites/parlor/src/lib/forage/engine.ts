@@ -237,6 +237,21 @@ export function isWon(s: State): boolean {
 	return !s.alive.some(Boolean);
 }
 
+/** Whether any food of color c is left: in the picture, or still to come from a dispenser. */
+export function foodLeft(s: State, c: number): boolean {
+	for (let i = 0; i < s.target.length; i++) if (s.alive[i] && s.target[i] === c) return true;
+	for (const d of s.dispensers ?? []) {
+		if (!s.alive[d.cell]) continue;
+		// Each color's run of the dispenser ends here; a run of c not handed out yet is food left.
+		let end = 0;
+		for (let k = 0; k < d.colors.length; k++) {
+			end += d.amounts[k];
+			if (d.colors[k] === c && d.used < end) return true;
+		}
+	}
+	return false;
+}
+
 /** Food still to eat: in the picture, and still in the dispensers. */
 export function blocksLeft(s: State): number {
 	let n = s.alive.filter(Boolean).length;

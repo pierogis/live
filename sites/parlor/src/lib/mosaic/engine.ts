@@ -303,6 +303,14 @@ export function selectionDots(s: State, sel: Sel | null): Held[] | null {
 	return dots.length ? dots : null;
 }
 
+/** Whether every spot of `color` has its dot. */
+export function colorDone(s: State, color: number): boolean {
+	for (let i = 0; i < s.target.length; i++) {
+		if (s.target[i] === color && !s.filled[i]) return false;
+	}
+	return true;
+}
+
 export function openCount(s: State, color: number): number {
 	let n = 0;
 	for (let i = 0; i < s.target.length; i++) {

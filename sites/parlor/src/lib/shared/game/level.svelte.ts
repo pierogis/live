@@ -20,7 +20,7 @@ import { goto } from '$app/navigation';
 import type { Listed, Picture } from '../level';
 import { hashStr } from '../engine';
 import { memoryStore, type GameSave, type Save, type SaveStore } from '../save';
-import { blip } from '../sound';
+import { music, type Music, type Rhythm } from '../sound';
 import { Cue } from './cue.svelte';
 
 interface CommonProps<S> {
@@ -90,6 +90,8 @@ export interface LevelGame<L extends Picture, S> {
 	stuckDelay?: number;
 	/** Undo steps kept; 500 by default. */
 	maxHistory?: number;
+	/** How its landings come, for the music: a run's beat, and whether the beats between tune notes play. */
+	rhythm: Rhythm;
 }
 
 export class LevelControl<L extends Picture, S extends { moves: number }> {
@@ -228,9 +230,14 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.status = msg;
 	}
 
-	/** A blip, unless muted; `i` steps the pitch up. */
-	sound(i: number, soft = false) {
-		if (!this.save.muted) blip(i, soft);
+	/** The level's music, or null while the sound is off: `ctl.music?.note(hex)`. */
+	get music(): Music | null {
+		return this.save.muted ? null : music;
+	}
+
+	/** Color `hex` was just finished: its sound, unless that finished the picture (the win has its own). */
+	finished(hex: string) {
+		if (this.state && !this.#game.isWon(this.state)) this.music?.done(hex);
 	}
 
 	/** A cue that's turned off when the game goes away. */
@@ -293,6 +300,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.options = options;
 		this.#history = [];
 		this.key++;
+		music.seed(hashStr(this.level.id), this.#game.rhythm);
 		g.reset?.(s, 'level');
 		this.touch();
 		this.say(`${this.level.name}.`);
@@ -317,6 +325,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.#history.push(before);
 		if (this.#history.length > (this.#game.maxHistory ?? 500)) this.#history.shift();
 		this.#stuckSeen = false;
+		// Quick moves swell the music.
+		this.music?.move();
 	}
 
 	/** Call when the board is still: wins, or shows the stuck panel when no way is left. */
@@ -342,6 +352,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 			s.completed[id] = true;
 		});
 		this.won = true;
+		this.music?.cadence();
 		this.say(g.wonStatus);
 		this.#later(g.winDelay ?? 900, () => {
 			if (this.state && g.isWon(this.state)) this.overlay = 'win';
@@ -382,7 +393,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.#write((s) => {
 			s.muted = muted;
 		});
-		if (!muted) blip(4);
+		if (muted) music.hush();
+		else music.chime();
 	};
 
 	/** For `<svelte:document onkeydown>`: Z undoes, R restarts, then the game's own keys. */

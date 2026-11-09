@@ -34,8 +34,35 @@
 	/** Colonies shown in each lane; a count stands for the rest. */
 	const VISIBLE = 3;
 
+	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
+	const TICK_MS = 100;
+
 	let ants: AntLayer | null = null;
-	let tickCount = 0;
+	/** Colors whose food is all gone, and heard so. Only the sound reads it, so it needn't be reactive. */
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	let finished = new Set<number>();
+
+	/**
+	 * Color c's last food may just have gone from sight: sound it once it's gone
+	 * in the engine with no drawn ant still on its way to some (an ant carries its
+	 * food's color, a dispenser's too).
+	 */
+	function checkFinished(c: number) {
+		const s = game;
+		if (!s || finished.has(c)) return;
+		const hex = s.colors[c].hex;
+		if (ants?.coming(hex) || E.foodLeft(s, c)) return;
+		finished.add(c);
+		ctl.finished(hex);
+	}
+
+	/** A drawn ant got to its block: it goes from sight now, with the tune's next note. */
+	function arrived(hex: string) {
+		ctl.touch();
+		ctl.music?.note(hex);
+		const c = game?.colors.findIndex((x) => x.hex === hex) ?? -1;
+		if (c >= 0) checkFinished(c);
+	}
 
 	const ctl = new LevelControl<Level, State>(
 		{
@@ -44,7 +71,13 @@
 			clone: E.clone,
 			isWon: E.isWon,
 			isStuck: E.isStuck,
-			reset: () => ants?.clear(),
+			reset: (s) => {
+				ants?.clear();
+				// Colors already done here aren't heard again.
+				finished = new Set(s.colors.map((_, c) => c).filter((c) => !E.foodLeft(s, c)));
+			},
+			// Ants get to their blocks on the clock's ticks: a sixteenth each, resting between tune notes.
+			rhythm: { beat: TICK_MS / 1000, fill: false },
 			key: (_e, key) => {
 				const n = Number(key);
 				if (game && n >= 1 && n <= game.columns.length) {
@@ -197,8 +230,6 @@
 	}
 
 	// ---------- moves ----------
-	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
-	const TICK_MS = 100;
 	/** When the last tick ran: an ant's block goes on a tick, so its walk is timed to end on one. */
 	let lastTick = 0;
 
@@ -206,15 +237,16 @@
 		const s = game;
 		if (!s || ctl.overlay || E.isWon(s)) return;
 		const before = E.clone(s);
+		const front = s.columns[col][0];
 		const r = E.send(s, col);
 		if (!r.ok) {
 			explain(r.reason, col);
-			ctl.sound(0, true);
+			ctl.music?.nope();
 			return;
 		}
 		ctl.record(before);
 		ctl.touch();
-		ctl.sound(6);
+		ctl.music?.tap(front && s.colors[front.c].hex);
 		launch(r.dispatched);
 	}
 
@@ -278,11 +310,14 @@
 		}
 		if (r.eaten.length) {
 			ctl.touch();
-			if (tickCount++ % 2 === 0) ctl.sound(r.eaten.length + tickCount / 2, true);
+			// Drawn ants play the tune as they get to their blocks; with none drawn, the clock does.
+			if (ctl.still) ctl.music?.note(s.colors[r.eaten[0].c].hex);
 			if (r.unlocked.length) {
 				ctl.say(`Column ${r.unlocked.map((k) => k + 1).join(' and ')} opened.`);
-				ctl.sound(9);
+				ctl.music?.chime();
 			}
+			// A color's last food eaten with no drawn ant to show it: heard now.
+			for (const c of new Set(r.eaten.map((e) => e.c))) checkFinished(c);
 			if (r.won) ctl.settle();
 		} else {
 			// Nothing eaten: maybe nothing can be, so the stuck panel shows (after a moment).
@@ -519,8 +554,8 @@
 			<div
 				class="ant-layer"
 				{@attach (node) => {
-					// A drawn ant got to its block: it goes from sight now.
-					ants = new AntLayer(node, () => ctl.touch());
+					// A drawn ant got to its block: it goes from sight now, with the tune's next note.
+					ants = new AntLayer(node, arrived);
 				}}
 				aria-hidden="true"
 			></div>

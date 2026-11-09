@@ -46,12 +46,14 @@ function frames(path: Point[], origin: Point): Keyframe[] {
  */
 export class AntLayer extends Sprites {
 	#layer: HTMLElement;
-	#arrived: () => void;
+	#arrived: (hex: string) => void;
 	/** Blocks a drawn ant is still walking to. */
 	readonly bound = new Set<number>();
+	/** How many drawn ants of each color are still walking to their blocks. */
+	#coming = new Map<string, number>();
 
-	/** `arrived` is called whenever a drawn ant gets to its block. */
-	constructor(layer: HTMLElement, arrived: () => void) {
+	/** `arrived` is called with its color whenever a drawn ant gets to its block. */
+	constructor(layer: HTMLElement, arrived: (hex: string) => void) {
 		super();
 		this.#layer = layer;
 		this.#arrived = arrived;
@@ -66,12 +68,14 @@ export class AntLayer extends Sprites {
 		node.style.cssText = `--size:${size}px;--crumb:${hex};left:${origin.x}px;top:${origin.y}px`;
 		const ant = this.add(this.#layer, node);
 		this.bound.add(cell);
+		this.#coming.set(hex, this.coming(hex) + 1);
 
 		const duration = Math.max(100, ms);
 		const out = this.animate(ant, frames(path, origin), { duration, fill: 'forwards' });
 		out.onfinish = () => {
 			this.bound.delete(cell);
-			this.#arrived();
+			this.#coming.set(hex, this.coming(hex) - 1);
+			this.#arrived(hex);
 			const back = this.animate(ant, frames([...path].reverse(), origin), {
 				duration,
 				fill: 'forwards'
@@ -80,8 +84,14 @@ export class AntLayer extends Sprites {
 		};
 	}
 
+	/** How many drawn ants of color `hex` are still on their way. */
+	coming(hex: string): number {
+		return this.#coming.get(hex) ?? 0;
+	}
+
 	clear() {
 		super.clear();
 		this.bound.clear();
+		this.#coming.clear();
 	}
 }

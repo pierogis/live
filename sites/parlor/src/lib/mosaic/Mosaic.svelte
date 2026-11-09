@@ -71,6 +71,8 @@
 					resetZoom();
 				}
 			},
+			// A move's dots land a stagger apart: a sixteenth note each, with a quiet pattern between tune notes.
+			rhythm: { beat: STAGGER / 1000, fill: true },
 			key: (e, key) => {
 				if (e.key === 'Escape') {
 					if (sel) select(null);
@@ -461,7 +463,7 @@
 		const res = E.move(game, sel, dst);
 		if (!res.ok) {
 			explain(res);
-			ctl.sound(0, true);
+			ctl.music?.nope();
 			return;
 		}
 		ctl.record(before);
@@ -571,7 +573,23 @@
 
 	function animate(res: MoveResult, rects: Map<number, DOMRect>) {
 		if (!res.ok || !game) return;
-		const colors = game.colors;
+		const s = game;
+		const colors = s.colors;
+		// A move's dots are all one color. One that finishes it sounds so as its last dot lands.
+		const toSpots = [...res.toBoard, ...res.fromTray];
+		const moved = (toSpots[0] ?? res.toTray[0])?.c ?? 0;
+		const hex = colors[moved].hex;
+		const finishes = toSpots.length > 0 && E.colorDone(s, moved);
+		let landing = toSpots.length;
+		const landSpot = (cell: number) => {
+			pendingCells.delete(cell);
+			ctl.music?.note(hex);
+			if (--landing === 0 && finishes) ctl.finished(hex);
+		};
+		const landTray = (id: number) => {
+			pendingTray.delete(id);
+			ctl.music?.note(hex, true);
+		};
 		const fly = (
 			c: number,
 			id: number,
@@ -589,23 +607,13 @@
 				onLand,
 				onSettle: () => ctl.settle()
 			});
-		res.toBoard.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landCell(p.cell, k)));
+		res.toBoard.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landSpot(p.cell)));
 		res.toTray.forEach((p, k) => {
 			const to = trayEl?.querySelector<HTMLElement>(`[data-id="${p.id}"]`) ?? null;
-			fly(p.c, p.id, to, k, () => landTray(p.id, k));
+			fly(p.c, p.id, to, k, () => landTray(p.id));
 		});
-		res.fromTray.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landCell(p.cell, k)));
+		res.fromTray.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landSpot(p.cell)));
 		if (!flights.size) ctl.settle();
-	}
-
-	function landCell(i: number, k: number) {
-		pendingCells.delete(i);
-		ctl.sound(k);
-	}
-
-	function landTray(id: number, k: number) {
-		pendingTray.delete(id);
-		ctl.sound(k, true);
 	}
 
 	function cancelFlights() {
