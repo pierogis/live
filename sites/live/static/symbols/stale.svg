@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+	<!-- A loaf with three score cuts, edged like the KARL plate: blue top and left, pink bottom and right. -->
+	<defs>
+		<path id="shape" d="M16,76 L16,54 C16,33 33,24 50,24 C67,24 84,33 84,54 L84,76 Z" />
+		<clipPath id="lit"><polygon points="-4,4 104,4 74.5,33.5 25.5,66.5 -4,96" /></clipPath>
+	</defs>
+	<g fill="none" stroke-linejoin="round">
+		<use href="#shape" stroke="rgb(225,140,150)" stroke-width="15" />
+		<use href="#shape" stroke="rgb(140,205,225)" stroke-width="15" clip-path="url(#lit)" />
+		<use href="#shape" stroke="rgb(255,203,210)" stroke-width="5" />
+		<use href="#shape" stroke="rgb(202,243,255)" stroke-width="5" clip-path="url(#lit)" />
+	</g>
+	<use href="#shape" fill="rgb(255,240,220)" />
+	<g stroke="rgb(58,96,106)" stroke-width="4.5" stroke-linecap="round">
+		<path d="M27,50 L39,38" />
+		<path d="M44,50 L56,38" />
+		<path d="M61,50 L73,38" />
+	</g>
+</svg>

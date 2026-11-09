@@ -1,22 +1,25 @@
 <script lang="ts">
 	import { Card, Interactable } from '@pierogis/utensils';
 
+	import { MAIN } from '#lib/sites.js';
+
 	let { data } = $props();
 </script>
 
 <h3 class="tagline">{data.tagline}</h3>
 
-<div class="grid">
-	{#each data.sites as site (site)}
-		<div class="tile">
-			<Card border={false} inset={false}>
-				<Interactable>
-					<a class="border inset link-box" href={site.href}>{site.tagline}</a>
-				</Interactable>
-				<iframe title={site.title} src={site.href}></iframe>
-				<br />
-			</Card>
-		</div>
+<div class="sites">
+	{#each MAIN as site (site.href)}
+		<Card>
+			<!-- The name below is the link for keyboards and screen readers; the symbol is a bigger target. -->
+			<a href={site.href} tabindex="-1" aria-hidden="true">
+				<img src="/symbols/{site.title}.svg" alt="" width="112" height="112" />
+			</a>
+			<Interactable>
+				<a class="border inset link-box" href={site.href}>{site.title}</a>
+			</Interactable>
+			<p>{site.tagline}</p>
+		</Card>
 	{/each}
 </div>
 
@@ -25,67 +28,17 @@
 		margin: 0;
 		text-align: center;
 	}
-
-	.grid {
+	.sites {
 		display: grid;
-		grid-template-columns: repeat(6, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 		gap: 1rem;
-	}
-	.tile a {
 		width: 100%;
-		height: 100%;
+		max-width: 800px;
 	}
-
-	.tile:nth-child(1) {
-		grid-column: span 3;
+	img {
+		display: block;
 	}
-
-	.tile:nth-child(2) {
-		grid-column: span 3;
-	}
-
-	.tile:nth-child(3) {
-		grid-column: span 6;
-	}
-
-	.tile:nth-child(4) {
-		grid-column: span 3;
-	}
-
-	.tile:nth-child(5) {
-		grid-column: span 3;
-	}
-
-	.tile:only-child {
-		grid-column: span 6;
-	}
-
-	.tile {
-		grid-column: span 2;
-	}
-
-	@media screen and (max-width: 1200px) {
-		.tile:nth-child(1),
-		.tile {
-			grid-column: span 3;
-		}
-	}
-
-	@media screen and (max-width: 768px) {
-		.grid {
-			display: flex;
-			flex-direction: column;
-		}
-	}
-
-	iframe {
-		max-width: 90%;
-		width: 60rem;
-		height: 50rem;
-
-		padding: 0.4rem;
-
-		border: dashed var(--text-color) 1px;
-		border-radius: 1rem;
+	p {
+		margin: 0;
 	}
 </style>

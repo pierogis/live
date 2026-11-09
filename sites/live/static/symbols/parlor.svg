@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+	<!-- Parlor's favicon tiles in a frame edged like the KARL plate: one pixel left to place. -->
+	<defs>
+		<path id="shape" d="M16,16 L84,16 L84,84 L16,84 Z" />
+		<clipPath id="lit"><polygon points="-4,-4 104,-4 74.5,25.5 25.5,74.5 -4,104" /></clipPath>
+	</defs>
+	<g fill="none" stroke-linejoin="round">
+		<use href="#shape" stroke="rgb(225,140,150)" stroke-width="15" />
+		<use href="#shape" stroke="rgb(140,205,225)" stroke-width="15" clip-path="url(#lit)" />
+		<use href="#shape" stroke="rgb(255,203,210)" stroke-width="5" />
+		<use href="#shape" stroke="rgb(202,243,255)" stroke-width="5" clip-path="url(#lit)" />
+	</g>
+	<use href="#shape" fill="rgb(255,240,220)" />
+	<rect x="22" y="22" width="56" height="56" rx="6" fill="rgb(58,96,106)" />
+	<g shape-rendering="crispEdges">
+		<rect x="30.75" y="30.75" width="10.5" height="10.5" fill="rgb(225,140,150)" />
+		<rect x="44.75" y="30.75" width="10.5" height="10.5" fill="rgb(140,205,225)" />
+		<rect x="58.75" y="30.75" width="10.5" height="10.5" fill="rgb(255,240,220)" />
+		<rect x="30.75" y="44.75" width="10.5" height="10.5" fill="rgb(140,205,225)" />
+		<rect x="44.75" y="44.75" width="10.5" height="10.5" fill="rgb(255,240,220)" />
+		<rect x="58.75" y="44.75" width="10.5" height="10.5" fill="rgb(225,140,150)" />
+		<rect x="30.75" y="58.75" width="10.5" height="10.5" fill="rgb(255,240,220)" />
+		<rect x="44.75" y="58.75" width="10.5" height="10.5" fill="rgb(225,140,150)" />
+		<rect x="58.75" y="58.75" width="10.5" height="10.5" fill="rgb(45,75,83)" />
+	</g>
+</svg>
