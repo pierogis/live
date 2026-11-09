@@ -1,5 +1,9 @@
 /* default styles */
 
+/* Lora, the body font, served with the site rather than from a font host. */
+@import '@fontsource-variable/lora/wght.css';
+@import '@fontsource-variable/lora/wght-italic.css';
+
 :root {
 	--light-color: hsla(34, 100%, 93.1%, 1);
 	--dark-color: rgba(58, 96, 106);
@@ -66,7 +70,7 @@ body {
 
 	vertical-align: baseline;
 
-	font-family: 'Lora';
+	font-family: 'Lora Variable', serif;
 	color: var(--text-color);
 
 	transition:

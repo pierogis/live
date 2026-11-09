@@ -42,7 +42,7 @@
 
 		white-space: pre-line;
 
-		font-family: 'Lora';
+		font-family: 'Lora Variable', serif;
 		font-weight: normal;
 	}
 </style>
