@@ -1,4 +1,4 @@
-// The site's list of games (src/lib/games.ts) has every game folder, and only those.
+// The site's list of games (src/lib/games.ts) has every game folder, and only those, and each has its routes.
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
@@ -15,4 +15,13 @@ test('every game folder with levels is in the games list', () => {
 		GAMES.map((g) => g.id),
 		[...GAME_IDS]
 	);
+});
+
+test('every game has its own routes', () => {
+	const routes = new URL('../src/routes/', import.meta.url);
+	for (const id of GAME_IDS) {
+		for (const page of ['', '[n]/', 'pictures/', 'edit/']) {
+			assert.ok(existsSync(new URL(`${id}/${page}+page.svelte`, routes)), `${id}/${page}`);
+		}
+	}
 });

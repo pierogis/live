@@ -17,26 +17,40 @@
 import { untrack } from 'svelte';
 import { goto } from '$app/navigation';
 
-import type { Picture } from '../level';
+import type { Listed, Picture } from '../level';
 import { hashStr } from '../engine';
 import { memoryStore, type GameSave, type Save, type SaveStore } from '../save';
 import { blip } from '../sound';
 import { Cue } from './cue.svelte';
 
-/** The props every game component takes; the controller reads them through a getter. */
-export interface LevelProps<L, S> {
-	levels: L[];
+interface CommonProps<S> {
 	/** Start on this level instead of the saved one. */
 	start?: number;
 	/** The `start` level's state as `build` makes it, built ahead of time (say, at prerender). */
 	initial?: S;
 	/** Keep progress in memory only, never in the cookie: for play-testing a draft. */
 	sandbox?: boolean;
-	/** Each level's own page. When given, moving to another level navigates there. */
-	levelHref?: (index: number) => string;
 	/** Where the list of all pictures lives; omit to hide the link. */
 	picturesHref?: string;
 }
+
+/** Each level has its own page, which builds it ahead; moving to another level goes there. */
+interface PagedProps<L extends Picture, S> extends CommonProps<S> {
+	/** Every level in play order, without its picture: enough to name and save each one. */
+	levels: Listed<L>[];
+	start: number;
+	initial: S;
+	levelHref: (index: number) => string;
+}
+
+/** Every level built and played in place, like the editor's play-test. */
+interface InPlaceProps<L extends Picture, S> extends CommonProps<S> {
+	levels: L[];
+	levelHref?: undefined;
+}
+
+/** The props every game component takes; the controller reads them through a getter. */
+export type LevelProps<L extends Picture, S> = PagedProps<L, S> | InPlaceProps<L, S>;
 
 /** What a game tells the controller about itself. */
 export interface LevelGame<L extends Picture, S> {
@@ -100,7 +114,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	/** The options the current level was built with. */
 	options: Record<string, boolean> = $state.raw({});
 
-	level = $derived.by(() => this.#props().levels[this.index]);
+	level: Listed<L> = $derived.by(() => this.#props().levels[this.index]);
 	/** The level's name, like "Bullseye". */
 	label = $derived.by(() => this.level?.name ?? '');
 	/** You've finished this level, before or just now. */
@@ -266,8 +280,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	 */
 	#build(i: number) {
 		const g = this.#game;
-		const { levels, start, initial } = this.#props();
-		const s = initial && i === start ? g.clone(initial) : g.build(levels[i], i);
+		const s = this.#starting(i);
 		const options = this.save.options;
 		g.applyOptions?.(s, options);
 		this.#clearTimers();
@@ -282,7 +295,16 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.key++;
 		g.reset?.(s, 'level');
 		this.touch();
-		this.say(`${levels[i].name}.`);
+		this.say(`${this.level.name}.`);
+	}
+
+	/** Level i's starting state: the page's own, built ahead, or built here. */
+	#starting(i: number): S {
+		const props = this.#props();
+		if (props.initial && i === props.start) return this.#game.clone(props.initial);
+		// A level with its own page is only played there, where it's built ahead.
+		if (props.levelHref) throw new Error(`level ${i + 1} is built on its own page`);
+		return this.#game.build(props.levels[i], i);
 	}
 
 	#clamp(i: number) {

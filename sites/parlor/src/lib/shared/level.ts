@@ -8,6 +8,9 @@ export interface Picture {
 	art: string[];
 }
 
+/** A level as a game's level list has it: everything but its picture (scripts/level-lists.ts). */
+export type Listed<L extends Picture = Picture> = Omit<L, 'palette' | 'art'>;
+
 /** One `levels/*.json` file: a named run of levels. */
 export interface Pack<L extends Picture = Picture> {
 	/** File name without `.json`, like `01-first-light`. */

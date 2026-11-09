@@ -7,7 +7,8 @@
 //              win share forage:tune saved
 import { parseArgs } from 'node:util';
 
-import { GAME_IDS } from '../src/lib/games.ts';
+import { rules as forage } from '../src/lib/forage/rules.ts';
+import { rules as mosaic } from '../src/lib/mosaic/rules.ts';
 import type { Row, Rules } from '../src/lib/shared/editor/types.ts';
 import type { Picture } from '../src/lib/shared/level.ts';
 import { loadPacks } from '../test/levels.ts';
@@ -16,20 +17,15 @@ const { values: flags } = parseArgs({
 	options: { order: { type: 'boolean' }, measure: { type: 'boolean' } }
 });
 
-// Each game's rules (src/lib/<game>/rules.ts), typed loosely so one loop takes them all.
-const GAMES = await Promise.all(
-	GAME_IDS.map(async (id) => ({
-		id,
-		rules: (await import(`../src/lib/${id}/rules.ts`)).rules as Rules<Picture>
-	}))
-);
-
 type Line = Row & { pack: string; id: string };
 
 let total = 0;
 let bad = 0;
-for (const { id: game, rules } of GAMES) {
-	const lines: Line[] = loadPacks<Picture>(game)
+
+/** Print one game's table and problems, and add its levels to the totals. */
+function checkGame<L extends Picture>(rules: Rules<L>) {
+	const game = rules.id;
+	const lines: Line[] = loadPacks<L>(game)
 		.flatMap((pack) => pack.levels.map((lv) => ({ pack: pack.id, lv })))
 		.map(({ pack, lv }, index) => ({ pack, id: lv.id, ...rules.row(lv, index, !!flags.measure) }));
 
@@ -73,6 +69,9 @@ for (const { id: game, rules } of GAMES) {
 	total += lines.length;
 	bad += lines.filter((l) => l.problems.length).length;
 }
+
+checkGame(mosaic);
+checkGame(forage);
 
 console.log(bad ? `\n${bad} level(s) need work` : `\nall ${total} levels ok`);
 process.exitCode = bad ? 1 : 0;

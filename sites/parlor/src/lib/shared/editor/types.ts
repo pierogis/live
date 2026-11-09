@@ -5,6 +5,7 @@
  */
 import type { Component } from 'svelte';
 
+import type { GameId } from '../../games.ts';
 import type { Pack, Picture } from '../level.ts';
 
 /** The editor's live checks for a draft. */
@@ -30,7 +31,7 @@ export interface Row {
 /** A game's checks, with no UI: node scripts and the editor's check worker import them. */
 export interface Rules<L extends Picture = Picture> {
 	/** The game's name; also the folder its packs live in: src/lib/<id>/levels. */
-	id: string;
+	id: GameId;
 	/** Check a draft as if it were the `index`th level in play order. Quick enough to run as you paint. */
 	check: (level: L, index: number) => Check;
 	/** A shipped level's line in `pnpm -F parlor levels`; `measure` asks for the slow measurements too. */
@@ -43,4 +44,9 @@ export interface EditorGame<L extends Picture = Picture> extends Rules<L> {
 	packs: Pack<L>[];
 	/** The game itself, for play-testing a draft. */
 	play: Component<{ levels: L[]; start?: number; sandbox?: boolean }>;
+	/**
+	 * Starts the game's check worker (src/lib/<game>/check.worker.ts). Written in the
+	 * game's own module, so Vite bundles the worker with that game's rules and no other.
+	 */
+	checker(): Worker;
 }

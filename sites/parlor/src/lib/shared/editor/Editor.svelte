@@ -7,7 +7,7 @@
 <script lang="ts" generics="L extends Picture">
 	import { onMount, untrack } from 'svelte';
 
-	import type { CheckReply, CheckRequest } from './check.worker';
+	import type { CheckReply, CheckRequest } from './worker';
 	import * as G from './grid';
 	import { quantize } from './quantize';
 	import type { Check, EditorGame } from './types';
@@ -164,7 +164,7 @@
 
 	function startWorker(): Worker | null {
 		try {
-			const w = new Worker(new URL('./check.worker.ts', import.meta.url), { type: 'module' });
+			const w = game.checker();
 			w.onmessage = (e: MessageEvent<CheckReply>) => {
 				if (e.data.seq === busy) busy = 0;
 				if ('error' in e.data) settle(e.data.seq, null, e.data.error);
@@ -198,7 +198,7 @@
 		if (useWorker) worker ??= startWorker();
 		if (!worker) return checkHere(n, level, index);
 		busy = n;
-		worker.postMessage({ seq: n, game: game.id, level, index } satisfies CheckRequest);
+		worker.postMessage({ seq: n, level, index } satisfies CheckRequest<L>);
 	}
 
 	$effect(() => {
