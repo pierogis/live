@@ -73,8 +73,11 @@
 	const view = $derived.by(() => {
 		void ctl.version;
 		if (!game) return null;
+		// A block stays in sight until its drawn ant gets there (see AntLayer.bound).
+		const alive = game.alive.slice();
+		for (const cell of ants?.bound ?? []) alive[cell] = true;
 		return {
-			alive: game.alive.slice(),
+			alive,
 			slots: game.slots.slice(),
 			left: E.blocksLeft(game)
 		};
@@ -195,6 +198,8 @@
 	// ---------- moves ----------
 	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
 	const TICK_MS = 100;
+	/** When the last tick ran: an ant's block goes on a tick, so its walk is timed to end on one. */
+	let lastTick = 0;
 
 	function send(col: number) {
 		const s = game;
@@ -253,12 +258,16 @@
 				if (Math.abs(at(pts[k]).x - sx) < Math.abs(at(pts[j]).x - sx)) j = k;
 			}
 			const path = [{ x: sx, y: slot.top - box.top }, { x: sx, y: edgeY }, ...pts.slice(j).map(at)];
-			ants.run(path, d.eta * TICK_MS, s.colors[d.c].hex, Math.max(3, Math.round(cellPx * 0.32)));
+			const size = Math.max(3, Math.round(cellPx * 0.32));
+			// Its block goes on the eta-th tick from the last one (a tap's ants leave between ticks).
+			const ms = lastTick + d.eta * TICK_MS - performance.now();
+			ants.run(path, d.cell, ms, s.colors[d.c].hex, size);
 		}
 	}
 
 	/** One step of time: working colonies eat. Paused while the end panel shows or the picture is done. */
 	function runTick() {
+		lastTick = performance.now();
 		const s = game;
 		if (!s || ctl.overlay || ctl.won) return;
 		const r = E.tick(s);
@@ -296,6 +305,7 @@
 
 	onMount(() => {
 		const unmount = ctl.mount();
+		lastTick = performance.now();
 		const clock = setInterval(runTick, TICK_MS);
 		return () => {
 			unmount();
@@ -482,7 +492,8 @@
 			<div
 				class="ant-layer"
 				{@attach (node) => {
-					ants = new AntLayer(node);
+					// A drawn ant got to its block: it goes from sight now.
+					ants = new AntLayer(node, () => ctl.touch());
 				}}
 				aria-hidden="true"
 			></div>
