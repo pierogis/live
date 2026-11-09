@@ -3,6 +3,12 @@
  * level page arrives drawn), moving to another level, undo and restart, noticing
  * a win or a dead end, the end panel, saving, sound and the shared keys.
  *
+ * A level in progress lives only in memory, so it's also kept in the tab's
+ * session storage when the page is hidden or left, and picked up again when the
+ * same level's page loads in the same tab. That way a page the browser reloads
+ * (a phone that dropped a backgrounded tab, or the dev server reconnecting)
+ * comes back where you were.
+ *
  * A game makes one `LevelControl` while its component starts, passing its props
  * and a few hooks (`LevelGame`), and keeps only its own board, UI and animations.
  * Engines change their state in place, so the game calls `touch()` after each
@@ -12,6 +18,7 @@ import { untrack } from 'svelte';
 import { goto } from '$app/navigation';
 
 import type { Picture } from '../level';
+import { hashStr } from '../engine';
 import { memoryStore, type GameSave, type Save, type SaveStore } from '../save';
 import { blip } from '../sound';
 import { Cue } from './cue.svelte';
@@ -96,10 +103,10 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	options: Record<string, boolean> = $state.raw({});
 
 	level = $derived.by(() => this.#props().levels[this.index]);
-	/** Like "5 / 100 · Bullseye". */
-	label = $derived.by(() =>
-		this.level ? `${this.index + 1} / ${this.#props().levels.length} · ${this.level.name}` : ''
-	);
+	/** The level's name, like "Bullseye"; where it falls in the game is under the board (`nav`). */
+	label = $derived.by(() => this.level?.name ?? '');
+	/** You've finished this level, before or just now. */
+	done = $derived.by(() => !!this.level && !!this.save.completed[this.level.id]);
 	canUndo = $derived.by(() => {
 		void this.version;
 		return this.#history.length > 0;
@@ -118,6 +125,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	#timers = new Set<ReturnType<typeof setTimeout>>();
 	#cues: Cue<unknown>[] = [];
 	#motion: MediaQueryList | null = null;
+	/** Mounted with the game's own save: the level in progress is kept through a reload. */
+	#keeping = false;
 
 	/**
 	 * Call while the component starts. `props` gives the component's props object
@@ -169,7 +178,23 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 				s.level = index;
 			});
 		}
-		return () => this.destroy();
+		if (this.#store !== this.#game.save.store) return () => this.destroy();
+		this.#resume();
+		this.#keeping = true;
+		const keep = () => this.#keep();
+		const onHide = () => {
+			if (document.visibilityState === 'hidden') keep();
+		};
+		document.addEventListener('visibilitychange', onHide);
+		window.addEventListener('pagehide', keep);
+		return () => {
+			document.removeEventListener('visibilitychange', onHide);
+			window.removeEventListener('pagehide', keep);
+			// Gone to another page in the site: what was kept is stale now.
+			this.#keeping = false;
+			this.#forget();
+			this.destroy();
+		};
 	}
 
 	destroy() {
@@ -206,6 +231,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	// ---------- levels ----------
 	/** Start level `i` here and remember it. */
 	start(i: number) {
+		// Another level: the one kept from before is stale.
+		if (this.#keeping) this.#forget();
 		this.#build(i);
 		this.#write((s) => {
 			s.level = i;
@@ -223,6 +250,16 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 
 	get nextHref(): string | undefined {
 		return this.#props().levelHref?.(this.nextIndex);
+	}
+
+	/** LevelNav's props: `<LevelNav {...ctl.nav} />`. */
+	get nav() {
+		return {
+			index: this.index,
+			count: this.#props().levels.length,
+			href: this.#props().levelHref,
+			ongo: this.go
+		};
 	}
 
 	/**
@@ -348,6 +385,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	/** GameBar's props: `<GameBar {...ctl.bar} game=… label=… />`. */
 	get bar() {
 		return {
+			label: this.label,
+			done: this.done,
 			canUndo: this.canUndo,
 			muted: this.save.muted,
 			onundo: this.undo,
@@ -367,6 +406,68 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 			onrestart: () => this.restart(true),
 			picturesHref: this.#props().picturesHref
 		};
+	}
+
+	// ---------- a level in progress, through a reload ----------
+	get #sessionKey() {
+		return `${this.#game.save.cookie}-playing`;
+	}
+
+	/** What the level started as, so a kept game is only picked up on the same deal. */
+	#deal(): number {
+		return hashStr(JSON.stringify(this.initial));
+	}
+
+	/**
+	 * Keep the level in progress in session storage. Runs when the page is hidden or
+	 * left, which comes before any reload, so what's kept is always the latest.
+	 */
+	#keep() {
+		const { state, level } = this;
+		if (!state || !level || this.won || state.moves === 0) {
+			this.#forget();
+			return;
+		}
+		try {
+			const kept = { id: level.id, deal: this.#deal(), state, history: this.#history };
+			try {
+				sessionStorage.setItem(this.#sessionKey, JSON.stringify(kept));
+			} catch {
+				// Too big for the storage: keep the game without its undo steps.
+				sessionStorage.setItem(this.#sessionKey, JSON.stringify({ ...kept, history: [] }));
+			}
+		} catch {
+			/* no session storage: a reload starts the level over */
+		}
+	}
+
+	#forget() {
+		try {
+			sessionStorage.removeItem(this.#sessionKey);
+		} catch {
+			/* nothing kept */
+		}
+	}
+
+	/** Pick up the level as it was kept, once: only on the page load right after. */
+	#resume() {
+		let kept: { id: string; deal: number; state: S; history: S[] } | null = null;
+		try {
+			kept = JSON.parse(sessionStorage.getItem(this.#sessionKey) ?? 'null');
+		} catch {
+			/* broken or out of reach: start fresh */
+		}
+		this.#forget();
+		if (!kept || !this.level || kept.id !== this.level.id || kept.deal !== this.#deal()) return;
+		this.#clearTimers();
+		this.overlay = null;
+		this.won = false;
+		this.#stuckSeen = false;
+		this.state = kept.state;
+		this.#history = kept.history;
+		this.#game.reset?.(kept.state, 'undo');
+		this.touch();
+		this.settle();
 	}
 
 	// ---------- saving and timers ----------

@@ -18,7 +18,7 @@
 
 {#if label}
 	<span title="Difficulty {difficulty} of 5">
-		· <span class="pips" aria-hidden="true">{dots}</span>
+		<span class="pips" aria-hidden="true">{dots}</span>
 		{LABELS[difficulty - 1].toLowerCase()}
 	</span>
 {:else}

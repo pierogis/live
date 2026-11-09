@@ -14,6 +14,7 @@
 	import { inkOn, lighten } from '../shared/ink';
 	import LevelEnd from '../shared/game/LevelEnd.svelte';
 	import GameBar from '../shared/game/GameBar.svelte';
+	import LevelNav from '../shared/game/LevelNav.svelte';
 	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
 	import { plural } from '../shared/game/text';
 	import { AntLayer } from './ants';
@@ -332,7 +333,7 @@
 {/snippet}
 
 <div class="forage" style:--w={game?.w ?? 1} style:--h={game?.h ?? 1}>
-	<GameBar {...ctl.bar} game="forage" label={ctl.label} {difficulty} />
+	<GameBar {...ctl.bar} game="forage" {difficulty} />
 
 	<p class="sr-only" aria-live="polite">{ctl.status}</p>
 
@@ -488,6 +489,7 @@
 						</div>
 					</div>
 				</Card>
+				<LevelNav {...ctl.nav} />
 			</div>
 			<div
 				class="ant-layer"

@@ -13,6 +13,7 @@
 	import type { Dst, Level, MoveResult, Sel, State } from './engine';
 	import LevelEnd from '../shared/game/LevelEnd.svelte';
 	import GameBar from '../shared/game/GameBar.svelte';
+	import LevelNav from '../shared/game/LevelNav.svelte';
 	import '../shared/game/stage.css';
 	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
 	import { plural } from '../shared/game/text';
@@ -818,6 +819,7 @@
 					</button>
 				</div>
 			</div>
+			<LevelNav {...ctl.nav} />
 		</div>
 	</div>
 

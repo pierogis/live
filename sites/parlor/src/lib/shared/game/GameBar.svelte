@@ -1,13 +1,19 @@
-<!-- The bar every game shares: its name, the level, and undo / restart / sound / pictures. -->
+<!--
+	The bar every game shares: its name, the level's name, difficulty and whether you've
+	finished it, and undo / restart / sound / pictures. On a narrow screen the difficulty
+	and the finished mark wrap under the level's name rather than being cut off.
+-->
 <script lang="ts">
 	import Pips from './Pips.svelte';
 
 	interface Props {
 		game: string;
-		/** Like "5 / 100 · Bullseye". */
+		/** The level's name, like "Bullseye". */
 		label: string;
 		/** The level's difficulty from 1 to 5, when the game has one. */
 		difficulty?: number | null;
+		/** You've finished this level before (or just now). */
+		done?: boolean;
 		canUndo: boolean;
 		muted: boolean;
 		picturesHref?: string;
@@ -20,6 +26,7 @@
 		game,
 		label,
 		difficulty = null,
+		done = false,
 		canUndo,
 		muted,
 		picturesHref,
@@ -33,8 +40,9 @@
 	<div class="titles">
 		<h2 class="brand">{game}</h2>
 		<div class="label">
-			{label}
+			<span class="name">{label}</span>
 			{#if difficulty}<Pips {difficulty} label />{/if}
+			{#if done}<span class="done">✓ done</span>{/if}
 		</div>
 	</div>
 	<nav class="tools" aria-label="Game controls">
@@ -108,11 +116,24 @@
 		font-size: 20px;
 	}
 	.label {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: 8px;
 		color: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		font-size: 13px;
 		white-space: nowrap;
+	}
+	/* Only a name too long for a line of its own is cut short. */
+	.name {
+		min-width: 0;
+		max-width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	.done {
+		color: var(--link-color);
+		font-weight: 800;
 	}
 	.tools {
 		display: flex;
