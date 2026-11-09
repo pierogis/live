@@ -4,8 +4,8 @@ import { test } from 'node:test';
 import { difficultyIndex } from '../src/lib/forage/difficulty.ts';
 import * as F from '../src/lib/forage/engine.ts';
 import { analyze, QUICK, THOROUGH } from '../src/lib/forage/cruxes.ts';
-import { carelessGame, options, playAs, strongGame, winsOf } from '../src/lib/forage/player.ts';
-import { pressure, targetWins } from '../src/lib/forage/report.ts';
+import { options, playAs, strongGame, winsOf } from '../src/lib/forage/player.ts';
+import { measure, pressure, targetWins } from '../src/lib/forage/report.ts';
 import { makeRng } from '../src/lib/shared/engine.ts';
 import { closePairs } from '../src/lib/shared/palette.ts';
 import { loadPacks } from './levels.ts';
@@ -112,26 +112,31 @@ test('a locked column opens when its key block touches the outside', () => {
 	assert.ok(F.pick(s, 1).ok);
 });
 
-test('ants leave one at a time; uncovered food is claimed only once it is exposed', () => {
-	// A 3x3 block: the middle (4) is sealed until an ant picks up a food beside it.
+test('ants leave one at a time; a block is taken when its ant sets off, and the next ant goes behind it', () => {
+	// A 3x3 block: the middle (4) is sealed until a block beside it is taken.
 	const s = make(['AAA', 'AAA', 'AAA'], [[[0, 9]]]);
 	assert.ok(F.send(s, 0).ok);
 	assert.equal(s.walking.length, 1, 'the first ant leaves right away');
-	const claimedAt = new Map<number, number>([[s.walking[0].cell, 0]]);
+	assert.equal(s.alive[s.walking[0].cell], false, 'its block is gone from play already');
+	const takenAt = new Map<number, number>([[s.walking[0].cell, 0]]);
 	const eatenAt = new Map<number, number>();
-	for (let t = 1; t < 60 && !F.isWon(s); t++) {
-		for (const e of F.tick(s).eaten) eatenAt.set(e.cell, t);
-		for (const a of s.walking) if (!claimedAt.has(a.cell)) claimedAt.set(a.cell, t);
+	for (let t = 1; t < 60 && (!F.isWon(s) || s.walking.length); t++) {
+		const r = F.tick(s);
+		for (const e of r.taken) takenAt.set(e.cell, t);
+		for (const e of r.eaten) eatenAt.set(e.cell, t);
 	}
-	assert.ok(F.isWon(s));
-	const order = [...claimedAt.keys()];
+	assert.ok(F.isWon(s) && !s.walking.length);
+	const order = [...takenAt.keys()];
 	assert.deepEqual(order.slice(0, 3), [6, 7, 8], 'bottom row first, left to right');
-	const ticks = [...claimedAt.values()];
+	assert.equal(order[3], 3, 'then the row above, now that the bottom row is taken');
+	const ticks = [...takenAt.values()];
 	for (let k = 1; k < ticks.length; k++) {
 		assert.ok(ticks[k] - ticks[k - 1] >= F.DISPATCH_EVERY, 'one ant every DISPATCH_EVERY ticks');
 	}
-	const opened = Math.min(...[1, 3, 5, 7].map((i) => eatenAt.get(i)!));
-	assert.ok(claimedAt.get(4)! >= opened, 'the middle is claimed only after a side of it opens');
+	const side = Math.min(...[1, 3, 5, 7].map((i) => takenAt.get(i)!));
+	assert.ok(takenAt.get(4)! > side, 'the middle is taken only after a block beside it');
+	const cleared = Math.min(...[1, 3, 5, 7].map((i) => eatenAt.get(i)!));
+	assert.ok(eatenAt.get(4)! > cleared, 'and its ant gets there after one beside it is cleared');
 });
 
 test('linked colonies stay linked in their slots until both are done', () => {
@@ -306,12 +311,10 @@ for (const pack of packs) {
 			for (const col of s.intended!) assert.ok(F.pick(r, col).ok);
 			assert.ok(F.isWon(r));
 			// Games are slow on big pictures, so check a sample of levels: forage:tune never
-			// keeps a deal that lost every game it measured when another will do, and the
-			// strong and careless games here are among those.
+			// keeps a deal that lost every game it measured when another will do, and these
+			// are the games it measured (its win share is the best of the players).
 			if (i % 10 === 0 && lv.wins !== undefined) {
-				let won = false;
-				for (let k = 1; k <= 16 && !won; k++) won = strongGame(s, k).won || !!carelessGame(s, k);
-				assert.ok(won, 'a measured game wins');
+				assert.ok(measure(s, 16).wins > 0, 'a measured game wins');
 			}
 			assert.deepEqual(F.buildPuzzle(lv, i).columns, s.columns, 'same level, same deal');
 		});

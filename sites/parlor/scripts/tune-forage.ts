@@ -1,5 +1,5 @@
 // Pick each Forage level's deal so it's about as hard as its place in play order asks for:
-//   pnpm -F parlor forage:tune [--seeds 10] [--games 16] [--screen 4] [--climb 80] [--hard-ms 420000] [--jobs 8]
+//   pnpm -F parlor forage:tune [--seeds 16] [--games 16] [--screen 4] [--climb 80] [--hard-ms 420000] [--jobs 8]
 //                              [--only <id>] [--levels 0,5,20] [--dry] [--cruxes-only] [--results <file>]
 // Hard has two parts (see src/lib/forage/report.ts and cruxes.ts):
 //   - how often a good player wins: the best of a strong player, two that follow the rule
@@ -39,6 +39,7 @@ import * as F from '../src/lib/forage/engine.ts';
 import { rememberSends } from '../src/lib/forage/player.ts';
 import {
 	measure,
+	paceProof,
 	pressure,
 	targetWins,
 	UNMEASURED,
@@ -53,7 +54,7 @@ import { writePack } from './write-pack.ts';
 
 const { values: args } = parseArgs({
 	options: {
-		seeds: { type: 'string', default: '10' },
+		seeds: { type: 'string', default: '16' },
 		games: { type: 'string', default: '16' },
 		screen: { type: 'string', default: '4' },
 		climb: { type: 'string', default: '80' },
@@ -81,8 +82,11 @@ const FAST: Budget = { ms: 20_000, playouts: 4, nodes: 20 };
 const CLIMB_MS = 120_000;
 const LEVEL_MS = 200_000;
 const HARD_LEVEL_MS = Number(args['hard-ms']);
-/** Seeds whose deal gets searched. */
-const SEARCHED = 2;
+/**
+ * Seeds whose deal gets searched. A deal's win share tends to be all or nothing,
+ * so the few that land near the target are worth searching from.
+ */
+const SEARCHED = 4;
 /** Levels from here on are the top tier (the last 20): their timing is checked too (it's slow). */
 const TOP = 180;
 
@@ -146,6 +150,8 @@ interface Result extends Difficulty, CruxFields {
 	late: boolean;
 	/** The columns the deal search found, or '' for the seed's own deal. */
 	deal: string;
+	/** Whether its way to win also wins played hurried (see paceProof()). */
+	paced: boolean;
 	pressure: Pressure;
 	screened: number;
 	searched: number;
@@ -207,13 +213,16 @@ function tune(index: number): Result {
 	const target = targetWins(index);
 	const w = want(index);
 	const targetPips = difficultyIndex(target)!;
+	/** Why a deal is unfair: its way to win loses when played hurried (see paceProof()). */
+	const unfair = (s: F.State, a: Analysis) => (a.complete && paceProof(s, a.line) ? 0 : 1);
 	/** How far a measured deal is from the level's target: lower is better. */
-	const miss = (wins: number, a: Analysis) => {
+	const miss = (s: F.State, wins: number, a: Analysis) => {
 		const pips = difficultyIndex(wins, cruxCounts(a))!;
 		return (
+			unfair(s, a) +
 			Math.abs(wins - target) +
 			(wins > target ? 0.02 : 0) +
-			(wins === 0 ? 0.3 : 0) +
+			(wins === 0 ? 1 : 0) +
 			0.25 * short(a, w) +
 			0.15 * Math.abs(pips - targetPips)
 		);
@@ -244,7 +253,11 @@ function tune(index: number): Result {
 			screened++;
 		}
 		const rough = (c: Candidate) =>
-			Math.abs(c.quick - target) + 0.25 * short(c.a, w) + (c.quick === 0 ? 0.3 : 0);
+			unfair(c.s, c.a) +
+			Math.abs(c.quick - target) +
+			// Searching fixes cruxes more easily than it moves the win share.
+			0.08 * short(c.a, w) +
+			(c.quick === 0 ? 1 : 0);
 		return out.sort((x, y) => rough(x) - rough(y));
 	};
 
@@ -257,7 +270,7 @@ function tune(index: number): Result {
 		// Harder when the seed's deal is too easy (if the level should be hard at all);
 		// easier when it's too hard.
 		const harder = c.quick > target && targetPips >= 2;
-		if (short(c.a, w) === 0 && !harder) return [c];
+		if (short(c.a, w) === 0 && !harder && !unfair(c.s, c.a)) return [c];
 		const rng = makeRng(hashStr(lv.id) + c.seed * 7 + c.push * 131);
 		const groups = [...c.plan.groups];
 		let place = F.placementOf(c.s);
@@ -265,6 +278,8 @@ function tune(index: number): Result {
 		const linkedAt = groups.map(([j, g]) => new Set(place.slice(j, j + g)).size === g);
 		let dist = short(c.a, w);
 		let hard = hardness(c.a);
+		/** Whether the deal it's at is fair; an unfair one gives way to the first fair one found. */
+		let fair = !unfair(c.s, c.a);
 		const kept: Candidate[] = [c];
 		const tough = targetPips >= 4;
 		const until = Math.min(
@@ -295,16 +310,17 @@ function tune(index: number): Result {
 			searched++;
 			it++;
 			const a = analyze(s, FAST);
-			if (!a.complete) continue;
+			if (unfair(s, a)) continue;
 			const d = short(a, w);
 			const h = hardness(a);
 			// Closer to the cruxes it wants; at the same distance, harder or easier as it needs.
 			const sideways = harder ? h >= hard : h <= hard;
-			if (!(d < dist || (d === dist && sideways))) continue;
-			const step = d < dist || h !== hard;
+			if (fair && !(d < dist || (d === dist && sideways))) continue;
+			const step = !fair || d < dist || h !== hard;
 			place = p;
 			dist = d;
 			hard = h;
+			fair = true;
 			if (d > 0 || !step) continue;
 			// Right cruxes, and a real step: see how often it's won.
 			const next = { ...c, s, placement: p, a, quick: measure(s, screen).wins };
@@ -329,7 +345,7 @@ function tune(index: number): Result {
 		for (const c of list) {
 			const d = measure(c.s, games);
 			const full = analyze(c.s, { ...THOROUGH, timing: index >= TOP });
-			const m = miss(d.wins, full);
+			const m = miss(c.s, d.wins, full);
 			if (!best || m < best.m) best = { ...c, d, full, m };
 		}
 	};
@@ -356,6 +372,7 @@ function tune(index: number): Result {
 		push: b.push,
 		late: b.late,
 		deal: b.placement ? b.placement.join('') : '',
+		paced: !unfair(b.s, b.full),
 		...b.d,
 		...cruxFields(b.full, index),
 		pressure: pressure(b.s),
@@ -378,6 +395,7 @@ function remeasure(index: number): Result {
 		push: lv.push ?? 0,
 		late: !!lv.tuning?.late,
 		deal: lv.deal ?? '',
+		paced: full.complete && paceProof(s, full.line),
 		...UNMEASURED,
 		wins: lv.wins ?? NaN,
 		...cruxFields(full, index),
@@ -450,6 +468,7 @@ if (worker) {
 							`${LABELS[pips - 1].padEnd(9)} (${pips}, cruxes allow ${cap.least}-${cap.most})`,
 							`cruxes ${r.cruxes} breaks ${r.breaks} thirds ${r.byThird.join('/')} sequences ${r.sequences >= 1e6 ? 'many' : r.sequences}${r.timing >= 0 ? ` timing ${r.timing}` : ''}`,
 							`seed ${String(r.seed).padStart(2)} push ${r.push >= 0 ? '+' : ''}${r.push}${r.late ? ' late' : ''}${r.deal ? ' searched deal' : ''}`,
+							r.paced ? 'paced' : 'LOSES HURRIED',
 							`waits ${p.waits}/${p.sends} held groups ${p.heldPairs}`,
 							`[${r.detail}]`,
 							`screened ${r.screened} searched ${r.searched} in ${(r.ms / 1000).toFixed(0)}s`
@@ -461,6 +480,8 @@ if (worker) {
 		})
 	);
 	console.log(`tuned ${results.length} levels in ${((performance.now() - t0) / 1000).toFixed(0)}s`);
+	const hurried = results.filter((r) => !r.paced).map((r) => r.index + 1);
+	if (hurried.length) console.log(`their way to win loses played hurried: ${hurried.join(', ')}`);
 	if (args.dry) console.log('dry run: level packs left as they were');
 	else {
 		for (const p of packs) await writePack(p.path, { name: p.name, levels: p.levels });

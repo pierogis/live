@@ -8,7 +8,9 @@
  * exposed: a side touches empty space that reaches the outside of the picture.
  * Holes sealed inside the picture don't count until something opens a way to
  * them. Ants eat from the outside in, so eating a block can expose the one
- * behind it.
+ * behind it. A block is taken the moment an ant sets off for it: the next ant
+ * goes for what's exposed with it gone. So the order food goes in depends only
+ * on the order ants set off, never on how long their walks take.
  *
  * A colony that still has ants left keeps working in one of 5 slots, and eats
  * again by itself whenever blocks of its color become exposed. A colony can't be
@@ -101,7 +103,11 @@ export interface Colony {
 /** A colony sends one ant every this many ticks. */
 export const DISPATCH_EVERY = 2;
 
-/** An ant on its way to a food, with ticks left until it gets there. */
+/**
+ * An ant on its way to a block it has taken, with ticks left until it gets
+ * there. The block is gone from play already (alive is false); it stays in
+ * sight until the ant arrives.
+ */
 export interface Ant {
 	cell: number;
 	eta: number;
@@ -128,7 +134,10 @@ export interface State {
 	 */
 	lockAt: number[];
 	slots: (Colony | null)[];
-	/** Ants out walking. They carry on after their colony has left its slot. */
+	/**
+	 * Ants out walking to blocks they've taken. They carry on after their colony
+	 * has left its slot. Only for the board's eyes: play never waits on them.
+	 */
 	walking: Ant[];
 	moves: number;
 	/** The column picks the level was built from: one way to win. */
@@ -213,10 +222,10 @@ export function groupOf(s: State, link: number): Colony[] {
 }
 
 /**
- * outside() of each `alive` array. Only step() and reachOf() change an alive
- * array in place (they eat blocks), and both save the grown outside() for it
- * right away with grewOutside(), which also drops its blocksKey(). So neither is
- * ever stale. Anything else that changes blocks must make a new array.
+ * outside() of each `alive` array. Only dispatch() and reachOf() change an
+ * alive array in place (they take blocks), and both save the grown outside()
+ * for it right away with grewOutside(), which also drops its blocksKey(). So
+ * neither is ever stale. Anything else that changes blocks must make a new array.
  */
 const outCache = new WeakMap<boolean[], Uint8Array>();
 
@@ -263,21 +272,15 @@ function flood(s: State, out: Uint8Array, from: number[]): number[] {
 }
 
 /**
- * While a send settles (see onOwnGround()): its board's own copies of outside(),
- * walkable() and the food lists. Nothing else sees the board until it's
- * settled, so these grow in place each tick instead of being copied.
+ * While a send settles (see onOwnGround()): its board's own copies of outside()
+ * and the food lists. Nothing else sees the board until it's settled, so these
+ * grow in place each tick instead of being copied.
  */
 let mine: {
 	out: Uint8Array;
-	ok: Uint8Array | null;
 	food: number[][] | null;
 	/** Food lists (one per color) made during the settle. */
 	lists: Set<number[]>;
-	/**
-	 * Per slot, once one of its ants walks on `ok`: steps from its door to every
-	 * cell, kept up to date as `ok` grows (see doorDist()).
-	 */
-	dists: (Int32Array | undefined)[];
 } | null = null;
 
 /** Scratch for grewFood: a stamp on the pixels that just joined the outside. */
@@ -319,12 +322,9 @@ function grewOutside(s: State, before: Uint8Array, cells: number[]): Uint8Array 
 	const added = flood(s, out, from);
 	outCache.set(s.alive, out);
 	if (ok) {
-		if (own?.ok === ok) {
-			const W = s.w + 2;
-			const cells = added.map((i) => (Math.floor(i / s.w) + 1) * W + (i % s.w) + 1);
-			for (const j of cells) ok[j] = 1;
-			for (const dist of own.dists) if (dist) shorten(s, ok, dist, cells);
-		} else walkCache.set(out, added.length ? grewWalkable(s, ok, added) : ok);
+		// A settling board sends no ants (see dispatch()), so it keeps no walking grid.
+		if (own) walkCache.delete(out);
+		else walkCache.set(out, added.length ? grewWalkable(s, ok, added) : ok);
 	}
 	if (food) {
 		if (own?.food === food) grewFood(s, out, food, cells, added, own.lists);
@@ -377,7 +377,17 @@ export function exposedOf(s: State, c: number): number[] {
 }
 
 export type SendResult = Refusal | Sent;
-type Sent = { ok: true; sent: number[]; dispatched: Dispatch[] };
+type Sent = {
+	ok: true;
+	sent: number[];
+	dispatched: Dispatch[];
+	taken: Taken[];
+	/** Columns whose key the first ants uncovered. */
+	unlocked: number[];
+};
+
+/** A block an ant set off for, so it's gone from play. */
+type Taken = { cell: number; c: number; id: number };
 
 /** Why a column's front colony can't go out. */
 type Refusal = { ok: false; reason: 'empty' | 'locked' | 'partner' | 'no-slot' };
@@ -398,18 +408,14 @@ export interface Dispatch {
 	walks: Walks;
 }
 
-/**
- * What sending ants reads. Food only goes when an ant gets there, so this holds
- * for every ant that leaves in one send or tick.
- */
+/** What sending ants reads and leaves behind, through one send or tick. */
 interface Ground {
+	/** outside(s), grown as each ant takes its block. */
 	out: Uint8Array;
-	/** Food some ant is already heading for; grows as ants leave. */
-	taken: Claims;
-	/** Where ants can walk, made when the first ant leaves. */
-	ok?: Uint8Array;
-	/** Only time the ants (for a patient pick): skip the walks the board draws them along. */
-	quick?: boolean;
+	/** For a patient pick: take the blocks without sending ants to walk to them. */
+	quick: boolean;
+	dispatched: Dispatch[];
+	taken: Taken[];
 }
 
 /** A send canSend() allows: the columns whose fronts go out, and the free slots. */
@@ -451,7 +457,7 @@ export function send(s: State, col: number): SendResult {
 	return can.ok ? sendOut(s, false, can) : can;
 }
 
-/** send() of a send canSend() allowed; `quick` skips making the walks the board draws ants along. */
+/** send() of a send canSend() allowed; `quick` takes the blocks without sending ants (see dispatch()). */
 function sendOut(s: State, quick: boolean, { cols, free }: Allowed): Sent {
 	const columns = s.columns.slice();
 	const slots = s.slots.slice();
@@ -470,20 +476,21 @@ function sendOut(s: State, quick: boolean, { cols, free }: Allowed): Sent {
 	s.lockAt = lockAt;
 	s.moves++;
 	// The first ant leaves right away.
-	const ground: Ground = { out: outside(s), taken: claims(s), quick };
-	const dispatched: Dispatch[] = [];
-	s.walking = s.walking.slice();
-	for (const k of free.slice(0, cols.length)) {
-		const ant = dispatch(s, slots[k]!, ground, k);
-		if (ant) dispatched.push(ant);
-	}
+	const before = outside(s);
+	const wasLocked = s.locks.map((key, k) => key >= 0 && s.alive[key] && hasLock(s, k, before));
+	const ground: Ground = { out: before, quick, dispatched: [], taken: [] };
+	if (!quick) s.walking = s.walking.slice();
+	for (const k of free.slice(0, cols.length)) dispatch(s, slots[k]!, ground, k);
 	freeSlots(s);
-	return { ok: true, sent, dispatched };
+	const unlocked = wasLocked.flatMap((was, k) => (was && !hasLock(s, k, ground.out) ? [k] : []));
+	return { ok: true, sent, dispatched: ground.dispatched, taken: ground.taken, unlocked };
 }
 
 export interface TickResult {
-	/** Food picked up this tick. */
-	eaten: { cell: number; c: number; id: number }[];
+	/** Blocks ants reached this tick: gone from sight (they left play when the ant set off). */
+	eaten: Taken[];
+	/** Blocks ants set off for this tick: gone from play. */
+	taken: Taken[];
 	/** Columns whose lock went away because their key got exposed. */
 	unlocked: number[];
 	/** Ants that left their colony this tick. */
@@ -512,10 +519,6 @@ function walkable(s: State, out: Uint8Array): Uint8Array {
 		}
 	}
 	walkCache.set(out, ok);
-	if (mine?.out === out) {
-		mine.ok = ok;
-		mine.dists = [];
-	}
 	return ok;
 }
 
@@ -584,12 +587,30 @@ function approach(s: State, field: Walks, cell: number): number {
 }
 
 /**
- * Steps an ant walks to reach food `cell` along `field`, the walks from its slot:
- * out of its door, around the edge of the picture and in through cleared space.
+ * Ticks until an ant walking `field`, the walks from its slot, gets to food
+ * `cell`: out of its door, around the edge of the picture and in through cleared
+ * space at ANT_SPEED. Blocks taken by ants still on their way are cleared space
+ * too, but still in sight: it goes slower, so it passes each only once that
+ * block's ant has got there (an ant walks at an even pace along its path).
  */
-function walkSteps(s: State, cell: number, field: Walks): number {
+function arrival(s: State, cell: number, field: Walks): number {
 	const at = approach(s, field, cell);
-	return at < 0 ? s.w + s.h : field.dist[at] + 1;
+	if (at < 0) return 1 + Math.ceil((s.w + s.h) / ANT_SPEED);
+	const steps = field.dist[at] + 1;
+	let eta = 1 + Math.ceil(steps / ANT_SPEED);
+	if (!s.walking.length) return eta;
+	const due = new Map(s.walking.map((a) => [a.cell, a.eta]));
+	const W = s.w + 2;
+	for (let i = at; i >= 0; i = field.prev[i]) {
+		const x = (i % W) - 1;
+		const y = Math.floor(i / W) - 1;
+		if (x < 0 || y < 0 || x >= s.w || y >= s.h) continue;
+		const t = due.get(y * s.w + x);
+		// It reaches i at eta * dist / steps, which must be after t.
+		if (t !== undefined)
+			eta = Math.max(eta, Math.ceil((t * steps) / Math.max(1, field.dist[i])) + 1);
+	}
+	return eta;
 }
 
 /**
@@ -609,194 +630,32 @@ export function antPath(s: State, d: Dispatch): { x: number; y: number }[] {
 }
 
 /**
- * Send one ant from colony e in `slot` to its first exposed, unclaimed food, if
- * there is one. Mutates e and ground.taken.
+ * Colony e in `slot` takes its first exposed block, if there is one, and sends
+ * an ant to it: the block is gone from play now, so the next ant goes for what's
+ * exposed without it. A quick (patient) send only takes the block. Mutates s, e
+ * and ground; false when there's nothing to take.
  */
-function dispatch(s: State, e: Colony, ground: Ground, slot: number): Dispatch | null {
-	if (e.n <= 0) return null;
-	const { at, mark } = ground.taken;
-	const cell = exposedIn(s, ground.out, e.c).find((i) => at[i] !== mark);
-	if (cell === undefined) return null;
-	at[cell] = mark;
-	const ok = (ground.ok ??= walkable(s, ground.out));
-	const walks = ground.quick ? NO_WALKS : walkFrom(s, ok, slot, cell);
-	const steps = ground.quick ? stepsTo(s, ok, slot, cell) : walkSteps(s, cell, walks);
-	const ant = { cell, c: e.c, id: e.id, eta: 1 + Math.ceil(steps / ANT_SPEED) };
-	s.walking.push(ant);
+function dispatch(s: State, e: Colony, ground: Ground, slot: number): boolean {
+	if (e.n <= 0) return false;
+	const cell = exposedIn(s, ground.out, e.c)[0];
+	if (cell === undefined) return false;
+	if (!ground.quick) {
+		const walks = walkFrom(s, walkable(s, ground.out), slot, cell);
+		const ant = { cell, c: e.c, id: e.id, eta: arrival(s, cell, walks) };
+		s.walking.push(ant);
+		ground.dispatched.push({ slot, ...ant, walks });
+	}
+	ground.taken.push({ cell, c: e.c, id: e.id });
+	s.alive[cell] = false;
+	ground.out = grewOutside(s, ground.out, [cell]);
 	e.n--;
 	e.cool = DISPATCH_EVERY;
-	return { slot, ...ant, walks };
-}
-
-const NO_WALKS: Walks = { dist: new Int32Array(0), prev: new Int32Array(0) };
-
-/** Scratch for stepsTo: a visit stamp per cell of the walking grid, and a queue. */
-let seen = new Int32Array(0);
-let queue = new Int32Array(0);
-let stamp = 0;
-
-/**
- * How far an ant walks from a slot's door to food `cell`: what walkSteps() finds along
- * walkFrom's walks, without keeping them.
- */
-function stepsTo(s: State, ok: Uint8Array, slot: number, cell: number): number {
-	const W = s.w + 2;
-	// A settling board's own grid: from its door's distances, kept as the grid grows.
-	if (mine?.ok === ok) {
-		const dist = (mine.dists[slot] ??= doorDist(s, ok, slot));
-		const at = (Math.floor(cell / s.w) + 1) * W + (cell % s.w) + 1;
-		let best = -1;
-		for (const j of [at - 1, at + 1, at - W, at + W]) {
-			if (dist[j] >= 0 && (best < 0 || dist[j] < best)) best = dist[j];
-		}
-		return best < 0 ? s.w + s.h : best + 1;
-	}
-	const size = W * (s.h + 2);
-	if (seen.length < size) {
-		seen = new Int32Array(size);
-		queue = new Int32Array(size);
-		stamp = 0;
-	}
-	stamp++;
-	const at = (Math.floor(cell / s.w) + 1) * W + (cell % s.w) + 1;
-	const isBeside = (j: number) => j === at - 1 || j === at + 1 || j === at - W || j === at + W;
-	const start = door(s, slot);
-	// Breadth first, a level at a time; queue holds cells, dist is their level.
-	if (isBeside(start)) return 1;
-	seen[start] = stamp;
-	queue[0] = start;
-	let head = 0;
-	let tail = 1;
-	for (let dist = 1; head < tail; dist++) {
-		const end = tail;
-		for (; head < end; head++) {
-			const i = queue[head];
-			const x = i % W;
-			for (const j of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) {
-				if (j < 0 || j >= size || !ok[j] || seen[j] === stamp) continue;
-				if (isBeside(j)) return dist + 1;
-				seen[j] = stamp;
-				queue[tail++] = j;
-			}
-		}
-	}
-	return s.w + s.h;
-}
-
-/** Scratch for doorDist and shorten: a queue, and a stamp per cell for what's on it. */
-let walkQueue = new Int32Array(0);
-let queued = new Int32Array(0);
-let queueMark = 0;
-
-function walkScratch(size: number) {
-	if (walkQueue.length >= size) return;
-	walkQueue = new Int32Array(size);
-	queued = new Int32Array(size);
-	queueMark = 0;
-}
-
-/** Steps from a slot's door to every cell of the walking grid `ok` (-1 where it can't walk). */
-function doorDist(s: State, ok: Uint8Array, slot: number): Int32Array {
-	const W = s.w + 2;
-	const size = ok.length;
-	walkScratch(size);
-	const dist = new Int32Array(size).fill(-1);
-	const start = door(s, slot);
-	dist[start] = 0;
-	walkQueue[0] = start;
-	let tail = 1;
-	for (let head = 0; head < tail; head++) {
-		const i = walkQueue[head];
-		const d = dist[i] + 1;
-		const x = i % W;
-		if (x > 0 && ok[i - 1] && dist[i - 1] < 0) {
-			dist[i - 1] = d;
-			walkQueue[tail++] = i - 1;
-		}
-		if (x < W - 1 && ok[i + 1] && dist[i + 1] < 0) {
-			dist[i + 1] = d;
-			walkQueue[tail++] = i + 1;
-		}
-		if (i >= W && ok[i - W] && dist[i - W] < 0) {
-			dist[i - W] = d;
-			walkQueue[tail++] = i - W;
-		}
-		if (i + W < size && ok[i + W] && dist[i + W] < 0) {
-			dist[i + W] = d;
-			walkQueue[tail++] = i + W;
-		}
-	}
-	return dist;
-}
-
-/**
- * A door's distances after the cells `added` became walkable in `ok`: lowered in
- * place where the new cells make a walk shorter. Walks only get shorter as the
- * picture opens up, so it spreads out from the new cells, a cell going back on
- * the queue whenever it gets closer (never twice at once, so the ring holds).
- */
-function shorten(s: State, ok: Uint8Array, dist: Int32Array, added: number[]) {
-	const W = s.w + 2;
-	const size = ok.length;
-	walkScratch(size);
-	const mark = ++queueMark;
-	let head = 0;
-	let tail = 0;
-	let count = 0;
-	const lower = (j: number, d: number) => {
-		if (!ok[j] || (dist[j] >= 0 && dist[j] <= d)) return;
-		dist[j] = d;
-		if (queued[j] === mark) return;
-		queued[j] = mark;
-		walkQueue[tail] = j;
-		tail = tail + 1 === size ? 0 : tail + 1;
-		count++;
-	};
-	for (const j of added) {
-		const x = j % W;
-		let best = -1;
-		for (const k of [x > 0 ? j - 1 : -1, x < W - 1 ? j + 1 : -1, j - W, j + W]) {
-			if (k >= 0 && k < size && dist[k] >= 0 && (best < 0 || dist[k] < best)) best = dist[k];
-		}
-		if (best >= 0) lower(j, best + 1);
-	}
-	while (count > 0) {
-		const i = walkQueue[head];
-		head = head + 1 === size ? 0 : head + 1;
-		count--;
-		queued[i] = 0;
-		const d = dist[i] + 1;
-		const x = i % W;
-		if (x > 0) lower(i - 1, d);
-		if (x < W - 1) lower(i + 1, d);
-		if (i >= W) lower(i - W, d);
-		if (i + W < size) lower(i + W, d);
-	}
+	return true;
 }
 
 /** Whether a working colony has sent all its ants out. */
 export function isDone(e: Colony): boolean {
 	return e.n === 0;
-}
-
-/** Food some ant is already heading for: the pixels of `at` holding `mark`. Good until the next call. */
-interface Claims {
-	at: Int32Array;
-	mark: number;
-}
-
-let claimAt = new Int32Array(0);
-let claimMark = 0;
-
-/** Claims for the ants walking now. */
-function claims(s: State): Claims {
-	if (claimAt.length < s.alive.length) {
-		claimAt = new Int32Array(s.alive.length);
-		claimMark = 0;
-	}
-	const mark = ++claimMark;
-	for (const a of s.walking) claimAt[a.cell] = mark;
-	return { at: claimAt, mark };
 }
 
 /**
@@ -819,10 +678,11 @@ function freeSlots(s: State) {
 
 /**
  * One step of time:
- *   1. ants that reach their food pick it up (the food is gone)
- *   2. every working colony with ants left sends one more, to the first exposed
- *      food of its color that no ant is heading for yet: bottom row first, left
- *      to right. Food uncovered by an ant that just arrived counts right away.
+ *   1. ants that reach their blocks: the blocks go from sight
+ *   2. every working colony with ants left takes the first exposed block of its
+ *      color (bottom row first, left to right) and sends an ant to it. Each
+ *      block taken is gone from play at once, so it can expose another for the
+ *      next colony in the same step.
  * A colony sends an ant every DISPATCH_EVERY ticks and frees its slot as soon
  * as it has sent its last one; linked colonies free theirs together, once all
  * of them have.
@@ -831,51 +691,41 @@ export function tick(s: State): TickResult {
 	return step(s, false);
 }
 
-/** tick(); `quick` skips making the walks the board draws ants along. */
+/** tick(); `quick` takes blocks without sending ants (see dispatch()). */
 function step(s: State, quick: boolean): TickResult {
 	// Which columns are locked before anyone eats, from one look at the picture.
 	const before = outside(s);
 	const wasLocked = s.locks.map((key, k) => key >= 0 && s.alive[key] && hasLock(s, k, before));
-	const eaten: TickResult['eaten'] = [];
-	// Ants that get to their food pick it up. A quick step's board is pick()'s or
-	// hurry()'s own (see own()), so it moves its ants and colonies in place.
-	const still: Ant[] = [];
-	for (const a of s.walking) {
-		if (a.eta > 1) {
-			if (quick) {
-				a.eta--;
-				still.push(a);
-			} else still.push({ ...a, eta: a.eta - 1 });
-		} else {
-			s.alive[a.cell] = false;
-			eaten.push({ cell: a.cell, c: a.c, id: a.id });
+	const eaten: Taken[] = [];
+	if (s.walking.length) {
+		const still: Ant[] = [];
+		for (const a of s.walking) {
+			if (a.eta > 1) still.push({ ...a, eta: a.eta - 1 });
+			else eaten.push({ cell: a.cell, c: a.c, id: a.id });
 		}
+		s.walking = still;
 	}
-	s.walking = still;
+	// A quick step's board is pick()'s or hurry()'s own (see own()), so it changes
+	// its colonies in place.
 	const slots = quick ? s.slots : s.slots.map((e) => e && { ...e });
 	s.slots = slots;
-	const out = eaten.length
-		? grewOutside(
-				s,
-				before,
-				eaten.map((e) => e.cell)
-			)
-		: before;
-	const ground: Ground = { out, taken: claims(s), quick };
-	const dispatched: Dispatch[] = [];
+	const ground: Ground = { out: before, quick, dispatched: [], taken: [] };
 	slots.forEach((e, k) => {
 		if (!e || e.n <= 0) return;
 		// One ant every few ticks; a colony that found nothing tries again on the next tick.
 		e.cool = (e.cool ?? 0) - 1;
 		if (e.cool > 0) return;
-		const ant = dispatch(s, e, ground, k);
-		if (ant) dispatched.push(ant);
-		else e.cool = 0;
+		if (!dispatch(s, e, ground, k)) e.cool = 0;
 	});
 	freeSlots(s);
-	// Sending ants eats nothing, so the picture is as it was after the ants arrived.
 	const unlocked = wasLocked.flatMap((was, k) => (was && !hasLock(s, k, ground.out) ? [k] : []));
-	return { eaten, unlocked, dispatched, won: isWon(s) };
+	return {
+		eaten,
+		taken: ground.taken,
+		unlocked,
+		dispatched: ground.dispatched,
+		won: isWon(s) && !s.walking.length
+	};
 }
 
 /**
@@ -972,21 +822,21 @@ function grewFood(
 	return food;
 }
 
-/** Whether no ant is on its way and no working colony has food it can send one to. */
+/**
+ * Whether no working colony has food it can send an ant to. Ants still walking
+ * don't count: play never waits on them.
+ */
 function isQuiet(s: State): boolean {
-	if (s.walking.length) return false;
 	const out = outside(s);
 	return s.slots.every((e) => !e || e.n === 0 || exposedIn(s, out, e.c).length === 0);
 }
 
 /**
- * Whether a working colony has nothing to send ants to: no unclaimed food of its
- * color in reach. `out` is outside(s), when the caller has it.
+ * Whether a working colony has nothing to send ants to: no food of its color in
+ * reach. `out` is outside(s), when the caller has it.
  */
 export function isWaiting(s: State, e: Colony, out?: Uint8Array): boolean {
-	if (e.n <= 0) return false;
-	const { at, mark } = claims(s);
-	return exposedIn(s, out ?? outside(s), e.c).every((i) => at[i] === mark);
+	return e.n > 0 && exposedIn(s, out ?? outside(s), e.c).length === 0;
 }
 
 /**
@@ -1016,22 +866,17 @@ function own(s: State): State {
 }
 
 /**
- * Ticks from now that pass with nothing happening: no ant gets to its food and no
- * colony sends one. A colony sends when it's due and has food no ant is heading
- * for, and that only changes when an ant eats or another colony sends.
+ * Ticks from now that pass with no colony sending an ant. A colony sends when
+ * it's due and has food in reach, and what's in reach only changes when a
+ * colony takes a block.
  */
 function idleTicks(s: State): number {
 	let next = Infinity;
-	for (const a of s.walking) if (a.eta < next) next = a.eta;
-	if (next <= 1) return 0;
 	const out = outside(s);
-	let taken: Claims | undefined;
 	for (const e of s.slots) {
 		if (!e || e.n <= 0) continue;
 		const due = Math.max(1, e.cool ?? 0);
-		if (due >= next) continue;
-		const { at, mark } = (taken ??= claims(s));
-		if (exposedIn(s, out, e.c).some((i) => at[i] !== mark)) next = due;
+		if (due < next && exposedIn(s, out, e.c).length) next = due;
 		if (next <= 1) return 0;
 	}
 	return next === Infinity ? 0 : next - 1;
@@ -1053,20 +898,18 @@ function skip(s: State, ticks: number) {
 }
 
 /**
- * Run `fn` with s's board as its own (see mine): its outside(), walkable() and
- * food lists copied once, to grow in place as its blocks are eaten. s must be
- * its own already (see own()).
+ * Run `fn` with s's board as its own (see mine): its outside() and food lists
+ * copied once, to grow in place as its blocks are eaten. s must be its own
+ * already (see own()).
  */
 function onOwnGround<T>(s: State, fn: () => T): T {
 	const before = outside(s);
 	const out = before.slice();
 	outCache.set(s.alive, out);
-	const ok = walkCache.get(before)?.slice() ?? null;
-	if (ok) walkCache.set(out, ok);
 	const food = foodCache.get(before)?.slice() ?? null;
 	if (food) foodCache.set(out, food);
 	const was = mine;
-	mine = { out, ok, food, lists: new Set(), dists: [] };
+	mine = { out, food, lists: new Set() };
 	try {
 		return fn();
 	} finally {
@@ -1076,23 +919,28 @@ function onOwnGround<T>(s: State, fn: () => T): T {
 
 /**
  * Let time run until no working colony can eat, skipping ticks where nothing
- * happens. Returns what each colony ate, by tick. Runs on its own ground (see onOwnGround()).
+ * happens. Returns what each colony ate, by tick, starting from what the send
+ * itself took (`sent`). Runs on its own ground (see onOwnGround()).
  */
-function settleTicks(s: State): { meals: Meal[]; unlocked: number[] } {
+function settleTicks(s: State, sent: Sent): { meals: Meal[]; unlocked: number[] } {
 	const byId = new Map<number, Meal>();
-	const unlocked: number[] = [];
-	for (let t = 0; !isQuiet(s); t++) {
+	const unlocked = sent.unlocked.slice();
+	const eat = (list: Taken[], wave: number) => {
+		for (const e of list) {
+			let meal = byId.get(e.id);
+			if (!meal) byId.set(e.id, (meal = { id: e.id, c: e.c, eaten: [] }));
+			meal.eaten.push({ cell: e.cell, wave });
+		}
+	};
+	eat(sent.taken, 0);
+	for (let t = 1; !isQuiet(s); t++) {
 		const idle = idleTicks(s);
 		if (idle) {
 			skip(s, idle);
 			t += idle;
 		}
 		const r = step(s, true);
-		for (const e of r.eaten) {
-			let meal = byId.get(e.id);
-			if (!meal) byId.set(e.id, (meal = { id: e.id, c: e.c, eaten: [] }));
-			meal.eaten.push({ cell: e.cell, wave: t });
-		}
+		eat(r.taken, t);
 		unlocked.push(...r.unlocked);
 	}
 	return { meals: [...byId.values()], unlocked };
@@ -1108,7 +956,7 @@ export function pick(s: State, col: number): PickResult {
 	const t = own(clone(s));
 	const { r, meals, unlocked } = onOwnGround(t, () => {
 		const r = sendOut(t, true, can);
-		return { r, ...settleTicks(t) };
+		return { r, ...settleTicks(t, r) };
 	});
 	Object.assign(s, t);
 	const parked = s.slots.flatMap((e, k) => (e && r.sent.includes(e.id) ? [k] : []));
@@ -1126,6 +974,28 @@ export function hurry(s: State, col: number, ticks: number): boolean {
 	sendOut(own(s), true, can);
 	for (let t = 0; t < ticks && !isQuiet(s); t++) step(s, true);
 	return true;
+}
+
+/**
+ * Play the sends in `line` the way a hurried person does: each one `gap` ticks
+ * after the last, or as soon after that as it can go, never waiting for the
+ * board to settle. Whether it wins.
+ */
+export function playHurried(s0: State, line: number[], gap: number): boolean {
+	const s = own(clone(s0));
+	for (const col of line) {
+		for (let t = 0; t < gap; t++) step(s, true);
+		let can = canSend(s, col);
+		while (!can.ok) {
+			// Nothing more will eat, so nothing will change: it can never go.
+			if (isQuiet(s)) return false;
+			step(s, true);
+			can = canSend(s, col);
+		}
+		sendOut(s, true, can);
+	}
+	while (!isQuiet(s)) step(s, true);
+	return isWon(s);
 }
 
 /** Columns whose front colony can be sent out right now. */
