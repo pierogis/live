@@ -1,0 +1,43 @@
+/* What every game's page shares around its board. */
+
+/*
+ * The board and what sits under it (the tray, the slots) are one utensils
+ * `Card`, which already has the site's card look (`.border.inset`). A game's
+ * card has no padding and the page's color, and --edge set on a parent recolors
+ * the whole bevel. Games size their boards with the bevel's --border-size.
+ */
+.stage .card.border {
+	display: block;
+	place-items: normal;
+	place-content: normal;
+	height: auto;
+	padding: 0;
+	text-align: start;
+	background: var(--primary-color);
+	border-color: var(--edge, var(--secondary-color)) var(--edge, var(--accent-color))
+		var(--edge, var(--accent-color)) var(--edge, var(--secondary-color));
+}
+
+/* Read out by screen readers, never seen. */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+/* A cleared level's outline lights up. */
+.stage.won {
+	--edge: var(--secondary-color);
+}
+
+/*
+ * The page centers its content, which can land on half a pixel, so a game's parts
+ * center themselves with whole-pixel margins instead of flex. Put `snapped` on a
+ * part and set --snap-w to its width; it centers in the nearest size container.
+ */
+.snapped {
+	margin-left: max(0px, round(down, calc((100cqw - var(--snap-w)) / 2), 1px));
+}

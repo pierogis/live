@@ -1,0 +1,173 @@
+<!--
+	Every picture of a game, by pack. Each one links to its level page. The save comes
+	from the server (read from the game's cookie), so your ✓ marks are there at once.
+	The game's options show above the pictures as toggles.
+-->
+<script lang="ts" generics="L extends Picture">
+	import { untrack } from 'svelte';
+
+	import { art } from './art';
+	import { LABELS } from './difficulty';
+	import Pips from './game/Pips.svelte';
+	import type { Pack, Picture } from './level';
+	import type { GameSave, Save } from './save';
+
+	interface Props {
+		/** The game's name, for the title. */
+		game: string;
+		packs: Pack<L>[];
+		/** The game page; each picture links to `${gameHref}/N`. */
+		gameHref: string;
+		save: Save;
+		/** A level's difficulty from 1 to 5, when the game has one. */
+		difficulty?: (level: L) => number | null;
+		/** The game's save functions, when it has options (like Mosaic's relaxed mode) to toggle. */
+		saves?: GameSave;
+	}
+
+	let { game, packs, gameHref, save, difficulty, saves }: Props = $props();
+
+	// Each toggle starts from your saved setting and saves straight to your cookie,
+	// changing only that setting, so progress from another tab stays.
+	const options = $state(untrack(() => ({ ...save.options })));
+
+	function toggle(key: string, on: boolean) {
+		options[key] = on;
+		saves?.update((s) => {
+			s.options[key] = on;
+		});
+	}
+
+	const sections = $derived.by(() => {
+		let at = 0;
+		return packs.map((p) => ({ name: p.name, items: p.levels.map((lv) => ({ lv, n: ++at })) }));
+	});
+</script>
+
+<div class="pictures">
+	<div class="bar">
+		<h2>{game} · pictures</h2>
+		<a class="border inset link-box" href="{gameHref}/{save.level + 1}">back to the game</a>
+	</div>
+
+	{#each saves?.options ?? [] as option (option.key)}
+		<label class="option inset">
+			<input
+				type="checkbox"
+				checked={!!options[option.key]}
+				onchange={(e) => toggle(option.key, e.currentTarget.checked)}
+			/>
+			<span
+				><b>{option.label}</b>{#if option.note}<br /><small>{option.note}</small>{/if}</span
+			>
+		</label>
+	{/each}
+
+	{#each sections as section (section.name)}
+		<h3>{section.name.toLowerCase()}</h3>
+		<div class="grid">
+			{#each section.items as { lv, n } (lv.id)}
+				{@const done = !!save.completed[lv.id]}
+				{@const d = difficulty?.(lv) ?? null}
+				<a
+					class="card inset"
+					class:current={save.level === n - 1}
+					href="{gameHref}/{n}"
+					aria-label="{n}. {lv.name}{d ? `, ${LABELS[d - 1]}` : ''}{done ? ', complete' : ''}"
+				>
+					<span class="thumb" class:unplayed={!done}><canvas {@attach art(lv, 72)}></canvas></span>
+					<span>{n}. {lv.name}</span>
+					{#if d}<Pips difficulty={d} />{/if}
+					{#if done}<span class="done" aria-hidden="true">✓</span>{/if}
+				</a>
+			{/each}
+		</div>
+	{/each}
+</div>
+
+<style>
+	.pictures {
+		width: 100%;
+		max-width: 760px;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+	h2 {
+		font-size: 20px;
+	}
+	.option {
+		display: flex;
+		gap: 10px;
+		align-items: flex-start;
+		padding: 12px;
+		border-radius: 10px;
+		cursor: pointer;
+	}
+	.option input {
+		margin-top: 3px;
+		width: 18px;
+		height: 18px;
+		accent-color: var(--accent-color);
+	}
+	.option small {
+		color: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
+	}
+	h3 {
+		margin-top: 12px;
+		font-size: 14px;
+		color: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+		gap: 10px;
+	}
+	.card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		padding: 12px 8px 10px;
+		border-radius: 10px;
+		background: var(--primary-color);
+		text-align: center;
+		font-size: 13px;
+		font-weight: 600;
+	}
+	.card:hover {
+		box-shadow: var(--inset), var(--shadow);
+	}
+	.card.current {
+		box-shadow:
+			var(--inset),
+			0 0 0 3px var(--secondary-color);
+	}
+	.thumb {
+		height: 72px;
+		display: grid;
+		place-items: center;
+	}
+	canvas {
+		image-rendering: pixelated;
+	}
+	/* Pictures fill their frames, so an unplayed one shows faded rather than as a blank shape. */
+	.thumb.unplayed canvas {
+		filter: grayscale(0.85) opacity(0.55);
+	}
+	.done {
+		position: absolute;
+		top: 6px;
+		right: 8px;
+		color: var(--link-color);
+		font-weight: 800;
+	}
+</style>

@@ -28,7 +28,7 @@
 
 		{#snippet footer()}
 			<Interactable>
-				<a class="border inset link-box" href="https://careers.pierogis.live">careers</a>
+				<a class="border inset link-box" href="/other">other</a>
 			</Interactable>
 		{/snippet}
 	</Layout>
