@@ -25,11 +25,9 @@
  * counts only the rule breaks you can't avoid.
  *
  * Timing (top levels only, it's slow): the game runs on a clock and lets you
- * send while others are still eating. A hurried send takes blocks while the
- * others are still taking theirs, which can change what's exposed when they
- * pick. `timing` counts the line's sends that only win if you wait for the board
- * to settle first (the tuner also checks the whole line played hurried, see
- * paceProof() in report.ts).
+ * send while others are still eating. A hurried send can take food a colony
+ * already out was going to eat. `timing` counts the line's sends that only win
+ * if you wait for the board to settle first.
  *
  * The solver: playouts by the players in player.ts first (a win proves a
  * position winnable, and every position along it), then a small depth-first

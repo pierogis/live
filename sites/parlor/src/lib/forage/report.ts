@@ -61,18 +61,6 @@ export function measure(s: F.State, games = GAMES): Difficulty {
 	return { wins: Math.max(strong, clean, look, careless), strong, clean, look, careless };
 }
 
-/** Ticks a hurried player leaves between sends: rapid taps to a slow look (a tick is 0.1s). */
-const PACES = [0, 2, 5, 10, 20];
-
-/**
- * Whether `line`, a way to win played patiently, also wins played hurried at
- * every pace in PACES. Most people tap the next send while ants are still out, so
- * knowing the way through has to be enough, however fast they go.
- */
-export function paceProof(s: F.State, line: number[]): boolean {
-	return PACES.every((gap) => F.playHurried(s, line, gap));
-}
-
 /** Places in play order the difficulty ramp spans after the teaching levels: to level 200. */
 const RAMP = 195;
 

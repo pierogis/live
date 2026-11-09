@@ -41,9 +41,8 @@
 			save: forageSave,
 			build: E.buildPuzzle,
 			clone: E.clone,
-			// Ants still walking to blocks they took finish their walk first.
-			isWon: (s) => E.isWon(s) && !s.walking.length,
-			isStuck: (s) => !s.walking.length && E.isStuck(s),
+			isWon: E.isWon,
+			isStuck: E.isStuck,
 			reset: () => ants?.clear(),
 			key: (_e, key) => {
 				const n = Number(key);
@@ -70,19 +69,14 @@
 	const HOVER_LIGHTEN = 0.22;
 
 	// ---------- what to draw ----------
-	/**
-	 * The parts of the state the template shows, read through `version` so moves
-	 * redraw them. A block an ant has taken stays in sight until the ant gets there.
-	 */
+	/** The parts of the state the template shows, read through `version` so moves redraw them. */
 	const view = $derived.by(() => {
 		void ctl.version;
 		if (!game) return null;
-		const alive = game.alive.slice();
-		for (const a of game.walking) alive[a.cell] = true;
 		return {
-			alive,
+			alive: game.alive.slice(),
 			slots: game.slots.slice(),
-			left: E.blocksLeft(game) + game.walking.length
+			left: E.blocksLeft(game)
 		};
 	});
 
@@ -216,14 +210,6 @@
 		ctl.touch();
 		ctl.sound(6);
 		launch(r.dispatched);
-		opened(r.unlocked);
-	}
-
-	/** Columns whose key just got uncovered. */
-	function opened(cols: number[]) {
-		if (!cols.length) return;
-		ctl.say(`Column ${cols.map((k) => k + 1).join(' and ')} opened.`);
-		ctl.sound(9);
 	}
 
 	let stageEl: HTMLElement | undefined = $state();
@@ -280,13 +266,18 @@
 			ctl.touch();
 			launch(r.dispatched);
 		}
-		opened(r.unlocked);
 		if (r.eaten.length) {
 			ctl.touch();
 			if (tickCount++ % 2 === 0) ctl.sound(r.eaten.length + tickCount / 2, true);
+			if (r.unlocked.length) {
+				ctl.say(`Column ${r.unlocked.map((k) => k + 1).join(' and ')} opened.`);
+				ctl.sound(9);
+			}
+			if (r.won) ctl.settle();
+		} else {
+			// Nothing eaten: maybe nothing can be, so the stuck panel shows (after a moment).
+			ctl.settle();
 		}
-		// Done eating, or maybe nothing more can be: the win or stuck panel shows (after a moment).
-		if (r.won || !r.eaten.length) ctl.settle();
 	}
 
 	/** A tap that can't go: show why with a quick cue, not a message. */
