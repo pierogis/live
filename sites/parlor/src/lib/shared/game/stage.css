@@ -1,7 +1,22 @@
+/* What every game's page shares around its board. */
+
 /*
- * What every game's page shares around its board and tab, which are one card
- * (`ui/joined.css`).
+ * The board and what sits under it (the tray, the slots) are one utensils
+ * `Card`, which already has the site's card look (`.border.inset`). A game's
+ * card has no padding and the --well fill, and --edge set on a parent recolors
+ * the whole bevel. Games size their boards with the bevel's --border-size.
  */
+.stage .card.border {
+	display: block;
+	place-items: normal;
+	place-content: normal;
+	height: auto;
+	padding: 0;
+	text-align: start;
+	background: var(--well);
+	border-color: var(--edge, var(--secondary-color)) var(--edge, var(--accent-color))
+		var(--edge, var(--accent-color)) var(--edge, var(--secondary-color));
+}
 
 /* Read out by screen readers, never seen. */
 .sr-only {

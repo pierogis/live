@@ -23,7 +23,7 @@ Each game lives in `src/lib/<game>/` and is listed once in `src/lib/games.ts`. T
 - `save.ts`: the save cookie
 - `difficulty.ts`: the 1 to 5 difficulty labels
 - `palette.ts` (checks that a picture's colors are easy to tell apart), `ink.ts` (black or white text on a color), `art.ts` (draws a level as a small picture) and `sound.ts`
-- `game/`: a level's life on its page (`level.svelte.ts`), the title bar with undo, restart, sound and pictures (`GameBar.svelte`), the panel for a finished or stuck level (`LevelEnd.svelte`), difficulty dots, animated sprites and the page styles around the board. The board and its tab are one card, from `ui/joined.css` in `packages/ui`.
+- `game/`: a level's life on its page (`level.svelte.ts`), the title bar with undo, restart, sound and pictures (`GameBar.svelte`), the panel for a finished or stuck level (`LevelEnd.svelte`), difficulty dots, animated sprites and the page styles around the board. The board and what sits under it are one utensils `Card`, styled for games in `stage.css`.
 - `Pictures.svelte`: a game's picture list
 - `editor/`: the level editor, its image import, its check worker and the picture checks every game shares
 

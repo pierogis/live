@@ -22,6 +22,8 @@
 	--text-color-t: rgba(58, 96, 106, 0);
 
 	--divider-size: 0.4rem;
+	/* Whole pixels, so things sized around a border stay on the pixel grid. */
+	--border-size: 4px;
 
 	--inset: inset 0 0 0 2px var(--text-color-st);
 	--shadow: 0 0 0 2px var(--text-color-st);
@@ -167,10 +169,10 @@ a:active {
 }
 
 .border {
-	border-top: solid 0.3rem var(--secondary-color);
-	border-left: solid 0.3rem var(--secondary-color);
-	border-bottom: solid 0.3rem var(--accent-color);
-	border-right: solid 0.3rem var(--accent-color);
+	border-top: solid var(--border-size) var(--secondary-color);
+	border-left: solid var(--border-size) var(--secondary-color);
+	border-bottom: solid var(--border-size) var(--accent-color);
+	border-right: solid var(--border-size) var(--accent-color);
 	border-radius: 10px;
 }
 

@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { Card } from '@pierogis/utensils';
 
 	import * as E from './engine';
 	import type { Colony, Level, State } from './engine';
@@ -25,7 +26,6 @@
 		type Group,
 		type Seg
 	} from './marks';
-	import 'ui/joined.css';
 	import '../shared/game/stage.css';
 
 	const props: LevelProps<Level, State> = $props();
@@ -334,35 +334,151 @@
 			style:--n={view.slots.length}
 			style:--cols={columnItems.length}
 		>
-			{#key ctl.key}
-				<div
-					class="picture joined-top snapped"
-					bind:this={pictureEl}
-					role="img"
-					aria-label="{ctl.level.name}: {view.left} food left"
-				>
-					{#each game.target as c, i (i)}
-						{#if view.alive[i]}
-							<div class="px food" data-i={i} style:--c={game.colors[c].hex}>
-								{#if i in board.keys}
-									<!-- A key: ringed in its lock's color. -->
-									<span
-										class="key"
-										class:flash={flashCol.value === board.keys[i]}
-										style:--m={marks.lock[board.keys[i]]}
-										title="Key for column {board.keys[i] + 1}"
-									></span>
+			<!-- One card: the picture, and the slots and lanes under it. -->
+			<div class="board snapped">
+				<Card>
+					{#key ctl.key}
+						<div
+							class="picture"
+							bind:this={pictureEl}
+							role="img"
+							aria-label="{ctl.level.name}: {view.left} food left"
+						>
+							{#each game.target as c, i (i)}
+								{#if view.alive[i]}
+									<div class="px food" data-i={i} style:--c={game.colors[c].hex}>
+										{#if i in board.keys}
+											<!-- A key: ringed in its lock's color. -->
+											<span
+												class="key"
+												class:flash={flashCol.value === board.keys[i]}
+												style:--m={marks.lock[board.keys[i]]}
+												title="Key for column {board.keys[i] + 1}"
+											></span>
+										{/if}
+									</div>
+								{:else if board.out[i]}
+									<div class="px"></div>
+								{:else}
+									<div class="px sealed"></div>
 								{/if}
-							</div>
-						{:else if board.out[i]}
-							<div class="px"></div>
-						{:else}
-							<div class="px sealed"></div>
-						{/if}
-					{/each}
-				</div>
-			{/key}
+							{/each}
+						</div>
+					{/key}
 
+					<!-- Under the picture: the working slots, then the colonies' lanes. -->
+					<div class="tab">
+						<div class="slots" class:flash={slotsFlash.value} aria-label="Working slots">
+							{#each view.slots as e, k (k)}
+								<div class="slot" data-slot={k}>
+									{#if e}
+										{@const done = E.isDone(e)}
+										{@const g = e.link}
+										<div
+											class="colony"
+											class:linked={g !== undefined}
+											class:flash={g !== undefined && flashGroup.value === g}
+											style:--g={linkColor(e)}
+											style:--c={game.colors[e.c].hex}
+											style:--ink={inkOn(game.colors[e.c].hex)}
+											aria-label="{done
+												? 'Done, waiting for its linked group'
+												: board.hungry[k]
+													? 'Waiting'
+													: 'Working'}: {colonyLabel(e, true)}"
+										>
+											<!-- Counts down as its ants leave. -->
+											<span class="count">{done ? '✓' : e.n > 0 ? e.n : ''}</span>
+										</div>
+									{/if}
+								</div>
+							{/each}
+							{@render railBars(links.slots)}
+						</div>
+						<!-- The end panel takes the lanes' place, so nothing on the page moves. -->
+						<div class="lanes-area">
+							<div class="lanes" class:hidden={!!ctl.overlay}>
+								{#each columnItems as items, k (k)}
+									{@const head = items[0]}
+									<!-- A lane is one button: tapping it sends the colony at its front. -->
+									<button
+										class="lane"
+										class:flash={flashCol.value === k}
+										disabled={!head}
+										aria-label="Column {k + 1}: {!head
+											? 'empty'
+											: head.kind === 'lock'
+												? 'locked until its key in the picture touches the outside'
+												: colonyLabel(head.e, true)}{items.length > 1
+											? `, ${items.length - 1} more`
+											: ''}"
+										onclick={() => send(k)}
+										onpointerenter={(ev) => ev.pointerType === 'mouse' && hoverLane(k, true)}
+										onpointerleave={() => hoverLane(k, false)}
+										onfocus={(ev) =>
+											ev.currentTarget.matches(':focus-visible') && hoverLane(k, true)}
+										onblur={() => hoverLane(k, false)}
+									>
+										{#each items.slice(0, VISIBLE) as item (item.kind === 'lock' ? 'lock' : item.e.id)}
+											{#if item.kind === 'lock'}
+												<!-- Ringed in its key's color. -->
+												<span
+													class="lock"
+													style:--m={marks.lock[k]}
+													title="Locked until its key in the picture touches the outside"
+												>
+													<svg viewBox="0 0 24 24"
+														><rect x="5" y="11" width="14" height="10" rx="2" /><path
+															d="M8 11V7a4 4 0 0 1 8 0v4"
+														/></svg
+													>
+												</span>
+											{:else}
+												{@const e = item.e}
+												{@const hidden = !item.front && !!e.mystery}
+												{@const g = e.link}
+												{@const lights = item.front || g !== undefined}
+												<span
+													class="colony"
+													class:front={item.front}
+													class:linked={g !== undefined}
+													class:lit={g !== undefined && hoverGroup === g}
+													class:flash={g !== undefined && flashGroup.value === g}
+													style:--g={linkColor(e)}
+													style:--c={hidden ? 'var(--hole)' : game.colors[e.c].hex}
+													style:--ink={hidden ? 'var(--text-color)' : inkOn(game.colors[e.c].hex)}
+													style:--c-hover={lights && !hidden
+														? lighten(game.colors[e.c].hex, HOVER_LIGHTEN)
+														: undefined}
+													style:--ink-hover={lights && !hidden
+														? inkOn(lighten(game.colors[e.c].hex, HOVER_LIGHTEN))
+														: undefined}
+												>
+													<span class="count">{hidden ? '?' : e.n}</span>
+												</span>
+											{/if}
+										{/each}
+										{#if items.length > VISIBLE}<span
+												class="more"
+												class:linked={k in links.more}
+												style:--g={links.more[k]}>+{items.length - VISIBLE}</span
+											>{/if}
+									</button>
+								{/each}
+								{@render railBars(links.lanes)}
+							</div>
+							{#if ctl.overlay}
+								<LevelEnd
+									{...ctl.end}
+									text={ctl.overlay === 'win'
+										? `${ctl.level.name} cleared.`
+										: 'every slot is busy and no colony at the front can finish'}
+								/>
+							{/if}
+						</div>
+					</div>
+				</Card>
+			</div>
 			<div
 				class="ant-layer"
 				{@attach (node) => {
@@ -370,116 +486,6 @@
 				}}
 				aria-hidden="true"
 			></div>
-			<!-- One tab under the picture: the working slots, then the colonies' lanes. -->
-			<div class="tab joined-tab snapped">
-				<div class="slots" class:flash={slotsFlash.value} aria-label="Working slots">
-					{#each view.slots as e, k (k)}
-						<div class="slot" data-slot={k}>
-							{#if e}
-								{@const done = E.isDone(e)}
-								{@const g = e.link}
-								<div
-									class="colony"
-									class:linked={g !== undefined}
-									class:flash={g !== undefined && flashGroup.value === g}
-									style:--g={linkColor(e)}
-									style:--c={game.colors[e.c].hex}
-									style:--ink={inkOn(game.colors[e.c].hex)}
-									aria-label="{done
-										? 'Done, waiting for its linked group'
-										: board.hungry[k]
-											? 'Waiting'
-											: 'Working'}: {colonyLabel(e, true)}"
-								>
-									<!-- Counts down as its ants leave. -->
-									<span class="count">{done ? '✓' : e.n > 0 ? e.n : ''}</span>
-								</div>
-							{/if}
-						</div>
-					{/each}
-					{@render railBars(links.slots)}
-				</div>
-				<!-- The end panel takes the lanes' place, so nothing on the page moves. -->
-				<div class="lanes-area">
-					<div class="lanes" class:hidden={!!ctl.overlay}>
-						{#each columnItems as items, k (k)}
-							{@const head = items[0]}
-							<!-- A lane is one button: tapping it sends the colony at its front. -->
-							<button
-								class="lane"
-								class:flash={flashCol.value === k}
-								disabled={!head}
-								aria-label="Column {k + 1}: {!head
-									? 'empty'
-									: head.kind === 'lock'
-										? 'locked until its key in the picture touches the outside'
-										: colonyLabel(head.e, true)}{items.length > 1
-									? `, ${items.length - 1} more`
-									: ''}"
-								onclick={() => send(k)}
-								onpointerenter={(ev) => ev.pointerType === 'mouse' && hoverLane(k, true)}
-								onpointerleave={() => hoverLane(k, false)}
-								onfocus={(ev) => ev.currentTarget.matches(':focus-visible') && hoverLane(k, true)}
-								onblur={() => hoverLane(k, false)}
-							>
-								{#each items.slice(0, VISIBLE) as item (item.kind === 'lock' ? 'lock' : item.e.id)}
-									{#if item.kind === 'lock'}
-										<!-- Ringed in its key's color. -->
-										<span
-											class="lock"
-											style:--m={marks.lock[k]}
-											title="Locked until its key in the picture touches the outside"
-										>
-											<svg viewBox="0 0 24 24"
-												><rect x="5" y="11" width="14" height="10" rx="2" /><path
-													d="M8 11V7a4 4 0 0 1 8 0v4"
-												/></svg
-											>
-										</span>
-									{:else}
-										{@const e = item.e}
-										{@const hidden = !item.front && !!e.mystery}
-										{@const g = e.link}
-										{@const lights = item.front || g !== undefined}
-										<span
-											class="colony"
-											class:front={item.front}
-											class:linked={g !== undefined}
-											class:lit={g !== undefined && hoverGroup === g}
-											class:flash={g !== undefined && flashGroup.value === g}
-											style:--g={linkColor(e)}
-											style:--c={hidden ? 'var(--hole)' : game.colors[e.c].hex}
-											style:--ink={hidden ? 'var(--text-color)' : inkOn(game.colors[e.c].hex)}
-											style:--c-hover={lights && !hidden
-												? lighten(game.colors[e.c].hex, HOVER_LIGHTEN)
-												: undefined}
-											style:--ink-hover={lights && !hidden
-												? inkOn(lighten(game.colors[e.c].hex, HOVER_LIGHTEN))
-												: undefined}
-										>
-											<span class="count">{hidden ? '?' : e.n}</span>
-										</span>
-									{/if}
-								{/each}
-								{#if items.length > VISIBLE}<span
-										class="more"
-										class:linked={k in links.more}
-										style:--g={links.more[k]}>+{items.length - VISIBLE}</span
-									>{/if}
-							</button>
-						{/each}
-						{@render railBars(links.lanes)}
-					</div>
-					{#if ctl.overlay}
-						<LevelEnd
-							{...ctl.end}
-							text={ctl.overlay === 'win'
-								? `${ctl.level.name} cleared.`
-								: 'every slot is busy and no colony at the front can finish'}
-						/>
-					{/if}
-				</div>
-			</div>
 		</div>
 	{/if}
 </div>
@@ -508,7 +514,7 @@
 		);
 		--cell: calc(var(--pitch) - var(--gap));
 		/* The picture with its walking ring, (w + 2) cells and (w + 3) gaps, in the card's bevel. */
-		--picture-w: calc((var(--w) + 2) * var(--pitch) + var(--gap) + 2 * var(--card-bevel));
+		--picture-w: calc((var(--w) + 2) * var(--pitch) + var(--gap) + 2 * var(--border-size));
 		--slot-size: 52px;
 		--colony: 36px;
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
@@ -542,9 +548,9 @@
 	}
 
 	/*
-	 * The picture and the slots are one card (ui/joined.css), so the ants walk out
-	 * of their slot straight into the picture's margin. The picture is at least
-	 * wide enough for the slots' tab and the curves beside it.
+	 * The picture and the slots are one card (stage.css), so the ants walk out of
+	 * their slot straight into the picture's margin. The card is as wide as the
+	 * wider of the picture and the slots or lanes.
 	 */
 	.stage {
 		/* Slots and lanes share one pitch, so a colony is the same size in both. */
@@ -554,9 +560,10 @@
 		--lanes-w: calc(var(--cols) * var(--slot-size) + (var(--cols) - 1) * 8px);
 		/* The tab's side padding (roomier than its 8px top and bottom) and bevel on each side. */
 		--tab-pad: 14px;
-		--tab-edges: calc(2 * (var(--tab-pad) + var(--card-bevel)));
+		--tab-edges: calc(2 * (var(--tab-pad) + var(--border-size)));
 		--tab-w: calc(max(var(--slots-w), var(--lanes-w)) + var(--tab-edges));
-		--board-w: min(100cqw, max(var(--picture-w), calc(var(--tab-w) + 48px)));
+		/* The card's width, bevel and all. */
+		--board-w: min(100cqw, max(var(--picture-w), var(--tab-w)));
 		position: relative;
 		align-self: stretch;
 		display: flex;
@@ -568,13 +575,14 @@
 	.slots,
 	.lanes {
 		position: relative;
-		margin-left: round(down, calc((var(--tab-w) - var(--tab-edges) - var(--row-w)) / 2), 1px);
+		margin-left: round(down, calc((var(--board-w) - var(--tab-edges) - var(--row-w)) / 2), 1px);
+	}
+	.board {
+		--snap-w: var(--board-w);
+		width: var(--board-w);
 	}
 	.picture {
-		--snap-w: var(--board-w);
 		--ring: calc(var(--cell) + var(--gap) * 2);
-		box-sizing: border-box;
-		width: var(--board-w);
 		display: grid;
 		grid-template-columns: repeat(var(--w), var(--cell));
 		gap: var(--gap);
@@ -648,8 +656,6 @@
 
 	/* The tab: working slots on top, the colonies' lanes under them. */
 	.tab {
-		--snap-w: var(--tab-w);
-		width: var(--tab-w);
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -847,7 +853,7 @@
 		/* Phones: the picture takes the full width (the page scrolls if the colonies end up below). */
 		.forage {
 			--gap: 1px;
-			--room-w: calc(100cqw - 8px - 2 * var(--card-bevel));
+			--room-w: calc(100cqw - 8px - 2 * var(--border-size));
 			--pitch: round(down, clamp(8px, calc(var(--room-w) / (var(--w) + 2)), 24px), 1px);
 		}
 		:global(body .content:has(> .forage)) {

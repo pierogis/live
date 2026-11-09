@@ -7,12 +7,12 @@
 	import { onMount, tick } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { Attachment } from 'svelte/attachments';
+	import { Card } from '@pierogis/utensils';
 
 	import * as E from './engine';
 	import type { Dst, Level, MoveResult, Sel, State } from './engine';
 	import LevelEnd from '../shared/game/LevelEnd.svelte';
 	import GameBar from '../shared/game/GameBar.svelte';
-	import 'ui/joined.css';
 	import '../shared/game/stage.css';
 	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
 	import { plural } from '../shared/game/text';
@@ -692,9 +692,9 @@
 	<div class="stage" class:won={ctl.won}>
 		<p class="sr-only" aria-live="polite">{ctl.status}</p>
 
-		<div class="board-wrap snapped">
-			<!-- The board's card: the bevel and ring around the zoomable window. -->
-			<div class="board-card joined-top">
+		<div class="board-wrap snapped" class:nofit={trayState.nofit || trayFlash.value}>
+			<!-- One card: the zoomable board, and the tray under it. -->
+			<Card>
 				<!-- Cells take Enter and Space; this handler adds forgiving taps and zoom gestures. -->
 				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 				<div
@@ -750,44 +750,44 @@
 						</div>
 					{/key}
 				</div>
-			</div>
 
-			<!-- The tray hangs under the board; a level's end panel shows in its place. -->
-			<div class="tray-tab joined-tab" class:nofit={trayState.nofit || trayFlash.value}>
-				<!-- Tray dots and slots are reached by pointer; the keyboard sends picked-up dots here with T. -->
-				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-				<div
-					class="tray"
-					class:warn={trayState.warn}
-					class:hidden={!!ctl.overlay}
-					bind:this={trayEl}
-					style:--n={trayView.length}
-					onclick={onTray}
-					onpointerover={onTrayHover}
-					onpointerleave={() => (trayHover = null)}
-				>
-					{#each trayView as t, k (k)}
-						<div
-							class="slot"
-							class:drop={t.drop}
-							class:fill-preview={t.fill}
-							class:group-start={t.groupStart}
-						>
-							{#if t.g}
-								<div class="gem {t.cls}" data-id={t.g.id} style:--c={t.hex}></div>
-							{/if}
-						</div>
-					{/each}
+				<!-- The tray, under the board; a level's end panel shows in its place. -->
+				<div class="tray-area">
+					<!-- Tray dots and slots are reached by pointer; the keyboard sends picked-up dots here with T. -->
+					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+					<div
+						class="tray"
+						class:warn={trayState.warn}
+						class:hidden={!!ctl.overlay}
+						bind:this={trayEl}
+						style:--n={trayView.length}
+						onclick={onTray}
+						onpointerover={onTrayHover}
+						onpointerleave={() => (trayHover = null)}
+					>
+						{#each trayView as t, k (k)}
+							<div
+								class="slot"
+								class:drop={t.drop}
+								class:fill-preview={t.fill}
+								class:group-start={t.groupStart}
+							>
+								{#if t.g}
+									<div class="gem {t.cls}" data-id={t.g.id} style:--c={t.hex}></div>
+								{/if}
+							</div>
+						{/each}
+					</div>
+					{#if ctl.overlay}
+						<LevelEnd
+							{...ctl.end}
+							text={ctl.overlay === 'win'
+								? `${ctl.level.name} complete.`
+								: 'no group fits in the tray or in an open spot'}
+						/>
+					{/if}
 				</div>
-				{#if ctl.overlay}
-					<LevelEnd
-						{...ctl.end}
-						text={ctl.overlay === 'win'
-							? `${ctl.level.name} complete.`
-							: 'no group fits in the tray or in an open spot'}
-					/>
-				{/if}
-			</div>
+			</Card>
 			<div class="under">
 				<span class="count"
 					>tray <b class:warn={trayState.warn}>{trayState.used} / {trayState.cap}</b></span
@@ -866,7 +866,7 @@
 		--pad: 12px;
 		--gap: 2px;
 		/* Room for the cells inside the card's padding and bevel. */
-		--edges: calc(2 * (var(--pad) + var(--card-bevel)));
+		--edges: calc(2 * (var(--pad) + var(--border-size)));
 		--fit-w: calc((min(100cqw, 1000px) - var(--edges) - (var(--w) - 1) * var(--gap)) / var(--w));
 		--fit-h: calc(
 			(max(100svh - 340px, 200px) - var(--edges) - (var(--h) - 1) * var(--gap)) / var(--h)
@@ -891,10 +891,10 @@
 			--cell: round(down, clamp(9px, var(--fit-w), 44px), 1px);
 		}
 	}
-	/* The board and the tray under it are one card (ui/joined.css), so dots fly within it. */
+	/* The board and the tray under it are one card (stage.css), so dots fly within it. */
 	.board-wrap {
 		/* Its width with the card's bevel, for centering (`snapped` in stage.css). */
-		--card-w: calc(var(--board-w) + 2 * var(--card-bevel));
+		--card-w: calc(var(--board-w) + 2 * var(--border-size));
 		--snap-w: var(--card-w);
 		display: flex;
 		flex-direction: column;
@@ -922,8 +922,8 @@
 		touch-action: none;
 		/* Raised dots stay under the tray where the two meet. */
 		isolation: isolate;
-		/* Zoomed cells stay inside the card's rounded corners. */
-		border-radius: calc(10px - var(--card-bevel));
+		/* Zoomed cells stay inside the card's rounded top corners. */
+		border-radius: calc(10px - var(--border-size)) calc(10px - var(--border-size)) 0 0;
 	}
 	.board-view.zoomed {
 		cursor: grab;
@@ -1070,21 +1070,19 @@
 		z-index: 4;
 	}
 	/*
-	 * Tray: a tab 24px in from each side of the board. Its slots' rows hold as many
-	 * whole slots as fit, or all of them if they fit on one row, centered by a
+	 * Tray: the card's width under the board. Its slots' rows hold as many whole
+	 * slots as fit, or all of them if they fit on one row, centered by a
 	 * whole-pixel left padding.
 	 */
-	.tray-tab {
+	.tray-area {
 		--tray-gap: round(calc(var(--slot) * 0.14), 1px);
-		--tab-w: calc(var(--card-w) - 48px);
-		/* Inside the tray's 8px padding and the card's bevel. */
-		--room: calc(var(--tab-w) - 2 * (8px + var(--card-bevel)));
-		width: var(--tab-w);
-		margin-left: 24px;
+		/* Inside the tray's 8px padding. */
+		--room: calc(var(--board-w) - 16px);
 		display: grid;
+		border-radius: 0 0 calc(10px - var(--border-size)) calc(10px - var(--border-size));
 	}
 	/* The tray and the end panel share one spot, so the panel never moves the page. */
-	.tray-tab > :global(*) {
+	.tray-area > :global(*) {
 		grid-area: 1 / 1;
 	}
 	.tray {
@@ -1144,10 +1142,18 @@
 	.tray.hidden {
 		visibility: hidden;
 	}
-	/* No room: the tab's bevel goes all accent and its fill takes a tint of it. */
-	.tray-tab.nofit {
+	/* No room: the card's bevel goes all accent and the tray takes a tint of it. */
+	.board-wrap.nofit {
 		--edge: var(--accent-color);
-		--well: color-mix(in srgb, var(--accent-color) 22%, var(--primary-color));
+	}
+	.nofit .tray-area {
+		background: color-mix(in srgb, var(--accent-color) 22%, var(--primary-color));
+		/* The card's ring, on the tray's sides and bottom, over the tint. */
+		--ring: var(--text-color-st);
+		box-shadow:
+			inset 2px 0 var(--ring),
+			inset -2px 0 var(--ring),
+			inset 0 -2px var(--ring);
 	}
 	/* Flying dots */
 	.fx {
