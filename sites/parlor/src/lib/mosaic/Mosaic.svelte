@@ -17,6 +17,7 @@
 	import '../shared/game/stage.css';
 	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
 	import { plural } from '../shared/game/text';
+	import { inkOn } from '../shared/ink';
 	import { mosaicSave } from './save';
 	import { Flights, snapshotRects } from './flights';
 
@@ -128,7 +129,8 @@
 		void ctl.version;
 		const s = game;
 		if (!s) return [];
-		const color = selColor();
+		// An open spot's socket is its own color shaded toward the ink that reads on it.
+		const inks = s.colors.map((k) => inkOn(k.hex));
 		return s.target.map((c, i) => {
 			if (c < 0) return null;
 			const dot = s.top[i];
@@ -144,12 +146,14 @@
 			} else {
 				cls = 'open';
 				label = 'Open spot';
-				if (c === color) cls += ' target';
 			}
 			let dotCls = picked.has(i) ? 'sel' : '';
 			if (sel?.from === 'board' && sel.cell === i) dotCls += ' center';
 			return {
 				hex: s.colors[c].hex,
+				ink: inks[c],
+				// A checkerboard: an open spot's stripes turn the other way on every other one.
+				alt: ((i % s.w) + Math.floor(i / s.w)) % 2 === 1,
 				dot,
 				dotHex: dot ? s.colors[dot.c].hex : '',
 				cls,
@@ -520,11 +524,23 @@
 	}
 
 	/** Tray taps: a dot picks up that dot's color; an empty slot is where picked-up dots go. */
+	/**
+	 * The tray dot a tap or hover is on: anywhere in a slot that holds one counts,
+	 * so a near miss beside a dot never lands on the slot as if it were empty.
+	 */
+	function trayGemAt(target: Element): HTMLElement | null {
+		return (
+			target.closest<HTMLElement>('.gem[data-id]') ??
+			target.closest('.slot')?.querySelector<HTMLElement>('.gem[data-id]') ??
+			null
+		);
+	}
+
 	function onTray(e: MouseEvent) {
 		const s = game;
 		if (!s || ctl.overlay || E.isWon(s)) return;
 		const target = e.target as Element;
-		const node = target.closest<HTMLElement>('.gem[data-id]');
+		const node = trayGemAt(target);
 		if (node) {
 			const gem = s.tray.find((q) => q.id === +node.dataset.id!);
 			if (!gem) return;
@@ -541,7 +557,7 @@
 	function onTrayHover(e: PointerEvent) {
 		if (e.pointerType !== 'mouse' || !game) return;
 		const target = e.target as Element;
-		const node = target.closest<HTMLElement>('.gem[data-id]');
+		const node = trayGemAt(target);
 		const gem = node && game.tray.find((q) => q.id === +node.dataset.id!);
 		if (gem) trayHover = { color: gem.c };
 		else if (target.closest('.slot')) trayHover = { slot: true };
@@ -734,6 +750,8 @@
 										tabindex={i === focusCell ? 0 : -1}
 										aria-label={pending ? 'Open spot' : v.label}
 										style:--c={v.hex}
+										class:alt={v.alt}
+										style:--ink={v.ink}
 									>
 										{#if v.dot}
 											<div
@@ -831,7 +849,6 @@
 	.mosaic {
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		--well: color-mix(in srgb, var(--text-color) 7%, var(--primary-color));
-		--slotbg: color-mix(in srgb, var(--text-color) 12%, var(--primary-color));
 
 		/*
 		 * The page centers its content, which can land on half a pixel. So the game
@@ -875,6 +892,8 @@
 		/* Whole pixels, so dots and their rings sit exactly centered in their cells. */
 		--cell: round(down, clamp(9px, min(var(--fit-w), var(--fit-h)), 44px), 1px);
 		--slot: round(down, clamp(22px, calc(var(--cell) * 0.9), 36px), 1px);
+		/* A dot's size, on the board and in the tray alike. */
+		--dot: calc(var(--cell) - 2 * round(calc(var(--cell) * 0.2), 1px));
 		--board-w: calc(var(--w) * var(--cell) + (var(--w) - 1) * var(--gap) + 2 * var(--pad));
 		--board-h: calc(var(--h) * var(--cell) + (var(--h) - 1) * var(--gap) + 2 * var(--pad));
 
@@ -883,6 +902,8 @@
 		/* Centered by whole-pixel margins (`snapped`) rather than by flex, which can split a pixel. */
 		align-items: flex-start;
 		gap: 12px;
+		/* The same room under the game bar as Forage's. */
+		margin-top: 14px;
 	}
 	/* Phones: the board takes the full width (the page scrolls if the tray ends up below). */
 	@media (max-width: 500px) {
@@ -993,20 +1014,30 @@
 	.cell.pending {
 		cursor: pointer;
 	}
-	/* Open: an empty socket where a dot goes. A filled spot whose dot is still flying looks open. */
+	/*
+	 * Open: an empty socket where a dot goes, a big striped diamond so it can't pass
+	 * for a dot of another color. Its stripes are the spot's own color shaded toward
+	 * its ink (darker on light colors, lighter on dark ones), and turn the other way
+	 * on every other spot. A filled spot whose dot is still flying looks open.
+	 */
 	.cell.open::after,
 	.cell.pending::after {
+		--shade: color-mix(in srgb, var(--c), var(--ink) 40%);
+		--stripe: max(1px, round(calc(var(--cell) * 0.07), 1px));
 		content: '';
 		position: absolute;
-		inset: round(calc(var(--cell) * 0.22), 1px);
-		border-radius: 50%;
-		background: rgb(0 0 0 / 0.28);
-		/* A dark hole shows on light colors; the light rim shows on dark colors. */
-		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.45);
+		inset: round(calc(var(--cell) * 0.17), 1px);
+		border-radius: 2px;
+		rotate: 45deg;
+		/* Turned with the diamond, the stripes run along two of its sides. */
+		background: repeating-linear-gradient(
+			var(--turn, 0deg),
+			var(--shade) 0 var(--stripe),
+			transparent var(--stripe) calc(var(--stripe) * 2 + 1px)
+		);
 	}
-	/* Open spots your dots could go to: a brighter socket rim. */
-	.cell.target::after {
-		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.8);
+	.cell.alt::after {
+		--turn: 90deg;
 	}
 	/*
 	 * Hovering an open area: outline it; the spots that would fill show a pale dot.
@@ -1016,7 +1047,11 @@
 	.cell.fill-preview {
 		box-shadow: inset 0 0 0 2px var(--text-color);
 	}
+	/* A dot as it would land: round, where the socket was. */
 	.cell.fill-preview::after {
+		inset: round(calc(var(--cell) * 0.2), 1px);
+		border-radius: 50%;
+		rotate: none;
 		background: color-mix(in srgb, var(--c) 60%, #fff);
 		box-shadow: 0 0 0 2px var(--text-color);
 	}
@@ -1033,11 +1068,9 @@
 		border-radius: 50%;
 		background: var(--c);
 		--ring: max(1px, round(calc(var(--cell) * 0.06), 1px));
-		box-shadow:
-			0 0 0 var(--ring) rgb(0 0 0 / 0.45),
-			0 0 0 calc(var(--ring) * 2) rgb(255 255 255 / 0.5);
+		/* Just a thin dark edge. */
+		box-shadow: 0 0 0 var(--ring) rgb(0 0 0 / 0.45);
 	}
-	.slot .gem,
 	.fx :global(.flyer) {
 		--ring: max(1px, round(calc(var(--slot) * 0.04), 1px));
 	}
@@ -1054,18 +1087,14 @@
 		outline: max(2px, round(calc(var(--ring) * 1.5), 1px)) dashed var(--text-color);
 		outline-offset: var(--ring);
 	}
-	/* Picked up: a light ring inside a dark one, so it reads on any color. */
+	/* Picked up: an outline in the text color. */
 	.gem.sel {
-		box-shadow:
-			0 0 0 var(--ring) rgb(255 255 255 / 0.9),
-			0 0 0 calc(var(--ring) * 3) var(--text-color);
+		box-shadow: 0 0 0 calc(var(--ring) * 2) var(--text-color);
 		z-index: 3;
 	}
 	/* The dot the move is centered on gets the accent color. */
 	.gem.sel.center {
-		box-shadow:
-			0 0 0 var(--ring) rgb(255 255 255 / 0.9),
-			0 0 0 calc(var(--ring) * 3) var(--accent-color);
+		box-shadow: 0 0 0 calc(var(--ring) * 2) var(--accent-color);
 		z-index: 4;
 	}
 	/*
@@ -1103,17 +1132,50 @@
 		width: var(--slot);
 		height: var(--slot);
 		border-radius: 50%;
-		background: var(--slotbg);
+		background: color-mix(in srgb, var(--text-color) 18%, transparent);
 		position: relative;
 	}
-	/* Room around each tray dot for its selection ring, so neighbors don't paint over it. */
+	/*
+	 * An empty slot: a striped diamond like an open spot on the board, in a neutral
+	 * shade (a slot has no color of its own). Its stripes turn the other way on every
+	 * other slot.
+	 */
+	.slot:empty::after {
+		--shade: color-mix(in srgb, var(--text-color) 55%, transparent);
+		--stripe: max(1px, round(calc(var(--cell) * 0.07), 1px));
+		--side: calc(var(--cell) - 2 * round(calc(var(--cell) * 0.17), 1px));
+		content: '';
+		position: absolute;
+		width: var(--side);
+		height: var(--side);
+		left: round(down, calc((var(--slot) - var(--side)) / 2), 1px);
+		top: round(down, calc((var(--slot) - var(--side)) / 2), 1px);
+		border-radius: 2px;
+		rotate: 45deg;
+		background: repeating-linear-gradient(
+			var(--turn, 0deg),
+			var(--shade) 0 var(--stripe),
+			transparent var(--stripe) calc(var(--stripe) * 2 + 1px)
+		);
+	}
+	.slot:nth-child(even)::after {
+		--turn: 90deg;
+	}
+	/* A tray dot is the size of a board dot, in the middle of its (bigger) slot. */
 	.slot .gem {
 		position: absolute;
-		inset: round(calc(var(--slot) * 0.16), 1px);
+		width: var(--dot);
+		height: var(--dot);
+		left: round(down, calc((var(--slot) - var(--dot)) / 2), 1px);
+		top: round(down, calc((var(--slot) - var(--dot)) / 2), 1px);
+	}
+	/* A slot with a dot is all that dot's: a tap anywhere in it picks the dot's color up. */
+	.slot:has(.gem) {
 		cursor: pointer;
 	}
-	.tray.warn .slot:empty {
-		background: color-mix(in srgb, var(--accent-color) 25%, var(--slotbg));
+	/* Nearly full: the empty slots that are left take the accent color. */
+	.tray.warn .slot:empty::after {
+		--shade: color-mix(in srgb, var(--accent-color) 80%, transparent);
 	}
 	.slot.drop {
 		cursor: pointer;
