@@ -6,15 +6,13 @@ import type { Level } from '../src/lib/mosaic/engine.ts';
 import type { Pack, Picture } from '../src/lib/shared/level.ts';
 import { levelsFrom, type PackFiles } from '../src/lib/shared/levels.ts';
 
-const levelsDir = (game: GameId) => new URL(`../src/lib/${game}/levels/`, import.meta.url);
-
 export interface PackFile<L extends Picture = Level> extends Pack<L> {
 	path: URL;
 }
 
 /** The game's pack files, read the way its levels/index.ts globs them. */
 function read<L extends Picture>(game: GameId) {
-	const dir = levelsDir(game);
+	const dir = new URL(`../src/lib/${game}/levels/`, import.meta.url);
 	const files: PackFiles<L> = {};
 	for (const f of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
 		files[f] = { default: JSON.parse(readFileSync(new URL(f, dir), 'utf8')) };

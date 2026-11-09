@@ -18,7 +18,7 @@ import type { Canvas } from './canvas.ts';
 const EYE = ['black', 'charcoal', 'chocolate', 'navy'];
 const LIGHT_BG = ['mint', 'sky', 'lemon', 'blush', 'ice', 'lilac', 'cream', 'peach', 'aqua'];
 
-/** Pupils and the like: black dots, min 3 cells. */
+/** Pupils and the like: dark dots, min 3 cells. */
 function eyes(c: Canvas, pts: [number, number][], r: number, pri: number, orElse: string) {
 	c.part('eye', EYE, pri, orElse, 3);
 	for (const [x, y] of pts) c.paint('eye', c.dot(x, y, r));

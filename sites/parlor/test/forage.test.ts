@@ -10,6 +10,9 @@ import { makeRng } from '../src/lib/shared/engine.ts';
 import { closePairs } from '../src/lib/shared/palette.ts';
 import { loadPacks } from './levels.ts';
 
+const packs = loadPacks<F.Level>('forage');
+const LEVELS = packs.flatMap((p) => p.levels);
+
 /** A hand-made state: art rows, colonies per column (front first), as [color, ants]. */
 function make(art: string[], columns: [number, number][][], slots = 5): F.State {
 	const lv: F.Level = {
@@ -26,6 +29,9 @@ function make(art: string[], columns: [number, number][][], slots = 5): F.State 
 	s.slots = new Array(slots).fill(null);
 	return s;
 }
+
+/** Whether every slot is empty. */
+const slotsFree = (s: F.State) => s.slots.every((e) => !e);
 
 test('only blocks touching the outside are exposed; sealed holes do not count', () => {
 	// A ring of A around a hole, with B in the hole's corner.
@@ -64,7 +70,7 @@ test('every colony out working holds a slot until it has eaten its count', () =>
 	assert.ok(F.isStuck(s), 'nothing can eat and nothing can go');
 });
 
-test('time: ants leave one per tick and the food goes when they get there', () => {
+test('time: ants leave one at a time and the food goes when they get there', () => {
 	const s = make(['AAAA', 'BBBB'], [[[0, 4]], [[1, 4]]]);
 	assert.ok(F.send(s, 0).ok && F.send(s, 1).ok);
 	const first = F.tick(s);
@@ -78,25 +84,19 @@ test('time: ants leave one per tick and the food goes when they get there', () =
 	}
 	assert.ok(F.isWon(s));
 	assert.ok(most <= 2, 'at most one food per colony per tick');
-	assert.ok(
-		s.slots.every((e) => !e),
-		'colonies have left their slots'
-	);
+	assert.ok(slotsFree(s), 'colonies have left their slots');
 });
 
 test('a colony frees its slot as soon as it sends its last ant', () => {
 	const s = make(['AAAA', 'BBBB'], [[[0, 1]], [[1, 4]]]);
 	assert.ok(F.send(s, 0).ok);
-	assert.ok(
-		s.slots.every((e) => !e),
-		'one ant, sent right away: the slot is already free'
-	);
+	assert.ok(slotsFree(s), 'one ant, sent right away: the slot is already free');
 	assert.equal(s.walking.length, 1, 'the ant is still on its way');
 	assert.ok(F.send(s, 1).ok);
 	let freedWhileWalking = false;
 	for (let t = 0; t < 40 && !F.isWon(s); t++) {
 		F.tick(s);
-		if (s.slots.every((e) => !e) && s.walking.length) freedWhileWalking = true;
+		if (slotsFree(s) && s.walking.length) freedWhileWalking = true;
 	}
 	assert.ok(freedWhileWalking, 'B left its slot while its last ants were still walking');
 });
@@ -112,8 +112,8 @@ test('a locked column opens when its key block touches the outside', () => {
 	assert.ok(F.pick(s, 1).ok);
 });
 
-test('ants leave one at a time; uncovered food is claimed only once it is exposed', () => {
-	// A 3x3 block: the middle (4) is sealed until an ant picks up a food beside it.
+test('ants leave one at a time; covered food is claimed only once it is exposed', () => {
+	// A 3x3 block: the middle (4) is sealed until a food beside it is eaten.
 	const s = make(['AAA', 'AAA', 'AAA'], [[[0, 9]]]);
 	assert.ok(F.send(s, 0).ok);
 	assert.equal(s.walking.length, 1, 'the first ant leaves right away');
@@ -149,10 +149,7 @@ test('linked colonies stay linked in their slots until both are done', () => {
 	}
 	assert.ok(sawWaitingPartner, 'A stayed in its slot, done, while B was still eating');
 	assert.ok(F.isWon(s));
-	assert.ok(
-		s.slots.every((e) => !e),
-		'both left together'
-	);
+	assert.ok(slotsFree(s), 'both left together');
 });
 
 test('a lock sits in front of the colony it blocks; colonies ahead of it can still go', () => {
@@ -342,10 +339,7 @@ test('a linked group of three goes out together and holds its slots until all ar
 		if (out.some(F.isDone) && out.some((e) => !F.isDone(e))) heldDone = true;
 	}
 	assert.ok(heldDone, 'a finished colony stayed in its slot while the group was busy');
-	assert.ok(
-		t.slots.every((e) => !e),
-		'then all three left together'
-	);
+	assert.ok(slotsFree(t), 'then all three left together');
 	const full = F.clone(s);
 	full.slots = [null, null, { id: 99, c: 1, n: 1 }, { id: 98, c: 1, n: 1 }, { id: 97, c: 1, n: 1 }];
 	const r = F.send(full, 0);
@@ -363,7 +357,7 @@ test('dig depth: blocks to eat before each cell is exposed', () => {
 
 test('a patient pick times ants the same way the board does, tick by tick', () => {
 	// pick() skips making the walks the board draws ants along; it must still match send + tick.
-	const lv = loadPacks<F.Level>('forage')[0].levels[3];
+	const lv = packs[0].levels[3];
 	const s0 = F.buildPuzzle(lv, 3);
 	const a = F.clone(s0);
 	const b = F.clone(s0);
@@ -404,7 +398,7 @@ test('difficulty: the first levels are easy, the last very hard, with breathers'
 });
 
 test('the strong player clears a teaching level, and its path replays to a win', () => {
-	const lv = loadPacks<F.Level>('forage')[0].levels[0];
+	const lv = packs[0].levels[0];
 	const s = F.buildPuzzle(lv, 0);
 	assert.equal(winsOf('strong', s, 6), 1);
 	const t = F.clone(s);
@@ -412,7 +406,6 @@ test('the strong player clears a teaching level, and its path replays to a win',
 	assert.ok(F.isWon(t));
 });
 
-const packs = loadPacks<F.Level>('forage');
 let index = 0;
 for (const pack of packs) {
 	for (const lv of pack.levels) {
@@ -434,11 +427,10 @@ for (const pack of packs) {
 			const r = F.clone(s);
 			for (const col of s.intended!) assert.ok(F.pick(r, col).ok);
 			assert.ok(F.isWon(r));
-			// Games are slow on big pictures, so check a sample of levels: forage:tune never
-			// keeps a deal that lost every game it measured when another will do, and these
-			// are the games it measured (its win share is the best of the players).
+			// Games are slow on big pictures, so check every tenth tuned level: these are
+			// the games forage:tune measured, and it avoids deals that lose them all.
 			if (i % 10 === 0 && lv.wins !== undefined) {
-				assert.ok(measure(s, 16).wins > 0, 'a measured game wins');
+				assert.ok(measure(s).wins > 0, 'a measured game wins');
 			}
 			assert.deepEqual(F.buildPuzzle(lv, i).columns, s.columns, 'same level, same deal');
 		});
@@ -446,10 +438,7 @@ for (const pack of packs) {
 }
 
 test('later deals make you wait: waits and long-held linked pairs are common', () => {
-	const later = packs
-		.flatMap((p) => p.levels)
-		.map((lv, i) => ({ lv, i }))
-		.slice(60);
+	const later = LEVELS.map((lv, i) => ({ lv, i })).slice(60);
 	let waits = 0;
 	let sends = 0;
 	let withHeld = 0;
@@ -463,8 +452,8 @@ test('later deals make you wait: waits and long-held linked pairs are common', (
 	assert.ok(withHeld >= later.length * 0.7, `${withHeld} of ${later.length} hold a pair long`);
 });
 
-test('forage level ids are unique and there are about 200 levels', () => {
-	const ids = packs.flatMap((p) => p.levels.map((l) => l.id));
+test('forage level ids are unique and there are at least 200 levels', () => {
+	const ids = LEVELS.map((l) => l.id);
 	assert.equal(new Set(ids).size, ids.length);
 	assert.ok(ids.length >= 200);
 });
@@ -513,8 +502,7 @@ test('cruxes: a teaching level has none, and the walked line wins', () => {
 	for (const col of a.line) assert.ok(F.pick(t, col).ok);
 	assert.ok(F.isWon(t));
 	// Cheap enough for the editor: it stops on time, with what it found so far.
-	const big = packs.at(-1)!.levels.at(-1)!;
-	const quick = analyze(F.buildPuzzle(big, packs.flatMap((p) => p.levels).length - 1), {
+	const quick = analyze(F.buildPuzzle(LEVELS.at(-1)!, LEVELS.length - 1), {
 		...QUICK,
 		ms: 300
 	});
@@ -545,13 +533,12 @@ test("a level's deal string says which column each colony goes to; a bad one is 
 });
 
 test('tuned levels: teaching ones have no cruxes, late ones several rule breaks', () => {
-	const all = packs.flatMap((p) => p.levels);
-	if (all.some((l) => l.cruxes === undefined)) return; // not tuned yet
-	for (const l of all.slice(0, 5)) assert.equal(l.cruxes, 0, l.id);
-	const late = all.slice(160);
+	if (LEVELS.some((l) => l.cruxes === undefined)) return; // not tuned yet
+	for (const l of LEVELS.slice(0, 5)) assert.equal(l.cruxes, 0, l.id);
+	const late = LEVELS.slice(160);
 	const breaks = late.reduce((n, l) => n + (l.breaks ?? 0), 0) / late.length;
 	assert.ok(breaks >= 2, `late levels average ${breaks.toFixed(1)} rule breaks`);
-	const pips = all.map((l) => difficultyIndex(l.wins, l)!);
+	const pips = LEVELS.map((l) => difficultyIndex(l.wins, l)!);
 	const avg = (from: number, to: number) =>
 		pips.slice(from, to).reduce((a, b) => a + b) / (to - from);
 	assert.ok(avg(0, 5) <= 1.2 && avg(160, 200) >= 4, 'rises from 1 to about 5');

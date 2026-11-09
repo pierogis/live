@@ -832,7 +832,6 @@
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		--well: color-mix(in srgb, var(--text-color) 7%, var(--primary-color));
 		--slotbg: color-mix(in srgb, var(--text-color) 12%, var(--primary-color));
-		--gem: 30px;
 
 		/*
 		 * The page centers its content, which can land on half a pixel. So the game
@@ -867,7 +866,7 @@
 	.stage {
 		--pad: 12px;
 		--gap: 2px;
-		/* Room for the cells inside the card's padding and bevel. */
+		/* Room around the cells: the board's padding and the card's bevel. */
 		--edges: calc(2 * (var(--pad) + var(--border-size)));
 		--fit-w: calc((min(100cqw, 1000px) - var(--edges) - (var(--w) - 1) * var(--gap)) / var(--w));
 		--fit-h: calc(
@@ -893,10 +892,12 @@
 			--cell: round(down, clamp(9px, var(--fit-w), 44px), 1px);
 		}
 	}
-	/* The board and the tray under it are one card (stage.css), so dots fly within it. */
+	/* The card (the board and the tray under it), then its controls and the level nav. */
 	.board-wrap {
-		/* Its width with the card's bevel, for centering (`snapped` in stage.css). */
+		/* The card's width with its bevel, for centering (`snapped` in stage.css). */
 		--card-w: calc(var(--board-w) + 2 * var(--border-size));
+		/* The card's inner corner radius: utensils' .border is 10px round. */
+		--inner-r: calc(10px - var(--border-size));
 		--snap-w: var(--card-w);
 		display: flex;
 		flex-direction: column;
@@ -925,7 +926,7 @@
 		/* Raised dots stay under the tray where the two meet. */
 		isolation: isolate;
 		/* Zoomed cells stay inside the card's rounded top corners. */
-		border-radius: calc(10px - var(--border-size)) calc(10px - var(--border-size)) 0 0;
+		border-radius: var(--inner-r) var(--inner-r) 0 0;
 	}
 	.board-view.zoomed {
 		cursor: grab;
@@ -1029,8 +1030,6 @@
 	/* Dots (on the board, in the tray, and flying). Flyers are made in script, so they're global. */
 	.gem,
 	.fx :global(.flyer) {
-		width: var(--gem);
-		height: var(--gem);
 		border-radius: 50%;
 		background: var(--c);
 		--ring: max(1px, round(calc(var(--cell) * 0.06), 1px));
@@ -1045,8 +1044,6 @@
 	.cell .gem {
 		position: absolute;
 		inset: round(calc(var(--cell) * 0.2), 1px);
-		width: auto;
-		height: auto;
 		z-index: 1;
 	}
 	.gem.ghost {
@@ -1081,7 +1078,7 @@
 		/* Inside the tray's 8px padding. */
 		--room: calc(var(--board-w) - 16px);
 		display: grid;
-		border-radius: 0 0 calc(10px - var(--border-size)) calc(10px - var(--border-size));
+		border-radius: 0 0 var(--inner-r) var(--inner-r);
 	}
 	/* The tray and the end panel share one spot, so the panel never moves the page. */
 	.tray-area > :global(*) {
@@ -1113,8 +1110,6 @@
 	.slot .gem {
 		position: absolute;
 		inset: round(calc(var(--slot) * 0.16), 1px);
-		width: auto;
-		height: auto;
 		cursor: pointer;
 	}
 	.tray.warn .slot:empty {

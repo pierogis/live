@@ -37,7 +37,7 @@ function wheel(c: Canvas, x: number, y: number, r: number, tire: string, hub: st
 	c.paint(hub, c.dot(x, y, Math.max(1, r * 0.45)));
 }
 
-/** Wall above a table edge at `y`, with an optional stripe along the table. */
+/** A wall, and a table from `y` down with a stripe along its edge. */
 function room(c: Canvas, y: number) {
 	c.part('wall', WALLS, 2);
 	c.fill('wall');

@@ -67,7 +67,7 @@ export function blank(defaults: Record<string, boolean> = {}): Save {
 }
 
 /** Each option's starting value, by key. */
-export function optionDefaults(options: GameOption[]): Record<string, boolean> {
+function optionDefaults(options: GameOption[]): Record<string, boolean> {
 	return Object.fromEntries(options.map((o) => [o.key, !!o.default]));
 }
 

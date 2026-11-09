@@ -3,7 +3,6 @@ import { test } from 'node:test';
 
 import * as E from '../src/lib/mosaic/engine.ts';
 import { reportLevel } from '../src/lib/mosaic/report.ts';
-import type { Level, State } from '../src/lib/mosaic/engine.ts';
 import { loadLevels } from './levels.ts';
 
 const LEVELS = loadLevels();
@@ -14,8 +13,8 @@ function tiny(
 	top: number[],
 	trayCap: number,
 	palette: Record<string, string> = { A: '#000', B: '#fff' }
-): State {
-	const lv: Level = { id: 't', name: 't', palette, art };
+): E.State {
+	const lv: E.Level = { id: 't', name: 't', palette, art };
 	const s = E.buildPuzzle(lv, 0);
 	s.top = top.map((c, id) => ({ id, c }));
 	s.tray = [];
@@ -160,7 +159,7 @@ test('taps: a direct hit wins, a near miss snaps to the nearest useful cell', ()
 	const g: E.TapGrid = { w: 4, h: 1, cell: 40, step: 44, reach: 42 };
 	const isDot = (i: number) => i === 0 || i === 3;
 	const isDrop = (i: number) => i === 1;
-	// Inside the dot's square, nearer its edge: the dot, though the open spot is preferred when near.
+	// Inside the dot's square, near its edge: still the dot, though near misses prefer the open spot.
 	assert.equal(E.tapCell(g, 38, 20, isDot, isDrop), 0);
 	assert.equal(E.tapCell(g, 46, 20, isDot, isDrop), 1, 'a direct hit on the open spot');
 	// In the gap between them: the open spot gets the preference.

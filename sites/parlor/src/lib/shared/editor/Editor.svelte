@@ -61,6 +61,8 @@
 		{ tool: 'pick', key: 'i' },
 		{ tool: 'erase', key: 'e' }
 	];
+	/** A picture's width or height, a whole number from 4 to 48. */
+	const side = (n: number) => Math.max(4, Math.min(48, Math.round(n)));
 
 	let name = $state('');
 	let id = $state('');
@@ -484,8 +486,8 @@
 
 	// ---------- size ----------
 	function applySize() {
-		const w = Math.max(4, Math.min(48, Math.round(sizeW)));
-		const h = Math.max(4, Math.min(48, Math.round(sizeH)));
+		const w = side(sizeW);
+		const h = side(sizeH);
 		if (w === grid.w && h === grid.h) return;
 		remember();
 		grid = G.resize(grid, w, h, '.');
@@ -502,8 +504,8 @@
 	async function importImage(file: File) {
 		try {
 			const bitmap = await createImageBitmap(file);
-			const w = Math.max(4, Math.min(48, Math.round(importWidth)));
-			const h = Math.max(4, Math.min(48, Math.round((w * bitmap.height) / bitmap.width)));
+			const w = side(importWidth);
+			const h = side((w * bitmap.height) / bitmap.width);
 			// Halve in steps first, so a big photo averages smoothly instead of aliasing.
 			let src: CanvasImageSource = bitmap;
 			let sw = bitmap.width;

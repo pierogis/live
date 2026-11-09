@@ -43,8 +43,8 @@ test('quantize: keeps distinct colors, merges look-alikes, empties transparent p
 });
 
 test('quantize: the colors it writes are far enough apart, even on a noisy gradient', () => {
-	// Merging by average Lab once let this one through: the written hex colors (average
-	// RGB) of two kept colors came out just under MIN_DELTA.
+	// Two kept colors can be far enough apart in average Lab yet land just under MIN_DELTA
+	// once written as hex (average RGB): the check has to use the written colors.
 	const w = 24;
 	const h = 20;
 	const rng = makeRng(54);

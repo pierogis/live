@@ -41,8 +41,11 @@ const CLOUD: Record<Time, string[]> = {
 	dawn: ['white', 'cream', 'snow', 'blush']
 };
 
-/** "Fox" at a time of day, as a level name. Long names only take the time after them. */
-export function timed(time: Time, name: string, alt = 0): string {
+/**
+ * "Fox" at a time of day, as a level name. `alt` picks between two wordings; long names
+ * always take the one with the time after them.
+ */
+export function timed(time: Time, name: string, alt: number): string {
 	if (/^(The|A) | (under|over|on|in|and|of|at|by) /.test(name)) alt = 1;
 	switch (time) {
 		case 'day':
@@ -65,14 +68,14 @@ export function sky(c: Canvas, time: Time, pri = 2, fill = true, orElse?: string
 }
 
 /** A band of glow above the horizon, from y0 down to y1 (fractions), wavy at the top. */
-export function glow(c: Canvas, time: Time, y0: number, y1: number, pri = 5) {
+export function glow(c: Canvas, time: Time, y0: number, y1: number, pri: number) {
 	c.part('glow', GLOW[time], pri, 'sky');
 	const f = c.wave(y0, 0.015, c.r(0.6, 1.4), c.r(0, 1));
 	c.paint('glow', (x, y) => y >= f(x) && y < y1);
 }
 
 /** The sun, or the moon at night. r in fractions of the shorter side. */
-export function sun(c: Canvas, time: Time, x: number, y: number, r: number, pri = 3) {
+export function sun(c: Canvas, time: Time, x: number, y: number, r: number, pri: number) {
 	c.part('sun', SUN[time], pri, 'sky');
 	c.paint('sun', c.circ(x, y, r));
 	if (time === 'night' && c.chance(0.5)) {
@@ -87,7 +90,7 @@ export function sun(c: Canvas, time: Time, x: number, y: number, r: number, pri 
 }
 
 /** A puffy cloud made of three circles, centered at (x, y), about `s` across (of the shorter side). */
-function cloud(c: Canvas, time: Time, x: number, y: number, s: number, pri = 5) {
+function cloud(c: Canvas, time: Time, x: number, y: number, s: number, pri: number) {
 	c.part('cloud', CLOUD[time], pri, 'sky');
 	const k = c.h / c.w;
 	c.paint('cloud', c.circ(x, y, s * 0.3));
@@ -97,7 +100,7 @@ function cloud(c: Canvas, time: Time, x: number, y: number, s: number, pri = 5) 
 }
 
 /** `n` clouds spread across the band y0..y1, over whatever is there. */
-export function clouds(c: Canvas, time: Time, n: number, y0: number, y1: number, pri = 5) {
+export function clouds(c: Canvas, time: Time, n: number, y0: number, y1: number, pri: number) {
 	for (let i = 0; i < n; i++) {
 		const x = (i + c.r(0.25, 0.75)) / n;
 		cloud(c, time, x, c.r(y0, y1), c.r(0.22, 0.32), pri);

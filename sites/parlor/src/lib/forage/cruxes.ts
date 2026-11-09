@@ -146,6 +146,7 @@ export function cruxCounts(a: Analysis): Required<Cruxes> {
 
 /** A crux this tight or more counts as real. */
 const TIGHT = 0.4;
+/** The cap on counted orderings. */
 const MANY = 1e6;
 
 /** A board's identity: columns, slots and food left. */
@@ -229,7 +230,7 @@ class Solver {
 		return won;
 	}
 
-	/** Depth first, sends that finish and eat most first; null when it ran out of room. */
+	/** Depth first, sends that finish, open locks and eat most first; null when it ran out of room. */
 	private search(s: F.State, room: () => boolean): boolean | null {
 		if (F.isWon(s)) return true;
 		const k = stateKey(s);

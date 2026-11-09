@@ -45,7 +45,7 @@ const MARGIN = 2;
  * How much a player cares about each thing it scores. People weigh these
  * differently, so each game jitters them a little (see style()).
  */
-export interface Style {
+interface Style {
 	/** Times FREE. */
 	free: number;
 	/** Per colony left waiting. */
@@ -92,7 +92,7 @@ const STYLE: Style = {
 };
 
 /** This game's weights: each one 0.6 to 1.4 times the usual, and any eagerness to park. */
-export function style(rng: Rng): Style {
+function style(rng: Rng): Style {
 	const s = { ...STYLE };
 	for (const k of Object.keys(s) as (keyof Style)[]) s[k] *= 0.6 + 0.8 * rng();
 	s.early = rng();
@@ -171,6 +171,7 @@ function buriedOf(t: F.State): Int32Array {
 	return nearest;
 }
 
+/** One send from a board, played out patiently. */
 export interface Choice {
 	col: number;
 	/** The board after sending it. */

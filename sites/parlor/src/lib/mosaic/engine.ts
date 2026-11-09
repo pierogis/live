@@ -108,7 +108,7 @@ export interface Solution {
 }
 
 /** The 8 spots around `i`, corners included: diagonal spots count as touching. */
-export function neighbors(w: number, h: number, i: number): number[] {
+function neighbors(w: number, h: number, i: number): number[] {
 	const x = i % w;
 	const y = Math.floor(i / w);
 	const out: number[] = [];
@@ -132,7 +132,7 @@ export function neighbors(w: number, h: number, i: number): number[] {
  * Every color ends up with exactly as many dots as the picture has spots for it.
  * Returns the dot color for each spot (-1 for empty pixels).
  */
-export function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[] {
+function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[] {
 	const { w, h, target } = art;
 	const cells: number[] = [];
 	target.forEach((c, i) => {

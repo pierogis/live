@@ -115,10 +115,10 @@ const sub = (a: Len, b: Len): Len =>
 	L(a.lanes - b.lanes, a.slots - b.slots, a.pads - b.pads, a.px - b.px);
 const px = (n: number) => L(0, 0, 0, n);
 /** A length in px at the desktop sizes, to compare lengths and weigh paths. */
-export const size = (v: Len) => v.lanes * (52 + GAP) + v.slots * 52 + v.pads * 8 + v.px;
+const size = (v: Len) => v.lanes * (52 + GAP) + v.slots * 52 + v.pads * 8 + v.px;
 
 /** The CSS for a length. */
-export function css(v: Len): string {
+function css(v: Len): string {
 	return `calc(${v.lanes} * var(--lane-pitch) + ${v.slots} * var(--slot-size) + ${v.pads} * var(--pad) + ${v.px}px)`;
 }
 
@@ -212,11 +212,7 @@ function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] 
 	const W = 2 * grid.cols + 1;
 	const H = 2 * grid.rows;
 	const free = (i: number, j: number) =>
-		i >= 0 &&
-		j >= 0 &&
-		i < W &&
-		j < H &&
-		!(i % 2 && j % 2 && j < 2 * grid.rows && grid.taken((i - 1) / 2, (j - 1) / 2));
+		i >= 0 && j >= 0 && i < W && j < H && !(i % 2 && j % 2 && grid.taken((i - 1) / 2, (j - 1) / 2));
 	const id = (i: number, j: number, d: number) => (j * W + i) * 4 + d;
 	const cost = new Map<number, number>();
 	const prev = new Map<number, number>();
@@ -251,7 +247,7 @@ function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] 
 			if (dj !== 0 && ((start && a[1] % 2) || (end && b[1] % 2))) step += UPRIGHT_END;
 			if (ni === 0 || ni === W - 1) step += OUTSIDE;
 			// The bands between rows are narrow, so a rail keeps to them only when it has to.
-			if (!dj && j % 2 === 0 && j > 0 && j < 2 * grid.rows) step += NARROW;
+			if (!dj && j % 2 === 0 && j > 0) step += NARROW;
 			if (others(edgeKey([i, j], [ni, nj]))) {
 				const roomy = dj ? i % 2 === 0 : j === 0 && !!grid.channels;
 				step += roomy ? SHARE_ROOMY : SHARE;

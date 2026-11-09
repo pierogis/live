@@ -2,7 +2,7 @@ import type { Attachment } from 'svelte/attachments';
 
 import type { Picture } from './level';
 
-/** Draw a level's picture in its colors, as small as fits `size` in whole pixels. */
+/** Draw a level's picture in its colors, at the biggest whole-pixel scale that fits in `size`. */
 function drawArt(canvas: HTMLCanvasElement, lv: Pick<Picture, 'palette' | 'art'>, size: number) {
 	const w = lv.art[0].length;
 	const h = lv.art.length;
@@ -13,7 +13,6 @@ function drawArt(canvas: HTMLCanvasElement, lv: Pick<Picture, 'palette' | 'art'>
 	canvas.style.height = h * scale + 'px';
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return;
-	ctx.clearRect(0, 0, w, h);
 	let color: string | undefined;
 	lv.art.forEach((row, y) => {
 		for (let x = 0; x < w; x++) {

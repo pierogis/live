@@ -190,8 +190,8 @@
 		hoverGroup = on && head?.kind === 'colony' ? head.e.link : undefined;
 	}
 
-	function colonyLabel(e: Colony, front: boolean) {
-		if (e.mystery && !front) return 'Mystery colony';
+	/** What a screen reader hears for a front colony. */
+	function colonyLabel(e: Colony) {
 		const name = game!.colors[e.c].key;
 		return `${name} colony, ${plural(e.n, 'ant', 'ants')}${e.link !== undefined ? ', linked' : ''}`;
 	}
@@ -233,7 +233,7 @@
 		const box = stageEl.getBoundingClientRect();
 		const first = pictureEl.querySelector<HTMLElement>('.px');
 		if (!first) return;
-		// CSS sizes the picture (see .picture in the styles); read the result.
+		// CSS sizes the picture (see .forage in the styles); read the result.
 		const cellPx = first.offsetWidth;
 		const pitch = cellPx + (parseFloat(getComputedStyle(pictureEl).columnGap) || 0);
 		const r0 = first.getBoundingClientRect();
@@ -410,7 +410,7 @@
 												? 'Done, waiting for its linked group'
 												: board.hungry[k]
 													? 'Waiting'
-													: 'Working'}: {colonyLabel(e, true)}"
+													: 'Working'}: {colonyLabel(e)}"
 										>
 											<!-- Counts down as its ants leave. -->
 											<span class="count">{done ? '✓' : e.n > 0 ? e.n : ''}</span>
@@ -434,7 +434,7 @@
 											? 'empty'
 											: head.kind === 'lock'
 												? 'locked until its key in the picture touches the outside'
-												: colonyLabel(head.e, true)}{items.length > 1
+												: colonyLabel(head.e)}{items.length > 1
 											? `, ${items.length - 1} more`
 											: ''}"
 										onclick={() => send(k)}

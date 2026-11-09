@@ -428,17 +428,15 @@ const any =
 	(...shapes: Shape[]) =>
 	(x: number, y: number) =>
 		shapes.some((s) => inside(s, x + 0.5, y + 0.5));
-/** Within `w` of the segment from (x0, y0) to (x1, y1), like a stick. */
-const line =
-	(x0: number, y0: number, x1: number, y1: number, w = 0.6) =>
-	(x: number, y: number) => {
-		const px = x + 0.5 - x0;
-		const py = y + 0.5 - y0;
-		const dx = x1 - x0;
-		const dy = y1 - y0;
-		const t = Math.max(0, Math.min(1, (px * dx + py * dy) / (dx * dx + dy * dy)));
-		return Math.hypot(px - t * dx, py - t * dy) <= w;
-	};
+/** Within 0.6 cells of the segment from (x0, y0) to (x1, y1), like a stick. */
+const line = (x0: number, y0: number, x1: number, y1: number) => (x: number, y: number) => {
+	const px = x + 0.5 - x0;
+	const py = y + 0.5 - y0;
+	const dx = x1 - x0;
+	const dy = y1 - y0;
+	const t = Math.max(0, Math.min(1, (px * dx + py * dy) / (dx * dx + dy * dy)));
+	return Math.hypot(px - t * dx, py - t * dy) <= 0.6;
+};
 
 /**
  * New colors for a finished, outlined picture: shading, and parts like clouds, a path
@@ -5013,7 +5011,7 @@ function unique(name: string, ids: Set<string>) {
 	return { id, shown };
 }
 
-// The first set: packs 02 to 05, the first templates in turn, 28 wide at first, up to 34.
+// The first set: packs 02 to 05, from TEMPLATES in turn.
 const kinds = Object.keys(TEMPLATES);
 const pictures: Picture[] = [];
 const ids = new Set<string>();
@@ -5130,7 +5128,7 @@ for (const { num, name, levels } of packs) {
 	const file = new URL(`${String(num).padStart(2, '0')}-${slug(name)}.json`, OUT);
 	const was: Picture[] = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).levels : [];
 	const out = levels.map((lv) => {
-		const old = was.find((o) => same(o, lv)) as Record<string, unknown> | undefined;
+		const old = was.find((o) => same(o, lv));
 		if (!old) return lv;
 		return { ...lv, ...Object.fromEntries(Object.entries(old).filter(([k]) => KEEP.has(k))) };
 	});

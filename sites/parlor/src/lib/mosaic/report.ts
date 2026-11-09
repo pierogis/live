@@ -13,7 +13,7 @@ export interface LevelReport {
 	colors: number;
 	moves: number;
 	parks: number;
-	/** The most tray the solver's path filled: its biggest park, up to the whole tray. */
+	/** The most tray the solver's path filled at once. */
 	minTray: number;
 	/** The sizes of the scattered blobs at this point in play, like "10-28". */
 	blobs: string;

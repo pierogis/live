@@ -1,5 +1,5 @@
 // Pick each Forage level's deal so it's about as hard as its place in play order asks for:
-//   pnpm -F parlor forage:tune [--seeds 10] [--games 16] [--screen 4] [--climb 80] [--hard-ms 420000] [--jobs 8]
+//   pnpm -F parlor forage:tune [--seeds 10] [--games 16] [--screen 4] [--climb 80] [--hard-ms 420000] [--jobs <n>]
 //                              [--only <id>] [--levels 0,5,20] [--dry] [--cruxes-only] [--results <file>]
 // Hard has two parts (see src/lib/forage/report.ts and cruxes.ts):
 //   - how often a good player wins: the best of a strong player, two that follow the rule
@@ -14,10 +14,12 @@
 // what the level wants, for up to `--climb` tries. The deals that come out of that are
 // measured properly and the closest to the target kept. When nothing lands near it, it
 // pushes the tuning harder (or easier) and tries again.
-// Writes `seed`, `push`, `deal` (the columns found), the measured win share `wins` and the
-// crux counts `breaks`, `cruxes` and `spread` into the level packs; together they set the
-// level's difficulty index. `--dry` only prints. `--cruxes-only` keeps each level's deal and
-// win share and only measures its cruxes again. Levels are shared out to `--jobs` workers.
+// Hard levels also try late pressure (`tuning.late`) on half their seeds.
+// Writes `seed`, `push`, `deal` (the columns found), `tuning.late`, the measured win share
+// `wins` and the crux counts `breaks`, `cruxes` and `spread` into the level packs; together
+// they set the level's difficulty index. `--dry` only prints. `--cruxes-only` keeps each
+// level's deal and win share and only measures its cruxes again. Levels are shared out to
+// `--jobs` workers (one per core but one, by default).
 // `--results <file>` also appends each level's result to that file as a JSON line, as it
 // comes in, so a long run's work isn't lost if it stops early.
 import { spawn } from 'node:child_process';
@@ -312,7 +314,7 @@ function tune(index: number): Result {
 			if (harder ? next.quick <= target : next.quick >= target) break;
 			if (kept.length > 8) break;
 		}
-		// The two whose quick look is closest to the target.
+		// The two closest to the target, by their quick look and their cruxes.
 		const near = (k: Candidate) => Math.abs(k.quick - target) + short(k.a, w);
 		return kept.sort((x, y) => near(x) - near(y)).slice(0, 2);
 	};

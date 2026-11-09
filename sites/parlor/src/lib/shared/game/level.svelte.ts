@@ -30,10 +30,8 @@ export interface LevelProps<L, S> {
 	start?: number;
 	/** The `start` level's state as `build` makes it, built ahead of time (say, at prerender). */
 	initial?: S;
-	/** Play without touching saved progress, e.g. to play-test a draft (a memory store). */
+	/** Keep progress in memory only, never in the cookie: for play-testing a draft. */
 	sandbox?: boolean;
-	/** Where progress is kept; the game's cookie unless given (or `sandbox`). */
-	store?: SaveStore;
 	/** Each level's own page. When given, moving to another level navigates there. */
 	levelHref?: (index: number) => string;
 	/** Where the list of all pictures lives; omit to hide the link. */
@@ -103,7 +101,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	options: Record<string, boolean> = $state.raw({});
 
 	level = $derived.by(() => this.#props().levels[this.index]);
-	/** The level's name, like "Bullseye"; where it falls in the game is under the board (`nav`). */
+	/** The level's name, like "Bullseye". */
 	label = $derived.by(() => this.level?.name ?? '');
 	/** You've finished this level, before or just now. */
 	done = $derived.by(() => !!this.level && !!this.save.completed[this.level.id]);
@@ -136,10 +134,9 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.#game = game;
 		this.#props = props;
 		this.save = game.save.blank();
-		this.#store = untrack(() => {
-			const { store, sandbox } = props();
-			return store ?? (sandbox ? memoryStore(game.save.blank()) : game.save.store);
-		});
+		this.#store = untrack(() =>
+			props().sandbox ? memoryStore(game.save.blank()) : game.save.store
+		);
 		// The page's own level, built right away (on the server too).
 		untrack(() => {
 			const { start } = props();
@@ -157,7 +154,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	/**
 	 * Call from `onMount`: reads the save, then either resumes the saved level or,
 	 * when the page's level is built already, fits it to the saved options and
-	 * remembers it. Returns the cleanup.
+	 * remembers it. With the game's own save, it then picks up a game kept through
+	 * a reload and keeps the game whenever the page is hidden. Returns the cleanup.
 	 */
 	mount(): () => void {
 		this.#motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -382,7 +380,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	};
 
 	// ---------- the shared pieces ----------
-	/** GameBar's props: `<GameBar {...ctl.bar} game=… label=… />`. */
+	/** GameBar's props: `<GameBar {...ctl.bar} game=… />`. */
 	get bar() {
 		return {
 			label: this.label,

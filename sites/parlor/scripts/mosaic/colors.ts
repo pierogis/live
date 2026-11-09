@@ -69,6 +69,7 @@ const BANK: Record<string, [string, string]> = {
 };
 
 const COLOR_NAMES = Object.keys(BANK);
+/** The hex for a color name; throws on a name not in the bank. */
 export const hexOf = (name: string) => {
 	if (!BANK[name]) throw new Error(`no color "${name}"`);
 	return BANK[name][0];
@@ -83,6 +84,7 @@ const LABS: Record<string, Lab> = Object.fromEntries(
 	Object.entries(BANK).map(([k, [hex]]) => [k, lab(hex)])
 );
 
+/** Whether two colors stand far enough apart to sit in one picture. */
 export function fits(a: string, b: string): boolean {
 	const d = deltaE(LABS[a], LABS[b]);
 	return d >= (BANK[a][1] === BANK[b][1] ? FAMILY_DELTA : DELTA);

@@ -180,7 +180,7 @@ export class Canvas {
 	}
 
 	/** Regions (corners touching) of one part each, as cell lists. */
-	regions(grid = this.grid): number[][] {
+	regions(grid: string[]): number[][] {
 		const { w, h } = this;
 		const seen = new Uint8Array(w * h);
 		const out: number[][] = [];

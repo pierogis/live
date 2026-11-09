@@ -38,6 +38,8 @@ const px = (v: Len) => v.lanes * 64 + v.slots * 52 + v.pads * 8 + v.px;
 const phonePx = (v: Len) => v.lanes * 56 + v.slots * 44 + v.pads * 6 + v.px;
 const box = (s: Seg) => [px(s.x), px(s.y), px(s.w), px(s.h)];
 const join = (members: Spot[], grid = lanes()) => rails([{ g: 1, members }], grid)[0]?.segs ?? [];
+/** Members as "col:depth", for messages. */
+const where = (members: Spot[]) => members.map((m) => `${m.col}:${m.depth}`).join();
 
 test('forage: side-by-side members get one straight rail between their rings', () => {
 	const segs = join([
@@ -69,7 +71,7 @@ test('forage: members a lane apart at different depths get one step down the gap
 	assert.equal(px(upright.x) + px(upright.w) / 2, 58);
 });
 
-test('forage: rails stay whole pixels, off colonies, and in the gaps and the strip above the lanes', () => {
+test('forage: rails stay whole pixels, off colonies, above the counts, and in the gaps and the strip above the lanes', () => {
 	const cases: Spot[][] = [
 		[
 			{ col: 0, depth: 0 },
@@ -109,32 +111,29 @@ test('forage: rails stay whole pixels, off colonies, and in the gaps and the str
 					assert.ok(!over, `${JSON.stringify(members)} crosses ${col}:${depth}`);
 				}
 			}
-		}
-	}
-	for (const members of cases) {
-		for (const s of join(members)) {
 			const [x, y, w, h] = box(s);
 			// Nothing under the rows, where the lanes' counts are.
-			assert.ok(y + h <= 3 * 52, `${members.map((m) => `${m.col}:${m.depth}`)} below the rows`);
+			assert.ok(y + h <= 3 * 52, `${where(members)} below the rows`);
 			if (w > h) {
 				// Across: along the strip above the lanes (6px up), or a step from a colony to a gap.
 				const strip = Math.abs(y + h / 2 + 6) <= 3;
-				assert.ok(
-					strip || w <= 26,
-					`${members.map((m) => `${m.col}:${m.depth}`)} across ${box(s)}`
-				);
+				assert.ok(strip || w <= 26, `${where(members)} across ${box(s)}`);
 			} else {
 				// Down: in a gap (52..64 of each pitch), or up from a front colony to the strip.
 				const mid = (((x + w / 2) % 64) + 64) % 64;
-				assert.ok(
-					(mid >= 52 && mid <= 64) || y + h <= 8,
-					`${members.map((m) => `${m.col}:${m.depth}`)} down ${box(s)}`
-				);
+				assert.ok((mid >= 52 && mid <= 64) || y + h <= 8, `${where(members)} down ${box(s)}`);
 			}
 		}
 	}
-	// A member out of sight gets no rail: lanes 0 and 2 are joined, and nothing reaches lane 3.
-	const segs = join(cases[2]);
+});
+
+test('forage: a member out of sight gets no rail', () => {
+	// Lanes 0 and 2 are joined, and nothing reaches lane 3, whose member is out of sight.
+	const segs = join([
+		{ col: 0, depth: 0 },
+		{ col: 2, depth: 1 },
+		{ col: 3, depth: 5 }
+	]);
 	assert.ok(segs.length > 0);
 	assert.ok(segs.every((s) => px(s.x) + px(s.w) <= 2 * 64 + 26));
 });
@@ -162,16 +161,16 @@ test('forage: rails of two groups that share a gap run side by side', () => {
 	const area = (s: Seg) => [px(s.x), px(s.y), px(s.x) + px(s.w), px(s.y) + px(s.h)];
 	for (const a of laid[0].segs.map(area)) {
 		for (const b of laid[1].segs.map(area)) {
-			const overlap = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
+			const overlapX = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
 			const overlapY = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
 			// Crossing is fine; running over each other isn't.
-			assert.ok(!(overlap > 4 && overlapY > 4), `${a} over ${b}`);
+			assert.ok(!(overlapX > 4 && overlapY > 4), `${a} over ${b}`);
 			assert.ok(
 				!(
-					overlap > 0 &&
+					overlapX > 0 &&
 					overlapY > 0 &&
 					(a[2] - a[0] === b[2] - b[0] || a[3] - a[1] === b[3] - b[1]) &&
-					Math.max(overlap, overlapY) > 4
+					Math.max(overlapX, overlapY) > 4
 				),
 				`${a} along ${b}`
 			);

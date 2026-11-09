@@ -1,7 +1,7 @@
 <!--
 	A level's difficulty from 1 to 5 as filled and empty dots. With `label`, the
 	difficulty's name follows them (the game bar); without, the name is a tooltip.
-	The dots are drawn, not ● and ○ characters, which fonts give different sizes.
+	The dots are drawn in CSS, since fonts give ● and ○ different sizes.
 -->
 <script lang="ts">
 	import { LABELS } from '../difficulty';

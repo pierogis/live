@@ -3,16 +3,16 @@
  * load this file directly.
  *
  * A pixel picture is made of colored blocks. Below it are columns of ant
- * colonies, each with a color and a count. Tap the front colony of a column and
- * its ants eat up to `count` blocks of their color, but only blocks that are
- * exposed: a side touches empty space that reaches the outside of the picture.
- * Holes sealed inside the picture don't count until something opens a way to
- * them. Ants eat from the outside in, so eating a block can expose the one
- * behind it.
+ * colonies, each with a color and a count of ants. Tap the front colony of a
+ * column and it goes to work in one of 5 slots, sending its ants one at a time
+ * to eat blocks of its color, but only blocks that are exposed: a side touches
+ * empty space that reaches the outside of the picture. Holes sealed inside the
+ * picture don't count until something opens a way to them. Ants eat from the
+ * outside in, so eating a block can expose the one behind it.
  *
- * A colony that still has ants left keeps working in one of 5 slots, and eats
- * again by itself whenever blocks of its color become exposed. A colony can't be
- * sent out if it would need a slot and every slot is full. Clear every block to win.
+ * A colony holds its slot until it has sent its last ant, and sends again by
+ * itself whenever blocks of its color become exposed. No colony can be sent out
+ * while every slot is full. Clear every block to win.
  *
  * Later levels add:
  *   - linked colonies: a group of 2 to 4 colonies that go out together and stay
@@ -28,7 +28,8 @@
  *     nothing. It changes color after set amounts (the next color isn't shown),
  *     and once it's empty its tile is empty space.
  *
- * Each color's colony counts add up exactly to its blocks.
+ * Each color's colony counts add up exactly to its food: its blocks, plus what
+ * the dispensers hand out.
  */
 
 import {
@@ -100,8 +101,6 @@ export interface Colony {
 	mystery?: boolean;
 	/** While working: ticks until it can send its next ant. */
 	cool?: number;
-	/** While working: how much food it set out to collect. */
-	total?: number;
 }
 
 /** A colony sends one ant every this many ticks. */
@@ -168,7 +167,7 @@ export function dispensing(d: Dispenser): { c: number; left: number } | null {
 	return null;
 }
 
-/** One colony eating: which blocks, and in which wave (0 = already exposed). */
+/** One colony eating: which blocks, and on which tick after the send (`wave`). */
 export interface Meal {
 	id: number;
 	c: number;
@@ -363,10 +362,9 @@ function grewOutside(s: State, before: Uint8Array, cells: number[]): Uint8Array 
 	outCache.set(s.alive, out);
 	if (ok) {
 		if (own?.ok === ok) {
-			const W = s.w + 2;
-			const cells = added.map((i) => (Math.floor(i / s.w) + 1) * W + (i % s.w) + 1);
-			for (const j of cells) ok[j] = 1;
-			for (const dist of own.dists) if (dist) shorten(s, ok, dist, cells);
+			const grid = added.map((i) => walkCell(s, i));
+			for (const j of grid) ok[j] = 1;
+			for (const dist of own.dists) if (dist) shorten(s, ok, dist, grid);
 		} else walkCache.set(out, added.length ? grewWalkable(s, ok, added) : ok);
 	}
 	if (food) {
@@ -437,7 +435,7 @@ export interface Dispatch {
 	cell: number;
 	c: number;
 	eta: number;
-	/** The walks from its slot the engine timed it by; antPath follows one. */
+	/** The walks from its slot that timed it; antPath() follows them. */
 	walks: Walks;
 }
 
@@ -496,7 +494,7 @@ function canSend(s: State, col: number): Refusal | Allowed {
 
 /**
  * Send out the front colony of column `col` (and its linked group) into free
- * working slots. They start eating on the next tick. Every colony out working
+ * working slots. Each sends its first ant right away. Every colony out working
  * holds a slot until it has sent out all its ants, so with all slots busy
  * nothing more can go. Mutates s only when allowed.
  */
@@ -512,7 +510,7 @@ function sendOut(s: State, quick: boolean, { cols, free }: Allowed): Sent {
 	const sent: number[] = [];
 	const lockAt = s.lockAt.slice();
 	cols.forEach((k, j) => {
-		const colony = { ...columns[k][0], total: columns[k][0].n };
+		const colony = { ...columns[k][0] };
 		columns[k] = columns[k].slice(1);
 		// The colony ahead of a lock leaves, so the lock moves one closer to the front.
 		if (lockAt[k] > 0 && hasLock(s, k)) lockAt[k]--;
@@ -573,14 +571,18 @@ function walkable(s: State, out: Uint8Array): Uint8Array {
 	return ok;
 }
 
-/** walkable() for each outside() array, which never changes once made. */
+/** walkable() for each outside() array. */
 const walkCache = new WeakMap<Uint8Array, Uint8Array>();
+
+/** Picture pixel i's cell in the walking grid (see walkable()). */
+function walkCell(s: State, i: number): number {
+	return (Math.floor(i / s.w) + 1) * (s.w + 2) + (i % s.w) + 1;
+}
 
 /** walkable() after the picture pixels `added` joined the outside, from what it was. */
 function grewWalkable(s: State, ok: Uint8Array, added: number[]): Uint8Array {
-	const W = s.w + 2;
 	const grown = ok.slice();
-	for (const i of added) grown[(Math.floor(i / s.w) + 1) * W + (i % s.w) + 1] = 1;
+	for (const i of added) grown[walkCell(s, i)] = 1;
 	return grown;
 }
 
@@ -603,7 +605,7 @@ function walkFrom(s: State, ok: Uint8Array, slot: number, cell: number): Walks {
 	const dist = new Int32Array(W * H).fill(-1);
 	const prev = new Int32Array(W * H).fill(-1);
 	// The food's neighbors in the bigger grid.
-	const at = (Math.floor(cell / s.w) + 1) * W + (cell % s.w) + 1;
+	const at = walkCell(s, cell);
 	const beside = [at - 1, at + 1, at - W, at + W];
 	let stop = Infinity;
 	const start = door(s, slot);
@@ -664,7 +666,7 @@ export function antPath(s: State, d: Dispatch): { x: number; y: number }[] {
 
 /**
  * Send one ant from colony e in `slot` to its first exposed, unclaimed food, if
- * there is one. Mutates e and ground.taken.
+ * there is one. Mutates e, ground.taken and s.walking.
  */
 function dispatch(s: State, e: Colony, ground: Ground, slot: number): Dispatch | null {
 	if (e.n <= 0) return null;
@@ -682,6 +684,7 @@ function dispatch(s: State, e: Colony, ground: Ground, slot: number): Dispatch |
 	return { slot, ...ant, walks };
 }
 
+/** A quick send's walks: nothing draws its ants. */
 const NO_WALKS: Walks = { dist: new Int32Array(0), prev: new Int32Array(0) };
 
 /** Scratch for stepsTo: a visit stamp per cell of the walking grid, and a queue. */
@@ -695,10 +698,10 @@ let stamp = 0;
  */
 function stepsTo(s: State, ok: Uint8Array, slot: number, cell: number): number {
 	const W = s.w + 2;
+	const at = walkCell(s, cell);
 	// A settling board's own grid: from its door's distances, kept as the grid grows.
 	if (mine?.ok === ok) {
 		const dist = (mine.dists[slot] ??= doorDist(s, ok, slot));
-		const at = (Math.floor(cell / s.w) + 1) * W + (cell % s.w) + 1;
 		let best = -1;
 		for (const j of [at - 1, at + 1, at - W, at + W]) {
 			if (dist[j] >= 0 && (best < 0 || dist[j] < best)) best = dist[j];
@@ -712,7 +715,6 @@ function stepsTo(s: State, ok: Uint8Array, slot: number, cell: number): number {
 		stamp = 0;
 	}
 	stamp++;
-	const at = (Math.floor(cell / s.w) + 1) * W + (cell % s.w) + 1;
 	const isBeside = (j: number) => j === at - 1 || j === at + 1 || j === at - W || j === at + W;
 	const start = door(s, slot);
 	// Breadth first, a level at a time; queue holds cells, dist is their level.
@@ -742,6 +744,7 @@ let walkQueue = new Int32Array(0);
 let queued = new Int32Array(0);
 let queueMark = 0;
 
+/** Make that scratch at least `size` cells. */
 function walkScratch(size: number) {
 	if (walkQueue.length >= size) return;
 	walkQueue = new Int32Array(size);
@@ -873,7 +876,8 @@ function freeSlots(s: State) {
 
 /**
  * One step of time:
- *   1. ants that reach their food pick it up (the food is gone)
+ *   1. ants that reach their food pick it up (the food is gone, unless a
+ *      dispenser refills it)
  *   2. every working colony with ants left sends one more, to the first exposed
  *      food of its color that no ant is heading for yet: bottom row first, left
  *      to right. Food uncovered by an ant that just arrived counts right away.
@@ -911,7 +915,7 @@ function step(s: State, quick: boolean): TickResult {
 	for (const i of gone) s.alive[i] = false;
 	const slots = quick ? s.slots : s.slots.map((e) => e && { ...e });
 	s.slots = slots;
-	const out = gone.length || eaten.length ? grewOutside(s, before, gone) : before;
+	const out = gone.length ? grewOutside(s, before, gone) : before;
 	const ground: Ground = { out, taken: claims(s), quick };
 	const dispatched: Dispatch[] = [];
 	slots.forEach((e, k) => {
@@ -955,6 +959,11 @@ function exposedIn(s: State, out: Uint8Array, c: number): number[] {
 }
 
 const NONE: number[] = [];
+
+/** Pixel i's place in eating order, smallest first: bottom rows first, then left to right. */
+function eatingOrder(w: number, i: number): number {
+	return 2 * (i % w) - i;
+}
 
 /** foodOf() for each outside() array: what's exposed follows from what's outside. */
 const foodCache = new WeakMap<Uint8Array, number[][]>();
@@ -1014,8 +1023,6 @@ function grewFood(
 	for (const i of added) joined[i] = mark;
 	const wasOut = (j: number) => !!out[j] && joined[j] !== mark;
 	let come: Set<number> | undefined;
-	/** Eating order: bottom rows first, then left to right (x - y * w, smallest first). */
-	const order = (i: number) => 2 * (i % w) - i;
 	for (const i of added) {
 		const x = i % w;
 		for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
@@ -1027,12 +1034,12 @@ function grewFood(
 			(come ??= new Set()).add(j);
 			// Into its place in eating order.
 			const list = edit(s.target[j]);
-			const key = order(j);
+			const key = eatingOrder(w, j);
 			let lo = 0;
 			let hi = list.length;
 			while (lo < hi) {
 				const mid = (lo + hi) >> 1;
-				if (order(list[mid]) < key) lo = mid + 1;
+				if (eatingOrder(w, list[mid]) < key) lo = mid + 1;
 				else hi = mid;
 			}
 			list.splice(lo, 0, j);
@@ -1437,15 +1444,14 @@ function placeDispensers(base: State, tune: Tuning, rng: Rng): Dispenser[] {
 		}
 		if (colors.length) out.push({ cell, colors, amounts, used: 0 });
 	}
-	const w = base.w;
-	return out.sort((a, b) => 2 * (a.cell % w) - a.cell - (2 * (b.cell % w) - b.cell));
+	return out.sort((a, b) => eatingOrder(base.w, a.cell) - eatingOrder(base.w, b.cell));
 }
 
 /**
- * Per color: the most ants of it the play can send now without eating the
- * picture's last food of it while a dispenser has more of it to hand out later
- * (it would never get to: it only hands out when its color is eaten). Unlimited
- * for a color no dispenser holds back.
+ * Per color: the most ants of it the play can send now and still leave one of
+ * its food in the picture while a dispenser has more of it to hand out later. A
+ * dispenser only hands out when its color is eaten, so with none left it would
+ * never get there. Unlimited for a color no dispenser holds back.
  */
 function dispenserRoom(s: State): number[] {
 	const onBoard = s.colors.map(() => 0);
@@ -1516,8 +1522,8 @@ export function buildWithPlan(
  * without ever filling every slot. It avoids colonies of 1 or 2 ants: a lone
  * tiny colony that frees a big color makes one memorable choke point, and then
  * the level is easy. Dealt into columns in the order it was played, keeping
- * linked groups in columns of their own and locked columns empty until their
- * key would be exposed, it's always a way to win.
+ * a linked group's colonies in different columns (or back to back in one) and
+ * nothing behind a lock until its key would be exposed, it's always a way to win.
  */
 export function planPlay(
 	level: Level,
@@ -1569,6 +1575,9 @@ export function planPlay(
 		const r = pick(t, 0);
 		return { t, r, ok: r.ok && (isWon(t) || t.slots.includes(null)) };
 	};
+	/** The colonies sent before colony `id` that ate when it went out. */
+	const fedBy = (r: PickResult, id: number) =>
+		r.ok ? r.meals.map((meal) => meal.id).filter((m) => m < id) : [];
 	/** n ants of color c, or all that's left of it when n would leave only 1 or 2. */
 	const roundUp = (c: number, n: number) => (unassigned[c] - n <= 2 ? unassigned[c] : n);
 	let fed: number[] = [];
@@ -1596,11 +1605,11 @@ export function planPlay(
 			if (unassigned[c] <= reach(c)) n = roundUp(c, n);
 			return { id, c, n: Math.min(n, most[c]) };
 		};
+		let weights: ((c: number) => number) | undefined;
 		/**
 		 * A colony that has to wait: more ants than its color has in reach. Food
 		 * buried deep, or split into many islands, opens bit by bit, so its wait is long.
 		 */
-		let weights: ((c: number) => number) | undefined;
 		const waiter = (id: number, not: number[] = [], long = false): Colony | null => {
 			const pool = canWait.filter((c) => !not.includes(c));
 			if (!pool.length) return null;
@@ -1655,9 +1664,7 @@ export function planPlay(
 				if (attempt.ok) {
 					sent = group;
 					next = attempt.t;
-					fed = attempt.r.ok
-						? attempt.r.meals.map((meal) => meal.id).filter((id) => id < a.id)
-						: [];
+					fed = fedBy(attempt.r, a.id);
 					groups.set(id, group.length);
 					linksLeft--;
 				}
@@ -1677,9 +1684,7 @@ export function planPlay(
 			if (!attempt.ok) throw new Error(`${level.id}: could not build colonies`);
 			sent = [colony];
 			next = attempt.t;
-			fed = attempt.r.ok
-				? attempt.r.meals.map((meal) => meal.id).filter((id) => id < colony.id)
-				: [];
+			fed = fedBy(attempt.r, colony.id);
 		}
 		sim = next;
 		for (const e of sent) {
@@ -1706,7 +1711,8 @@ export function planPlay(
 	/** Keys for locks after the first, with late pressure: they open in the last part of the play. */
 	const late = tune.late > 0 ? keysBetween(0.5, 0.85) : early;
 	/** Whether every linked group could still go out from columns of its own, with these locks. */
-	const roomy = () => [...groups].every(([j, g]) => opensAt.filter((at) => at <= j).length >= g);
+	const groupsFit = () =>
+		[...groups].every(([j, g]) => opensAt.filter((at) => at <= j).length >= g);
 	// Each lock sits behind 0 to 2 colonies, which can go out before its key is exposed.
 	const lockAt = new Array(tune.columns).fill(0);
 	for (let k = 0; k < lockedCols; k++) {
@@ -1714,11 +1720,11 @@ export function planPlay(
 		const candidates = k > 0 ? late : early;
 		if (!candidates.length) break;
 		// A key that leaves room for the linked groups, if a few tries find one.
-		for (let tries = 0; tries < 6 && candidates.length; tries++) {
+		for (let tries = 0; tries < 6; tries++) {
 			const at = Math.floor(rng() * candidates.length);
 			locks[col] = candidates[at];
 			opensAt[col] = openedAt[locks[col]];
-			if (roomy() || tries === 5) {
+			if (groupsFit() || tries === 5) {
 				candidates.splice(at, 1);
 				break;
 			}
@@ -1806,14 +1812,13 @@ export function dealAs(plan: Plan, placement: number[], linked = true): State | 
 	const { tune, order, base, groupAt } = plan;
 	const { lockAt, opensAt, mystery, stackedMystery } = plan.layout;
 	if (placement.length !== order.length) return null;
-	const together = (start: number) => linked && start >= 0;
 	const columns: Colony[][] = Array.from({ length: tune.columns }, () => []);
 	const intended: number[] = [];
 	for (let j = 0; j < order.length; j++) {
 		const k = placement[j];
 		if (!(k >= 0 && k < tune.columns)) return null;
 		const start = groupAt[j];
-		const linkedHere = together(start);
+		const linkedHere = linked && start >= 0;
 		const pickedAt = linkedHere ? start : j;
 		if (!(opensAt[k] <= pickedAt || columns[k].length < lockAt[k])) return null;
 		const colony: Colony = { ...order[j] };

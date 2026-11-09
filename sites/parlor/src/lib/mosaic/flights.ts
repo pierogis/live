@@ -1,6 +1,7 @@
 /* Dots flying between the board and the tray, as sprites (see shared/game/sprites.ts). */
 import { canAnimate, Sprites } from '../shared/game/sprites';
 
+/** How long a dot takes to fly, in milliseconds. */
 const FLIGHT = 420;
 
 /** Where each dot is on screen right now, by dot id. */
