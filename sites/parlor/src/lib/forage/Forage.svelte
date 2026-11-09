@@ -19,7 +19,7 @@
 	import { plural } from '../shared/game/text';
 	import { AntLayer } from './ants';
 	import {
-		L,
+		GAP,
 		linkColors,
 		lockColors,
 		rails as layRails,
@@ -80,7 +80,9 @@
 		return {
 			alive,
 			slots: game.slots.slice(),
-			left: E.blocksLeft(game)
+			left: E.blocksLeft(game),
+			/** Each dispenser's tile: the color it hands out now and how many more of it. */
+			dispensers: new Map(game.dispensers?.map((d) => [d.cell, E.dispensing(d)]))
 		};
 	});
 
@@ -130,7 +132,7 @@
 	});
 	const linkColor = (e: Colony) => (e.link === undefined ? undefined : marks.link.get(e.link));
 
-	/** Each linked group's rails in the slots and in the lanes, and the lanes' counts that hide a member. */
+	/** Each linked group's rails in the slots and in the lanes, and the groups each lane hides. */
 	const links = $derived.by(() => {
 		void ctl.version;
 		const collect = (
@@ -162,22 +164,20 @@
 			cols: columnItems.length,
 			rows: VISIBLE,
 			taken: (col, depth) => depth < columnItems[col].length,
-			// The lanes' bottom edge, under their counts.
-			floor: L(0, VISIBLE, 0, 14)
+			// Rails keep to the gaps between lanes and the strip above them.
+			channels: true
 		});
-		// A lane's count takes the color of the nearest group it hides a member of,
-		// when that group shows a member elsewhere.
-		const more: Record<number, string> = {};
-		const nearest: Record<number, number> = {};
-		for (const { g, members } of inLanes) {
-			if (!members.some((m) => m.depth < VISIBLE)) continue;
-			for (const m of members) {
-				if (m.depth < VISIBLE || m.depth >= (nearest[m.col] ?? Infinity)) continue;
-				nearest[m.col] = m.depth;
-				more[m.col] = marks.link.get(g)!;
+		// Per lane: the linked groups among its colonies out of sight, nearest first.
+		// No rail reaches them, so each gets a ring in its color by the lane's count.
+		const late: Record<number, { g: number; color: string }[]> = {};
+		columnItems.forEach((items, col) => {
+			for (const item of items.slice(VISIBLE)) {
+				const g = item.kind === 'colony' ? item.e.link : undefined;
+				if (g === undefined || late[col]?.some((r) => r.g === g)) continue;
+				(late[col] ??= []).push({ g, color: marks.link.get(g)! });
 			}
-		}
-		return { slots, lanes, more };
+		});
+		return { slots, lanes, late };
 	});
 
 	/**
@@ -343,6 +343,7 @@
 			class:won={ctl.won}
 			bind:this={stageEl}
 			style:--n={view.slots.length}
+			style:--lane-gap="{GAP}px"
 			style:--cols={columnItems.length}
 		>
 			<!-- One card: the picture, and the slots and lanes under it. -->
@@ -356,7 +357,20 @@
 							aria-label="{ctl.level.name}: {view.left} food left"
 						>
 							{#each game.target as c, i (i)}
-								{#if view.alive[i]}
+								{@const dispenser = c === E.DISPENSER ? view.dispensers.get(i) : undefined}
+								{#if dispenser && view.alive[i]}
+									<!-- A dispenser: what it hands out now and how many more; never what comes after. -->
+									<div
+										class="px dispenser"
+										style:--c={game.colors[dispenser.c].hex}
+										style:--ink={inkOn(game.colors[dispenser.c].hex)}
+										title="Dispenser: {dispenser.left} more of this color"
+									>
+										<span class="dispense">{dispenser.left}</span>
+									</div>
+								{:else if c === E.DISPENSER}
+									<div class="px" class:sealed={!board.out[i]}></div>
+								{:else if view.alive[i]}
 									<div class="px food" data-i={i} style:--c={game.colors[c].hex}>
 										{#if i in board.keys}
 											<!-- A key: ringed in its lock's color. -->
@@ -469,11 +483,22 @@
 												</span>
 											{/if}
 										{/each}
-										{#if items.length > VISIBLE}<span
-												class="more"
-												class:linked={k in links.more}
-												style:--g={links.more[k]}>+{items.length - VISIBLE}</span
-											>{/if}
+										{#if items.length > VISIBLE}
+											<span class="more">
+												{#if links.late[k]}
+													<span class="late" class:crowded={links.late[k].length > 4}>
+														{#each links.late[k] as r (r.g)}
+															<span
+																class="late-ring"
+																class:flash={flashGroup.value === r.g}
+																style:--g={r.color}
+															></span>
+														{/each}
+													</span>
+												{/if}
+												<span class="left">+{items.length - VISIBLE}</span>
+											</span>
+										{/if}
 									</button>
 								{/each}
 								{@render railBars(links.lanes)}
@@ -566,11 +591,17 @@
 	 * wider of the picture and the slots or lanes.
 	 */
 	.stage {
-		/* Slots and lanes share one pitch, so a colony is the same size in both. */
-		--lane-pitch: calc(var(--slot-size) + 8px);
+		/*
+		 * Slots and lanes share one pitch, so a colony is the same size in both. The
+		 * gaps between them, and the strip between the slots and the lanes, are the
+		 * rails' room (GAP in marks.ts).
+		 */
+		--lane-pitch: calc(var(--slot-size) + var(--lane-gap));
+		/* Room under a lane's three colonies for its count and the rings above it. */
+		--lane-foot: 24px;
 		--pad: calc((var(--slot-size) - var(--colony)) / 2);
-		--slots-w: calc(var(--n) * var(--slot-size) + (var(--n) - 1) * 8px);
-		--lanes-w: calc(var(--cols) * var(--slot-size) + (var(--cols) - 1) * 8px);
+		--slots-w: calc(var(--n) * var(--slot-size) + (var(--n) - 1) * var(--lane-gap));
+		--lanes-w: calc(var(--cols) * var(--slot-size) + (var(--cols) - 1) * var(--lane-gap));
 		/* The tab's side padding (roomier than its 8px top and bottom) and bevel on each side. */
 		--tab-pad: 14px;
 		--tab-edges: calc(2 * (var(--tab-pad) + var(--border-size)));
@@ -620,6 +651,24 @@
 	.sealed {
 		background: var(--hole);
 		border-radius: 2px;
+	}
+	/*
+	 * A dispenser: its color with a ring in the text color, so it can't pass for
+	 * food, and how many more of that color it holds.
+	 */
+	.dispenser {
+		display: grid;
+		place-items: center;
+		background: var(--c);
+		border-radius: 2px;
+		box-shadow: inset 0 0 0 max(1px, round(down, calc(var(--cell) / 8), 1px)) var(--text-color);
+	}
+	.dispense {
+		font-family: Courier, monospace;
+		font-weight: 700;
+		font-size: max(7px, round(down, calc(var(--cell) * 0.6), 1px));
+		line-height: 1;
+		color: var(--ink);
 	}
 	/*
 	 * A lock and its key share a marker color, only ever as a ring, never a fill,
@@ -672,13 +721,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 8px;
+		gap: var(--lane-gap);
 		padding: 8px var(--tab-pad);
 	}
 	.slots {
 		--row-w: var(--slots-w);
 		display: flex;
-		gap: 8px;
+		gap: var(--lane-gap);
 	}
 	.slots.flash .slot {
 		box-shadow:
@@ -707,7 +756,7 @@
 		--row-w: var(--lanes-w);
 		display: grid;
 		grid-template-columns: repeat(var(--cols), var(--slot-size));
-		gap: 8px;
+		gap: var(--lane-gap);
 	}
 	/*
 	 * A lane holds its colonies on the slots' pitch, front at the top. It's fixed
@@ -718,7 +767,7 @@
 		z-index: 0;
 		box-sizing: border-box;
 		width: var(--slot-size);
-		height: calc(var(--slot-size) * 3 + 14px);
+		height: calc(var(--slot-size) * 3 + var(--lane-foot));
 		padding: var(--pad) 0;
 		display: flex;
 		flex-direction: column;
@@ -831,22 +880,50 @@
 	.rail.flash {
 		box-shadow: 0 0 0 2px var(--accent-color);
 	}
-	/* How many more wait behind the three shown, along the lane's bottom. */
+	/*
+	 * How many more wait behind the three shown, along the lane's bottom, with a
+	 * ring above it in the color of each linked group among them, nearest first.
+	 */
 	.more {
 		position: absolute;
 		bottom: 2px;
 		left: 0;
 		right: 0;
-		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
 		line-height: 12px;
 		font-family: Courier, monospace;
 		font-size: 12px;
 		color: var(--muted);
 	}
-	/* A count hiding a linked colony takes its group's color; that group's rail ends under it. */
-	.more.linked {
-		color: var(--g);
-		font-weight: 700;
+	/* The site gives every element its own font and color; the count keeps the lane's. */
+	.left {
+		font: inherit;
+		color: inherit;
+	}
+	.late {
+		display: flex;
+		gap: 2px;
+	}
+	/* Five or more overlap like links of a chain, so they fit a phone's lane. */
+	.late.crowded {
+		gap: 0;
+	}
+	.late.crowded .late-ring + .late-ring {
+		margin-left: -2px;
+	}
+	/* A ring like a linked colony's halo, never a fill, so it can't pass for food. */
+	.late-ring {
+		box-sizing: border-box;
+		width: 8px;
+		height: 8px;
+		border: 2px solid var(--g);
+		border-radius: 50%;
+	}
+	.late-ring.flash {
+		box-shadow: 0 0 0 2px var(--accent-color);
 	}
 
 	/* The lanes give way to the level end, keeping their room. */

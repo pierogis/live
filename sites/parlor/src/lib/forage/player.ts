@@ -165,7 +165,7 @@ function buriedOf(t: F.State): Int32Array {
 	const nearest = new Int32Array(t.colors.length).fill(1 << 30);
 	for (let i = 0; i < t.target.length; i++) {
 		const k = t.target[i];
-		if (t.alive[i] && depth[i] < nearest[k]) nearest[k] = depth[i];
+		if (k >= 0 && t.alive[i] && depth[i] < nearest[k]) nearest[k] = depth[i];
 	}
 	buriedCache.set(depth, nearest);
 	return nearest;

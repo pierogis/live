@@ -15,12 +15,18 @@
  * sent out if it would need a slot and every slot is full. Clear every block to win.
  *
  * Later levels add:
- *   - linked colonies: a group of 2 to 4 colonies, each at the front of its own
- *     column, that go out together and stay linked in their slots: none leaves
- *     until all are done
+ *   - linked colonies: a group of 2 to 4 colonies that go out together and stay
+ *     linked in their slots: none leaves until all are done. They go once every
+ *     member is at the front of its column, or right behind another member there:
+ *     members in one column sit back to back and leave as one stack
  *   - locks: a lock sits in a column in front of the colony it blocks; once it
  *     reaches the front, the column waits until its key block is exposed
  *   - mystery colonies: their color is hidden until they reach the front
+ *   - food dispensers: a tile in the picture, in place of a food, holding more
+ *     food. Whenever an ant eats food of the dispenser's color anywhere, the
+ *     dispenser puts a new one in its place at once, so eating it uncovers
+ *     nothing. It changes color after set amounts (the next color isn't shown),
+ *     and once it's empty its tile is empty space.
  *
  * Each color's colony counts add up exactly to its blocks.
  */
@@ -114,7 +120,7 @@ export interface State {
 	w: number;
 	h: number;
 	colors: Color[];
-	/** Color of each pixel; -1 is empty, not part of the picture. */
+	/** Color of each pixel; -1 is empty, not part of the picture; DISPENSER is a dispenser's tile. */
 	target: number[];
 	/** Whether each pixel's block is still there. */
 	alive: boolean[];
@@ -133,6 +139,33 @@ export interface State {
 	moves: number;
 	/** The column picks the level was built from: one way to win. */
 	intended?: number[];
+	/** Food dispensers, in eating order (bottom row first, left to right). Replaced, never changed. */
+	dispensers?: Dispenser[];
+}
+
+/** A dispenser's tile in State.target. */
+export const DISPENSER = -2;
+
+/**
+ * A food dispenser: it hands out amounts[0] of colors[0], then amounts[1] of
+ * colors[1], and so on. Its tile stays (alive) until it has handed out the lot.
+ */
+export interface Dispenser {
+	cell: number;
+	colors: number[];
+	amounts: number[];
+	/** How many it has handed out. */
+	used: number;
+}
+
+/** The color a dispenser hands out now and how many more of it, or null once it's empty. */
+export function dispensing(d: Dispenser): { c: number; left: number } | null {
+	let at = d.used;
+	for (let k = 0; k < d.colors.length; k++) {
+		if (at < d.amounts[k]) return { c: d.colors[k], left: d.amounts[k] - at };
+		at -= d.amounts[k];
+	}
+	return null;
 }
 
 /** One colony eating: which blocks, and in which wave (0 = already exposed). */
@@ -180,7 +213,7 @@ const blocksCache = new WeakMap<boolean[], string>();
 /** The blocks left, as text: how many, and two hashes of which. */
 export function blocksKey(s: State): string {
 	const hit = blocksCache.get(s.alive);
-	if (hit !== undefined) return hit;
+	if (hit !== undefined) return withDispensers(s, hit);
 	let a = 2166136261;
 	let b = 0;
 	let left = 0;
@@ -192,7 +225,12 @@ export function blocksKey(s: State): string {
 	}
 	const key = `${left}:${a >>> 0}:${b >>> 0}`;
 	blocksCache.set(s.alive, key);
-	return key;
+	return withDispensers(s, key);
+}
+
+/** A blocks key with how far each dispenser has got, which changes without eating a block. */
+function withDispensers(s: State, key: string): string {
+	return s.dispensers?.length ? `${key}:${s.dispensers.map((d) => d.used).join('.')}` : key;
 }
 
 /** Whether every block is eaten. */
@@ -200,9 +238,14 @@ export function isWon(s: State): boolean {
 	return !s.alive.some(Boolean);
 }
 
-/** Blocks still in the picture. */
+/** Food still to eat: in the picture, and still in the dispensers. */
 export function blocksLeft(s: State): number {
-	return s.alive.filter(Boolean).length;
+	let n = s.alive.filter(Boolean).length;
+	for (const d of s.dispensers ?? []) {
+		const total = d.amounts.reduce((a, b) => a + b, 0);
+		if (s.alive[d.cell]) n += total - d.used - 1;
+	}
+	return n;
 }
 
 /** The colonies still in the columns that are linked in group `link`. */
@@ -412,28 +455,39 @@ interface Ground {
 	quick?: boolean;
 }
 
-/** A send canSend() allows: the columns whose fronts go out, and the free slots. */
+/**
+ * A send canSend() allows: the column of each colony going out, in order (a
+ * column shows up once per colony its stack sends), and the free slots.
+ */
 type Allowed = { ok: true; cols: number[]; free: number[] };
 
 /**
  * Whether column `col`'s front colony can go out now. If so: the columns it
  * leaves from (its own, then its linked group's) and the free slots. Every
- * colony in a group has to be at the front of an open column.
+ * colony in a group has to be at the front of an open column, or right behind
+ * another member there with no lock between.
  */
 function canSend(s: State, col: number): Refusal | Allowed {
 	const front = s.columns[col]?.[0];
 	if (!front) return { ok: false, reason: 'empty' };
 	if (isLocked(s, col)) return { ok: false, reason: 'locked' };
-	const cols = [col];
-	if (front.link !== undefined) {
-		let members = 0;
-		for (let k = 0; k < s.columns.length; k++) {
-			for (const e of s.columns[k]) if (e.link === front.link) members++;
-			if (k === col || s.columns[k][0]?.link !== front.link) continue;
-			if (isLocked(s, k)) return { ok: false, reason: 'partner' };
-			cols.push(k);
+	let cols = [col];
+	const g = front.link;
+	if (g !== undefined) {
+		cols = [];
+		const order = [col, ...s.columns.keys()].filter((k, j) => j === 0 || k !== col);
+		for (const k of order) {
+			const column = s.columns[k];
+			const members = column.filter((e) => e.link === g).length;
+			if (!members) continue;
+			// The members here have to be the column's front, back to back.
+			let stack = 0;
+			while (stack < column.length && column[stack].link === g) stack++;
+			if (stack < members || isLocked(s, k)) return { ok: false, reason: 'partner' };
+			// A lock part way down the stack holds back the members behind it.
+			if (s.lockAt[k] < stack && hasLock(s, k)) return { ok: false, reason: 'partner' };
+			for (let n = 0; n < stack; n++) cols.push(k);
 		}
-		if (cols.length < members) return { ok: false, reason: 'partner' };
 	}
 	const free = s.slots.flatMap((e, k) => (e ? [] : [k]));
 	if (free.length < cols.length) return { ok: false, reason: 'no-slot' };
@@ -837,6 +891,8 @@ function step(s: State, quick: boolean): TickResult {
 	const before = outside(s);
 	const wasLocked = s.locks.map((key, k) => key >= 0 && s.alive[key] && hasLock(s, k, before));
 	const eaten: TickResult['eaten'] = [];
+	/** Blocks that went: eaten and not refilled, and dispensers that ran out. */
+	const gone: number[] = [];
 	// Ants that get to their food pick it up. A quick step's board is pick()'s or
 	// hurry()'s own (see own()), so it moves its ants and colonies in place.
 	const still: Ant[] = [];
@@ -847,20 +903,15 @@ function step(s: State, quick: boolean): TickResult {
 				still.push(a);
 			} else still.push({ ...a, eta: a.eta - 1 });
 		} else {
-			s.alive[a.cell] = false;
 			eaten.push({ cell: a.cell, c: a.c, id: a.id });
+			if (!refill(s, a.c, gone)) gone.push(a.cell);
 		}
 	}
 	s.walking = still;
+	for (const i of gone) s.alive[i] = false;
 	const slots = quick ? s.slots : s.slots.map((e) => e && { ...e });
 	s.slots = slots;
-	const out = eaten.length
-		? grewOutside(
-				s,
-				before,
-				eaten.map((e) => e.cell)
-			)
-		: before;
+	const out = gone.length || eaten.length ? grewOutside(s, before, gone) : before;
 	const ground: Ground = { out, taken: claims(s), quick };
 	const dispatched: Dispatch[] = [];
 	slots.forEach((e, k) => {
@@ -876,6 +927,23 @@ function step(s: State, quick: boolean): TickResult {
 	// Sending ants eats nothing, so the picture is as it was after the ants arrived.
 	const unlocked = wasLocked.flatMap((was, k) => (was && !hasLock(s, k, ground.out) ? [k] : []));
 	return { eaten, unlocked, dispatched, won: isWon(s) };
+}
+
+/**
+ * Food of color c was just eaten: the first dispenser handing out c (in eating
+ * order) puts a new one in its place at once. Returns whether one did. A
+ * dispenser that hands out its last one goes too: its cell joins `gone`, the
+ * blocks step() takes away. Changes s.dispensers (a new list).
+ */
+function refill(s: State, c: number, gone: number[]): boolean {
+	const list = s.dispensers;
+	const k = list?.findIndex((d) => dispensing(d)?.c === c) ?? -1;
+	if (!list || k < 0) return false;
+	const d = { ...list[k], used: list[k].used + 1 };
+	s.dispensers = list.slice();
+	s.dispensers[k] = d;
+	if (!dispensing(d)) gone.push(d.cell);
+	return true;
 }
 
 /**
@@ -899,7 +967,7 @@ function foodOf(s: State, out: Uint8Array): number[][] {
 	for (let y = s.h - 1; y >= 0; y--) {
 		for (let x = 0; x < s.w; x++) {
 			const i = y * s.w + x;
-			if (s.alive[i] && exposedAt(s, out, i)) food[s.target[i]].push(i);
+			if (s.alive[i] && s.target[i] >= 0 && exposedAt(s, out, i)) food[s.target[i]].push(i);
 		}
 	}
 	foodCache.set(out, food);
@@ -933,6 +1001,7 @@ function grewFood(
 		return food[c];
 	};
 	for (const i of cells) {
+		if (s.target[i] < 0) continue;
 		const list = edit(s.target[i]);
 		const at = list.indexOf(i);
 		if (at >= 0) list.splice(at, 1);
@@ -950,7 +1019,7 @@ function grewFood(
 	for (const i of added) {
 		const x = i % w;
 		for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
-			if (j < 0 || j >= s.alive.length || !s.alive[j] || come?.has(j)) continue;
+			if (j < 0 || j >= s.alive.length || !s.alive[j] || s.target[j] < 0 || come?.has(j)) continue;
 			// Exposed before: on the edge, or beside what was already outside.
 			const jx = j % w;
 			if (jx === 0 || jx === w - 1 || j < w || j >= w * (h - 1)) continue;
@@ -996,9 +1065,16 @@ export function isWaiting(s: State, e: Colony, out?: Uint8Array): boolean {
 function reachOf(s0: State, c: number): number {
 	const s = clone(s0);
 	let n = 0;
+	// While a dispenser hands out c, eating c in reach brings more of it.
+	const more = exposedIn(s0, outside(s0), c).length
+		? (s0.dispensers ?? []).reduce((m, d) => {
+				const now = dispensing(d);
+				return m + (now?.c === c ? now.left : 0);
+			}, 0)
+		: 0;
 	for (let out = outside(s); ;) {
 		const cells = exposedIn(s, out, c);
-		if (!cells.length) return n;
+		if (!cells.length) return n + more;
 		for (const i of cells) s.alive[i] = false;
 		out = grewOutside(s, out, cells);
 		n += cells.length;
@@ -1159,6 +1235,13 @@ export interface Tuning {
 	/** Most colonies in a linked group: 2 to 4. */
 	group: number;
 	/**
+	 * Chance a linked colony is dealt right behind the one before it in its group,
+	 * in the same column, so the two leave as one stack.
+	 */
+	stack: number;
+	/** Chance a colony stacked behind another of its group is a mystery one. */
+	stackMystery: number;
+	/**
 	 * Chance a colony whose eating opens food for a waiting colony is dealt behind
 	 * it, in its column. Then the waiting one has to go out first and sit in its
 	 * slot: you can't hold it back until its food is open.
@@ -1173,6 +1256,10 @@ export interface Tuning {
 	locks: number;
 	/** Share of colonies whose color is hidden until they reach the front. */
 	mystery: number;
+	/** Food dispensers in the picture. */
+	dispensers: number;
+	/** Most colors a dispenser hands out, one after another. */
+	dispenseColors: number;
 	/**
 	 * 0 or 1: pressure late in the game too. Locks after the first get keys that
 	 * open late, and the last of the linked groups wait for the last part of the
@@ -1199,10 +1286,16 @@ export function tuning(level: Level, index: number): Tuning {
 			: [10, 12, 15, 20, 25, 30, 35, 40].slice(0, 5 + Math.min(3, Math.round(3 * p))),
 		links: index < 4 ? 0 : 1 + Math.round(9 * p),
 		group: teach || index < 12 ? 2 : Math.min(4, 2 + Math.round(2.6 * p)),
+		// Stacks from about level 40, and from about level 80 the one behind is often a mystery.
+		stack: index < 40 ? 0 : Math.min(0.45, 0.15 + 0.35 * p),
+		stackMystery: index < 80 ? 0 : Math.min(0.7, 0.3 + 0.4 * p),
 		behind: teach ? 0 : Math.min(1, 0.3 + 0.7 * p),
 		runs: teach ? 0 : Math.min(0.95, 0.2 + 0.75 * p),
 		locks: index < 2 ? 0 : index < 8 ? 1 : index < 80 ? 2 : 3,
 		mystery: index < 5 ? 0 : Math.min(0.35, 0.1 + (index - 5) * 0.002),
+		// Dispensers from level 100, in a little over half the levels after it.
+		dispensers: index < 99 || hashStr(`${level.id}:dispense`) % 100 >= 55 ? 0 : p > 1 ? 2 : 1,
+		dispenseColors: Math.min(3, 1 + Math.round(2 * Math.max(0, p - 0.55) * 2)),
 		late: 0,
 		...level.tuning
 	};
@@ -1262,7 +1355,7 @@ function islands(s: State): number[] {
 	const seen = new Uint8Array(target.length);
 	const stack: number[] = [];
 	for (let i0 = 0; i0 < target.length; i0++) {
-		if (!alive[i0] || seen[i0]) continue;
+		if (!alive[i0] || seen[i0] || target[i0] < 0) continue;
 		const c = target[i0];
 		count[c]++;
 		seen[i0] = 1;
@@ -1312,6 +1405,68 @@ export interface Layout {
 	opensAt: number[];
 	/** Per colony in the play: its color is hidden until it reaches the front. */
 	mystery: boolean[];
+	/** Per colony in the play: hidden too, if it's dealt stacked behind another of its group. */
+	stackedMystery: boolean[];
+}
+
+/**
+ * The deal's food dispensers: each in place of a food a little way in from the
+ * outside, handing out 3 to 8 each of one to `dispenseColors` colors (never the
+ * same twice running), in eating order. Draws on rng only when the level has some.
+ */
+function placeDispensers(base: State, tune: Tuning, rng: Rng): Dispenser[] {
+	if (tune.dispensers <= 0) return [];
+	const depth = digDepth(base);
+	const counts = base.colors.map(() => 0);
+	base.target.forEach((c) => c >= 0 && counts[c]++);
+	const cells = base.target
+		.map((_, i) => i)
+		.filter((i) => base.target[i] >= 0 && depth[i] >= 1 && depth[i] <= 4);
+	const out: Dispenser[] = [];
+	for (let n = 0; n < tune.dispensers && cells.length; n++) {
+		const cell = cells.splice(Math.floor(rng() * cells.length), 1)[0];
+		counts[base.target[cell]]--;
+		const colors: number[] = [];
+		const amounts: number[] = [];
+		const parts = 1 + Math.floor(rng() * tune.dispenseColors);
+		for (let k = 0; k < parts; k++) {
+			const pool = counts.map((_, c) => c).filter((c) => counts[c] >= 3 && c !== colors[k - 1]);
+			if (!pool.length) break;
+			colors.push(pickWeighted(pool, (c) => counts[c], rng));
+			amounts.push(3 + Math.floor(rng() * 6));
+		}
+		if (colors.length) out.push({ cell, colors, amounts, used: 0 });
+	}
+	const w = base.w;
+	return out.sort((a, b) => 2 * (a.cell % w) - a.cell - (2 * (b.cell % w) - b.cell));
+}
+
+/**
+ * Per color: the most ants of it the play can send now without eating the
+ * picture's last food of it while a dispenser has more of it to hand out later
+ * (it would never get to: it only hands out when its color is eaten). Unlimited
+ * for a color no dispenser holds back.
+ */
+function dispenserRoom(s: State): number[] {
+	const onBoard = s.colors.map(() => 0);
+	s.target.forEach((c, i) => c >= 0 && s.alive[i] && onBoard[c]++);
+	const now = s.colors.map(() => 0);
+	const later = s.colors.map(() => 0);
+	for (const d of s.dispensers ?? []) {
+		let at = d.used;
+		let started = false;
+		d.colors.forEach((c, k) => {
+			if (at >= d.amounts[k]) {
+				at -= d.amounts[k];
+				return;
+			}
+			if (!started) now[c] += d.amounts[k] - at;
+			else later[c] += d.amounts[k];
+			started = true;
+			at = 0;
+		});
+	}
+	return onBoard.map((n, c) => (later[c] > 0 ? n - 1 + now[c] : Infinity));
 }
 
 /**
@@ -1373,8 +1528,6 @@ export function planPlay(
 	const art = parseArt(level);
 	const rng = makeRng(hashStr(level.id) + 7919 + seed * 104729);
 	const tune = { ...tuning(level, index), ...override };
-	const unassigned = art.colors.map(() => 0);
-	art.target.forEach((c) => c >= 0 && unassigned[c]++);
 	const base: State = {
 		w: art.w,
 		h: art.h,
@@ -1388,6 +1541,16 @@ export function planPlay(
 		walking: [],
 		moves: 0
 	};
+	const dispensers = placeDispensers(base, tune, rng);
+	if (dispensers.length) {
+		base.target = art.target.slice();
+		for (const d of dispensers) base.target[d.cell] = DISPENSER;
+		base.dispensers = dispensers;
+	}
+	// Each color's food: in the picture, and handed out by the dispensers.
+	const unassigned = art.colors.map(() => 0);
+	base.target.forEach((c) => c >= 0 && unassigned[c]++);
+	for (const d of dispensers) d.colors.forEach((c, k) => (unassigned[c] += d.amounts[k]));
 	let sim = clone(base);
 	const order: Colony[] = [];
 	const groups = new Map<number, number>();
@@ -1411,7 +1574,8 @@ export function planPlay(
 	let fed: number[] = [];
 
 	while (!isWon(sim)) {
-		const colors = unassigned.map((_, c) => c).filter((c) => unassigned[c] > 0);
+		const most = dispenserRoom(sim);
+		const colors = unassigned.map((_, c) => c).filter((c) => unassigned[c] > 0 && most[c] >= 1);
 		const reachable = new Map(colors.map((c) => [c, reachOf(sim, c)]));
 		const reach = (c: number) => reachable.get(c)!;
 		const free = sim.slots.filter((e) => !e).length;
@@ -1430,7 +1594,7 @@ export function planPlay(
 			const c = pickWeighted(pool.length ? pool : canEat, reach, rng);
 			let n = Math.max(1, Math.min(unassigned[c], size(), reach(c)));
 			if (unassigned[c] <= reach(c)) n = roundUp(c, n);
-			return { id, c, n };
+			return { id, c, n: Math.min(n, most[c]) };
 		};
 		/**
 		 * A colony that has to wait: more ants than its color has in reach. Food
@@ -1456,7 +1620,7 @@ export function planPlay(
 			// Mostly a little more than it can reach, so it waits for the next island or two;
 			// a linked one wants a whole chunk more, so its partner sits held for a while.
 			const more = long ? size() : Math.max(3, Math.round(size() * rng()));
-			return { id, c, n: roundUp(c, Math.min(unassigned[c], reach(c) + more)) };
+			return { id, c, n: Math.min(most[c], roundUp(c, Math.min(unassigned[c], reach(c) + more))) };
 		};
 
 		let sent: Colony[] = [];
@@ -1535,9 +1699,9 @@ export function planPlay(
 	const locks = new Array(tune.columns).fill(-1);
 	const opensAt: number[] = new Array(tune.columns).fill(0);
 	const keysBetween = (from: number, to: number) =>
-		art.target
+		base.target
 			.map((_, i) => i)
-			.filter((i) => art.target[i] >= 0 && openedAt[i] >= m * from && openedAt[i] <= m * to);
+			.filter((i) => base.target[i] >= 0 && openedAt[i] >= m * from && openedAt[i] <= m * to);
 	const early = keysBetween(0.2, 0.55);
 	/** Keys for locks after the first, with late pressure: they open in the last part of the play. */
 	const late = tune.late > 0 ? keysBetween(0.5, 0.85) : early;
@@ -1562,6 +1726,7 @@ export function planPlay(
 		lockAt[col] = Math.floor(rng() * 3);
 	}
 	const mystery = order.map(() => rng() < tune.mystery);
+	const stackedMystery = order.map(() => rng() < tune.stackMystery);
 	const groupAt = order.map(() => -1);
 	for (const [j, g] of groups) for (let i = j; i < j + g; i++) groupAt[i] = j;
 	return {
@@ -1573,7 +1738,7 @@ export function planPlay(
 		groupAt,
 		feeds,
 		openedAt,
-		layout: { locks, lockAt, opensAt, mystery },
+		layout: { locks, lockAt, opensAt, mystery, stackedMystery },
 		rng
 	};
 }
@@ -1598,6 +1763,12 @@ function dealRandom(plan: Plan, linked: boolean): State {
 			}
 		}
 		const pickedAt = together ? start : j;
+		// Right behind the one before it in its group, so the two leave as one stack.
+		if (together && j > start && open(placed[j - 1], pickedAt) && rng() < tune.stack) {
+			columns[placed[j - 1]]++;
+			placed.push(placed[j - 1]);
+			continue;
+		}
 		/** Columns other colonies of its group already went to. */
 		const taken = together ? placed.slice(start, j) : [];
 		let allowed = columns.map((_, k) => k).filter((k) => open(k, pickedAt) && !taken.includes(k));
@@ -1627,18 +1798,15 @@ function dealRandom(plan: Plan, linked: boolean): State {
 /**
  * Deal the play with colony j in column placement[j]; null if that can't be
  * done: a colony behind a lock that the play sends before its key is exposed.
- * A linked group stays linked when its colonies are in columns of their own;
- * without `linked`, or when they share one, they go out one at a time.
+ * A linked group's colonies go out one after another in the play, so any that
+ * share a column sit back to back there and leave as one stack. Without
+ * `linked`, they go out one at a time.
  */
 export function dealAs(plan: Plan, placement: number[], linked = true): State | null {
-	const { tune, order, base, groupAt, groups } = plan;
-	const { lockAt, opensAt, mystery } = plan.layout;
+	const { tune, order, base, groupAt } = plan;
+	const { lockAt, opensAt, mystery, stackedMystery } = plan.layout;
 	if (placement.length !== order.length) return null;
-	const together = (start: number) => {
-		if (!linked || start < 0) return false;
-		const cols = placement.slice(start, start + groups.get(start)!);
-		return new Set(cols).size === cols.length;
-	};
+	const together = (start: number) => linked && start >= 0;
 	const columns: Colony[][] = Array.from({ length: tune.columns }, () => []);
 	const intended: number[] = [];
 	for (let j = 0; j < order.length; j++) {
@@ -1650,7 +1818,8 @@ export function dealAs(plan: Plan, placement: number[], linked = true): State | 
 		if (!(opensAt[k] <= pickedAt || columns[k].length < lockAt[k])) return null;
 		const colony: Colony = { ...order[j] };
 		if (linkedHere) colony.link = order[start].id;
-		if (mystery[j]) colony.mystery = true;
+		const stacked = linkedHere && j > start && placement[j - 1] === k;
+		if (mystery[j] || (stacked && stackedMystery[j])) colony.mystery = true;
 		columns[k].push(colony);
 		// The group goes out when its first colony is picked.
 		if (!linkedHere || start === j) intended.push(k);

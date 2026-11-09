@@ -12,6 +12,12 @@
  * Rails are laid out on the lanes' grid (the slots row uses the same grid as
  * one row). Lengths are kept as sums of CSS sizes, so they stay whole pixels
  * at every size the page picks.
+ *
+ * In the lanes, rails keep to their own room: the gaps between lanes and the
+ * strip above them. A rail only crosses a lane's outline where it steps out of
+ * a colony. Members back to back in one lane (a stack, which goes out as one)
+ * are joined by a short bar straight between them. A member out of sight gets
+ * no rail; a ring in its group's color sits by its lane's count instead.
  */
 import type { State } from './engine';
 
@@ -72,8 +78,11 @@ export function lockColors(s: State): Record<number, string> {
 
 // ---------- rail layout ----------
 
+/** The gap between lanes (and slots), and the strip between the slots and the lanes, px. */
+export const GAP = 12;
+
 /**
- * A length on the lanes' grid: `lanes` lane pitches (a slot plus the 8px gap),
+ * A length on the lanes' grid: `lanes` lane pitches (a slot plus the GAP),
  * `slots` slot sizes, `pads` paddings (half of slot minus colony) and `px` pixels.
  * Slot and colony sizes are even and the padding is too, so halves of each are
  * whole pixels.
@@ -99,14 +108,14 @@ export interface Spot {
 }
 
 /** A length; see Len. */
-export const L = (lanes = 0, slots = 0, pads = 0, px = 0): Len => ({ lanes, slots, pads, px });
+const L = (lanes = 0, slots = 0, pads = 0, px = 0): Len => ({ lanes, slots, pads, px });
 const add = (a: Len, b: Len): Len =>
 	L(a.lanes + b.lanes, a.slots + b.slots, a.pads + b.pads, a.px + b.px);
 const sub = (a: Len, b: Len): Len =>
 	L(a.lanes - b.lanes, a.slots - b.slots, a.pads - b.pads, a.px - b.px);
 const px = (n: number) => L(0, 0, 0, n);
 /** A length in px at the desktop sizes, to compare lengths and weigh paths. */
-export const size = (v: Len) => v.lanes * 60 + v.slots * 52 + v.pads * 8 + v.px;
+export const size = (v: Len) => v.lanes * (52 + GAP) + v.slots * 52 + v.pads * 8 + v.px;
 
 /** The CSS for a length. */
 export function css(v: Len): string {
@@ -120,10 +129,8 @@ export function segStyle(s: Seg): string {
 
 /** Rail thickness, px. Even, so a rail centered on a whole pixel has whole edges. */
 const RAIL = 4;
-/** How far apart rails of different groups run when they share a gap, px. */
+/** How far apart rails of different groups run when they share a gap, px. Two fit in a GAP. */
 const TRACK = 6;
-/** How far a rail to a member out of sight runs past its lane's middle, under the lane's count. */
-const UNDERLINE = 8;
 
 export interface RailGrid {
 	/** Columns (lanes or slots). */
@@ -132,8 +139,12 @@ export interface RailGrid {
 	rows: number;
 	/** Whether something sits at a spot, so a rail has to go around it. */
 	taken: (col: number, depth: number) => boolean;
-	/** The line along the rows' bottom where rails to members out of sight run; none in the slots. */
-	floor?: Len;
+	/**
+	 * Rails keep to the gaps between columns and the strip above the rows (the lanes),
+	 * leaving a colony only by a short step into the gap beside it or the strip above.
+	 * Without it (the slots) a rail may cross a row's middle and runs just above it.
+	 */
+	channels?: boolean;
 }
 
 /** A linked group to join: its members, in sight or not. */
@@ -146,21 +157,22 @@ export interface Group {
  * The router works on a grid of lines between the colonies: x index i runs over
  * the gaps and lanes left to right (even = the gap left of lane i/2, odd = lane
  * (i-1)/2's middle), y index j over the bands and rows top to bottom (even = the
- * band above row j/2, the last even one being the floor; odd = row (j-1)/2's
- * middle). A rail may go anywhere on it except through a spot that's taken.
+ * band above row j/2; odd = row (j-1)/2's middle). A rail may go anywhere on it
+ * except through a spot that's taken, and in channels only along the gaps and
+ * the top strip.
  */
-const xAt = (i: number) => (i % 2 ? L((i - 1) / 2, 0.5) : L(i / 2 - 1, 1, 0, 4));
+const xAt = (i: number) => (i % 2 ? L((i - 1) / 2, 0.5) : L(i / 2 - 1, 1, 0, GAP / 2));
 function yAt(j: number, grid: RailGrid) {
 	if (j % 2) return L(0, (j - 1) / 2 + 0.5);
-	if (j === 0) return px(-2);
-	return j === 2 * grid.rows ? grid.floor! : L(0, j / 2);
+	if (j === 0) return px(grid.channels ? -GAP / 2 : -2);
+	return L(0, j / 2);
 }
 
 /** Path weights, in desktop px. */
 const BEND = 40;
 /**
  * Sharing a line with another group: cheap where there's room for tracks side by
- * side (the gaps between lanes, the floor), dear in the narrow bands between rows.
+ * side (the gaps between lanes, the strip above them), dear in the narrow bands between rows.
  */
 const SHARE_ROOMY = 30;
 const SHARE = 400;
@@ -181,15 +193,24 @@ const DIRS: Node[] = [
 	[0, -1]
 ];
 
-/** Where a member's rail starts: its middle, or under its lane's count when it's out of sight. */
-function nodeOf(m: Spot, grid: RailGrid): Node {
-	return m.depth >= grid.rows ? [2 * m.col + 1, 2 * grid.rows] : [2 * m.col + 1, 2 * m.depth + 1];
+/** Where a member's rail starts: its middle. */
+const nodeOf = (m: Spot): Node => [2 * m.col + 1, 2 * m.depth + 1];
+
+/**
+ * Whether a rail may run from (i, j) to (ni, nj) in channels: along a gap, along
+ * the top strip, or a step out of (or into) a member, sideways into the gap
+ * beside it or, from the front row, up into the strip.
+ */
+function inChannels(i: number, j: number, ni: number, nj: number, stub: boolean): boolean {
+	if (j === nj) return j === 0 || stub;
+	if (i % 2 === 0) return true;
+	return stub && Math.min(j, nj) === 0;
 }
 
 /** The cheapest grid path from a to b (a small Dijkstra over node and heading), or null. */
 function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] | null {
 	const W = 2 * grid.cols + 1;
-	const H = grid.floor ? 2 * grid.rows + 1 : 2 * grid.rows;
+	const H = 2 * grid.rows;
 	const free = (i: number, j: number) =>
 		i >= 0 &&
 		j >= 0 &&
@@ -221,9 +242,8 @@ function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] 
 			const nj = j + dj;
 			const end = ni === b[0] && nj === b[1];
 			if (!end && !free(ni, nj)) continue;
-			// The floor runs under the lanes' counts: rails reach it down the gaps, not a lane's middle.
-			if (dj && i % 2 && grid.floor && Math.max(j, nj) === 2 * grid.rows) continue;
 			const start = i === a[0] && j === a[1];
+			if (grid.channels && !inChannels(i, j, ni, nj, start || end)) continue;
 			let step =
 				Math.abs(size(sub(xAt(ni), xAt(i)))) + Math.abs(size(sub(yAt(nj, grid), yAt(j, grid))));
 			if (!start && nd !== d) step += BEND;
@@ -233,7 +253,7 @@ function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] 
 			// The bands between rows are narrow, so a rail keeps to them only when it has to.
 			if (!dj && j % 2 === 0 && j > 0 && j < 2 * grid.rows) step += NARROW;
 			if (others(edgeKey([i, j], [ni, nj]))) {
-				const roomy = dj ? i % 2 === 0 : j === 2 * grid.rows && !!grid.floor;
+				const roomy = dj ? i % 2 === 0 : j === 0 && !!grid.channels;
 				step += roomy ? SHARE_ROOMY : SHARE;
 			} else if (!end && others(`${ni},${nj}`)) step += CROSS;
 			const n = id(ni, nj, nd);
@@ -280,14 +300,13 @@ function corners(path: Node[]): Node[] {
 
 /**
  * Rails of different groups that share a gap run side by side, TRACK apart and
- * centered on the gap, rather than over each other. On the floor (y index
- * `floor`) they stack downward instead, away from the lanes' counts.
+ * centered on the gap, rather than over each other.
  *
  * Across a line, shorter stretches take the inner tracks. Down a gap, tracks
  * are ordered by where each rail turns off at its ends, so rails turning the
  * same way nest rather than cross.
  */
-function spread(runs: Run[], floor: number, yOf: (j: number) => number) {
+function spread(runs: Run[], yOf: (j: number) => number) {
 	const lines = new Map<string, Run[]>();
 	for (const r of runs) {
 		const key = `${r.h}${r.at}`;
@@ -320,7 +339,6 @@ function spread(runs: Run[], floor: number, yOf: (j: number) => number) {
 			}
 			if (cluster.length < 2) continue;
 			cluster.sort(([, a], [, b]) => a.key - b.key);
-			const onFloor = h && line[0].at === floor;
 			const track = new Map<number, number>();
 			if (h) {
 				// Across: shortest first, each on the first track it fits.
@@ -334,7 +352,7 @@ function spread(runs: Run[], floor: number, yOf: (j: number) => number) {
 				for (const r of line) {
 					const t = track.get(r.g);
 					if (t === undefined) continue;
-					r.off = onFloor ? t * TRACK : Math.round((t - (tracks.length - 1) / 2) * TRACK);
+					r.off = Math.round((t - (tracks.length - 1) / 2) * TRACK);
 				}
 			} else {
 				// Down: one track each, left to right in turning order.
@@ -378,40 +396,40 @@ function turnKey(r: Run, yOf: (j: number) => number): number {
 /**
  * The rails joining each group's members. Each group's members are joined left
  * to right, the shortest joins first, each by the path with the fewest bends
- * that keeps off colonies and other groups' rails. A rail to a member out of
- * sight drops to the floor and ends under that member's lane, where its count is.
- * Members in one column aren't joined.
+ * that keeps off colonies and other groups' rails. Only the members in sight
+ * are joined (a lane's count stands for the rest). Members in one column are
+ * back to back, so they're joined straight down.
  */
 export function rails(groups: Group[], grid: RailGrid): { g: number; segs: Seg[] }[] {
 	type Join = { g: number; a: Spot; b: Spot };
 	const joins: Join[] = [];
 	for (const { g, members } of groups) {
-		if (!members.some((m) => m.depth < grid.rows)) continue;
-		const spots = members.slice().sort((a, b) => a.col - b.col || a.depth - b.depth);
+		const spots = members
+			.filter((m) => m.depth < grid.rows)
+			.sort((a, b) => a.col - b.col || a.depth - b.depth);
 		for (let k = 0; k + 1 < spots.length; k++) {
 			const [a, b] = [spots[k], spots[k + 1]];
-			if (a.col === b.col) continue;
-			if (!grid.floor && (a.depth >= grid.rows || b.depth >= grid.rows)) continue;
-			joins.push({ g, a, b });
+			if (a.col !== b.col || b.depth === a.depth + 1) joins.push({ g, a, b });
 		}
 	}
 	const far = (j: Join) => {
-		const [a, b] = [nodeOf(j.a, grid), nodeOf(j.b, grid)];
+		const [a, b] = [nodeOf(j.a), nodeOf(j.b)];
 		return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 	};
 	joins.sort((x, y) => far(x) - far(y));
 
 	const used: Used = new Map();
 	const mark = (key: string, g: number) => used.set(key, (used.get(key) ?? new Set()).add(g));
-	const laid: { g: number; a: Spot; b: Spot; pts: Node[] }[] = [];
+	const laid: { g: number; pts: Node[] }[] = [];
 	for (const j of joins) {
-		const path = route(nodeOf(j.a, grid), nodeOf(j.b, grid), j.g, grid, used);
+		const [a, b] = [nodeOf(j.a), nodeOf(j.b)];
+		const path = j.a.col === j.b.col ? [a, b] : route(a, b, j.g, grid, used);
 		if (!path) continue;
 		path.forEach((p, k) => {
 			mark(`${p}`, j.g);
 			if (k) mark(edgeKey(path[k - 1], p), j.g);
 		});
-		laid.push({ ...j, pts: corners(path) });
+		laid.push({ g: j.g, pts: corners(path) });
 	}
 
 	// Each rail's runs, spread where groups share a line.
@@ -428,10 +446,10 @@ export function rails(groups: Group[], grid: RailGrid): { g: number; segs: Seg[]
 		});
 		return runs;
 	});
-	spread(runsOf.flat(), grid.floor ? 2 * grid.rows : -1, (j) => size(yAt(j, grid)));
+	spread(runsOf.flat(), (j) => size(yAt(j, grid)));
 
 	const out = new Map<number, Seg[]>();
-	laid.forEach(({ g, a, b, pts }, n) => {
+	laid.forEach(({ g, pts }, n) => {
 		const runs = runsOf[n];
 		// Each corner sits where its two runs' tracks meet.
 		const at = pts.map((p, k): { x: Len; y: Len } => {
@@ -444,27 +462,19 @@ export function rails(groups: Group[], grid: RailGrid): { g: number; segs: Seg[]
 			}
 			return { x, y };
 		});
-		trimEnd(at, pts, 0, a, grid);
-		trimEnd(at, pts, pts.length - 1, b, grid);
+		trimEnd(at, pts, 0);
+		trimEnd(at, pts, pts.length - 1);
 		out.set(g, [...(out.get(g) ?? []), ...bars(at)]);
 	});
 	return [...out].map(([g, segs]) => ({ g, segs }));
 }
 
-/**
- * Pull a rail's end back from a member's middle to the inside of its ring, so
- * the rail meets the ring. An end under a lane's count runs a little past the
- * lane's middle instead, underlining it.
- */
-function trimEnd(at: { x: Len; y: Len }[], pts: Node[], k: number, m: Spot, grid: RailGrid) {
+/** Pull a rail's end back from a member's middle to the inside of its ring, so the rail meets the ring. */
+function trimEnd(at: { x: Len; y: Len }[], pts: Node[], k: number) {
 	const next = pts[k === 0 ? 1 : k - 1];
 	const p = pts[k];
 	const h = next[1] === p[1];
 	const toward = h ? Math.sign(next[0] - p[0]) : Math.sign(next[1] - p[1]);
-	if (m.depth >= grid.rows) {
-		if (h) at[k].x = add(at[k].x, px(-toward * UNDERLINE));
-		return;
-	}
 	// From the middle: half a colony (half a slot less the padding), then the ring's gap.
 	const reach = L(0, 0.5, -0.5, -2);
 	const v = toward > 0 ? reach : sub(L(), reach);
