@@ -557,7 +557,6 @@
 		--colony: 36px;
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		--hole: color-mix(in srgb, var(--text-color) 18%, var(--primary-color));
-		--well: color-mix(in srgb, var(--text-color) 7%, var(--primary-color));
 
 		/*
 		 * The page centers its content, which can land on half a pixel. So the game
@@ -738,7 +737,7 @@
 		width: var(--slot-size);
 		height: var(--slot-size);
 		border-radius: 10px;
-		background: var(--well);
+		background: var(--primary-color);
 		box-shadow: var(--inset);
 		display: grid;
 		place-items: center;
@@ -775,7 +774,7 @@
 		gap: calc(2 * var(--pad));
 		border: 0;
 		border-radius: 10px;
-		background: var(--well);
+		background: var(--primary-color);
 		box-shadow: var(--inset);
 		color: var(--text-color);
 		cursor: pointer;
@@ -848,7 +847,7 @@
 	.colony.linked {
 		box-shadow:
 			var(--ring),
-			0 0 0 calc(var(--pad) / 2 - 2px) var(--well),
+			0 0 0 calc(var(--pad) / 2 - 2px) var(--primary-color),
 			0 0 0 calc(var(--pad) / 2) var(--g);
 	}
 	.colony.flash {
@@ -866,7 +865,7 @@
 		display: grid;
 		place-items: center;
 		color: var(--text-color);
-		background: var(--well);
+		background: var(--primary-color);
 		box-shadow: inset 0 0 0 3px var(--m);
 	}
 	/* A rail: one bar of a linked group's path, over the lanes, in the group's color. */

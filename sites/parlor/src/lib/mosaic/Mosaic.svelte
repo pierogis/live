@@ -848,7 +848,6 @@
 	/* Mosaic follows the site's look: flat colors, 2px inset rings, Courier for labels. */
 	.mosaic {
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
-		--well: color-mix(in srgb, var(--text-color) 7%, var(--primary-color));
 
 		/*
 		 * The page centers its content, which can land on half a pixel. So the game
@@ -1138,12 +1137,15 @@
 	/*
 	 * An empty slot: a striped diamond like an open spot on the board, in a neutral
 	 * shade (a slot has no color of its own). Its stripes turn the other way on every
-	 * other slot.
+	 * other slot. It's sized by the slot, not the board's cell, so it sits inside the
+	 * circle whatever the board's size, and holds whole stripes, so none is cut to a sliver.
 	 */
 	.slot:empty::after {
 		--shade: color-mix(in srgb, var(--text-color) 55%, transparent);
-		--stripe: max(1px, round(calc(var(--cell) * 0.07), 1px));
-		--side: calc(var(--cell) - 2 * round(calc(var(--cell) * 0.17), 1px));
+		--stripe: max(1px, round(calc(var(--slot) * 0.08), 1px));
+		--side: calc(
+			round(down, calc(var(--slot) * 0.5), calc(var(--stripe) * 2 + 1px)) + var(--stripe)
+		);
 		content: '';
 		position: absolute;
 		width: var(--side);
