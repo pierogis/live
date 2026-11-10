@@ -92,6 +92,54 @@ test('fewer dots than spots: they fill the spots closest to the tapped one', () 
 	assert.ok(r.ok && r.toBoard.length === 1 && r.toBoard[0].cell === 2);
 });
 
+test("dots that the tapped area has no room for go on to the color's other open spots", () => {
+	// Row 0 needs A B A B A, row 1 needs C x5. Dots: row 0 C B C B C, row 1 A A A B B.
+	const s = tiny(['ABABA', 'CCCCC'], [2, 1, 2, 1, 2, 0, 0, 0, 1, 1], 5, {
+		A: '#000',
+		B: '#fff',
+		C: '#f00'
+	});
+	// Lifting one C to the tray gathers the other two (it has room).
+	const lift = E.move(s, { from: 'board', cell: 0 }, { to: 'tray' });
+	assert.ok(lift.ok && lift.toTray.length === 3);
+	// A spots 0, 2 and 4 are open and don't touch. The three A dots dropped on spot 4 fill
+	// it, then the others, nearest first.
+	assert.deepEqual(E.dropSpots(s, 4), [4, 2, 0]);
+	const r = E.move(s, { from: 'board', cell: 5 }, { to: 'spot', cell: 4 });
+	assert.ok(r.ok && r.left === 0);
+	assert.deepEqual(
+		r.toBoard.map((p) => p.cell),
+		[4, 2, 0]
+	);
+});
+
+test("with room to spare, more dots of the color come too: the tray's, then the nearest", () => {
+	// Row 0 needs A x6, row 1 needs B x6. Dots: row 0 all B, row 1 A B B A B A.
+	const s = tiny(['AAAAAA', 'BBBBBB'], [1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0], 12);
+	// An A in the tray: with one slot free, only the picked one goes.
+	s.trayCap = 1;
+	assert.ok(E.move(s, { from: 'board', cell: 11 }, { to: 'tray' }).ok);
+	s.trayCap = 12;
+	assert.ok(E.move(s, { from: 'board', cell: 0 }, { to: 'tray' }).ok); // opens A spots 0..5
+	assert.equal(E.dropCount(s, { from: 'board', cell: 6 }, 0), 3);
+	const r = E.move(s, { from: 'board', cell: 6 }, { to: 'spot', cell: 0 });
+	assert.ok(r.ok && r.left === 0);
+	assert.deepEqual(
+		r.toBoard.map((p) => [p.from, p.cell, p.order]),
+		[
+			[6, 0, 0],
+			[9, 2, 2]
+		],
+		'the picked dot, then the nearest board dot'
+	);
+	assert.deepEqual(
+		r.fromTray.map((p) => [p.cell, p.order]),
+		[[1, 1]],
+		'the tray dot before it'
+	);
+	assert.ok(!s.tray.some((q) => q.c === 0), 'the tray has no A left');
+});
+
 test('diagonal spots count as touching', () => {
 	const s = tiny(['AB', 'BA'], [1, 0, 0, 1], 4); // dots B A / A B
 	assert.equal(E.groupAt(s, 0)!.cells.length, 2, 'B dots touching at the corner form one group');
@@ -107,12 +155,25 @@ test('diagonal spots count as touching', () => {
 
 test('the tray keeps dots grouped by color', () => {
 	const s = tiny(['ABCABC'], [1, 2, 0, 1, 2, 0], 6, { A: '#000', B: '#fff', C: '#f00' });
-	for (const cell of [0, 1, 3, 2, 4])
-		assert.ok(E.move(s, { from: 'board', cell }, { to: 'tray' }).ok);
+	// One slot free: just the picked B. Then the rest, each gathering its color's others.
+	s.trayCap = 1;
+	assert.ok(E.move(s, { from: 'board', cell: 0 }, { to: 'tray' }).ok);
+	s.trayCap = 6;
+	for (const cell of [1, 3, 2]) assert.ok(E.move(s, { from: 'board', cell }, { to: 'tray' }).ok);
 	assert.deepEqual(
 		s.tray.map((q) => q.c),
-		[1, 1, 2, 2, 0]
+		[1, 1, 2, 2, 0, 0]
 	);
+});
+
+test('with room to spare, the tray takes more of the color, nearest first', () => {
+	// Dots: A B A B A, the A's apart. Picking up the middle A with 2 slots free takes it and
+	// one of the others.
+	const s = tiny(['ABABA'], [0, 1, 0, 1, 0], 2);
+	assert.equal(E.parkCount(s, { from: 'board', cell: 2 }), 2);
+	const r = E.move(s, { from: 'board', cell: 2 }, { to: 'tray' });
+	assert.ok(r.ok && r.toTray.length === 2 && r.toTray[0].from === 2);
+	assert.ok(s.top[0] || s.top[4], 'one A is left on the board');
 });
 
 test('leftovers stay in hand, even when a drop splits them apart', () => {

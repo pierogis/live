@@ -1,8 +1,8 @@
 /* Dots flying between the board and the tray, as sprites (see shared/game/sprites.ts). */
 import { canAnimate, Sprites } from '../shared/game/sprites';
 
-/** How long a dot takes to fly, in milliseconds. */
-const FLIGHT = 420;
+/** About how long a dot takes to fly, in milliseconds. */
+export const FLIGHT = 420;
 
 /** Where each dot is on screen right now, by dot id. */
 export function snapshotRects(roots: (HTMLElement | undefined)[]): Map<number, DOMRect> {
@@ -17,9 +17,10 @@ export function snapshotRects(roots: (HTMLElement | undefined)[]): Map<number, D
 
 export class Flights extends Sprites {
 	/**
-	 * Fly a dot of color `hex` from `from` to `target`, then call `onLand`.
-	 * Lands right away when there's nothing to animate or motion is reduced.
-	 * `onSettle` runs once the last flight in the air has landed.
+	 * Fly a dot of color `hex` from `from` to `target` over `duration` ms (about
+	 * FLIGHT), then call `onLand` with when it was meant to land. Lands right
+	 * away when there's nothing to animate or motion is reduced. `onSettle` runs
+	 * once the last flight in the air has landed.
 	 */
 	launch(opts: {
 		layer: HTMLElement | undefined;
@@ -27,15 +28,17 @@ export class Flights extends Sprites {
 		from: DOMRect | undefined;
 		target: HTMLElement | null;
 		delay: number;
+		duration: number;
 		still: boolean;
-		onLand: () => void;
+		onLand: (at: number) => void;
 		onSettle: () => void;
 	}) {
-		const { layer, hex, from, target, delay, still, onLand, onSettle } = opts;
+		const { layer, hex, from, target, delay, duration, still, onLand, onSettle } = opts;
 		if (!layer || !from || !target || still || !canAnimate()) {
-			onLand();
+			onLand(performance.now());
 			return;
 		}
+		const lands = performance.now() + delay + duration;
 		const to = target.getBoundingClientRect();
 		const node = document.createElement('div');
 		node.className = 'gem flyer';
@@ -52,11 +55,11 @@ export class Flights extends Sprites {
 				{ transform: 'translate(0,0) scale(1)' },
 				{ transform: `translate(${dx}px, ${dy}px) scale(${scale})` }
 			],
-			{ duration: FLIGHT, delay, easing: 'ease-in-out', fill: 'both' }
+			{ duration, delay, easing: 'ease-in-out', fill: 'both' }
 		);
 		anim.onfinish = () => {
 			this.drop(flight);
-			onLand();
+			onLand(lands);
 			if (!this.size) onSettle();
 		};
 	}

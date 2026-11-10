@@ -11,7 +11,11 @@
  * dots of one color), then pick where they go: the tray, or an open spot of
  * their color. Lifting dots uncovers the spots under them. As many dots move
  * as there is room for, closest to the dot you picked up first, into the open
- * spots closest to the one you tapped. Diagonal spots count as touching.
+ * spots closest to the one you tapped: its open area first, then the other
+ * open spots of that color, nearest area first. When there's room for more
+ * dots than you picked up, the rest of that color come too: the tray's first,
+ * then the board's, nearest group first (to the tray, the board's). Diagonal
+ * spots count as touching.
  */
 
 import {
@@ -80,6 +84,8 @@ export interface Flight {
 	cell?: number;
 	/** Board spot the dot left. */
 	from?: number;
+	/** Its place in the move: dots onto spots go in this order, nearest the tap first. */
+	order?: number;
 }
 
 export type MoveResult =
@@ -319,6 +325,98 @@ export function openCount(s: State, color: number): number {
 	return n;
 }
 
+/**
+ * Where dots dropped on open spot `cell` go, in order: its open area, nearest
+ * first, then the other open spots of its color, area by area, the nearest
+ * area first and each from its spot nearest `cell`. (So with only tiny islands
+ * left, one drop can still fill several.)
+ */
+export function dropSpots(s: State, cell: number): number[] {
+	const out = openRegion(s, cell);
+	if (!out.length) return out;
+	const color = s.target[cell];
+	const seen = new Set(out);
+	const d2 = (i: number) =>
+		Math.pow((i % s.w) - (cell % s.w), 2) +
+		Math.pow(Math.floor(i / s.w) - Math.floor(cell / s.w), 2);
+	const rest: number[] = [];
+	for (let i = 0; i < s.target.length; i++) {
+		if (s.target[i] === color && !s.top[i] && !s.filled[i] && !seen.has(i)) rest.push(i);
+	}
+	rest.sort((a, b) => d2(a) - d2(b));
+	for (const i of rest) {
+		if (seen.has(i)) continue;
+		for (const j of openRegion(s, i)) {
+			seen.add(j);
+			out.push(j);
+		}
+	}
+	return out;
+}
+
+/**
+ * Up to `want` more dots of `color`, besides `held`, for a move with room to
+ * spare: the tray's first (unless they're going to the tray), then the
+ * board's, group by group, the group nearest `near` first and each from its
+ * dot nearest `near`.
+ */
+function gather(
+	s: State,
+	color: number,
+	held: Held[],
+	want: number,
+	near: number,
+	tray = true
+): Held[] {
+	const out: Held[] = [];
+	const taken = new Set(held.map((d) => d.gem.id));
+	for (const gem of tray ? s.tray : []) {
+		if (out.length >= want) return out;
+		if (gem.c === color && !taken.has(gem.id)) out.push({ cell: -1, gem });
+	}
+	const d2 = (i: number) =>
+		Math.pow((i % s.w) - (near % s.w), 2) +
+		Math.pow(Math.floor(i / s.w) - Math.floor(near / s.w), 2);
+	const cells: number[] = [];
+	for (let i = 0; i < s.top.length; i++) {
+		const q = s.top[i];
+		if (q && q.c === color && !taken.has(q.id)) cells.push(i);
+	}
+	cells.sort((a, b) => d2(a) - d2(b));
+	for (const i of cells) {
+		if (taken.has(s.top[i]!.id)) continue;
+		for (const j of outward(s, groupAt(s, i)!.cells, i)) {
+			if (out.length >= want) return out;
+			taken.add(s.top[j]!.id);
+			out.push({ cell: j, gem: s.top[j]! });
+		}
+	}
+	return out;
+}
+
+/** How many dots sending board selection `sel` to the tray would park there. */
+export function parkCount(s: State, sel: Sel | null): number {
+	const dots = selectionDots(s, sel);
+	if (!dots || sel?.from !== 'board') return 0;
+	const free = Math.max(0, s.trayCap - s.tray.length);
+	if (free <= dots.length) return free;
+	let all = 0;
+	for (const q of s.top) if (q?.c === dots[0].gem.c) all++;
+	return Math.min(free, all);
+}
+
+/** How many dots dropping selection `sel` on open spot `cell` would place. */
+export function dropCount(s: State, sel: Sel, cell: number): number {
+	const dots = selectionDots(s, sel);
+	if (!dots) return 0;
+	const spots = dropSpots(s, cell).length;
+	if (spots <= dots.length) return spots;
+	const color = dots[0].gem.c;
+	let all = s.tray.filter((q) => q.c === color).length;
+	for (const q of s.top) if (q?.c === color) all++;
+	return Math.min(spots, all);
+}
+
 /** Cells of a group ordered by how close they are (along the group) to `center`. */
 function outward(s: State, cells: number[], center: number): number[] {
 	const inGroup = new Set(cells);
@@ -359,7 +457,9 @@ function trayInsert(s: State, gem: Gem) {
  * Fills as much as it can, centered on what you tapped:
  *   - the dots that move are the ones closest to the dot you picked up
  *   - the spots they fill are the ones closest to the spot you tapped,
- *     within its touching group of open spots of that color
+ *     within its touching group of open spots of that color, then on to the
+ *     color's other open spots (see `dropSpots`)
+ *   - with room to spare, more dots of that color come too (see `gather`)
  * Dots that don't fit stay where they were.
  */
 export function move(s: State, sel: Sel, dst: Dst): MoveResult {
@@ -386,7 +486,8 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 		if (sel.from === 'tray') return { ok: false, reason: 'same' };
 		const free = s.trayCap - s.tray.length;
 		if (free <= 0) return { ok: false, reason: 'tray-full' };
-		n = Math.min(free, size);
+		if (free > size) dots = dots.concat(gather(s, color, dots, free - size, sel.cell, false));
+		n = Math.min(free, dots.length);
 		for (let k = 0; k < n; k++) {
 			const d = dots[k];
 			s.top[d.cell] = null;
@@ -398,21 +499,25 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 		if (s.target[cell] < 0 || s.filled[cell]) return { ok: false, reason: 'filled' };
 		if (s.top[cell]) return { ok: false, reason: 'covered' };
 		if (s.target[cell] !== color) return { ok: false, reason: 'color' };
-		const spots = openRegion(s, cell);
-		n = Math.min(spots.length, size);
+		const spots = dropSpots(s, cell);
+		if (spots.length > size) {
+			const near = sel.from === 'board' ? sel.cell : cell;
+			dots = dots.concat(gather(s, color, dots, spots.length - size, near));
+		}
+		n = Math.min(spots.length, dots.length);
 		for (let k = 0; k < n; k++) {
 			const d = dots[k];
 			s.filled[spots[k]] = true;
-			if (sel.from === 'board') {
+			if (d.cell >= 0) {
 				s.top[d.cell] = null;
-				toBoard.push({ id: d.gem.id, c: d.gem.c, cell: spots[k], from: d.cell });
+				toBoard.push({ id: d.gem.id, c: d.gem.c, cell: spots[k], from: d.cell, order: k });
 			} else {
 				s.tray.splice(s.tray.indexOf(d.gem), 1);
-				fromTray.push({ id: d.gem.id, c: d.gem.c, cell: spots[k] });
+				fromTray.push({ id: d.gem.id, c: d.gem.c, cell: spots[k], order: k });
 			}
 		}
 	}
-	const left = size - n;
+	const left = Math.max(0, size - n);
 	let leftCell = -1;
 	let leftCells: number[] | undefined;
 	if (left && sel.from === 'board') {

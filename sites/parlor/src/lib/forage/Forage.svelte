@@ -36,6 +36,13 @@
 
 	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
 	const TICK_MS = 100;
+	/**
+	 * Drawn ants get to their blocks only on the music's eighth notes (this many
+	 * of its sixteenths, a tick each at its usual pace), a little after the
+	 * engine's tick if need be, so every arrival sounds on the beat; they stride
+	 * on it too.
+	 */
+	const BEAT_TICKS = 2;
 
 	let ants: AntLayer | null = null;
 	/** Colors whose food is all gone, and heard so. Only the sound reads it, so it needn't be reactive. */
@@ -56,12 +63,13 @@
 		ctl.finished(hex);
 	}
 
-	/** A drawn ant got to its block: it goes from sight now, with the tune's next note. */
-	function arrived(hex: string) {
+	/** A drawn ant got to its block (meant to, `at`, on a tick): it goes from sight now, with the tune's next note. */
+	function arrived(hex: string, at: number) {
 		ctl.touch();
-		ctl.music?.note(hex);
+		ctl.music?.note(hex, false, at);
 		const c = game?.colors.findIndex((x) => x.hex === hex) ?? -1;
 		if (c >= 0) checkFinished(c);
+		if (game && E.isWon(game)) settle();
 	}
 
 	const ctl = new LevelControl<Level, State>(
@@ -76,8 +84,10 @@
 				// Colors already done here aren't heard again.
 				finished = new Set(s.colors.map((_, c) => c).filter((c) => !E.foodLeft(s, c)));
 			},
-			// Ants get to their blocks on the clock's ticks: a sixteenth each, resting between tune notes.
-			rhythm: { beat: TICK_MS / 1000, fill: false },
+			// A tick is a sixteenth of the music (which then follows the player's pace); ants get to
+			// their blocks on its eighths, each with a tune note or, between them, a quiet one.
+			// Each arrival warms the music, as a move does in Mosaic, so a busy colony swells it.
+			rhythm: { beat: TICK_MS, fill: true, warm: 0.05 },
 			key: (_e, key) => {
 				const n = Number(key);
 				if (game && n >= 1 && n <= game.columns.length) {
@@ -292,15 +302,15 @@
 			}
 			const path = [{ x: sx, y: slot.top - box.top }, { x: sx, y: edgeY }, ...pts.slice(j).map(at)];
 			const size = Math.max(3, Math.round(cellPx * 0.32));
-			// Its block goes on the eta-th tick from the last one (a tap's ants leave between ticks).
-			const ms = lastTick + d.eta * TICK_MS - performance.now();
-			ants.run(path, d.cell, ms, s.colors[d.c].hex, size);
+			// Its block goes on the eta-th tick from the last one (a tap's ants leave between ticks);
+			// the ant gets there on the next eighth, the block in sight till then.
+			const arrives = ctl.clock.next(lastTick + d.eta * TICK_MS, BEAT_TICKS);
+			ants.run(path, d.cell, arrives, s.colors[d.c].hex, size);
 		}
 	}
 
 	/** One step of time: working colonies eat. Paused while the end panel shows or the picture is done. */
 	function runTick() {
-		lastTick = performance.now();
 		const s = game;
 		if (!s || ctl.overlay || ctl.won) return;
 		const r = E.tick(s);
@@ -318,11 +328,20 @@
 			}
 			// A color's last food eaten with no drawn ant to show it: heard now.
 			for (const c of new Set(r.eaten.map((e) => e.c))) checkFinished(c);
-			if (r.won) ctl.settle();
+			if (r.won) settle();
 		} else {
 			// Nothing eaten: maybe nothing can be, so the stuck panel shows (after a moment).
-			ctl.settle();
+			settle();
 		}
+	}
+
+	/**
+	 * The board is still once no drawn ant is on its way to a block: the picture
+	 * is done when the last one gets there (as Mosaic's is once its last dot
+	 * lands), so the win's music comes after the last arrival's.
+	 */
+	function settle() {
+		if (!ants?.bound.size) ctl.settle();
 	}
 
 	/** A tap that can't go: show why with a quick cue, not a message. */
@@ -341,11 +360,21 @@
 
 	onMount(() => {
 		const unmount = ctl.mount();
-		lastTick = performance.now();
-		const clock = setInterval(runTick, TICK_MS);
+		// Ticks every TICK_MS from now, each timed from the first so they never drift. (The
+		// game's own clock: the music's beat follows the player, and ants meet it on arriving.)
+		const start = performance.now();
+		let timer = 0;
+		const loop = () => {
+			const now = performance.now();
+			lastTick = start + Math.round((now - start) / TICK_MS) * TICK_MS;
+			runTick();
+			timer = window.setTimeout(loop, lastTick + TICK_MS - performance.now());
+		};
+		lastTick = start;
+		timer = window.setTimeout(loop, TICK_MS);
 		return () => {
 			unmount();
-			clearInterval(clock);
+			clearTimeout(timer);
 			ants?.clear();
 		};
 	});
@@ -555,7 +584,7 @@
 				class="ant-layer"
 				{@attach (node) => {
 					// A drawn ant got to its block: it goes from sight now, with the tune's next note.
-					ants = new AntLayer(node, arrived);
+					ants = new AntLayer(node, arrived, () => BEAT_TICKS * ctl.clock.ms);
 				}}
 				aria-hidden="true"
 			></div>

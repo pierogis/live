@@ -19,12 +19,17 @@
 	import { plural } from '../shared/game/text';
 	import { inkOn } from '../shared/ink';
 	import { mosaicSave } from './save';
-	import { Flights, snapshotRects } from './flights';
+	import { FLIGHT, Flights, snapshotRects } from './flights';
 
 	const props: LevelProps<Level, State> = $props();
 
-	/** Milliseconds between the dots of one move taking off. */
-	const STAGGER = 40;
+	/** The music's sixteenth note here, in milliseconds. */
+	const SIXTEENTH = 100;
+	/**
+	 * A move's dots cascade in on eighth notes, like Forage's ants: one an eighth,
+	 * or for a big move two or more together, so it's never more than this many eighths.
+	 */
+	const CASCADE = 12;
 	const MAX_ZOOM = 4;
 	/** Whether the last tap was a finger, which gets a wider reach than a mouse. */
 	let touchTap = false;
@@ -71,8 +76,8 @@
 					resetZoom();
 				}
 			},
-			// A move's dots land a stagger apart: a sixteenth note each, with a quiet pattern between tune notes.
-			rhythm: { beat: STAGGER / 1000, fill: true },
+			// A move's dots land on eighth notes, each eighth with a tune note or, between them, a quiet one.
+			rhythm: { beat: SIXTEENTH, fill: true },
 			key: (e, key) => {
 				if (e.key === 'Escape') {
 					if (sel) select(null);
@@ -103,10 +108,6 @@
 		if (!sel || !game) return -1;
 		if (sel.from === 'tray') return sel.color;
 		return game.top[sel.cell]?.c ?? -1;
-	}
-
-	function selSize(): number {
-		return (game && E.selectionDots(game, sel)?.length) || 0;
 	}
 
 	const picked = $derived.by(() => {
@@ -183,9 +184,12 @@
 			return out;
 		}
 		if (!sel || s.filled[cell] || s.target[cell] !== selColor()) return out;
-		const region = E.openRegion(s, cell);
-		const n = Math.min(region.length, selSize());
-		region.forEach((i, k) => (k < n ? out.fill : out.region).add(i));
+		// The spots the move would fill (spilling over to the color's other open spots, with
+		// more of its dots gathered if there's room), and the rest of the hovered area.
+		const spots = E.dropSpots(s, cell);
+		const n = E.dropCount(s, sel, cell);
+		spots.slice(0, n).forEach((i) => out.fill.add(i));
+		E.openRegion(s, cell).forEach((i) => out.fill.has(i) || out.region.add(i));
 		return out;
 	});
 
@@ -198,9 +202,7 @@
 		// Hovering an empty slot with dots in hand: preview the slots they'd fill.
 		const fillFrom = s.tray.length;
 		const fillTo =
-			trayHover && 'slot' in trayHover && boardPick
-				? fillFrom + Math.min(selSize(), s.trayCap - s.tray.length)
-				: fillFrom;
+			trayHover && 'slot' in trayHover && boardPick ? fillFrom + E.parkCount(s, sel) : fillFrom;
 		const hoverColor = trayHover && 'color' in trayHover ? trayHover.color : -1;
 		const out = [];
 		for (let k = 0; k < s.trayCap; k++) {
@@ -581,38 +583,48 @@
 		const hex = colors[moved].hex;
 		const finishes = toSpots.length > 0 && E.colorDone(s, moved);
 		let landing = toSpots.length;
-		const landSpot = (cell: number) => {
+		const landSpot = (cell: number, at: number) => {
 			pendingCells.delete(cell);
-			ctl.music?.note(hex);
+			ctl.music?.note(hex, false, at);
 			if (--landing === 0 && finishes) ctl.finished(hex);
 		};
-		const landTray = (id: number) => {
+		const landTray = (id: number, at: number) => {
 			pendingTray.delete(id);
-			ctl.music?.note(hex, true);
+			ctl.music?.note(hex, true, at);
 		};
+		// The first dot lands on an eighth note, so the tune keeps time from move to move, and the
+		// rest an eighth or more after it: the k-th of n on the eighth its share of the cascade puts it.
+		const now = performance.now();
+		const duration = ctl.clock.nearest(now + FLIGHT, 2) - now;
+		const eighth = 2 * ctl.clock.ms;
 		const fly = (
 			c: number,
 			id: number,
 			target: HTMLElement | null,
 			k: number,
-			onLand: () => void
+			n: number,
+			onLand: (at: number) => void
 		) =>
 			flights.launch({
 				layer: fxEl,
 				hex: colors[c].hex,
 				from: rects.get(id),
 				target,
-				delay: k * STAGGER,
+				delay: Math.floor((k * Math.min(n, CASCADE)) / n) * eighth,
+				duration,
 				still: ctl.still,
 				onLand,
 				onSettle: () => ctl.settle()
 			});
-		res.toBoard.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landSpot(p.cell)));
+		// Dots onto spots, from the board and the tray alike, cascade in the move's order.
+		const onto = toSpots.toSorted((a, b) => (a.order ?? 0) - (b.order ?? 0));
+		onto.forEach((p, k) =>
+			fly(p.c, p.id, cellEl(p.cell), k, onto.length, (at) => landSpot(p.cell, at))
+		);
 		res.toTray.forEach((p, k) => {
 			const to = trayEl?.querySelector<HTMLElement>(`[data-id="${p.id}"]`) ?? null;
-			fly(p.c, p.id, to, k, () => landTray(p.id));
+			fly(p.c, p.id, to, k, res.toTray.length, (at) => landTray(p.id, at));
 		});
-		res.fromTray.forEach((p, k) => fly(p.c, p.id, cellEl(p.cell), k, () => landSpot(p.cell)));
 		if (!flights.size) ctl.settle();
 	}
 

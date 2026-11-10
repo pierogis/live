@@ -20,7 +20,7 @@ import { goto } from '$app/navigation';
 import type { Listed, Picture } from '../level';
 import { hashStr } from '../engine';
 import { memoryStore, type GameSave, type Save, type SaveStore } from '../save';
-import { music, type Music, type Rhythm } from '../sound';
+import { music, type Clock, type Music, type Rhythm } from '../sound';
 import { Cue } from './cue.svelte';
 
 interface CommonProps<S> {
@@ -90,7 +90,7 @@ export interface LevelGame<L extends Picture, S> {
 	stuckDelay?: number;
 	/** Undo steps kept; 500 by default. */
 	maxHistory?: number;
-	/** How its landings come, for the music: a run's beat, and whether the beats between tune notes play. */
+	/** How its landings come, for the music: its sixteenth note, and whether the ones between tune notes play. */
 	rhythm: Rhythm;
 }
 
@@ -233,6 +233,11 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	/** The level's music, or null while the sound is off: `ctl.music?.note(hex)`. */
 	get music(): Music | null {
 		return this.save.muted ? null : music;
+	}
+
+	/** The level's beat, sound or not: land things on it so the music keeps time. */
+	get clock(): Clock {
+		return music.clock;
 	}
 
 	/** Color `hex` was just finished: its sound, unless that finished the picture (the win has its own). */
