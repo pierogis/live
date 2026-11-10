@@ -34,7 +34,8 @@
  * The flourishes are the tune's own, each a different stretch of it: something
  * opening rings the chord in a bell's voice of its own, high up, which then
  * harmonizes the tune above it for a bar or so; finishing a color swells the
- * music and sweeps up into the tune running on ahead to a bar's first beat; a
+ * music and sweeps up into the tune running on ahead to a bar's first beat (or,
+ * in Mosaic, the color joins in the same way the bell does, in its own voice); a
  * finished picture plays the song's own ending, V to I, so it always ends at
  * home. Each starts on a beat, after any still playing, so two colors
  * finishing together run on as one longer stretch. In Forage, foods of two
@@ -801,6 +802,12 @@ export interface Rhythm {
 	 * so it skips in sixteenths. Not a bar's first note, and not twice running.
 	 */
 	doubles?: boolean;
+	/**
+	 * A finished color joins in, as an unlock's bell does: a quick sweep up the chord in
+	 * its voice, which then harmonizes the tune for a bar or so, rather than the tune
+	 * running on ahead in a flourish over the player's landings.
+	 */
+	harmonize?: boolean;
 }
 
 /** The quiet pattern between tune notes: root, fifth, third, fifth of the chord. */
@@ -889,8 +896,13 @@ export class Music {
 	/** The color of the last thing that landed, and when the echo last bent. */
 	#color: string | undefined;
 	#bent = -Infinity;
-	/** How many more tune notes the bell harmonizes, after something opened. */
+	/**
+	 * How many more tune notes get a harmony, after something opened or (`#joins`) a
+	 * color finished; in whose voice, and how many degrees up it sits from the tune's.
+	 */
 	#harmony = 0;
+	#harmonist: { voice: string; up: number; gain: number } = { voice: BELL, up: 7, gain: 0.035 };
+	#joins = false;
 	/** How swelled the music is, 0 to 1, as of `#heatAt`; it cools from there. */
 	#heat = 0;
 	#heatAt = 0;
@@ -925,6 +937,7 @@ export class Music {
 		this.#color = undefined;
 		this.#bent = -Infinity;
 		this.#harmony = 0;
+		this.#joins = rhythm.harmonize ?? false;
 		this.#heat = 0;
 		this.#lastMove = -Infinity;
 		timbres.clear();
@@ -1193,11 +1206,12 @@ export class Music {
 			this.#sing(o, tb, n, t, gain, n.len >= 8 ? 0.7 : 0.45, h, when(beat));
 			if (this.#harmony > 0) {
 				this.#harmony--;
-				// The bell's line, an octave up: a third above the tune's note, or a sixth when
-				// that's the chord's and the third isn't. Either sits sweetly on the tune.
+				// The harmony's line: a third above the tune's note, or a sixth when that's the
+				// chord's and the third isn't. Either sits sweetly on the tune.
 				const d =
 					n.deg + (isChordTone(n.deg + 2, n.root) || !isChordTone(n.deg + 5, n.root) ? 2 : 5);
-				pluck(o, timbre(o.ctx, BELL), this.#midi(d + 7), t, 0.035, 0.8);
+				const { voice, up, gain: g } = this.#harmonist;
+				pluck(o, timbre(o.ctx, voice), this.#midi(d + up), t, g * (1 + 0.25 * h), 0.8);
 			}
 		});
 	}
@@ -1270,27 +1284,43 @@ export class Music {
 	 */
 	chime() {
 		this.#play((o, now, when) => {
-			const from = this.#onBeat(now, 20);
-			const { root, key } = this.#sounding(from);
-			const tb = timbre(o.ctx, BELL);
-			const gap = (this.#six * this.clock.ms) / 2;
-			[2, 4, 7].forEach((k, i) =>
-				pluck(o, tb, this.#midi(root + 14 + k, key), when(from + i * gap), 0.035, 0.9)
-			);
-			// Through the end of the next whole bar: this one, if the next note starts it.
-			const notes = this.#song.notes;
-			const bar = (j: number) => {
-				while (!notes[j % notes.length].downbeat) j++;
-				return j;
-			};
-			let end = bar(this.#i + 1);
-			if (!notes[this.#i].downbeat) end = bar(end + 1);
-			this.#harmony = end - this.#i;
+			this.#joinIn(o, now, when, { voice: BELL, up: 7, gain: 0.035 }, [16, 18, 21], 0.035, 0.9);
 		});
 	}
 
 	/**
-	 * A color finished: the music swells and the tune runs on ahead. In that
+	 * `harmonist` comes in: chord tones `sweep` (degrees above the sounding chord's
+	 * root) quickly up from the next beat, then a harmony on the tune's notes
+	 * through the end of its next whole bar (this one, if the next note starts it).
+	 */
+	#joinIn(
+		o: Out,
+		now: number,
+		when: When,
+		harmonist: { voice: string; up: number; gain: number },
+		sweep: number[],
+		gain: number,
+		len: number
+	) {
+		const from = this.#onBeat(now, 20);
+		const { root, key } = this.#sounding(from);
+		const tb = timbre(o.ctx, harmonist.voice);
+		const gap = (this.#six * this.clock.ms) / 2;
+		sweep.forEach((k, i) => pluck(o, tb, this.#midi(root + k, key), when(from + i * gap), gain, len));
+		const notes = this.#song.notes;
+		const bar = (j: number) => {
+			while (!notes[j % notes.length].downbeat) j++;
+			return j;
+		};
+		let end = bar(this.#i + 1);
+		if (!notes[this.#i].downbeat) end = bar(end + 1);
+		this.#harmony = end - this.#i;
+		this.#harmonist = harmonist;
+	}
+
+	/**
+	 * A color finished: the music swells and (unless the color joins in, see
+	 * `Rhythm.harmonize`) the tune runs on ahead. In that
 	 * color's voice, just after the note that finished it, a sweep comes up the
 	 * chord into the tune's next notes, which play on a beat through to the
 	 * first of a bar and hold there. The tune goes on from after it, so each
@@ -1299,6 +1329,13 @@ export class Music {
 	done(color?: string) {
 		this.#play((o, now, when) => {
 			this.#heatTo(o, now, when(now), this.#warmth(now) + 0.35);
+			// Or, joining in: up the chord in the color's voice, into the tune's octave, and
+			// then a harmony a third or so above the tune in that voice.
+			if (this.#joins) {
+				const voice = color ?? PLAIN;
+				this.#joinIn(o, now, when, { voice, up: 0, gain: 0.045 }, [7, 9, 11, 14], 0.045, 0.4);
+				return;
+			}
 			const tb = timbre(o.ctx, color);
 			const { run, next } = this.#ahead();
 			const [first, last] = [run[0], run[run.length - 1]];
