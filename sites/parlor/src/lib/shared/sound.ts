@@ -1,7 +1,11 @@
 /*
  * A little synth that plays a tune as you play, no sound files.
  *
- * Each level writes its own song: a key and a mode, and 32 bars in eight
+ * Each level writes its own song: a key and a mode (from major and its
+ * relatives to lydian, harmonic minor and phrygian, some pentatonic), a style
+ * (a quiet pattern of its own, the tune's range and how much it leaps, and in
+ * Mosaic, sometimes 3/4 or swing), a motif of a few notes that its bars are
+ * built on, and 32 bars in eight
  * phrases, A A′ B B′ C C′ A A′. A is the level's theme over one chord loop;
  * A′ starts the same and comes home to the tonic through the V chord. B goes on
  * over another loop and comes home too; C goes somewhere else, another key or
@@ -114,12 +118,74 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 			['major', -4],
 			['dorian', 0]
 		]
+	},
+	// Major with a raised fourth: bright and floating, II major.
+	lydian: {
+		scale: [0, 2, 4, 6, 7, 9, 11],
+		loops: [
+			[0, 1, 0, 4],
+			[0, 1, 5, 4],
+			[0, 2, 1, 0]
+		],
+		away: [
+			['major', 7],
+			['minor', -3],
+			['mixolydian', 0]
+		]
+	},
+	// Minor with a raised seventh: V major, a little old-world.
+	harmonic: {
+		scale: [0, 2, 3, 5, 7, 8, 11],
+		loops: [
+			[0, 3, 4, 0],
+			[0, 5, 3, 4],
+			[0, 3, 5, 4]
+		],
+		away: [
+			['major', 3],
+			['minor', 5],
+			['dorian', 0]
+		]
+	},
+	// Minor with a lowered second: bII, Spanish.
+	phrygian: {
+		scale: [0, 1, 3, 5, 7, 8, 10],
+		loops: [
+			[0, 1, 0, 6],
+			[0, 1, 6, 0],
+			[0, 6, 5, 1]
+		],
+		away: [
+			['minor', 0],
+			['major', 3],
+			['harmonic', 0]
+		]
 	}
 };
 /** Majors come up more often: the site is calm, not moody. */
-const MODE_ODDS = ['major', 'major', 'major', 'mixolydian', 'dorian', 'minor'];
-/** Tonics as MIDI notes, C4 to F4, so the tune sits an octave above them. */
-const TONICS = [60, 61, 62, 63, 64, 65];
+const MODE_ODDS = [
+	'major',
+	'major',
+	'major',
+	'mixolydian',
+	'lydian',
+	'dorian',
+	'minor',
+	'harmonic',
+	'phrygian'
+];
+/**
+ * Scale degrees a pentatonic tune steps around (unless its chord has them), by mode:
+ * a major's 4th and 7th, a minor's 2nd and 6th. Other modes keep all seven.
+ */
+const PENTATONIC: Record<string, number[]> = {
+	major: [3, 6],
+	mixolydian: [3, 6],
+	minor: [1, 5],
+	dorian: [1, 5]
+};
+/** Tonics as MIDI notes, G3 to F♯4, so the tune sits an octave above them. */
+const TONICS = [55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66];
 
 /** About how long a flourish's sixteenth note is, in seconds; it's a whole number of the game's. */
 const UNIT = 0.09;
@@ -167,6 +233,56 @@ const ENDINGS = [
 	[6, 2, 8],
 	[8, 8]
 ];
+/** The same in 3/4: twelve sixteenths a bar. */
+const RHYTHMS3 = [
+	[4, 4, 4],
+	[4, 2, 2, 4],
+	[2, 2, 4, 4],
+	[6, 2, 4],
+	[4, 4, 2, 2],
+	[2, 2, 2, 2, 4]
+];
+const ENDINGS3 = [[4, 8], [2, 2, 8], [6, 6], [12]];
+
+/**
+ * The quiet pattern between tune notes, by meter: a chord degree for each eighth
+ * from where the chord came in (0 its root, 2 third, 4 fifth, 7 its root up an
+ * octave). Each level plays one.
+ */
+const FILLS: Record<3 | 4, number[][]> = {
+	4: [
+		[0, 4, 2, 4], // Alberti
+		[0, 2, 4, 7], // up the chord
+		[7, 4, 2, 0], // down it
+		[0, 7, 0, 7], // broken octaves
+		[0, 4, 0, 4], // bass and fifth
+		[0, 2, 4, 2] // up and back
+	],
+	3: [
+		[0, 4, 2, 4, 2, 4],
+		[0, 7, 4, 7, 4, 7],
+		[0, 2, 4, 7, 4, 2],
+		[0, 4, 7, 4, 7, 4]
+	]
+};
+
+/**
+ * What makes a level's song its own beyond its notes: its meter and swing (with
+ * the game's say-so), its quiet pattern, the tune's range, how much it leaps,
+ * and whether it steps around two of the scale's notes, a pentatonic.
+ */
+interface Style {
+	meter: 3 | 4;
+	/** How far an off eighth waits, as a part of an eighth (0 straight, ⅓ a triplet swing). */
+	swing: number;
+	fill: number[];
+	lo: number;
+	hi: number;
+	/** How often the motif leaps rather than steps, 0 to 1. */
+	leap: number;
+	/** Scale degrees (mod 7) the tune steps around, off its chord. */
+	avoid: number[];
+}
 
 const mod7 = (d: number) => ((d % 7) + 7) % 7;
 const isChordTone = (deg: number, root: number) => [0, 2, 4].includes(mod7(deg - root));
@@ -201,6 +317,7 @@ const NO_KEY: Key = { tonic: 60, scale: [] };
 interface Song {
 	home: Key;
 	notes: Note[];
+	style: Style;
 }
 
 /**
@@ -219,27 +336,68 @@ function nearest(d: number, lo: number, hi: number, ok: (c: number) => boolean) 
 }
 
 /**
- * One bar of tune. Notes on the beat (the bar's first and middle) are chord
- * tones near the last note; the rest step along the bar's direction, now and
- * then turning back. A phrase's last bar ends on its chord's root (`open`),
- * or is a cadence (`home`): over the V chord to ti or re, then up or down a
- * step to the tonic, which brings in the I chord.
+ * A motif: its notes' steps from its first, in scale degrees. Three to five
+ * notes, at least one a leap (more as `leap` says), spanning a third to a fifth.
+ */
+function motif(r: Rng, leap: number): number[] {
+	const n = 3 + Math.floor(r() * 3);
+	for (;;) {
+		const out = [0];
+		let d = 0;
+		let leaps = 0;
+		for (let i = 1; i < n; i++) {
+			const big = r() < leap;
+			const size = big ? pickOne([2, 2, 2, 3, 4], r) : r() < 0.1 ? 0 : 1;
+			d += size * (r() < 0.5 ? 1 : -1);
+			if (big) leaps++;
+			out.push(d);
+		}
+		const span = Math.max(...out) - Math.min(...out);
+		if (leaps > 0 && span >= 2 && span <= 4) return out;
+	}
+}
+
+/** The motif upside down, or backwards: a variation that still sounds like it. */
+function vary(r: Rng, m: number[]): number[] {
+	if (r() < 0.5) return m.map((x) => -x);
+	const last = m[m.length - 1];
+	return m.toReversed().map((x) => x - last);
+}
+
+/**
+ * One bar of tune, the motif's shape on its chord: it starts on a chord tone near
+ * the last note (one the shape fits in range from), and starts over on another
+ * when the bar has more notes than it. Notes on the bar's strong beats are chord
+ * tones, the rest keep their place in the shape, stepping around the style's
+ * avoided notes. A phrase's last bar ends on its chord's root (`open`), or is a
+ * cadence (`home`): over the V chord to ti or re, then up or down a step to the
+ * tonic, which brings in the I chord.
  */
 function bar(
 	r: Rng,
 	rhythm: number[],
 	root: number,
 	prev: number,
-	lo: number,
-	hi: number,
+	style: Style,
+	shape: number[],
 	end?: 'open' | 'home'
 ): Note[] {
-	let dir = r() < 0.5 ? 1 : -1;
-	if (prev >= hi - 2) dir = -1;
-	if (prev <= lo + 2) dir = 1;
+	const { lo, hi } = style;
+	const lowest = Math.min(...shape);
+	const highest = Math.max(...shape);
+	const strong = style.meter === 3 ? 12 : 8;
+	/** A chord tone the shape fits in range from, near `d`, rarely `d` itself. */
+	const startNear = (d: number) => {
+		const ok: number[] = [];
+		for (let c = lo - lowest; c <= hi - highest; c++) if (isChordTone(c, root)) ok.push(c);
+		if (!ok.length) return nearest(d, lo, hi, (c) => isChordTone(c, root));
+		ok.sort((a, b) => Math.abs(a - d) + (a === d ? 2 : 0) - (Math.abs(b - d) + (b === d ? 2 : 0)));
+		return ok[r() < 0.75 ? 0 : Math.min(1, ok.length - 1)];
+	};
 	const out: Note[] = [];
 	let pos = 0;
 	let d = prev;
+	let from = prev;
 	rhythm.forEach((len, i) => {
 		const n = {
 			root,
@@ -249,25 +407,20 @@ function bar(
 			key: NO_KEY,
 			strike: 'block' as Strike
 		};
+		const j = i % shape.length;
 		if (end && i === rhythm.length - 1) {
 			if (end === 'home') Object.assign(n, { root: 0, chord: true });
 			d = nearest(d, lo, hi, (c) => mod7(c) === n.root);
 		} else if (end === 'home' && i === rhythm.length - 2) {
 			d = nearest(d, lo, hi, (c) => mod7(c) === 1 || mod7(c) === 6);
-		} else if (pos % 8 === 0) {
-			// A chord tone, a step or two along, rarely the same note twice.
-			const near: number[] = [];
-			for (let k = -4; k <= 4; k++) {
-				const c = d + k;
-				if (c >= lo && c <= hi && isChordTone(c, root) && (k !== 0 || i === 0)) near.push(c);
-			}
-			near.sort((a, b) => Math.abs(a - d - dir) - Math.abs(b - d - dir));
-			d = near.length ? near[r() < 0.7 ? 0 : Math.min(1, near.length - 1)] : d;
+		} else if (j === 0) {
+			from = startNear(d);
+			d = from;
 		} else {
-			const turn = r() < 0.2 ? -1 : 1;
-			const step = r() < 0.8 ? 1 : 2;
-			d += dir * turn * step;
-			if (d > hi || d < lo) d -= 2 * dir * turn * step;
+			d = Math.min(hi, Math.max(lo, from + shape[j]));
+			const off = (c: number) => !isChordTone(c, root) && style.avoid.includes(mod7(c));
+			if (pos % strong === 0) d = nearest(d, lo, hi, (c) => isChordTone(c, root));
+			else if (off(d)) d = nearest(d, lo, hi, (c) => !off(c));
 		}
 		out.push({ ...n, deg: d, len });
 		pos += len;
@@ -275,14 +428,17 @@ function bar(
 	return out;
 }
 
-/** One phrase: four bars over the loop; one that comes `home` ends V to I instead. */
+/**
+ * One phrase: four bars over the loop, the motif on the first two, a variation
+ * of it on the third, then an ending; one that comes `home` ends V to I instead.
+ */
 function phrase(
 	r: Rng,
 	loop: number[],
 	rhythms: number[][],
 	start: number,
-	lo: number,
-	hi: number,
+	style: Style,
+	shapes: number[][],
 	home: boolean
 ): Note[] {
 	const out: Note[] = [];
@@ -290,7 +446,8 @@ function phrase(
 	for (let b = 0; b < 4; b++) {
 		const last = b === 3;
 		const root = last && home ? 4 : loop[b];
-		const ns = bar(r, rhythms[b], root, prev, lo, hi, last ? (home ? 'home' : 'open') : undefined);
+		const end = last ? (home ? 'home' : 'open') : undefined;
+		const ns = bar(r, rhythms[b], root, prev, style, shapes[b], end);
 		out.push(...ns);
 		prev = ns[ns.length - 1].deg;
 	}
@@ -298,52 +455,72 @@ function phrase(
 }
 
 /** A phrase's bar rhythms: three bars, then an ending. */
-function rhythms(r: Rng) {
-	return [pickOne(RHYTHMS, r), pickOne(RHYTHMS, r), pickOne(RHYTHMS, r), pickOne(ENDINGS, r)];
+function rhythms(r: Rng, meter: 3 | 4) {
+	const [bars, ends] = meter === 3 ? [RHYTHMS3, ENDINGS3] : [RHYTHMS, ENDINGS];
+	return [pickOne(bars, r), pickOne(bars, r), pickOne(bars, r), pickOne(ends, r)];
 }
 
 /**
- * Two phrases over `loop` from the same seed, so they share their first three
- * bars and differ in how they end: `ends` says which come home.
+ * Two phrases on motif `m` over `loop` from the same seed, so they share their
+ * first three bars and differ in how they end: `ends` says which come home.
  */
 function pair(
 	r: Rng,
 	loop: number[],
 	start: number,
-	lo: number,
-	hi: number,
+	style: Style,
+	m: number[],
 	ends: [boolean, boolean]
 ) {
-	const rh = rhythms(r);
+	const rh = rhythms(r, style.meter);
+	const shapes = [m, m, vary(r, m), m];
 	const s = Math.floor(r() * 2 ** 32) || 1;
-	return ends.map((home) => phrase(makeRng(s), loop, rh, start, lo, hi, home));
+	return ends.map((home) => phrase(makeRng(s), loop, rh, start, style, shapes, home));
+}
+
+/** Level `seed`'s style; only a game whose rhythm has a `feel` gets 3/4 or swing. */
+function styleOf(r: Rng, mode: string, feel: boolean): Style {
+	const meter = feel && r() < 0.3 ? 3 : 4;
+	const swing = feel && meter === 4 && r() < 0.4 ? pickOne([0.2, 1 / 3], r) : 0;
+	const lo = Math.floor(r() * 4);
+	const hi = lo + 10 + Math.floor(r() * 3);
+	const avoid = PENTATONIC[mode] && r() < 0.4 ? PENTATONIC[mode] : [];
+	return { meter, swing, fill: pickOne(FILLS[meter], r), lo, hi, leap: 0.15 + r() * 0.35, avoid };
 }
 
 /**
  * Pass `pass` through level `seed`'s song, 32 bars: A A′ B B′ C C′ A A′. A
- * is the level's theme, the same every pass, A′ bringing it home. B goes on
- * over another chord loop and comes home too; C goes somewhere else, another
- * key or mode, and leaves it open for A to come back. Each pass writes a new B
- * and C, so the song keeps changing around its theme.
+ * is the level's theme on its motif, the same every pass, A′ bringing it home.
+ * B goes on over another chord loop, on a variation of the motif or a new one,
+ * and comes home too; C goes somewhere else, another key or mode and motif, and
+ * leaves it open for A to come back. Each pass writes a new B and C, so the song
+ * keeps changing around its theme.
  */
-function compose(seed: number, pass = 0): Song {
+function compose(seed: number, pass = 0, feel = false): Song {
 	const r = makeRng(seed || 1);
 	const name = pickOne(MODE_ODDS, r);
 	const mode = MODES[name];
 	const home: Key = { tonic: pickOne(TONICS, r), scale: mode.scale };
+	const style = styleOf(r, name, feel);
 	const loop = pickOne(mode.loops, r);
-	const [a, a2] = pair(r, loop, 6, 2, 10, [false, true]);
+	const theme = motif(r, style.leap);
+	const opening = style.lo + 2 + Math.floor(r() * (style.hi - style.lo - 3));
+	const [a, a2] = pair(r, loop, opening, style, theme, [false, true]);
 
 	const v = makeRng((Math.imul(seed || 1, 31) + Math.imul(pass + 1, 0x9e3779b1)) >>> 0 || 1);
 	const loopB = pickOne(
 		mode.loops.filter((l) => l !== loop),
 		v
 	);
-	const [b, b2] = pair(v, loopB, a[a.length - 1].deg + 2, 4, 11, [false, true]);
+	const second = v() < 0.5 ? vary(v, theme) : motif(v, style.leap);
+	const [b, b2] = pair(v, loopB, a[a.length - 1].deg + 2, style, second, [false, true]);
 	const [awayName, shift] = pickOne(mode.away, v);
 	const away = MODES[awayName];
 	const there: Key = { tonic: home.tonic + shift, scale: away.scale };
-	const [c, c2] = pair(v, pickOne(away.loops, v), 5, 2, 10, [false, false]);
+	const [c, c2] = pair(v, pickOne(away.loops, v), opening, style, motif(v, style.leap), [
+		false,
+		false
+	]);
 
 	const sections: [Note[], Key][] = [
 		[a, home],
@@ -361,7 +538,7 @@ function compose(seed: number, pass = 0): Song {
 	);
 	// Each bar's chord comes in its own way (a cadence's I chord, all at once).
 	for (const x of notes) if (x.downbeat) x.strike = pickOne(STRIKES, v);
-	return { home, notes };
+	return { home, notes, style };
 }
 
 // ---------- the synth ----------
@@ -808,10 +985,10 @@ export interface Rhythm {
 	 * running on ahead in a flourish over the player's landings.
 	 */
 	harmonize?: boolean;
+	/** A level's song may be in 3/4 or swing (its landings with it, on the clock's swung lines). */
+	feel?: boolean;
 }
 
-/** The quiet pattern between tune notes: root, fifth, third, fifth of the chord. */
-const FILL = [0, 4, 2, 4];
 /** The chord's notes above its root (hot, its root again on top). */
 const TRIAD = [0, 2, 4];
 /** After the song's last note, the home chord rolled up above it. */
@@ -822,36 +999,58 @@ const RING = [2, 4, 7];
  * `ms` long from `origin`. Games time what they land by it.
  */
 export class Clock {
-	/** When the level's beat started, and how long its sixteenths are. */
+	/** When the level's beat started, and how long its sixteenths are (on average). */
 	origin = 0;
 	ms = 100;
+	/**
+	 * How far each beat's off eighth waits, as a part of an eighth: 0 straight, ⅓ a
+	 * triplet swing. The first eighth stretches and the second shrinks to make room.
+	 */
+	swing = 0;
 
-	/** Start counting sixteenths `ms` long from time `at`. */
-	start(at: number, ms: number) {
+	/** Start counting sixteenths `ms` long from time `at`, swung `swing`. */
+	start(at: number, ms: number, swing = 0) {
 		this.origin = at;
 		this.ms = ms;
+		this.swing = swing;
+	}
+
+	/** Sixteenths `s` (any amount) from the origin, as ms from it. */
+	#ms(s: number) {
+		const q = Math.floor(s / 4);
+		const p = s - 4 * q;
+		const w = this.swing;
+		return (4 * q + (p <= 2 ? p * (1 + w) : 2 * (1 + w) + (p - 2) * (1 - w))) * this.ms;
+	}
+
+	/** Ms `t` from the origin, as sixteenths (any amount) from it. */
+	#steps(t: number) {
+		const u = t / this.ms;
+		const q = Math.floor(u / 4);
+		const x = u - 4 * q;
+		const w = this.swing;
+		const e = 2 * (1 + w);
+		return 4 * q + (x <= e ? x / (1 + w) : 2 + (x - e) / (1 - w));
 	}
 
 	/** The sixteenth nearest time `at`. */
 	step(at: number) {
-		return Math.round((at - this.origin) / this.ms);
+		return Math.round(this.#steps(at - this.origin));
 	}
 
 	/** When sixteenth `step` is. */
 	time(step: number) {
-		return this.origin + step * this.ms;
+		return this.origin + this.#ms(step);
 	}
 
 	/** The line every `n` sixteenths nearest time `at`. */
 	nearest(at: number, n = 1) {
-		const p = n * this.ms;
-		return this.origin + Math.round((at - this.origin) / p) * p;
+		return this.time(n * Math.round(this.#steps(at - this.origin) / n));
 	}
 
 	/** The first line every `n` sixteenths at or after time `at`. */
 	next(at: number, n = 1) {
-		const p = n * this.ms;
-		return this.origin + Math.ceil((at - this.origin) / p - 1e-9) * p;
+		return this.time(n * Math.ceil(this.#steps(at - this.origin) / n - 1e-9));
 	}
 }
 
@@ -896,6 +1095,10 @@ export class Music {
 	/** The color of the last thing that landed, and when the echo last bent. */
 	#color: string | undefined;
 	#bent = -Infinity;
+	/** Whether the song may be in 3/4 or swing (`Rhythm.feel`). */
+	#feel = false;
+	/** The sixteenth the sounding chord came in on, where the quiet pattern counts from. */
+	#struck = 0;
 	/**
 	 * How many more tune notes get a harmony, after something opened or (`#joins`) a
 	 * color finished; in whose voice, and how many degrees up it sits from the tune's.
@@ -916,9 +1119,10 @@ export class Music {
 	seed(seed: number, rhythm: Rhythm) {
 		this.#seed = seed;
 		this.#pass = 0;
+		this.#feel = rhythm.feel ?? false;
 		this.#written = null;
 		this.#key = this.#song.home;
-		this.clock.start(performance.now(), rhythm.beat);
+		this.clock.start(performance.now(), rhythm.beat, this.#song.style.swing);
 		this.#fill = rhythm.fill;
 		this.#warmBy = rhythm.warm ?? 0;
 		this.#pulse = 4;
@@ -928,6 +1132,7 @@ export class Music {
 		this.#root = 0;
 		this.#last = -Infinity;
 		this.#due = 0;
+		this.#struck = 0;
 		this.#sung = -Infinity;
 		this.#early = false;
 		this.#doubles = rhythm.doubles ?? false;
@@ -946,7 +1151,7 @@ export class Music {
 	}
 
 	get #song() {
-		return (this.#written ??= compose(this.#seed, this.#pass));
+		return (this.#written ??= compose(this.#seed, this.#pass, this.#feel));
 	}
 
 	/** Go on to note `j` of the song; past its end, a new pass from the top. */
@@ -1155,7 +1360,8 @@ export class Music {
 			// all sounding at once off the beat.
 			if (at < now - this.clock.ms / 2) at = this.clock.next(now);
 			const gap = at - this.#last;
-			if (gap < this.clock.ms * 0.75) {
+			// Together: closer than most of the shortest sixteenth (a swung beat's last).
+			if (gap < this.clock.ms * 0.75 * (1 - this.clock.swing)) {
 				if (this.#bend && !soft && color !== this.#color && this.#bent !== this.#last) {
 					this.#bent = this.#last;
 					this.#bendEcho(when(this.#last));
@@ -1185,8 +1391,12 @@ export class Music {
 				!this.#song.notes[this.#i].downbeat;
 			if (!early && (soft || at < this.#ends || (step < this.#due && !lull))) {
 				const { root, key } = this.#sounding(at);
-				if (this.#fill)
-					pluck(o, tb, this.#midi(root + FILL[((step % 4) + 4) % 4], key), t, gain * 0.4, 0.12);
+				if (this.#fill) {
+					const { fill } = this.#song.style;
+					const k = Math.floor((step - this.#struck) / 2);
+					const deg = root + fill[((k % fill.length) + fill.length) % fill.length];
+					pluck(o, tb, this.#midi(deg, key), t, gain * 0.4, 0.12);
+				}
 				return;
 			}
 			// After a pause, pick up at the next bar rather than mid-phrase.
@@ -1203,6 +1413,7 @@ export class Music {
 			// changes come in time however the landings fall, and the old one rings on until it
 			// does: stopped at the note, the gap to the beat sounded like the music ducking.
 			const beat = this.clock.next(at - this.clock.ms / 2, this.#pulse);
+			if (n.chord) this.#struck = this.clock.step(beat);
 			this.#sing(o, tb, n, t, gain, n.len >= 8 ? 0.7 : 0.45, h, when(beat));
 			if (this.#harmony > 0) {
 				this.#harmony--;
@@ -1306,7 +1517,9 @@ export class Music {
 		const { root, key } = this.#sounding(from);
 		const tb = timbre(o.ctx, harmonist.voice);
 		const gap = (this.#six * this.clock.ms) / 2;
-		sweep.forEach((k, i) => pluck(o, tb, this.#midi(root + k, key), when(from + i * gap), gain, len));
+		sweep.forEach((k, i) =>
+			pluck(o, tb, this.#midi(root + k, key), when(from + i * gap), gain, len)
+		);
 		const notes = this.#song.notes;
 		const bar = (j: number) => {
 			while (!notes[j % notes.length].downbeat) j++;
