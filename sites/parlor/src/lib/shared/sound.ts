@@ -15,12 +15,13 @@
  * eighth notes: Forage's ants get to their blocks on them and walk in step,
  * Mosaic's dots cascade in on them, a move's first flying a little longer or
  * shorter to land on one. So the tune keeps time from move to move. The beat
- * follows the player, a little quicker when moves come quickly and calmer when
- * they come slowly, changing on a beat so it never jumps. The tune plays on in
+ * never changes: a tempo following the player's pace blurred it, and so did
+ * an echo gliding along with it. The tune plays on in
  * its own rhythm, a quarter note four sixteenths on, and landings between tune
  * notes play a quiet chord pattern below. (A tune note on every one is too
  * much to hear as a tune.) Each bar brings in its chord, low and soft, in one
- * of a few ways (together, rolled, its bass alone, an eighth late) in the
+ * of a few ways (together, rolled, its bass alone, an eighth late), on the
+ * breath's beat even when its first note lands between, in the
  * inversion nearest the last, and lets it ring until the next bar's comes in,
  * breathing on the beat, so the pauses between moves sound held, and in time,
  * rather than empty. A pause also ends the phrase: the next note starts the
@@ -31,13 +32,17 @@
  * the chords grow and gain an octave.
  *
  * The flourishes are the tune's own, each a different stretch of it: something
- * opening plays a glimpse of its next bar, soft; finishing a color swells the
+ * opening rings the chord in a bell's voice of its own, high up, which then
+ * harmonizes the tune above it for a bar or so; finishing a color swells the
  * music and sweeps up into the tune running on ahead to a bar's first beat; a
  * finished picture plays the song's own ending, V to I, so it always ends at
- * home. Each starts on a beat.
+ * home. Each starts on a beat, after any still playing, so two colors
+ * finishing together run on as one longer stretch. In Forage, foods of two
+ * colors picked up together bend the echo.
  *
- * Each color has its own voice, close kin rather than different instruments: see
- * `timbre`.
+ * Each color plays its own instrument, picked by its hue and lightness (a
+ * dozen, from electric piano and brass to harp and glass), no two colors of
+ * a level the same while there are instruments to go round: see `voiceOf`.
  */
 import { makeRng, pickOne, type Rng } from './engine.ts';
 import { lab } from './palette.ts';
@@ -130,17 +135,10 @@ const BREATH_MIN = 300;
 const REST = 4;
 /** Moves closer together than this (seconds) swell the music; slower ones barely do. */
 const QUICK = 1;
-/**
- * The tempo follows the player: its sixteenth stretches from this many times
- * the game's when moves come quickly to this many when they come slowly.
- */
-const TEMPO_QUICK = 0.94;
-const TEMPO_SLOW = 1.15;
-/** Moves this far apart (ms, on average) are quick, and this far slow. */
-const PACE_QUICK = 900;
-const PACE_SLOW = 3500;
 /** How fast the swell cools: it falls to about a third in this many seconds. */
 const COOL = 5;
+/** How far (s) the echo stretches when things of different colors land together. */
+const BEND = 0.008;
 /** The tune's low-pass, cool and fully swelled (Hz). */
 const TONE_REST = 4500;
 const TONE_HOT = 12000;
@@ -468,12 +466,180 @@ interface Timbre {
 	chorus: number;
 	/** Played through the pad (chords) rather than the tone filter (tune). */
 	pad: boolean;
+	/** The note's own filter opens at this many times its pitch and closes to this many. */
+	bright: number;
+	mellow: number;
+	/** A wavering pitch, in cents, and a wavering loudness (0 to 1), coming in as the note sounds. */
+	vibrato?: number;
+	tremolo?: number;
+	/** How loud it plays, so the soft and short instruments carry like the full ones. */
+	level?: number;
 }
 
-/** Timbres by color, for the level being played (so the cache stays small). */
+type Voice =
+	| 'keys'
+	| 'brass'
+	| 'kalimba'
+	| 'mallet'
+	| 'flute'
+	| 'organ'
+	| 'harp'
+	| 'vibes'
+	| 'reed'
+	| 'pizz'
+	| 'glass'
+	| 'string';
+
+type VoiceSpec = Omit<Timbre, 'wave' | 'pad' | 'detune' | 'chorus'> &
+	Partial<Pick<Timbre, 'detune' | 'chorus'>> & { levels: number[] };
+
+/** The instruments colors play: harmonic levels (index 1 the fundamental) and how they sound. */
+const VOICES: Record<Voice, VoiceSpec> = {
+	// Electric piano: a round body with a soft bell in its fourth harmonic.
+	keys: {
+		levels: [0, 1, 0.45, 0.12, 0.22, 0.05, 0.04],
+		attack: 0.004,
+		len: 1.4,
+		detune: 5,
+		chorus: 0.3,
+		bright: 7,
+		mellow: 2.2
+	},
+	// Brass: full, its filter opening as it speaks rather than closing, a soft "bwah".
+	brass: {
+		levels: [0, 1, 0.7, 0.5, 0.35, 0.25, 0.18, 0.12],
+		level: 0.85,
+		attack: 0.03,
+		len: 0.9,
+		bright: 1.6,
+		mellow: 6
+	},
+	// Kalimba: a thumb's pluck, with a high overtone that dies first.
+	kalimba: {
+		levels: [0, 1, 0.05, 0, 0, 0, 0.3],
+		level: 1.15,
+		attack: 0.002,
+		len: 0.75,
+		bright: 9,
+		mellow: 1.5
+	},
+	// Marimba: the fundamental with its fourth and tenth harmonics, short and woody.
+	mallet: {
+		levels: [0, 1, 0, 0, 0.4, 0, 0, 0, 0, 0, 0.12],
+		level: 1.15,
+		attack: 0.002,
+		len: 0.55,
+		bright: 12,
+		mellow: 1.5
+	},
+	// Flute: nearly pure, breathing in, steady, with a vibrato.
+	flute: {
+		levels: [0, 1, 0.18, 0.06, 0.03],
+		level: 1.25,
+		attack: 0.035,
+		len: 1.25,
+		bright: 5,
+		mellow: 4,
+		vibrato: 9
+	},
+	// Organ: drawbars at the octaves, steady, a little chorus like a turning speaker.
+	organ: {
+		levels: [0, 1, 0.5, 0, 0.3, 0, 0, 0, 0.15],
+		attack: 0.012,
+		len: 1.1,
+		detune: 4,
+		chorus: 0.3,
+		bright: 9,
+		mellow: 8
+	},
+	// Harp: every harmonic, falling off, bright when plucked and mellowing.
+	harp: {
+		levels: [0, 1, 0.31, 0.15, 0.09, 0.06, 0.05, 0.04, 0.03],
+		attack: 0.004,
+		len: 1.2,
+		detune: 3,
+		chorus: 0.2,
+		bright: 10,
+		mellow: 2.5
+	},
+	// Vibraphone: a soft bar ringing long, its loudness wavering.
+	vibes: {
+		levels: [0, 1, 0, 0, 0.2, 0, 0, 0, 0, 0, 0.04],
+		attack: 0.003,
+		len: 1.6,
+		bright: 8,
+		mellow: 3,
+		tremolo: 0.5
+	},
+	// Accordion: a full reed, and a second reed a little sharp beating against it.
+	reed: {
+		levels: [0, 1, 0.65, 0.45, 0.3, 0.22, 0.15, 0.1, 0.07],
+		level: 0.85,
+		attack: 0.018,
+		len: 0.85,
+		detune: 12,
+		chorus: 0.55,
+		bright: 6,
+		mellow: 4
+	},
+	// Pizzicato strings: plucked and stopped short.
+	pizz: {
+		levels: [0, 1, 0.6, 0.4, 0.3, 0.2, 0.15, 0.1],
+		level: 1.2,
+		attack: 0.002,
+		len: 0.35,
+		bright: 8,
+		mellow: 1.5
+	},
+	// Glass: a rubbed rim, nearly pure with a shimmer, fading in and ringing.
+	glass: {
+		levels: [0, 1, 0.1, 0, 0.15],
+		level: 1.25,
+		attack: 0.02,
+		len: 1.5,
+		detune: 8,
+		chorus: 0.4,
+		bright: 6,
+		mellow: 4
+	},
+	// A nylon string: very bright as it's plucked, quickly mellowing.
+	string: {
+		levels: [0, 1, 0.8, 0.55, 0.4, 0.3, 0.22, 0.15, 0.1, 0.07],
+		level: 0.9,
+		attack: 0.002,
+		len: 0.75,
+		bright: 16,
+		mellow: 2
+	}
+};
+
+/** The order a color tries instruments in when its own is taken. */
+const VOICE_ORDER = Object.keys(VOICES) as Voice[];
+
+/**
+ * The instrument for a color by its Lab hue (degrees), colorfulness and
+ * lightness: each family of hues has a light instrument and a dark one. Reds
+ * and pinks keys or brass, oranges and yellows kalimba or marimba, greens
+ * flute or organ, cyans and blues harp or vibraphone, purples accordion or
+ * pizzicato, grays glass or nylon string.
+ */
+function voiceOf(hue: number, chroma: number, light: number): Voice {
+	const dark = light < 60 ? 1 : 0;
+	if (chroma < 12) return (['glass', 'string'] as const)[dark];
+	const h = (hue + 360) % 360;
+	if (h >= 345 || h < 50) return (['keys', 'brass'] as const)[dark];
+	if (h < 115) return (['kalimba', 'mallet'] as const)[dark];
+	if (h < 180) return (['flute', 'organ'] as const)[dark];
+	if (h < 280) return (['harp', 'vibes'] as const)[dark];
+	return (['reed', 'pizz'] as const)[dark];
+}
+
+/** Timbres by color, for the level being played (so the cache stays small), and the instruments they've taken. */
 const timbres = new Map<string, Timbre>();
+const voices = new Set<Voice>();
 const PLAIN = 'plain';
 const CHORD = 'chord';
+const BELL = 'bell';
 
 /** A wave from its harmonics' levels (index 1 is the fundamental). */
 function wave(ctx: AudioContext, levels: number[]): PeriodicWave {
@@ -483,7 +649,15 @@ function wave(ctx: AudioContext, levels: number[]): PeriodicWave {
 function timbre(ctx: AudioContext, key: string = PLAIN): Timbre {
 	let t = timbres.get(key);
 	if (t) return t;
-	const plain = { attack: 0.006, len: 1, detune: 0, chorus: 0, pad: false };
+	const plain = {
+		attack: 0.006,
+		len: 1,
+		detune: 0,
+		chorus: 0,
+		pad: false,
+		bright: 10,
+		mellow: 2.5
+	};
 	if (key === PLAIN) {
 		// A triangle's odd harmonics, with a quiet octave on top.
 		const tri = (n: number) => (8 / Math.PI ** 2 / n ** 2) * (n % 4 === 1 ? 1 : -1);
@@ -491,24 +665,36 @@ function timbre(ctx: AudioContext, key: string = PLAIN): Timbre {
 	} else if (key === CHORD) {
 		// A slow attack: chords swell in under the tune rather than hit.
 		t = { ...plain, attack: 0.07, pad: true, wave: wave(ctx, [0, 1, 0.3, 0.12, 0.05]) };
+	} else if (key === BELL) {
+		// A celesta's: the fundamental, a strong double octave and a little sixth
+		// harmonic, struck quickly and left ringing, with a shimmer.
+		t = {
+			...plain,
+			attack: 0.003,
+			len: 1.6,
+			detune: 6,
+			chorus: 0.4,
+			wave: wave(ctx, [0, 1, 0, 0.12, 0.5, 0, 0.2, 0, 0.08])
+		};
 	} else {
 		const [L, a, b] = lab(key);
 		const light = Math.min(1, Math.max(0, L / 100));
-		// Warm: reds, oranges and yellows, 1; blues and greens, near 0.
-		const warm = (Math.cos(Math.atan2(b, a) - (50 * Math.PI) / 180) + 1) / 2;
-		const vivid = Math.min(1, Math.hypot(a, b) / 70);
-		// Harmonics fall off faster when dark, slower when light; warm ones lose some even harmonics.
-		// (Losing them all sounds reedy and throaty, like a clarinet.)
-		const fall = 1.9 - 0.8 * light;
-		const levels = [0];
-		for (let n = 1; n <= 8; n++) levels.push(n ** -fall * (n % 2 ? 1 : 1 - 0.35 * warm));
+		const chroma = Math.hypot(a, b);
+		// Its own instrument, or the next free one, so a level's colors all sound different.
+		const own = voiceOf((Math.atan2(b, a) * 180) / Math.PI, chroma, L);
+		const k = VOICE_ORDER.indexOf(own);
+		const voice =
+			[...VOICE_ORDER.slice(k), ...VOICE_ORDER.slice(0, k)].find((v) => !voices.has(v)) ?? own;
+		voices.add(voice);
+		const { levels, detune = 0, chorus = 0, ...rest } = VOICES[voice];
+		// Lighter colors play a little brighter, more colorful ones with more shimmer.
 		t = {
+			...rest,
 			wave: wave(ctx, levels),
-			attack: 0.012 - 0.008 * light,
-			len: 1.15 - 0.3 * light,
-			detune: 3 + 4 * vivid,
-			chorus: 0.35 * vivid,
-			pad: false
+			pad: false,
+			detune,
+			bright: rest.bright * (0.85 + 0.3 * light),
+			chorus: chorus && chorus + 0.15 * Math.min(1, chroma / 70)
 		};
 	}
 	timbres.set(key, t);
@@ -523,27 +709,54 @@ const hz = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
  * plucked string, rather than keeping one tone throughout like an organ.
  */
 function pluck(o: Out, tb: Timbre, midi: number, t: number, gain: number, len: number): GainNode {
-	len *= tb.len;
+	// Never so short it clicks.
+	len = Math.max(len * tb.len, tb.attack + 0.08);
+	gain *= tb.level ?? 1;
 	const g = o.ctx.createGain();
 	g.gain.setValueAtTime(0.0001, t);
 	g.gain.exponentialRampToValueAtTime(gain, t + tb.attack);
 	g.gain.exponentialRampToValueAtTime(0.0001, t + len);
 	g.connect(tb.pad ? o.pad : o.tone);
 	let into: AudioNode = g;
+	if (tb.tremolo) {
+		const lfo = o.ctx.createOscillator();
+		lfo.frequency.value = 5.5;
+		const trem = o.ctx.createGain();
+		trem.gain.value = 1 - tb.tremolo / 2;
+		const depth = o.ctx.createGain();
+		depth.gain.value = tb.tremolo / 2;
+		lfo.connect(depth).connect(trem.gain);
+		lfo.start(t);
+		lfo.stop(t + len + 0.02);
+		trem.connect(into);
+		into = trem;
+	}
 	if (!tb.pad) {
 		const f = o.ctx.createBiquadFilter();
 		f.type = 'lowpass';
 		f.Q.value = -3;
-		f.frequency.setValueAtTime(Math.min(16000, hz(midi) * 10), t);
-		f.frequency.exponentialRampToValueAtTime(hz(midi) * 2.5, t + len * 0.6);
-		f.connect(g);
+		f.frequency.setValueAtTime(Math.min(16000, hz(midi) * tb.bright), t);
+		f.frequency.exponentialRampToValueAtTime(hz(midi) * tb.mellow, t + len * 0.6);
+		f.connect(into);
 		into = f;
+	}
+	let vibrato: GainNode | null = null;
+	if (tb.vibrato) {
+		const lfo = o.ctx.createOscillator();
+		lfo.frequency.value = 5.2;
+		vibrato = o.ctx.createGain();
+		vibrato.gain.setValueAtTime(0, t);
+		vibrato.gain.linearRampToValueAtTime(tb.vibrato, t + 0.25);
+		lfo.connect(vibrato);
+		lfo.start(t);
+		lfo.stop(t + len + 0.02);
 	}
 	const osc = (cents: number) => {
 		const v = o.ctx.createOscillator();
 		v.setPeriodicWave(tb.wave);
 		v.frequency.value = hz(midi);
 		v.detune.value = cents;
+		vibrato?.connect(v.detune);
 		v.start(t);
 		v.stop(t + len + 0.02);
 		return v;
@@ -576,6 +789,8 @@ export interface Rhythm {
 	 * landings come on their own (Forage's ants), so a busy board swells it.
 	 */
 	warm?: number;
+	/** Things of different colors landing together bend the echo, a dip in pitch, rather than one going unheard. */
+	bend?: boolean;
 }
 
 /** The quiet pattern between tune notes: root, fifth, third, fifth of the chord. */
@@ -590,32 +805,24 @@ const RING = [2, 4, 7];
  * `ms` long from `origin`. Games time what they land by it.
  */
 export class Clock {
-	/** A line of the grid, which sixteenth it is, and how long they are from it on. */
+	/** When the level's beat started, and how long its sixteenths are. */
 	origin = 0;
-	base = 0;
 	ms = 100;
 
 	/** Start counting sixteenths `ms` long from time `at`. */
 	start(at: number, ms: number) {
-		this.origin = at;
-		this.base = 0;
-		this.ms = ms;
-	}
-
-	/**
-	 * From line `at` on, sixteenths `ms` long: the beat speeds up or slows down
-	 * there without a jump. `at` should be a line of every few sixteenths, so
-	 * the lines of every two, four... carry on from it.
-	 */
-	retime(at: number, ms: number) {
-		this.base = this.step(at);
 		this.origin = at;
 		this.ms = ms;
 	}
 
 	/** The sixteenth nearest time `at`. */
 	step(at: number) {
-		return this.base + Math.round((at - this.origin) / this.ms);
+		return Math.round((at - this.origin) / this.ms);
+	}
+
+	/** When sixteenth `step` is. */
+	time(step: number) {
+		return this.origin + step * this.ms;
 	}
 
 	/** The line every `n` sixteenths nearest time `at`. */
@@ -652,16 +859,24 @@ export class Music {
 	/** The key and chord under the last note played. */
 	#key: Key = NO_KEY;
 	#root = 0;
-	/** The game's own sixteenth (ms), and about how far apart the player's moves come. */
-	#beat = 100;
-	#pace = 1500;
 	/** When the last thing landed, and the sixteenth the next tune note is due. */
 	#last = -Infinity;
 	#due = 0;
 	/** The ringing chord's notes, faded out when the next one comes in. */
 	#held: GainNode[] = [];
-	/** Until this time a flourish is playing the tune: landings don't play it. */
-	#quiet = -Infinity;
+	/**
+	 * The flourish playing (when each note starts) and when it's over: until
+	 * then landings play the quiet pattern on its chords, the next flourish
+	 * waits for it and the tempo holds.
+	 */
+	#run: { at: number; n: Note }[] = [];
+	#ends = -Infinity;
+	#bend = false;
+	/** The color of the last thing that landed, and when the echo last bent. */
+	#color: string | undefined;
+	#bent = -Infinity;
+	/** How many more tune notes the bell harmonizes, after something opened. */
+	#harmony = 0;
 	/** How swelled the music is, 0 to 1, as of `#heatAt`; it cools from there. */
 	#heat = 0;
 	#heatAt = 0;
@@ -677,8 +892,6 @@ export class Music {
 		this.#pass = 0;
 		this.#written = null;
 		this.#key = this.#song.home;
-		this.#beat = rhythm.beat;
-		this.#pace = 1500;
 		this.clock.start(performance.now(), rhythm.beat);
 		this.#fill = rhythm.fill;
 		this.#warmBy = rhythm.warm ?? 0;
@@ -689,10 +902,16 @@ export class Music {
 		this.#root = 0;
 		this.#last = -Infinity;
 		this.#due = 0;
-		this.#quiet = -Infinity;
+		this.#run = [];
+		this.#ends = -Infinity;
+		this.#bend = rhythm.bend ?? false;
+		this.#color = undefined;
+		this.#bent = -Infinity;
+		this.#harmony = 0;
 		this.#heat = 0;
 		this.#lastMove = -Infinity;
 		timbres.clear();
+		voices.clear();
 		this.hush();
 	}
 
@@ -721,8 +940,8 @@ export class Music {
 	/**
 	 * Run `f` with the output, the time now (performance ms) and a way to turn
 	 * such times into the audio clock's; a browser without audio stays quiet.
-	 * A fresh output starts breathing on the beat, its echo a whole number of
-	 * sixteenths long.
+	 * A fresh output starts breathing on the beat, its echo three of the
+	 * level's sixteenths long.
 	 */
 	#play(f: (o: Out, now: number, when: When) => void) {
 		try {
@@ -753,12 +972,12 @@ export class Music {
 		lfo.connect(depth).connect(breath.gain);
 		lfo.start(when(this.clock.next(now, this.#pulse)));
 		o.lfo = lfo;
-		if (echo) echo.delayTime.value = (3 * this.#six * this.clock.ms) / 1000;
+		if (echo) echo.delayTime.value = this.#echo;
 	}
 
 	/** Degree `deg` in the key that's playing, as a MIDI note. */
-	#midi(deg: number) {
-		const { tonic, scale } = this.#key;
+	#midi(deg: number, key = this.#key) {
+		const { tonic, scale } = key;
 		return tonic + 12 * Math.floor(deg / 7) + scale[mod7(deg)];
 	}
 
@@ -784,26 +1003,7 @@ export class Music {
 			const gap = now - this.#lastMove;
 			this.#lastMove = now;
 			this.#heatTo(o, now, when(now), this.#warmth(now) + (gap < QUICK * 1000 ? 0.2 : 0.06));
-			this.#follow(o, now, when, gap);
 		});
-	}
-
-	/**
-	 * Follow the player's pace: quicker moves, a quicker beat; slower, a calmer
-	 * one. It changes a little at a time, on the breath's next beat.
-	 */
-	#follow(o: Out, now: number, when: When, gap: number) {
-		if (!Number.isFinite(gap)) return;
-		this.#pace = 0.7 * this.#pace + 0.3 * Math.min(Math.max(gap, 300), 5000);
-		const slow = Math.log(this.#pace / PACE_QUICK) / Math.log(PACE_SLOW / PACE_QUICK);
-		const k = TEMPO_QUICK + (TEMPO_SLOW - TEMPO_QUICK) * Math.min(1, Math.max(0, slow));
-		const { ms } = this.clock;
-		const to = Math.min(ms * 1.03, Math.max(ms * 0.97, this.#beat * k));
-		if (Math.abs(to - ms) < ms * 0.01) return;
-		const line = this.clock.next(now, this.#pulse);
-		this.clock.retime(line, to);
-		o.lfo?.frequency.setValueAtTime(1000 / (this.#pulse * to), when(line));
-		echo?.delayTime.setTargetAtTime((3 * this.#six * to) / 1000, when(line), 0.05);
 	}
 
 	/** Fade the ringing chord out quickly from `t`, so it never clashes with the next. */
@@ -845,7 +1045,11 @@ export class Music {
 		});
 	}
 
-	/** Sing song note `n` at `t`: doubled an octave up when hot, bringing its chord in unless `bare`. */
+	/**
+	 * Sing song note `n` at `t`: doubled an octave up when hot, bringing its
+	 * chord in at `chord` (with it, by default; not at all if false). A chord
+	 * that waits for its beat comes straight in on it.
+	 */
 	#sing(
 		o: Out,
 		tb: Timbre,
@@ -854,18 +1058,21 @@ export class Music {
 		gain: number,
 		len: number,
 		h: number,
-		bare = false
+		chord: number | false = t
 	) {
 		this.#key = n.key;
 		const m = this.#midi(n.deg);
 		pluck(o, tb, m, t, gain, len);
 		if (h > 0.3) pluck(o, tb, m + 12, t, gain * 0.6 * (h - 0.2), len);
-		if (n.chord && !bare) this.#chord(o, t, n.root, h, n.downbeat ? n.strike : 'block');
+		if (!n.chord || chord === false) return;
+		const strike = !n.downbeat || (chord > t && n.strike === 'late') ? 'block' : n.strike;
+		this.#chord(o, chord, n.root, h, strike);
 	}
 
 	/**
 	 * Play song `notes` from time `ms` in their own rhythm, a flourish's
-	 * sixteenths, the last ringing `hold` seconds. Returns when the last starts.
+	 * sixteenths, the last ringing `hold` seconds, on the clock's lines.
+	 * Returns when the last starts; `#ends` is when it's over.
 	 */
 	#flourish(
 		o: Out,
@@ -878,11 +1085,16 @@ export class Music {
 		h: number,
 		bare = false
 	) {
+		let step = this.clock.step(ms);
+		this.#run = [];
 		notes.forEach((n, i) => {
 			const last = i === notes.length - 1;
-			this.#sing(o, tb, n, when(ms), gain, last ? hold : 0.4, h, bare);
-			if (!last) ms += n.len * this.#six * this.clock.ms;
+			ms = this.clock.time(step);
+			this.#run.push({ at: ms, n });
+			this.#sing(o, tb, n, when(ms), gain, last ? hold : 0.4, h, !bare && when(ms));
+			step += n.len * this.#six;
 		});
+		this.#ends = this.clock.time(step);
 		return ms;
 	}
 
@@ -901,14 +1113,23 @@ export class Music {
 	 * (Mosaic's tray), meant `at` this time (ms; now, by default) on the beat.
 	 * The song's next note plays once the last one's length has gone by, and on
 	 * the sixteenths between, the game's fill, or nothing. Things landing
-	 * together play once. Hot, the tune is louder and doubled an octave up.
+	 * together play once (or bend the echo, colors apart, if the game's rhythm
+	 * says). A chord comes in on the breath's beat. Hot, the tune is louder and
+	 * doubled an octave up.
 	 */
 	note(color?: string, soft = false, at?: number) {
 		this.#play((o, now, when) => {
 			at ??= now;
 			const gap = at - this.#last;
-			if (gap < this.clock.ms * 0.75) return;
+			if (gap < this.clock.ms * 0.75) {
+				if (this.#bend && !soft && color !== this.#color && this.#bent !== this.#last) {
+					this.#bent = this.#last;
+					this.#bendEcho(when(this.#last));
+				}
+				return;
+			}
 			this.#last = at;
+			this.#color = color;
 			const step = this.clock.step(at);
 			const t = when(at);
 			const tb = timbre(o.ctx, color);
@@ -918,9 +1139,10 @@ export class Music {
 			// Only progress moves the song on: a side landing plays the quiet pattern. The first
 			// landing after a lull always plays the tune, so pecking one at a time walks through it.
 			const lull = gap > 6 * this.clock.ms;
-			if (soft || at < this.#quiet || (step < this.#due && !lull)) {
+			if (soft || at < this.#ends || (step < this.#due && !lull)) {
+				const { root, key } = this.#sounding(at);
 				if (this.#fill)
-					pluck(o, tb, this.#midi(this.#root + FILL[((step % 4) + 4) % 4]), t, gain * 0.4, 0.12);
+					pluck(o, tb, this.#midi(root + FILL[((step % 4) + 4) % 4], key), t, gain * 0.4, 0.12);
 				return;
 			}
 			// After a pause, pick up at the next bar rather than mid-phrase.
@@ -931,9 +1153,47 @@ export class Music {
 			this.#advance(this.#i + 1);
 			this.#root = n.root;
 			this.#due = step + n.len;
-			// Held notes in the song ring a little longer.
-			this.#sing(o, tb, n, t, gain, n.len >= 8 ? 0.7 : 0.45, h);
+			// Held notes in the song ring a little longer. A new chord waits for the breath's beat,
+			// the old one stopping with the note, so changes come in time however the landings fall.
+			const beat = this.clock.next(at - this.clock.ms / 2, this.#pulse);
+			if (n.chord && beat > at) this.#release(t);
+			this.#sing(o, tb, n, t, gain, n.len >= 8 ? 0.7 : 0.45, h, when(beat));
+			if (this.#harmony > 0) {
+				this.#harmony--;
+				// The bell's line, an octave up: a third above the tune's note, or a sixth when
+				// that's the chord's and the third isn't. Either sits sweetly on the tune.
+				const d =
+					n.deg + (isChordTone(n.deg + 2, n.root) || !isChordTone(n.deg + 5, n.root) ? 2 : 5);
+				pluck(o, timbre(o.ctx, BELL), this.#midi(d + 7), t, 0.035, 0.8);
+			}
 		});
+	}
+
+	/** The echo's delay (s): three of the level's sixteenths. */
+	get #echo() {
+		return (3 * this.#six * this.clock.ms) / 1000;
+	}
+
+	/** The chord and key sounding at time `at`: a flourish's, while one plays. */
+	#sounding(at: number): { root: number; key: Key } {
+		if (at < this.#ends) {
+			const now = this.#run.findLast((r) => r.at <= at + 1);
+			if (now) return { root: now.n.root, key: now.n.key };
+		}
+		return { root: this.#root, key: this.#key };
+	}
+
+	/**
+	 * Bend the echo of what played at audio time `t`: its delay
+	 * stretches a little and slowly comes back, so it dips in pitch and drifts
+	 * home.
+	 */
+	#bendEcho(t: number) {
+		if (!echo) return;
+		const d = this.#echo;
+		const p = echo.delayTime;
+		p.setTargetAtTime(d + BEND, t + d, 0.06);
+		p.setTargetAtTime(d, t + d + 0.2, 0.4);
 	}
 
 	/** A move that sets things going (an ant sent off): a short quiet note on the chord's root. */
@@ -970,19 +1230,29 @@ export class Music {
 	}
 
 	/**
-	 * Something opened (or the sound came on): a glimpse of the tune's next bar,
-	 * soft, moved onto the chord that's ringing. The tune doesn't move on, so
-	 * the next moves play that bar again.
+	 * Something opened (or the sound came on): a voice of its own, a bell high
+	 * up, rings the chord that's sounding, quickly up on a beat, then
+	 * harmonizes the tune's notes through the end of its next bar, above them,
+	 * as they're played. The tune itself goes on as it was.
 	 */
 	chime() {
 		this.#play((o, now, when) => {
+			const from = this.#onBeat(now, 20);
+			const { root, key } = this.#sounding(from);
+			const tb = timbre(o.ctx, BELL);
+			const gap = (this.#six * this.clock.ms) / 2;
+			[2, 4, 7].forEach((k, i) =>
+				pluck(o, tb, this.#midi(root + 14 + k, key), when(from + i * gap), 0.035, 0.9)
+			);
+			// Through the end of the next whole bar: this one, if the next note starts it.
 			const notes = this.#song.notes;
-			const next = notes[this.#i];
-			const bar = this.#bar(next.downbeat ? next.bar : (next.bar + 1) % this.#bars);
-			// The nearer way, up or down, from its chord's root to the ringing one's, in its key.
-			const shift = mod7(this.#root - bar[0].root + 3) - 3;
-			const moved = bar.map((n) => ({ ...n, deg: n.deg + shift, key: this.#key }));
-			this.#flourish(o, when, timbre(o.ctx), moved, this.#onBeat(now, 20), 0.05, 0.6, 0, true);
+			const bar = (j: number) => {
+				while (!notes[j % notes.length].downbeat) j++;
+				return j;
+			};
+			let end = bar(this.#i + 1);
+			if (!notes[this.#i].downbeat) end = bar(end + 1);
+			this.#harmony = end - this.#i;
 		});
 	}
 
@@ -1004,13 +1274,16 @@ export class Music {
 			for (let d = first.deg - 7; d < first.deg; d++) if (isChordTone(d, first.root)) sweep.push(d);
 			// The sweep in thirty-seconds, up to the run's first note.
 			const gap = (this.#six * this.clock.ms) / 2;
-			const from = this.#onBeat(now, 30 + sweep.length * gap);
+			// After any flourish still playing: the tune runs on from it, over its chord.
+			const beat = this.#onBeat(now, 30 + sweep.length * gap);
+			const on = this.#ends > beat;
+			const from = on ? this.#ends : beat;
 			sweep.forEach((d, i) => {
 				pluck(o, tb, this.#midi(d), when(from - (sweep.length - i) * gap), 0.045, 0.4);
 			});
-			// Its first note brings in its chord, if it's not a bar's first already.
-			if (!first.chord) this.#chord(o, when(from), first.root, this.#heat);
-			this.#quiet = this.#flourish(o, when, tb, run, from, 0.075, 1.4, this.#heat);
+			// Its first note brings in its chord, unless it's a bar's first already or carries on from a run.
+			if (!first.chord && !on) this.#chord(o, when(from), first.root, this.#heat);
+			this.#flourish(o, when, tb, run, from, 0.075, 1.4, this.#heat);
 			this.#advance(next);
 			this.#root = last.root;
 		});
@@ -1025,12 +1298,12 @@ export class Music {
 		this.#play((o, now, when) => {
 			const tb = timbre(o.ctx);
 			const end = this.#bar(this.#bars - 1);
-			const from = this.clock.next(now + 2 * this.#six * this.clock.ms, this.#pulse);
+			const lead = now + 2 * this.#six * this.clock.ms;
+			const from = this.clock.next(Math.max(lead, this.#ends), this.#pulse);
 			const at = this.#flourish(o, when, tb, end, from, 0.08, 2.4, this.#warmth(now));
 			const top = end[end.length - 1].deg;
 			const six = this.#six * this.clock.ms;
 			RING.forEach((k, i) => pluck(o, tb, this.#midi(top + k), when(at + (i + 1) * six), 0.035, 2));
-			this.#quiet = at;
 			this.#i = 0;
 			this.#root = 0;
 			this.#key = this.#song.home;

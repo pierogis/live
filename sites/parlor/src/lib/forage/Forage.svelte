@@ -84,10 +84,10 @@
 				// Colors already done here aren't heard again.
 				finished = new Set(s.colors.map((_, c) => c).filter((c) => !E.foodLeft(s, c)));
 			},
-			// A tick is a sixteenth of the music (which then follows the player's pace); ants get to
+			// A tick is a sixteenth of the music; ants get to
 			// their blocks on its eighths, each with a tune note or, between them, a quiet one.
 			// Each arrival warms the music, as a move does in Mosaic, so a busy colony swells it.
-			rhythm: { beat: TICK_MS, fill: true, warm: 0.05 },
+			rhythm: { beat: TICK_MS, fill: true, warm: 0.05, bend: true },
 			key: (_e, key) => {
 				const n = Number(key);
 				if (game && n >= 1 && n <= game.columns.length) {
@@ -361,7 +361,7 @@
 	onMount(() => {
 		const unmount = ctl.mount();
 		// Ticks every TICK_MS from now, each timed from the first so they never drift. (The
-		// game's own clock: the music's beat follows the player, and ants meet it on arriving.)
+		// game's own clock: ants meet the music's beat on arriving.)
 		const start = performance.now();
 		let timer = 0;
 		const loop = () => {

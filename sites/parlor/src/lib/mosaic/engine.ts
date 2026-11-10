@@ -13,9 +13,9 @@
  * as there is room for, closest to the dot you picked up first, into the open
  * spots closest to the one you tapped: its open area first, then the other
  * open spots of that color, nearest area first. When there's room for more
- * dots than you picked up, the rest of that color come too: the tray's first,
- * then the board's, nearest group first (to the tray, the board's). Diagonal
- * spots count as touching.
+ * dots than you picked up, more of that color come too, from the board only
+ * (the tray's stay put), nearest group first. Diagonal spots count as
+ * touching.
  */
 
 import {
@@ -355,25 +355,13 @@ export function dropSpots(s: State, cell: number): number[] {
 }
 
 /**
- * Up to `want` more dots of `color`, besides `held`, for a move with room to
- * spare: the tray's first (unless they're going to the tray), then the
- * board's, group by group, the group nearest `near` first and each from its
- * dot nearest `near`.
+ * Up to `want` more dots of `color` from the board, besides `held`, for a
+ * move with room to spare: group by group, the group nearest `near` first and
+ * each from its dot nearest `near`. The tray's never come.
  */
-function gather(
-	s: State,
-	color: number,
-	held: Held[],
-	want: number,
-	near: number,
-	tray = true
-): Held[] {
+function gather(s: State, color: number, held: Held[], want: number, near: number): Held[] {
 	const out: Held[] = [];
 	const taken = new Set(held.map((d) => d.gem.id));
-	for (const gem of tray ? s.tray : []) {
-		if (out.length >= want) return out;
-		if (gem.c === color && !taken.has(gem.id)) out.push({ cell: -1, gem });
-	}
 	const d2 = (i: number) =>
 		Math.pow((i % s.w) - (near % s.w), 2) +
 		Math.pow(Math.floor(i / s.w) - Math.floor(near / s.w), 2);
@@ -412,8 +400,9 @@ export function dropCount(s: State, sel: Sel, cell: number): number {
 	const spots = dropSpots(s, cell).length;
 	if (spots <= dots.length) return spots;
 	const color = dots[0].gem.c;
-	let all = s.tray.filter((q) => q.c === color).length;
-	for (const q of s.top) if (q?.c === color) all++;
+	const taken = new Set(dots.map((d) => d.gem.id));
+	let all = dots.length;
+	for (const q of s.top) if (q?.c === color && !taken.has(q.id)) all++;
 	return Math.min(spots, all);
 }
 
@@ -486,7 +475,7 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 		if (sel.from === 'tray') return { ok: false, reason: 'same' };
 		const free = s.trayCap - s.tray.length;
 		if (free <= 0) return { ok: false, reason: 'tray-full' };
-		if (free > size) dots = dots.concat(gather(s, color, dots, free - size, sel.cell, false));
+		if (free > size) dots = dots.concat(gather(s, color, dots, free - size, sel.cell));
 		n = Math.min(free, dots.length);
 		for (let k = 0; k < n; k++) {
 			const d = dots[k];

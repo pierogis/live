@@ -594,9 +594,10 @@
 		};
 		// The first dot lands on an eighth note, so the tune keeps time from move to move, and the
 		// rest an eighth or more after it: the k-th of n on the eighth its share of the cascade puts it.
+		const { clock } = ctl;
 		const now = performance.now();
-		const duration = ctl.clock.nearest(now + FLIGHT, 2) - now;
-		const eighth = 2 * ctl.clock.ms;
+		const duration = clock.nearest(now + FLIGHT, 2) - now;
+		const eighth = 2 * clock.ms;
 		const fly = (
 			c: number,
 			id: number,

@@ -113,7 +113,7 @@ test("dots that the tapped area has no room for go on to the color's other open 
 	);
 });
 
-test("with room to spare, more dots of the color come too: the tray's, then the nearest", () => {
+test("with room to spare, more of the color's board dots come too, nearest first, never the tray's", () => {
 	// Row 0 needs A x6, row 1 needs B x6. Dots: row 0 all B, row 1 A B B A B A.
 	const s = tiny(['AAAAAA', 'BBBBBB'], [1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0], 12);
 	// An A in the tray: with one slot free, only the picked one goes.
@@ -121,23 +121,22 @@ test("with room to spare, more dots of the color come too: the tray's, then the 
 	assert.ok(E.move(s, { from: 'board', cell: 11 }, { to: 'tray' }).ok);
 	s.trayCap = 12;
 	assert.ok(E.move(s, { from: 'board', cell: 0 }, { to: 'tray' }).ok); // opens A spots 0..5
-	assert.equal(E.dropCount(s, { from: 'board', cell: 6 }, 0), 3);
+	assert.equal(E.dropCount(s, { from: 'board', cell: 6 }, 0), 2);
 	const r = E.move(s, { from: 'board', cell: 6 }, { to: 'spot', cell: 0 });
 	assert.ok(r.ok && r.left === 0);
 	assert.deepEqual(
 		r.toBoard.map((p) => [p.from, p.cell, p.order]),
 		[
 			[6, 0, 0],
-			[9, 2, 2]
+			[9, 1, 1]
 		],
-		'the picked dot, then the nearest board dot'
+		'the picked dot, then the other board dot'
 	);
-	assert.deepEqual(
-		r.fromTray.map((p) => [p.cell, p.order]),
-		[[1, 1]],
-		'the tray dot before it'
+	assert.equal(r.fromTray.length, 0, 'none from the tray');
+	assert.ok(
+		s.tray.some((q) => q.c === 0),
+		'the tray keeps its A'
 	);
-	assert.ok(!s.tray.some((q) => q.c === 0), 'the tray has no A left');
 });
 
 test('diagonal spots count as touching', () => {
