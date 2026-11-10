@@ -87,7 +87,7 @@
 			// A tick is a sixteenth of the music; ants get to
 			// their blocks on its eighths, each with a tune note or, between them, a quiet one.
 			// Each arrival warms the music, as a move does in Mosaic, so a busy colony swells it.
-			rhythm: { beat: TICK_MS, fill: true, warm: 0.05, bend: true },
+			rhythm: { beat: TICK_MS, fill: true, warm: 0.05, bend: true, harmonize: 'soft' },
 			key: (_e, key) => {
 				const n = Number(key);
 				if (game && n >= 1 && n <= game.columns.length) {

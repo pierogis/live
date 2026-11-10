@@ -38,11 +38,10 @@
  * The flourishes are the tune's own, each a different stretch of it: something
  * opening rings the chord in a bell's voice of its own, high up, which then
  * harmonizes the tune above it for a bar or so; finishing a color swells the
- * music and sweeps up into the tune running on ahead to a bar's first beat (or,
- * in Mosaic, the color joins in the same way the bell does, in its own voice); a
- * finished picture plays the song's own ending, V to I, so it always ends at
- * home. Each starts on a beat, after any still playing, so two colors
- * finishing together run on as one longer stretch. In Forage, foods of two
+ * music and the color joins in the same way, in its own voice, so the tune
+ * keeps following play (in Forage, where colonies finish often, more briefly:
+ * one note, not a sweep); a finished picture plays the song's own ending, V to I,
+ * so it always ends at home. Each starts on a beat. In Forage, foods of two
  * colors picked up together bend the echo.
  *
  * Each color plays its own instrument, picked by its hue and lightness (a
@@ -896,6 +895,9 @@ function pluck(o: Out, tb: Timbre, midi: number, t: number, gain: number, len: n
 	len = Math.max(len * tb.len, tb.attack + 0.08);
 	gain *= tb.level ?? 1;
 	const g = o.ctx.createGain();
+	// Silent until it starts: a gain is 1 until told otherwise, so a note released before
+	// it starts (a rolled chord's, cut off by the next chord) would blare at full volume.
+	g.gain.setValueAtTime(0, o.ctx.currentTime);
 	g.gain.setValueAtTime(0.0001, t);
 	g.gain.exponentialRampToValueAtTime(gain, t + tb.attack);
 	g.gain.exponentialRampToValueAtTime(0.0001, t + len);
@@ -982,9 +984,11 @@ export interface Rhythm {
 	/**
 	 * A finished color joins in, as an unlock's bell does: a quick sweep up the chord in
 	 * its voice, which then harmonizes the tune for a bar or so, rather than the tune
-	 * running on ahead in a flourish over the player's landings.
+	 * running on ahead in a flourish over the player's landings. `'soft'`, for a game
+	 * where colors finish often (Forage's colonies): unlike the bell, one note, a little
+	 * swell, and a harmony to the end of the tune's bar.
 	 */
-	harmonize?: boolean;
+	harmonize?: boolean | 'soft';
 	/** A level's song may be in 3/4 or swing (its landings with it, on the clock's swung lines). */
 	feel?: boolean;
 }
@@ -1105,7 +1109,7 @@ export class Music {
 	 */
 	#harmony = 0;
 	#harmonist: { voice: string; up: number; gain: number } = { voice: BELL, up: 7, gain: 0.035 };
-	#joins = false;
+	#joins: boolean | 'soft' = false;
 	/** How swelled the music is, 0 to 1, as of `#heatAt`; it cools from there. */
 	#heat = 0;
 	#heatAt = 0;
@@ -1502,7 +1506,8 @@ export class Music {
 	/**
 	 * `harmonist` comes in: chord tones `sweep` (degrees above the sounding chord's
 	 * root) quickly up from the next beat, then a harmony on the tune's notes
-	 * through the end of its next whole bar (this one, if the next note starts it).
+	 * through the end of its next whole bar (this one, if the next note starts it),
+	 * or, `short`, the end of the bar it's in.
 	 */
 	#joinIn(
 		o: Out,
@@ -1511,7 +1516,8 @@ export class Music {
 		harmonist: { voice: string; up: number; gain: number },
 		sweep: number[],
 		gain: number,
-		len: number
+		len: number,
+		short = false
 	) {
 		const from = this.#onBeat(now, 20);
 		const { root, key } = this.#sounding(from);
@@ -1526,7 +1532,7 @@ export class Music {
 			return j;
 		};
 		let end = bar(this.#i + 1);
-		if (!notes[this.#i].downbeat) end = bar(end + 1);
+		if (!notes[this.#i].downbeat && !short) end = bar(end + 1);
 		this.#harmony = end - this.#i;
 		this.#harmonist = harmonist;
 	}
@@ -1541,7 +1547,15 @@ export class Music {
 	 */
 	done(color?: string) {
 		this.#play((o, now, when) => {
-			this.#heatTo(o, now, when(now), this.#warmth(now) + 0.35);
+			const soft = this.#joins === 'soft';
+			this.#heatTo(o, now, when(now), this.#warmth(now) + (soft ? 0.1 : 0.35));
+			// Softly: one note in the color's voice, the chord's root on the next beat (the bell
+			// sweeps up three), then a harmony a third or so above the tune to the end of its bar.
+			if (soft) {
+				const voice = color ?? PLAIN;
+				this.#joinIn(o, now, when, { voice, up: 0, gain: 0.045 }, [7], 0.045, 0.6, true);
+				return;
+			}
 			// Or, joining in: up the chord in the color's voice, into the tune's octave, and
 			// then a harmony a third or so above the tune in that voice.
 			if (this.#joins) {
