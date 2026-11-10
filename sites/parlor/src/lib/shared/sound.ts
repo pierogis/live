@@ -137,8 +137,12 @@ const REST = 4;
 const QUICK = 1;
 /** How fast the swell cools: it falls to about a third in this many seconds. */
 const COOL = 5;
-/** How far (s) the echo stretches when things of different colors land together. */
-const BEND = 0.008;
+/**
+ * How far (s) the echo stretches when things of different colors land together, and how
+ * fast (s): the echo dips by about their ratio, here 2.5%, under half a semitone.
+ */
+const BEND = 0.0025;
+const BEND_IN = 0.1;
 /** The tune's low-pass, cool and fully swelled (Hz). */
 const TONE_REST = 4500;
 const TONE_HOT = 12000;
@@ -397,12 +401,13 @@ function buildEffects(ctx: AudioContext): AudioNode {
 	limit.attack.value = 0.002;
 	limit.release.value = 0.1;
 	limit.connect(level);
+	// Gentle and slow, so a chord coming in doesn't duck the tune and swell it back (a pump).
 	const glue = ctx.createDynamicsCompressor();
-	glue.threshold.value = -20;
+	glue.threshold.value = -16;
 	glue.knee.value = 12;
-	glue.ratio.value = 3;
-	glue.attack.value = 0.01;
-	glue.release.value = 0.25;
+	glue.ratio.value = 2;
+	glue.attack.value = 0.03;
+	glue.release.value = 0.5;
 	glue.connect(limit);
 	const low = ctx.createBiquadFilter();
 	low.type = 'highpass';
@@ -791,6 +796,11 @@ export interface Rhythm {
 	warm?: number;
 	/** Things of different colors landing together bend the echo, a dip in pitch, rather than one going unheard. */
 	bend?: boolean;
+	/**
+	 * Doubles (a landing a sixteenth after a tune note) take the tune's next note early,
+	 * so it skips in sixteenths. Not a bar's first note, and not twice running.
+	 */
+	doubles?: boolean;
 }
 
 /** The quiet pattern between tune notes: root, fifth, third, fifth of the chord. */
@@ -862,6 +872,10 @@ export class Music {
 	/** When the last thing landed, and the sixteenth the next tune note is due. */
 	#last = -Infinity;
 	#due = 0;
+	/** The sixteenth the last tune note played on, and whether it came early on a double. */
+	#sung = -Infinity;
+	#early = false;
+	#doubles = false;
 	/** The ringing chord's notes, faded out when the next one comes in. */
 	#held: GainNode[] = [];
 	/**
@@ -902,6 +916,9 @@ export class Music {
 		this.#root = 0;
 		this.#last = -Infinity;
 		this.#due = 0;
+		this.#sung = -Infinity;
+		this.#early = false;
+		this.#doubles = rhythm.doubles ?? false;
 		this.#run = [];
 		this.#ends = -Infinity;
 		this.#bend = rhythm.bend ?? false;
@@ -1120,6 +1137,10 @@ export class Music {
 	note(color?: string, soft = false, at?: number) {
 		this.#play((o, now, when) => {
 			at ??= now;
+			// Late: the tab was hidden, so what was landing waited. It plays on the next
+			// sixteenth, and the rest that waited with it merge into that note, rather than
+			// all sounding at once off the beat.
+			if (at < now - this.clock.ms / 2) at = this.clock.next(now);
 			const gap = at - this.#last;
 			if (gap < this.clock.ms * 0.75) {
 				if (this.#bend && !soft && color !== this.#color && this.#bent !== this.#last) {
@@ -1139,7 +1160,17 @@ export class Music {
 			// Only progress moves the song on: a side landing plays the quiet pattern. The first
 			// landing after a lull always plays the tune, so pecking one at a time walks through it.
 			const lull = gap > 6 * this.clock.ms;
-			if (soft || at < this.#ends || (step < this.#due && !lull)) {
+			// A double: a sixteenth after the tune's note, it takes the next one early. That note
+			// holds to where it was due to end, so the bar stays where it was: an anticipation.
+			const early =
+				this.#doubles &&
+				!soft &&
+				!this.#early &&
+				at >= this.#ends &&
+				step === this.#sung + 1 &&
+				step < this.#due &&
+				!this.#song.notes[this.#i].downbeat;
+			if (!early && (soft || at < this.#ends || (step < this.#due && !lull))) {
 				const { root, key } = this.#sounding(at);
 				if (this.#fill)
 					pluck(o, tb, this.#midi(root + FILL[((step % 4) + 4) % 4], key), t, gain * 0.4, 0.12);
@@ -1152,11 +1183,13 @@ export class Music {
 			const n = this.#song.notes[this.#i];
 			this.#advance(this.#i + 1);
 			this.#root = n.root;
-			this.#due = step + n.len;
-			// Held notes in the song ring a little longer. A new chord waits for the breath's beat,
-			// the old one stopping with the note, so changes come in time however the landings fall.
+			this.#due = (early ? this.#due : step) + n.len;
+			this.#sung = step;
+			this.#early = early;
+			// Held notes in the song ring a little longer. A new chord waits for the breath's beat, so
+			// changes come in time however the landings fall, and the old one rings on until it
+			// does: stopped at the note, the gap to the beat sounded like the music ducking.
 			const beat = this.clock.next(at - this.clock.ms / 2, this.#pulse);
-			if (n.chord && beat > at) this.#release(t);
 			this.#sing(o, tb, n, t, gain, n.len >= 8 ? 0.7 : 0.45, h, when(beat));
 			if (this.#harmony > 0) {
 				this.#harmony--;
@@ -1192,7 +1225,7 @@ export class Music {
 		if (!echo) return;
 		const d = this.#echo;
 		const p = echo.delayTime;
-		p.setTargetAtTime(d + BEND, t + d, 0.06);
+		p.setTargetAtTime(d + BEND, t + d, BEND_IN);
 		p.setTargetAtTime(d, t + d + 0.2, 0.4);
 	}
 

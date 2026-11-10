@@ -27,9 +27,15 @@
 	const SIXTEENTH = 100;
 	/**
 	 * A move's dots cascade in on eighth notes, like Forage's ants: one an eighth,
-	 * or for a big move two or more together, so it's never more than this many eighths.
+	 * or for a big move two or more an eighth, so it's never more than this many eighths.
 	 */
 	const CASCADE = 12;
+	/**
+	 * The sixteenths landings are due on. Two never share one if they can help it: a dot
+	 * whose eighth is taken (the second of a pair, or another move's) lands a sixteenth
+	 * later, so the tune skips along in sixteenths instead of two notes merging into one.
+	 */
+	const booked = new Set<number>();
 	const MAX_ZOOM = 4;
 	/** Whether the last tap was a finger, which gets a wider reach than a mouse. */
 	let touchTap = false;
@@ -76,8 +82,10 @@
 					resetZoom();
 				}
 			},
-			// A move's dots land on eighth notes, each eighth with a tune note or, between them, a quiet one.
-			rhythm: { beat: SIXTEENTH, fill: true },
+			// A move's dots land on eighth notes, or the sixteenth after when that eighth is taken;
+			// each with a tune note or, between the tune's notes, a quiet one. A sixteenth after a
+			// tune note can take the next one early, so the tune skips along with the dots.
+			rhythm: { beat: SIXTEENTH, fill: true, doubles: true },
 			key: (e, key) => {
 				if (e.key === 'Escape') {
 					if (sel) select(null);
@@ -593,11 +601,20 @@
 			ctl.music?.note(hex, true, at);
 		};
 		// The first dot lands on an eighth note, so the tune keeps time from move to move, and the
-		// rest an eighth or more after it: the k-th of n on the eighth its share of the cascade puts it.
+		// rest an eighth or more after it: the k-th of n on the eighth its share of the cascade puts
+		// it, or the sixteenth after when that one's booked.
 		const { clock } = ctl;
 		const now = performance.now();
-		const duration = clock.nearest(now + FLIGHT, 2) - now;
-		const eighth = 2 * clock.ms;
+		const first = clock.nearest(now + FLIGHT, 2);
+		const duration = first - now;
+		const past = clock.step(now);
+		for (const b of booked) if (b < past) booked.delete(b);
+		const delayOf = (k: number, n: number) => {
+			let step = clock.step(first) + 2 * Math.floor((k * Math.min(n, CASCADE)) / n);
+			if (booked.has(step) && !booked.has(step + 1)) step++;
+			booked.add(step);
+			return clock.time(step) - first;
+		};
 		const fly = (
 			c: number,
 			id: number,
@@ -611,7 +628,7 @@
 				hex: colors[c].hex,
 				from: rects.get(id),
 				target,
-				delay: Math.floor((k * Math.min(n, CASCADE)) / n) * eighth,
+				delay: delayOf(k, n),
 				duration,
 				still: ctl.still,
 				onLand,
@@ -631,6 +648,7 @@
 
 	function cancelFlights() {
 		flights.clear();
+		booked.clear();
 		pendingCells.clear();
 		pendingTray.clear();
 	}

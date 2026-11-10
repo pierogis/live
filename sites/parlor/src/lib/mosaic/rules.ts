@@ -3,7 +3,7 @@
  * imports, so the editor's check worker and node scripts can load it.
  */
 import type { Rules } from '../shared/editor/types.ts';
-import { TRAY, type Level } from './engine.ts';
+import { BUILD_TRAY, type Level } from './engine.ts';
 import { reportLevel } from './report.ts';
 
 export const rules: Rules<Level> = {
@@ -13,11 +13,11 @@ export const rules: Rules<Level> = {
 		return {
 			problems: r.problems,
 			warnings: r.warnings,
-			summary: `Solvable with the ${TRAY}-slot tray.`,
+			summary: `Solvable with the ${BUILD_TRAY}-slot tray.`,
 			stats: [
 				{ label: 'dots', value: `${r.dots} in ${r.colors} colors` },
 				{ label: 'solver', value: `${r.moves} moves, ${r.parks} to the tray` },
-				{ label: 'tray used', value: `${r.minTray} / ${TRAY}` },
+				{ label: 'tray used', value: `${r.minTray} / ${BUILD_TRAY}` },
 				{ label: 'blobs', value: `${r.blobs} dots` },
 				{ label: 'groups', value: `${r.groups}, biggest ${r.biggestGroup}` },
 				{ label: 'on one color', value: `${r.cleanGroups} / ${r.groups} groups` },

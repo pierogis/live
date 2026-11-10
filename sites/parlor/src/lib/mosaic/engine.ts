@@ -760,9 +760,14 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 }
 
 /** The standard tray: how many dots it holds. */
-export const TRAY = 20;
+export const TRAY = 40;
+/**
+ * The tray a level is proven with: half the player's, so every level can be finished
+ * with plenty of room to spare (and the shuffles stay the ones levels always had).
+ */
+export const BUILD_TRAY = 20;
 /** The tray in relaxed mode: much bigger, never smaller than the level's own. */
-const RELAXED_TRAY = 40;
+const RELAXED_TRAY = 80;
 
 /** Give a puzzle the relaxed tray. Changes nothing else, so the level stays the same. */
 export function relax(s: State): State {
@@ -786,7 +791,7 @@ export const LAST_LEVEL = 199;
 
 /**
  * How big the scattered blobs of dots are for the `index`th level. They grow all through
- * play, from about half the tray (10 to 28 dots) at the first level to more than twice
+ * play, from about half the build tray (10 to 28 dots) at the first level to more than twice
  * it (16 to 48) at the last, so later groups rarely fit the tray whole. Pictures grow
  * faster than the blobs, so later levels still have more groups to sort.
  */
@@ -797,16 +802,21 @@ export function blobSizes(index: number): { min: number; max: number } {
 
 /**
  * Same level id and index always give the same puzzle.
- * Tries a few shuffles and keeps the first one the solver can finish with the
- * standard tray, so every level is solvable.
+ * Tries a few shuffles and keeps the first one the solver can finish with
+ * `BUILD_TRAY`, so every level is solvable with the standard tray.
  */
 export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
 	const { state } = buildSolved(level, index);
+	state.trayCap = Math.max(state.trayCap, TRAY);
 	if (opts.relaxed) relax(state);
 	return state;
 }
 
-/** `buildPuzzle` (standard tray), plus the solution that let it keep its shuffle. */
+/**
+ * The puzzle as proven, with `BUILD_TRAY` (`buildPuzzle` widens it for play), plus the
+ * solution that let it keep its shuffle. Drops gather by the room left in the tray, so
+ * the solution replays only with the tray it was found with.
+ */
 export function buildSolved(level: Level, index: number): Built {
 	const art = parseArt(level);
 	const base = hashStr(level.id);
@@ -823,14 +833,14 @@ export function buildSolved(level: Level, index: number): Built {
 			top: colorsAt.map((c) => (c < 0 ? null : { id: id++, c })),
 			filled: art.target.map(() => false),
 			tray: [],
-			trayCap: TRAY,
+			trayCap: BUILD_TRAY,
 			moves: 0
 		};
 	};
 
 	for (let attempt = 0; attempt < 8; attempt++) {
 		const s = make(attempt);
-		const sol = solve(s, 2, attempt + 1, TRAY);
+		const sol = solve(s, 2, attempt + 1);
 		if (sol) {
 			s.minTray = sol.peak;
 			s.attempt = attempt;

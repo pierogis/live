@@ -200,7 +200,12 @@ test('same level always gives the same puzzle', () => {
 test('the report judges a level by the solve that kept its shuffle', () => {
 	LEVELS.slice(0, 3).forEach((lv, i) => {
 		const { state, solution } = E.buildSolved(lv, i);
-		assert.deepEqual(state, E.buildPuzzle(lv, i), 'the same puzzle the game plays');
+		assert.equal(state.trayCap, E.BUILD_TRAY);
+		assert.deepEqual(
+			{ ...state, trayCap: E.TRAY },
+			E.buildPuzzle(lv, i),
+			'the same puzzle the game plays, with its wider tray'
+		);
 		// Replaying the build's own path wins, even if plain greedy play would not.
 		const r = E.clone(state);
 		for (const a of solution.path) assert.ok(E.move(r, a.sel, a.dst).ok);
@@ -257,13 +262,13 @@ test('the tray always holds as many dots as there are open spots, so play never 
 
 test('blobs grow all through play, from about half the tray to over twice it', () => {
 	let last = E.blobSizes(0);
-	assert.ok(last.max < 2 * E.TRAY && last.min < E.TRAY);
+	assert.ok(last.max < 2 * E.BUILD_TRAY && last.min < E.BUILD_TRAY);
 	for (let i = 1; i <= E.LAST_LEVEL; i++) {
 		const b = E.blobSizes(i);
 		assert.ok(b.min >= last.min && b.max >= last.max && b.min < b.max, `level ${i + 1}`);
 		last = b;
 	}
 	assert.ok(E.blobSizes(E.LAST_LEVEL).max > E.blobSizes(150).max, 'still growing late in play');
-	assert.ok(last.max > 2 * E.TRAY);
+	assert.ok(last.max > 2 * E.BUILD_TRAY);
 	assert.deepEqual(E.blobSizes(E.LAST_LEVEL + 50), last, 'and stops at the last level');
 });

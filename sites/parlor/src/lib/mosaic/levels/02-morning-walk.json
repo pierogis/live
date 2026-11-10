@@ -175,7 +175,7 @@
 		{
 			"id": "night-paper-lanterns",
 			"name": "Night Paper Lanterns",
-			"palette": { "R": "#e23838", "N": "#1d2f5e", "P": "#64329a", "B": "#141418", "W": "#ffffff" },
+			"palette": { "R": "#e23838", "N": "#1f3b78", "P": "#b48ae6", "B": "#0e0e12", "W": "#ffffff" },
 			"art": [
 				"NNNNNNNNNNNNNNNNNNNNNNNNN",
 				"WWNNNNNNNNNNNNNNNNNNNNNWW",
