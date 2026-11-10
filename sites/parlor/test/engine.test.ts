@@ -237,6 +237,20 @@ test('taps: a direct hit wins, a near miss snaps to the nearest useful cell', ()
 	assert.equal(E.tapCell(g, 20, 120, isDot, isDrop), -1);
 });
 
+test("taps on a dot by a bigger group's edge take the bigger group", () => {
+	// One row of dots: a lone one (cell 1) between dots of bigger groups.
+	const g: E.TapGrid = { w: 4, h: 1, cell: 40, step: 44, reach: 42 };
+	const isDot = () => true;
+	const size = (i: number) => (i === 1 ? 1 : 3);
+	const near = 44 * 0.75;
+	// The lone dot's middle keeps it; its edge by a big group's dot takes that.
+	assert.equal(E.tapCell(g, 64, 20, isDot, null, size, near), 1);
+	assert.equal(E.tapCell(g, 82, 20, isDot, null, size, near), 2);
+	assert.equal(E.tapCell(g, 47, 20, isDot, null, size, near), 0);
+	// Without sizes, a direct hit is that dot.
+	assert.equal(E.tapCell(g, 82, 20, isDot, null), 1);
+});
+
 test('greedy play takes the first listed action, without listing the rest', () => {
 	LEVELS.slice(0, 4).forEach((lv, i) => {
 		const s = E.buildPuzzle(lv, i);

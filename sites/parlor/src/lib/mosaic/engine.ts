@@ -9,10 +9,12 @@
  *
  * A move is two taps: pick up a touching group of same-color dots (or all tray
  * dots of one color), then pick where they go: the tray, or an open spot of
- * their color. Lifting dots uncovers the spots under them. As many dots move
- * as there is room for, closest to the dot you picked up first, into the open
- * spots closest to the one you tapped: its open area first, then the other
- * open spots of that color, nearest area first. When there's room for more
+ * their color. (In the game every move is one tap: a group goes to its color's
+ * nearest open spot, or into the tray when none is open, and a tray dot sends its
+ * color home.) Lifting dots uncovers
+ * the spots under them. As many dots move as there is room for, closest to the dot
+ * you picked up first, into the open spots closest to the one you tapped: its open
+ * area first, then the other open spots of that color, nearest area first. When there's room for more
  * dots than you picked up, more of that color come too, from the board only
  * (the tray's stay put), nearest group first. Diagonal spots count as
  * touching.
@@ -898,22 +900,47 @@ function nearestTap(
  * Which cell a tap at (x, y) means (forgiving taps), or -1 when nothing useful is in reach.
  * Useful cells are dots, and, with dots in hand, open spots of their color (`isDrop`;
  * null when nothing is in hand).
- * A direct hit, inside a useful cell's own square, wins. Otherwise the nearest useful
- * cell wins; with dots in hand an open spot gets a little preference over a dot beside it.
+ * A direct hit on an open spot wins. A direct hit on a dot takes, of the dots whose
+ * centers are within `near` of the tap, the one in the biggest group (`size`), the
+ * nearest of those: a tap by a group's edge rarely means the small group beside the
+ * big one. Otherwise the nearest useful cell wins; with dots in hand an open spot gets
+ * a little preference over a dot beside it.
  */
 export function tapCell(
 	g: TapGrid,
 	x: number,
 	y: number,
 	isDot: (i: number) => boolean,
-	isDrop: ((i: number) => boolean) | null
+	isDrop: ((i: number) => boolean) | null,
+	size?: (i: number) => number,
+	near = 0
 ): number {
 	const col = Math.floor(x / g.step);
 	const row = Math.floor(y / g.step);
 	const inside = x - col * g.step < g.cell && y - row * g.step < g.cell;
-	if (inside && col >= 0 && row >= 0 && col < g.w && row < g.h) {
-		const i = row * g.w + col;
-		if (isDot(i) || isDrop?.(i)) return i;
+	const hit = inside && col >= 0 && row >= 0 && col < g.w && row < g.h ? row * g.w + col : -1;
+	if (hit >= 0 && isDrop?.(hit)) return hit;
+	if (hit >= 0 && isDot(hit)) {
+		if (!size || near <= 0) return hit;
+		let best = hit;
+		let bestSize = size(hit);
+		let bestD = Math.hypot(col * g.step + g.cell / 2 - x, row * g.step + g.cell / 2 - y);
+		const k = Math.ceil(near / g.step) + 1;
+		for (let cy = Math.max(0, row - k); cy <= Math.min(g.h - 1, row + k); cy++) {
+			for (let cx = Math.max(0, col - k); cx <= Math.min(g.w - 1, col + k); cx++) {
+				const i = cy * g.w + cx;
+				if (!isDot(i)) continue;
+				const d = Math.hypot(cx * g.step + g.cell / 2 - x, cy * g.step + g.cell / 2 - y);
+				if (d > near) continue;
+				const n = size(i);
+				if (n > bestSize || (n === bestSize && d < bestD)) {
+					best = i;
+					bestSize = n;
+					bestD = d;
+				}
+			}
+		}
+		return best;
 	}
 	const dot = nearestTap(g, x, y, isDot);
 	const drop = isDrop && nearestTap(g, x, y, isDrop);

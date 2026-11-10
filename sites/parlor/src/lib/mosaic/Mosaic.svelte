@@ -16,7 +16,6 @@
 	import LevelNav from '../shared/game/LevelNav.svelte';
 	import '../shared/game/stage.css';
 	import { LevelControl, type LevelProps } from '../shared/game/level.svelte';
-	import { plural } from '../shared/game/text';
 	import { inkOn } from '../shared/ink';
 	import { mosaicSave } from './save';
 	import { FLIGHT, Flights, snapshotRects } from './flights';
@@ -40,9 +39,9 @@
 	/** Whether the last tap was a finger, which gets a wider reach than a mouse. */
 	let touchTap = false;
 
-	let sel: Sel | null = $state.raw(null);
 	let hoverCell = $state(-1);
-	let trayHover: { color: number } | { slot: true } | null = $state(null);
+	/** The tray color under the mouse, or -1. */
+	let trayHover = $state(-1);
 	let focusCell = $state(-1);
 
 	const pendingCells = new SvelteSet<number>();
@@ -75,7 +74,6 @@
 			},
 			reset: (s, why) => {
 				cancelFlights();
-				sel = null;
 				if (why === 'level') {
 					hoverCell = -1;
 					focusCell = s.target.findIndex((c) => c >= 0);
@@ -88,13 +86,11 @@
 			// A finished color joins in, harmonizing the tune, rather than taking it over.
 			// Some levels' songs are in 3/4, or swing: the dots land on the swung eighths.
 			rhythm: { beat: SIXTEENTH, fill: true, doubles: true, harmonize: true, feel: true },
-			key: (e, key) => {
-				if (e.key === 'Escape') {
-					if (sel) select(null);
-					return true;
-				}
+			// T lifts the focused dot's group into the tray, even when its color has an open spot.
+			key: (_e, key) => {
 				if (key === 't') {
-					if (sel?.from === 'board' && !ctl.overlay) tryMove({ to: 'tray' });
+					const s = game;
+					if (s && !ctl.overlay && s.top[focusCell]) tryMove(pickBoard(focusCell), { to: 'tray' });
 					return true;
 				}
 			},
@@ -108,33 +104,24 @@
 
 	const title = $derived(ctl.label + (ctl.options.relaxed ? ' · Relaxed' : ''));
 
-	// ---------- selection ----------
-	/** Board picks are held "in hand" as an exact set of dots. */
+	// ---------- moves ----------
+	/** The touching group of same-color dots around `cell`, as a move's dots. */
 	function pickBoard(cell: number): Sel {
 		return { from: 'board', cell, cells: E.groupAt(game!, cell)!.cells };
 	}
 
-	function selColor(): number {
-		if (!sel || !game) return -1;
-		if (sel.from === 'tray') return sel.color;
-		return game.top[sel.cell]?.c ?? -1;
-	}
-
-	const picked = $derived.by(() => {
-		void ctl.version;
-		if (!game || sel?.from !== 'board') return new Set<number>();
-		return new Set((E.selectionDots(game, sel) ?? []).map((d) => d.cell));
-	});
-
-	/** Call after anything changes the game state or the selection. */
-	function sync() {
-		if (game && sel) {
-			const dots = E.selectionDots(game, sel);
-			// Drop a selection that no longer points at anything; refresh what's in hand.
-			if (!dots) sel = null;
-			else if (sel.from === 'board' && sel.cells) sel = { ...sel, cells: dots.map((d) => d.cell) };
-		}
-		ctl.touch();
+	/** The open spot of `color` nearest `cell`, or -1. */
+	function nearestOpen(s: State, color: number, cell: number): number {
+		const x = cell % s.w;
+		const y = Math.floor(cell / s.w);
+		let best = -1;
+		let bestD = Infinity;
+		s.target.forEach((c, i) => {
+			if (c !== color || s.top[i] || s.filled[i]) return;
+			const d = Math.hypot((i % s.w) - x, Math.floor(i / s.w) - y);
+			if (d < bestD) [best, bestD] = [i, d];
+		});
+		return best;
 	}
 
 	// ---------- what to draw ----------
@@ -153,15 +140,13 @@
 				cls = 'covered';
 				label = 'Spot with a dot on it';
 			} else if (s.filled[i]) {
-				// Until its dot lands, the template shows a filled spot as open (`pending`).
+				// Until its dot lands, the template shows a filled spot as incoming (`pending`).
 				cls = 'filled';
 				label = 'Filled spot';
 			} else {
 				cls = 'open';
 				label = 'Open spot';
 			}
-			let dotCls = picked.has(i) ? 'sel' : '';
-			if (sel?.from === 'board' && sel.cell === i) dotCls += ' center';
 			return {
 				hex: s.colors[c].hex,
 				ink: inks[c],
@@ -170,64 +155,35 @@
 				dot,
 				dotHex: dot ? s.colors[dot.c].hex : '',
 				cls,
-				dotCls,
 				label
 			};
 		});
 	});
 
-	/**
-	 * Hover previews:
-	 *   - over a dot: outline the group a tap would pick up
-	 *   - over an open spot, with dots in hand: outline its open area, and show
-	 *     ghost dots on the exact spots that would fill
-	 */
-	const hover = $derived.by(() => {
+	/** Hovering a dot (with a mouse) outlines the group a tap would move. */
+	const hovered = $derived.by(() => {
 		void ctl.version;
-		const out = { hl: new Set<number>(), region: new Set<number>(), fill: new Set<number>() };
 		const s = game;
 		const cell = hoverCell;
-		if (!s || cell < 0) return out;
-		if (s.top[cell]) {
-			if (picked.has(cell)) return out;
-			E.groupAt(s, cell)!.cells.forEach((i) => out.hl.add(i));
-			return out;
-		}
-		if (!sel || s.filled[cell] || s.target[cell] !== selColor()) return out;
-		// The spots the move would fill (spilling over to the color's other open spots, with
-		// more of its dots gathered if there's room), and the rest of the hovered area.
-		const spots = E.dropSpots(s, cell);
-		const n = E.dropCount(s, sel, cell);
-		spots.slice(0, n).forEach((i) => out.fill.add(i));
-		E.openRegion(s, cell).forEach((i) => out.fill.has(i) || out.region.add(i));
-		return out;
+		if (!s || cell < 0 || !s.top[cell]) return new Set<number>();
+		return new Set(E.groupAt(s, cell)!.cells);
 	});
 
 	const trayView = $derived.by(() => {
 		void ctl.version;
 		const s = game;
 		if (!s) return [];
-		const traySel = sel?.from === 'tray' ? sel.color : -1;
-		const boardPick = sel?.from === 'board';
-		// Hovering an empty slot with dots in hand: preview the slots they'd fill.
-		const fillFrom = s.tray.length;
-		const fillTo =
-			trayHover && 'slot' in trayHover && boardPick ? fillFrom + E.parkCount(s, sel) : fillFrom;
-		const hoverColor = trayHover && 'color' in trayHover ? trayHover.color : -1;
 		const out = [];
 		for (let k = 0; k < s.trayCap; k++) {
 			const g = s.tray[k];
 			let cls = '';
 			if (g && pendingTray.has(g.id)) cls = 'ghost';
-			else if (g && g.c === traySel) cls = 'sel';
-			if (g && g.c === hoverColor) cls += ' hl';
+			if (g && g.c === trayHover) cls += ' hl';
 			const prev = s.tray[k - 1];
 			out.push({
 				g,
 				hex: g ? s.colors[g.c].hex : '',
 				cls,
-				drop: !g && boardPick,
-				fill: k >= fillFrom && k < fillTo,
 				groupStart: k > 0 && !!prev && (!g || prev.c !== g.c)
 			});
 		}
@@ -237,14 +193,9 @@
 	const trayState = $derived.by(() => {
 		void ctl.version;
 		const s = game;
-		if (!s) return { used: 0, cap: 0, warn: false, nofit: false };
+		if (!s) return { used: 0, cap: 0, warn: false };
 		const free = s.trayCap - s.tray.length;
-		return {
-			used: s.tray.length,
-			cap: s.trayCap,
-			warn: free <= 2,
-			nofit: sel?.from === 'board' && free === 0
-		};
+		return { used: s.tray.length, cap: s.trayCap, warn: free <= 2 };
 	});
 
 	/**
@@ -434,42 +385,28 @@
 	}
 
 	/**
-	 * Which cell a tap means (see `E.tapCell`). A direct hit on something useful wins.
-	 * Otherwise snap to the nearest useful thing within about a fingertip: with dots in
-	 * hand, an open spot of their color; then any dot. Falls back to the cell hit.
+	 * Which cell a tap means (see `E.tapCell`): the dot hit, or the nearest within about
+	 * a fingertip, a near miss by a bigger group taking that. Falls back to the cell hit.
 	 */
 	function resolveTap(x: number, y: number, hit: number): number {
 		const s = game!;
 		const { m, local } = boardFrame();
 		// About a fingertip: wider for a finger than for a mouse.
 		const reach = Math.max(touchTap ? 30 : 22, m.step * (touchTap ? 0.95 : 0.75));
-		const color = sel ? selColor() : -1;
 		const isDot = (i: number) => !!s.top[i];
-		const isDrop = sel ? (i: number) => !s.top[i] && !s.filled[i] && s.target[i] === color : null;
 		const grid = { w: s.w, h: s.h, cell: m.cell, step: m.step, reach };
 		const [lx, ly] = local(x, y);
-		const i = E.tapCell(grid, lx, ly, isDot, isDrop);
+		// A tap on a dot by its group's edge takes the bigger group beside it, if one's that close.
+		const sizes = new Map<number, number>();
+		for (const g of E.boardGroups(s)) for (const c of g.cells) sizes.set(c, g.cells.length);
+		const near = m.step * (touchTap ? 0.75 : 0.6);
+		const i = E.tapCell(grid, lx, ly, isDot, null, (c) => sizes.get(c) ?? 0, near);
 		return i >= 0 ? i : hit;
 	}
 
-	// ---------- selecting and moving ----------
-	function select(next: Sel | null) {
-		sel = next;
-		sync();
-		if (!sel || !game) return;
-		const dots = E.selectionDots(game, sel)!;
-		const open = E.openCount(game, dots[0].gem.c);
-		const where =
-			sel.from === 'board'
-				? 'an empty tray slot, or an open spot of this color'
-				: 'an open spot of this color';
-		ctl.say(
-			`Picked up ${plural(dots.length, 'dot', 'dots')}. Tap ${where}. ${plural(open, 'spot is', 'spots are')} open for it.`
-		);
-	}
-
-	async function tryMove(dst: Dst) {
-		if (!sel || !game) return;
+	// ---------- moving ----------
+	async function tryMove(sel: Sel, dst: Dst) {
+		if (!game) return;
 		const before = E.clone(game);
 		const rects = snapshotRects([boardEl, trayEl]);
 		const res = E.move(game, sel, dst);
@@ -482,22 +419,7 @@
 		res.toBoard.forEach((p) => pendingCells.add(p.cell));
 		res.fromTray.forEach((p) => pendingCells.add(p.cell));
 		res.toTray.forEach((p) => pendingTray.add(p.id));
-		// Leftover dots stay picked up, so you can put them somewhere else.
-		let keep: Sel | null = null;
-		if (res.left > 0) {
-			keep =
-				sel.from === 'tray' ? sel : { from: 'board', cell: res.leftCell, cells: res.leftCells };
-		}
-		sel = keep;
-		sync();
-		if (keep) {
-			const n = res.left;
-			const where = keep.from === 'tray' ? 'in the tray' : 'picked up';
-			const them = n === 1 ? 'it' : 'them';
-			ctl.say(
-				`${plural(n, 'dot didn’t', 'dots didn’t')} fit, so ${n === 1 ? 'it is' : 'they are'} still ${where}. Tap another spot, or tap ${them} to put ${them} down.`
-			);
-		}
+		ctl.touch();
 		await tick();
 		animate(res, rects);
 	}
@@ -516,66 +438,58 @@
 		const s = game;
 		if (!s || ctl.overlay || E.isWon(s)) return;
 		focusCell = i;
-		if (s.top[i]) {
-			// Tapping the exact dot you picked up puts it back down.
-			// Tapping another dot in hand re-centers the move on it.
-			// Tapping any other dot picks up its group instead.
-			if (sel?.from === 'board' && sel.cell === i) select(null);
-			else if (sel?.from === 'board' && picked.has(i))
-				select({ from: 'board', cell: i, cells: sel.cells });
-			else select(pickBoard(i));
-			return;
-		}
-		if (s.filled[i]) {
-			if (sel) select(null);
-			return;
-		}
-		if (!sel) {
-			ctl.say('Pick up some dots first, then tap this spot.');
-			return;
-		}
-		tryMove({ to: 'spot', cell: i });
+		if (!s.top[i]) return;
+		// A dot's group goes home to the nearest open spot of its color (and on to the
+		// color's others), or, with none open, into the tray.
+		const spot = nearestOpen(s, s.top[i]!.c, i);
+		tryMove(pickBoard(i), spot >= 0 ? { to: 'spot', cell: spot } : { to: 'tray' });
 	}
 
-	/** Tray taps: a dot picks up that dot's color; an empty slot is where picked-up dots go. */
 	/**
-	 * The tray dot a tap or hover is on: anywhere in a slot that holds one counts,
-	 * so a near miss beside a dot never lands on the slot as if it were empty.
+	 * The tray dot a tap or hover at (x, y) means: anywhere in the tray, gaps and edges
+	 * too, is the slot whose center is nearest. Its dot's color, or -1 for an empty slot.
 	 */
-	function trayGemAt(target: Element): HTMLElement | null {
-		return (
-			target.closest<HTMLElement>('.gem[data-id]') ??
-			target.closest('.slot')?.querySelector<HTMLElement>('.gem[data-id]') ??
-			null
-		);
+	function trayColorAt(x: number, y: number): number {
+		const s = game;
+		if (!trayEl || !s) return -1;
+		let best: HTMLElement | null = null;
+		let bestD = Infinity;
+		for (const slot of trayEl.querySelectorAll<HTMLElement>('.slot')) {
+			const r = slot.getBoundingClientRect();
+			const d = Math.hypot(r.left + r.width / 2 - x, r.top + r.height / 2 - y);
+			if (d < bestD) [best, bestD] = [slot, d];
+		}
+		const id = best?.querySelector<HTMLElement>('.gem[data-id]')?.dataset.id;
+		return id === undefined ? -1 : (s.tray.find((q) => q.id === +id)?.c ?? -1);
 	}
 
+	/**
+	 * A tray color, home in one tap: onto its open spots (the first one's area, then the
+	 * rest, nearest first, more of its board dots gathered if there's room). The tray is
+	 * the buffer that breaks the end's gridlock, so taking a color back out is cheap.
+	 */
+	function sendHome(color: number) {
+		const s = game!;
+		const spot = s.target.findIndex((c, i) => c === color && !s.top[i] && !s.filled[i]);
+		if (spot < 0) {
+			ctl.say('No open spot for that color yet.');
+			ctl.music?.nope();
+			return;
+		}
+		tryMove({ from: 'tray', color }, { to: 'spot', cell: spot });
+	}
+
+	/** Tray taps: a dot sends its color home; an empty slot does nothing. */
 	function onTray(e: MouseEvent) {
 		const s = game;
 		if (!s || ctl.overlay || E.isWon(s)) return;
-		const target = e.target as Element;
-		const node = trayGemAt(target);
-		if (node) {
-			const gem = s.tray.find((q) => q.id === +node.dataset.id!);
-			if (!gem) return;
-			if (sel?.from === 'tray' && sel.color === gem.c) select(null);
-			else select({ from: 'tray', color: gem.c });
-			return;
-		}
-		if (!target.closest('.slot')) return; // the tray's padding does nothing
-		if (sel?.from === 'board') tryMove({ to: 'tray' });
-		else if (sel) select(null);
-		else ctl.say('Pick up some dots first, then tap an empty slot.');
+		const color = trayColorAt(e.clientX, e.clientY);
+		if (color >= 0) sendHome(color);
 	}
 
 	function onTrayHover(e: PointerEvent) {
 		if (e.pointerType !== 'mouse' || !game) return;
-		const target = e.target as Element;
-		const node = trayGemAt(target);
-		const gem = node && game.tray.find((q) => q.id === +node.dataset.id!);
-		if (gem) trayHover = { color: gem.c };
-		else if (target.closest('.slot')) trayHover = { slot: true };
-		else trayHover = null;
+		trayHover = trayColorAt(e.clientX, e.clientY);
 	}
 
 	// ---------- animation ----------
@@ -750,7 +664,7 @@
 	<div class="stage" class:won={ctl.won}>
 		<p class="sr-only" aria-live="polite">{ctl.status}</p>
 
-		<div class="board-wrap snapped" class:nofit={trayState.nofit || trayFlash.value}>
+		<div class="board-wrap snapped" class:nofit={trayFlash.value}>
 			<!-- One card: the zoomable board, and the tray under it. -->
 			<Card>
 				<!-- Cells take Enter and Space; this handler adds forgiving taps and zoom gestures. -->
@@ -784,8 +698,6 @@
 									<div
 										class="cell {v.cls}"
 										class:pending
-										class:region-hover={hover.region.has(i)}
-										class:fill-preview={hover.fill.has(i)}
 										data-i={i}
 										role="gridcell"
 										tabindex={i === focusCell ? 0 : -1}
@@ -796,8 +708,8 @@
 									>
 										{#if v.dot}
 											<div
-												class="gem {v.dotCls}"
-												class:hl={hover.hl.has(i)}
+												class="gem"
+												class:hl={hovered.has(i)}
 												data-id={v.dot.id}
 												style:--c={v.dotHex}
 											></div>
@@ -813,7 +725,7 @@
 
 				<!-- The tray, under the board; a level's end panel shows in its place. -->
 				<div class="tray-area">
-					<!-- Tray dots and slots are reached by pointer; the keyboard sends picked-up dots here with T. -->
+					<!-- Tray dots are reached by pointer; the keyboard lifts the focused dot's group here with T. -->
 					<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 					<div
 						class="tray"
@@ -822,16 +734,11 @@
 						bind:this={trayEl}
 						style:--n={trayView.length}
 						onclick={onTray}
-						onpointerover={onTrayHover}
-						onpointerleave={() => (trayHover = null)}
+						onpointermove={onTrayHover}
+						onpointerleave={() => (trayHover = -1)}
 					>
 						{#each trayView as t, k (k)}
-							<div
-								class="slot"
-								class:drop={t.drop}
-								class:fill-preview={t.fill}
-								class:group-start={t.groupStart}
-							>
+							<div class="slot" class:group-start={t.groupStart}>
 								{#if t.g}
 									<div class="gem {t.cls}" data-id={t.g.id} style:--c={t.hex}></div>
 								{/if}
@@ -1056,13 +963,13 @@
 	}
 	/*
 	 * Open: an empty socket where a dot goes, a big striped diamond so it can't pass
-	 * for a dot of another color. Its stripes are the spot's own color shaded toward
-	 * its ink (darker on light colors, lighter on dark ones), and turn the other way
-	 * on every other spot. A filled spot whose dot is still flying looks open.
+	 * for a dot of another color. Its stripes are the spot's own color shaded well
+	 * toward its ink (darker on light colors, lighter on dark ones: at least about 3:1
+	 * on every level's colors), and turn the other way on every other spot.
 	 */
 	.cell.open::after,
 	.cell.pending::after {
-		--shade: color-mix(in srgb, var(--c), var(--ink) 40%);
+		--shade: color-mix(in srgb, var(--c), var(--ink) 70%);
 		--stripe: max(1px, round(calc(var(--cell) * 0.07), 1px));
 		content: '';
 		position: absolute;
@@ -1079,21 +986,13 @@
 	.cell.alt::after {
 		--turn: 90deg;
 	}
-	/*
-	 * Hovering an open area: outline it; the spots that would fill show a pale dot.
-	 * Outlines are drawn inside the cell, so they never spill into the gaps or neighbors.
-	 */
-	.cell.region-hover,
-	.cell.fill-preview {
-		box-shadow: inset 0 0 0 2px var(--text-color);
-	}
-	/* A dot as it would land: round, where the socket was. */
-	.cell.fill-preview::after {
+	/* Incoming: a dot's on its way here. A ring where it will land, not a socket. */
+	.cell.pending::after {
 		inset: round(calc(var(--cell) * 0.2), 1px);
 		border-radius: 50%;
 		rotate: none;
-		background: color-mix(in srgb, var(--c) 60%, #fff);
-		box-shadow: 0 0 0 2px var(--text-color);
+		background: none;
+		box-shadow: inset 0 0 0 max(1px, round(calc(var(--cell) * 0.08), 1px)) var(--shade);
 	}
 	.cell:focus-visible {
 		box-shadow: inset 0 0 0 3px var(--accent-color);
@@ -1122,20 +1021,10 @@
 	.gem.ghost {
 		visibility: hidden;
 	}
-	/* Hovering a dot outlines its group with a dashed ring, unlike the solid ring of a picked-up group. */
+	/* Hovering a dot outlines its group with a dashed ring. */
 	.gem.hl {
 		outline: max(2px, round(calc(var(--ring) * 1.5), 1px)) dashed var(--text-color);
 		outline-offset: var(--ring);
-	}
-	/* Picked up: an outline in the text color. */
-	.gem.sel {
-		box-shadow: 0 0 0 calc(var(--ring) * 2) var(--text-color);
-		z-index: 3;
-	}
-	/* The dot the move is centered on gets the accent color. */
-	.gem.sel.center {
-		box-shadow: 0 0 0 calc(var(--ring) * 2) var(--accent-color);
-		z-index: 4;
 	}
 	/*
 	 * Tray: the card's width under the board. Its slots' rows hold as many whole
@@ -1182,7 +1071,7 @@
 	 * circle whatever the board's size, and holds whole stripes, so none is cut to a sliver.
 	 */
 	.slot:empty::after {
-		--shade: color-mix(in srgb, var(--text-color) 55%, transparent);
+		--shade: color-mix(in srgb, var(--text-color) 80%, transparent);
 		--stripe: max(1px, round(calc(var(--slot) * 0.08), 1px));
 		--side: calc(
 			round(down, calc(var(--slot) * 0.5), calc(var(--stripe) * 2 + 1px)) + var(--stripe)
@@ -1212,19 +1101,13 @@
 		left: round(down, calc((var(--slot) - var(--dot)) / 2), 1px);
 		top: round(down, calc((var(--slot) - var(--dot)) / 2), 1px);
 	}
-	/* A slot with a dot is all that dot's: a tap anywhere in it picks the dot's color up. */
+	/* A slot with a dot is all that dot's: a tap anywhere in it sends the dot's color home. */
 	.slot:has(.gem) {
 		cursor: pointer;
 	}
 	/* Nearly full: the empty slots that are left take the accent color. */
 	.tray.warn .slot:empty::after {
 		--shade: color-mix(in srgb, var(--accent-color) 80%, transparent);
-	}
-	.slot.drop {
-		cursor: pointer;
-	}
-	.slot.fill-preview {
-		box-shadow: 0 0 0 2px var(--text-color);
 	}
 	/*
 	 * A new color starts: a faint 1px bar in the gap before its first slot. It hangs
@@ -1268,6 +1151,10 @@
 		position: fixed;
 		margin: 0;
 		will-change: transform;
+	}
+	/* Waiting its turn to fly: faded, so it's plainly on its way and not one to tap. */
+	.fx :global(.flyer.waiting) {
+		opacity: 0.45;
 	}
 
 	@media (max-width: 500px) {
