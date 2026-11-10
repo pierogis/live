@@ -6,6 +6,8 @@ export interface Picture {
 	name: string;
 	palette: Record<string, string>;
 	art: string[];
+	/** Its song's key and mode, when the seed's don't suit it (see `SongKey` in sound.ts). */
+	song?: { key: string; mode: string };
 }
 
 /** A level as a game's level list has it: everything but its picture (scripts/level-lists.ts). */

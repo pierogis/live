@@ -84,7 +84,7 @@
 			// each with a tune note or, between the tune's notes, a quiet one. A sixteenth after a
 			// tune note can take the next one early, so the tune skips along with the dots.
 			// A finished color joins in, harmonizing the tune, rather than taking it over.
-			// Some levels' songs are in 3/4, or swing: the dots land on the swung eighths.
+			// Some levels' songs are in 3/4, 5/4 or 7/8, or swing: the dots land on the swung eighths.
 			rhythm: { beat: SIXTEENTH, fill: true, doubles: true, harmonize: true, feel: true },
 			// T lifts the focused dot's group into the tray, even when its color has an open spot.
 			key: (_e, key) => {

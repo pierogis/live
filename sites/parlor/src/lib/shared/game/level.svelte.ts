@@ -305,7 +305,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.options = options;
 		this.#history = [];
 		this.key++;
-		music.seed(hashStr(this.level.id), this.#game.rhythm);
+		music.seed(hashStr(this.level.id), this.#game.rhythm, this.level.song);
 		g.reset?.(s, 'level');
 		this.touch();
 		this.say(`${this.level.name}.`);

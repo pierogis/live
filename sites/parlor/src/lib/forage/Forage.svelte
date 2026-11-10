@@ -247,7 +247,6 @@
 		const s = game;
 		if (!s || ctl.overlay || E.isWon(s)) return;
 		const before = E.clone(s);
-		const front = s.columns[col][0];
 		const r = E.send(s, col);
 		if (!r.ok) {
 			explain(r.reason, col);
@@ -256,7 +255,7 @@
 		}
 		ctl.record(before);
 		ctl.touch();
-		ctl.music?.tap(front && s.colors[front.c].hex);
+		ctl.music?.tap();
 		launch(r.dispatched);
 	}
 

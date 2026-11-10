@@ -131,6 +131,7 @@
 		{
 			"id": "deep-sea-sub",
 			"name": "Deep Sea Sub",
+			"song": { "key": "G", "mode": "minor" },
 			"palette": {
 				"Y": "#ffd23f",
 				"T": "#159a94",
