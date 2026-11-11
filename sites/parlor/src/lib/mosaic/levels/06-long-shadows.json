@@ -4,6 +4,7 @@
 		{
 			"id": "fair-at-night",
 			"name": "Fair at Night",
+			"song": { "mode": "dorian", "spice": "adventurous" },
 			"palette": {
 				"W": "#ffffff",
 				"R": "#e23838",
@@ -49,6 +50,7 @@
 		{
 			"id": "red-bridge",
 			"name": "Red Bridge",
+			"song": { "mode": "major", "spice": "lively" },
 			"palette": {
 				"R": "#e23838",
 				"S": "#4a5566",
@@ -89,6 +91,7 @@
 		{
 			"id": "above-the-clouds-at-sunset",
 			"name": "Above the Clouds at Sunset",
+			"song": { "mode": "mixolydian", "spice": "lively", "lead": "flute", "meter": 3 },
 			"palette": {
 				"G": "#9c9aa6",
 				"R": "#e23838",
@@ -130,6 +133,7 @@
 		{
 			"id": "morning-steam-train",
 			"name": "Morning Steam Train",
+			"song": { "mode": "major", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"R": "#e23838",
 				"B": "#141418",
@@ -167,54 +171,9 @@
 			]
 		},
 		{
-			"id": "windmill-and-tulips-at-sunset",
-			"name": "Windmill and Tulips at Sunset",
-			"palette": {
-				"R": "#e23838",
-				"B": "#8a552c",
-				"W": "#ffffff",
-				"A": "#f9a66c",
-				"G": "#2e9a50",
-				"P": "#ff6fb0",
-				"Y": "#ffd23f",
-				"L": "#cdb6ef"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAWWWWAAAAAAAAAA",
-				"AAAAAAAAAAAAAAWWWAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAWWWAAAAAAAAAAA",
-				"AAAAAAAALLAAAAWWWAAAAAAAAAAA",
-				"AAAAAALLLLLLLWWWWAAALLLAAAAA",
-				"AAAAALLLLLLLLWWWWLLLLLLLLLAA",
-				"AAAWWWWLLLLLLWWWWLLLLLLLLLAA",
-				"AAAWWWWWWWWWWWWWWLLLLLLLLLAA",
-				"AAAWWWWWWWWWWWWWWLLLLLLLLLAA",
-				"AAAAAAWWWWWWWWWWWWWWWAAAAAAA",
-				"AAAAAAAAAAAWWWWWWWWWWWWWWAAA",
-				"AAAAAAAAAAAAWWWWWWWWWWWWWAAA",
-				"AAAAAAAAAAAAWWWBAAAAWWWWWAAA",
-				"PPPPPPPPPPPPWWWBAAAAAAAAPPPP",
-				"PPPPPPPPPPPWWWWBPPPPPPPPPPPP",
-				"PPPPPPPPPPPWWWBBPPPPPPPPPPPP",
-				"PPPPPPPPPPPWWWBBPPPPPPPPPPPP",
-				"PPPPPPPPPPPWWWBBPPPPPPPPPPPP",
-				"PPPPPPPPPPWWWWBBPPPPPPPPPPPP",
-				"PPPPPPPPPPWWWBBBPPPPPPPPPPPP",
-				"GGGGGGGGGGGWBBBBGGGGGGGGGGGG",
-				"RRRRRRRRRRRRBBBBRRRRRRRRRRRR",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"YYYYYYYYYYYYYYYYYYYYYYYYYYYY",
-				"YYYYYYYYYYYYYYYYYYYYYYYYYYYY",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"RRRRRRRRRRRRRRRRRRRRRRRRRRRR",
-				"RRRRRRRRRRRRRRRRRRRRRRRRRRRR",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"YYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-			]
-		},
-		{
 			"id": "triple-scoop",
 			"name": "Triple Scoop",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"C": "#4b2716",
 				"S": "#94d4fb",
@@ -264,6 +223,7 @@
 		{
 			"id": "emperor-penguin-at-dawn",
 			"name": "Emperor Penguin at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"B": "#141418",
 				"C": "#fff1cc",
@@ -311,51 +271,9 @@
 			]
 		},
 		{
-			"id": "sheep-and-lamb",
-			"name": "Sheep and Lamb",
-			"palette": {
-				"W": "#ffffff",
-				"B": "#141418",
-				"S": "#94d4fb",
-				"L": "#5cb948",
-				"Y": "#ffd23f",
-				"F": "#1d5a32",
-				"R": "#8a552c",
-				"T": "#159a94",
-				"A": "#efd08f"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSYYYYSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSYYYYSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSYYYYSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSYYYYSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSTTTSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSTTTTSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSTTTTSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSTTSSSSSS",
-				"SSSSSFFFFFFFSSSSSSSSSSSSSSSTSSSSSS",
-				"SSFFFFFFFFFFFFFFWWSSSSSSSSSTSSFFFF",
-				"FFFFRFFFFRRWWWFWWWWWWWWSSSRFFFFRRF",
-				"RRRRRRRRRRWWWWWWWWWWWWWWRRRRRRRRRR",
-				"RRRRRRRRRRWWWWWWWWWWWWWBBBBRRRRRRR",
-				"RRRRRRRRRRWWWWWWWWWWWWBBBBBRRRRRRR",
-				"LLLLRLLLLRWWWWWWWWWWWWBBBBBLLLLRRL",
-				"LLLLLLLLLWWWWWWWWWWWWWWBBBLLLLLLLL",
-				"LLLWLWWLWWWWWWWWWWWWWWWWWLLLLLLLLL",
-				"LLWWWWWWWWBBBWLWWWLWLWWWLLLLLLLLLL",
-				"LLWWWWWWWBBBBLLLLLLLLLLLLLLLLLLLLL",
-				"LWWWWWWWWWBBBLLLLLLLLLLLLLLLLLLLLL",
-				"LLWBBWAWAWALBLLLLLLLLLLLLLLLLLLLLL",
-				"LLLBBAAAAALLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLBBAAAAALLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLAAAAAALLLLLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
 			"id": "still-life-with-fruit",
 			"name": "Still Life with Fruit",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"C": "#2350c8",
 				"R": "#e23838",
@@ -397,6 +315,7 @@
 		{
 			"id": "owl-by-moonlight",
 			"name": "Owl by Moonlight",
+			"song": { "mode": "minor", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"S": "#7d776e",
 				"O": "#ff8c2e",
@@ -448,6 +367,7 @@
 		{
 			"id": "library-shelf",
 			"name": "Library Shelf",
+			"song": { "mode": "major", "spice": "gentle", "lead": "keys" },
 			"palette": {
 				"B": "#8a552c",
 				"R": "#e23838",
@@ -496,6 +416,7 @@
 		{
 			"id": "winter-cabin-at-dawn",
 			"name": "Winter Cabin at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"F": "#1d5a32",
 				"B": "#f8c3d0",
@@ -539,6 +460,7 @@
 		{
 			"id": "green-parrot",
 			"name": "Green Parrot",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"L": "#5cb948",
 				"B": "#3b82e0",
@@ -589,6 +511,7 @@
 		{
 			"id": "cottage-at-dusk",
 			"name": "Cottage at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"C": "#fff1cc",
 				"G": "#f2b705",
@@ -630,6 +553,7 @@
 		{
 			"id": "chocolate-cupcake",
 			"name": "Chocolate Cupcake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"C": "#2350c8",
 				"H": "#4b2716",
@@ -680,6 +604,7 @@
 		{
 			"id": "orange-ladybug",
 			"name": "Orange Ladybug",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"B": "#141418",
 				"O": "#ff8c2e",
@@ -728,6 +653,7 @@
 		{
 			"id": "sea-turtle",
 			"name": "Sea Turtle",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"O": "#7c7d2a",
 				"C": "#c57b38",
@@ -770,58 +696,9 @@
 			]
 		},
 		{
-			"id": "giraffe-at-dawn",
-			"name": "Giraffe at Dawn",
-			"palette": {
-				"G": "#f2b705",
-				"B": "#8a552c",
-				"L": "#f8c3d0",
-				"O": "#7c7d2a",
-				"C": "#ff6f61",
-				"F": "#1d5a32",
-				"N": "#1d2f5e",
-				"A": "#141418",
-				"P": "#f9a66c"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLAAAALLLLLLLLLLLLLLLL",
-				"LLLLLLLAAALLLLLLLLLCCCLLLL",
-				"LLLLLLLANGLLLLLLLLCCCCLLLL",
-				"LLLLLGGNNGLLLLLLLLCCCCLLLL",
-				"LLLLLLGGGBLLLLLLLLLCCLLLLL",
-				"LLLLLLLLBBLLLLLLLLLLLLLLLL",
-				"LLLLLLLLBBLLLLLLLLLLLLLLLL",
-				"LLLLLLLLGGLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLGGLLLLLLLLLLLLLLL",
-				"LLLLLLLLLGGLLLLLLLLLLLLLLL",
-				"PPPPPPPPPGGPPPPPPPPPPPPPPP",
-				"PPPPPPPPPGGPPPPPPPPPPPPPPP",
-				"PPPPPPPPPBBPPPPPPPPPFFFFFP",
-				"PPPPPPPPPBBGPPPPPPPFFFFFFF",
-				"PPPPPPPPPGGGPPPPPPPFFFFFFF",
-				"PPPPPPPPPPGBBGGGBBPPPPFFPP",
-				"PPPPPPPPPPGBBBGBBBGPPPFFPP",
-				"PPPPPPPPPGGGBGGGBGGGPPFFPP",
-				"PPPPPPPPPGGGGGGGGGGGPPFFPP",
-				"PPPPPPPPPPPPGGBBGGBBPPFFPP",
-				"PPPPPPPPPPPPGGBBGPBBPPFFPP",
-				"PPPPPPPPPPPPGPPGGPPPPPFFPP",
-				"PPPPPPPPPPPPPPPGGPPPPPFFPP",
-				"PPPPPPPPPPPPPPPGGPPPPPFFPP",
-				"PPPPPPPPPPPPPPPGGPPPPPFFPP",
-				"PPPPPPPPPPPPOPPGGPPPPPFFPP",
-				"PPPPPOOOOOOOOOOBBOOOOPFFPP",
-				"OOOOOOOOOOOOOOOBBOOOOOFFOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO"
-			]
-		},
-		{
 			"id": "spring-flowers",
 			"name": "Spring Flowers",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"C": "#2350c8",
 				"S": "#9db894",
@@ -873,6 +750,7 @@
 		{
 			"id": "yellow-taxi",
 			"name": "Yellow Taxi",
+			"song": { "mode": "major", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"Y": "#ffd23f",
 				"C": "#34343c",
@@ -912,6 +790,7 @@
 		{
 			"id": "toadstools",
 			"name": "Toadstools",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"C": "#fff1cc",
 				"R": "#e23838",
@@ -957,6 +836,7 @@
 		{
 			"id": "tree-frog",
 			"name": "Tree Frog",
+			"song": { "mode": "major", "spice": "lively", "lead": "pizz" },
 			"palette": {
 				"L": "#a8dc42",
 				"A": "#5aa9f5",
@@ -1001,6 +881,7 @@
 		{
 			"id": "pizza-night",
 			"name": "Pizza Night",
+			"song": { "mode": "mixolydian", "spice": "lively", "lead": "mallet" },
 			"palette": {
 				"C": "#c57b38",
 				"Y": "#ffd23f",
@@ -1048,6 +929,7 @@
 		{
 			"id": "autumn-woods",
 			"name": "Autumn Woods",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"O": "#ff8c2e",
 				"S": "#94d4fb",

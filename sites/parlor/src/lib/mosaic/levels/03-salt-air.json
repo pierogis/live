@@ -4,6 +4,7 @@
 		{
 			"id": "green-turtle",
 			"name": "Green Turtle",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"F": "#1d5a32",
 				"L": "#5cb948",
@@ -37,117 +38,9 @@
 			]
 		},
 		{
-			"id": "canyon-at-dusk",
-			"name": "Canyon at Dusk",
-			"palette": {
-				"R": "#b5481b",
-				"O": "#ef8fae",
-				"B": "#e5d2b0",
-				"L": "#3b82e0",
-				"A": "#f9a66c",
-				"G": "#f2b705"
-			},
-			"art": [
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"RRRRRRGGGGGGGGGGGGGGGGGGGG",
-				"RRRRRRRGGGGGGGGGGGGGGGGGGG",
-				"RRRRRRRGGGGGGGGGGGGGRRRRRR",
-				"AAAAAAAGGGGGGGGGGGGAAAAAAA",
-				"AAAAAAAAGGGGGGGGGGGAAAAAAA",
-				"RRRRRRRRGGGGGGGGGGGRRRRRRR",
-				"RRRRRRRRGGGGGGGGGGGRRRRRRR",
-				"AAAAAAAAGGGGGGGGGGGAAAAAAA",
-				"AAAAAAAABBBBBBBBBBBAAAAAAA",
-				"AAAAAAAABBBLLBBBBBAAAAAAAA",
-				"RRRRRRRRBBLLLBBBBBRRRRRRRR",
-				"AAAAAAAABBLLLBBBBBAAAAAAAA",
-				"AAAAAAAAABBLLLLBBBAAAAAAAA",
-				"AAAAAAAAABBLLLLLBBAAAAAAAA",
-				"RRRRRRRRRBBBLLLLLBRRRRRRRR"
-			]
-		},
-		{
-			"id": "glowing-jellyfish",
-			"name": "Glowing Jellyfish",
-			"palette": {
-				"P": "#ffc8a2",
-				"A": "#5aa9f5",
-				"C": "#2350c8",
-				"L": "#cdb6ef",
-				"W": "#ffffff",
-				"B": "#141418"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAPAAAAAAAAAA",
-				"AAAAAAAPPPPPPPAAAAAAA",
-				"AAAAAAPPPPPPPPPAAAAAA",
-				"AAAAAPPPPWWWPPPPAAAAA",
-				"AAAAPPPPWWWWWPPPPAAAA",
-				"AAAAPPPWWWWWWWPPPAAAA",
-				"AAAAALLLLLLLLLLLAAAAA",
-				"AAAALLLLLLLLLLLAAAAAA",
-				"AAAAALLLLLLLLLLAAAAAA",
-				"CCAAALLLLLLLLLLLCCCCC",
-				"CCCCCLLLLLLCCLLLCCCCC",
-				"CCCCCCLLLLLCCLLLCCCCC",
-				"CCCCCCLLLLLCLLLLLCCCC",
-				"CCCCCLLLLLLCLLLLCCCCC",
-				"CCCCCLLCLLLCLLLLCCCCC",
-				"CCCCLLCCLLLLLCLLCCCCC",
-				"CCCCCCCCLLLLLCCCCCCCC",
-				"CCCBBBBBLLBLLCCCCCCCB",
-				"BBBBBBBBLBBBLBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBB"
-			]
-		},
-		{
-			"id": "snail",
-			"name": "Snail",
-			"palette": {
-				"O": "#ff8c2e",
-				"T": "#d4a373",
-				"S": "#94d4fb",
-				"G": "#2e9a50",
-				"B": "#8a552c",
-				"Y": "#ffd23f"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSYYSS",
-				"SSSSSSSSSSSSSSSSSSSSSSYYYYS",
-				"SSSSSSSSSSSSBBBOOOOSSSYYYYS",
-				"SSSSSSSSSSSBBOOOOOOOOSYYYYS",
-				"SSSSSSSSSSBBOOOOBOOOOSSSSSS",
-				"SSTTSTTTSBBOOOBBBBBOOOSSSSS",
-				"SSTTSTTTSBOOOBBOOOBBOOSSSSS",
-				"SSTTSSTSSBOOBBOOOOOBOOOSSSS",
-				"SSSTSTTSSBOOBBOOOOOBBOOSSSS",
-				"SSSTTTTSSBOOOBOOBOOBBOOSSSS",
-				"SSSTTTTSSBBOOOBBBOOBBOOSSSS",
-				"SSSTTTTSSSBOOOOOOOOBOOSSSSS",
-				"SSSTTTTSSSBBBOOOOBBBOOSSSSS",
-				"SSSSTTTTSSBBBBBBBBBOOSSSSSS",
-				"SSSTTTTTSSSSBBBBOOOOSSSGSSS",
-				"GSSTTTTTTTTTTTTTTTTTTTTGGGG",
-				"GGGTTTTTTTTTTTTTTTTTTTTGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGG"
-			]
-		},
-		{
 			"id": "morning-castle",
 			"name": "Morning Castle",
+			"song": { "mode": "major", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"S": "#c9c9d2",
 				"C": "#2350c8",
@@ -186,6 +79,7 @@
 		{
 			"id": "bowl-of-fruit",
 			"name": "Bowl of Fruit",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"C": "#2350c8",
 				"R": "#e23838",
@@ -222,6 +116,7 @@
 		{
 			"id": "blue-parrot",
 			"name": "Blue Parrot",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#5aa9f5",
 				"N": "#1d2f5e",
@@ -265,6 +160,7 @@
 		{
 			"id": "monarch-butterfly",
 			"name": "Monarch Butterfly",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"B": "#141418",
 				"O": "#ff8c2e",
@@ -304,6 +200,7 @@
 		{
 			"id": "beach-day",
 			"name": "Beach Day",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#e5d2b0",
 				"R": "#e23838",
@@ -342,6 +239,7 @@
 		{
 			"id": "chocolate-donut",
 			"name": "Chocolate Donut",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"T": "#d4a373",
 				"C": "#4b2716",
@@ -382,6 +280,7 @@
 		{
 			"id": "tent-in-the-pines-by-moonlight",
 			"name": "Tent in the Pines by Moonlight",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "vibes" },
 			"palette": {
 				"O": "#ff8c2e",
 				"R": "#e23838",
@@ -416,43 +315,9 @@
 			]
 		},
 		{
-			"id": "morning-bumblebee",
-			"name": "Morning Bumblebee",
-			"palette": {
-				"Y": "#ffd23f",
-				"B": "#141418",
-				"L": "#f8c3d0",
-				"P": "#ff6fb0",
-				"E": "#5cb948",
-				"A": "#f9a66c"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLBLLLBLLLLLL",
-				"LLLLLLLLLLLLLLLBBLBBLLLLLL",
-				"AAAAAAAAAAAAAAABBBBAAAAAAA",
-				"AAAAAAAYBBYYBYYBBBBAAAAAAA",
-				"AAAAAYYYBBYYBYYBBBBBAAAAAA",
-				"AAAAAYYYBBYYBYYBBBBBAAAAAA",
-				"AAYYYYYYBBYYBYYBBBBBAAAAAA",
-				"AAAAAYYYBBYYBYYBBBBBAAAAAA",
-				"AAAAAAYYBBYYBYYYBBBAAAAAAA",
-				"AAAAAAAABBYYBAAAAAAAPPPPAA",
-				"AAAAAAAAAAAAAAAAAAAAPPPPPA",
-				"AAPPPPAAAAAAAAAAAAAPPPPPPA",
-				"AAPPPPAAAAAAAAAAAAPPPPPPPP",
-				"EPPPPPPEEEEEEEEEEEEPPPPPPP",
-				"EPPPPPEEEEEEEEEEEEEEPPPPPE",
-				"EEPPPPEEEEEEEEEEEEEEPPPPEE",
-				"EEPPPEEEEEEEEEEEEEEAAAAEEE",
-				"EEEPPEEEEEEEEEEEEEEEEAAEEE"
-			]
-		},
-		{
 			"id": "candlelight",
 			"name": "Candlelight",
+			"song": { "mode": "minor", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"O": "#ff8c2e",
 				"C": "#fff1cc",
@@ -489,6 +354,7 @@
 		{
 			"id": "purple-octopus",
 			"name": "Purple Octopus",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"V": "#8a55d8",
 				"A": "#5aa9f5",
@@ -527,44 +393,9 @@
 			]
 		},
 		{
-			"id": "morning-tulip-bed",
-			"name": "Morning Tulip Bed",
-			"palette": {
-				"R": "#e23838",
-				"Y": "#ffd23f",
-				"L": "#cdb6ef",
-				"E": "#5cb948",
-				"F": "#1d5a32",
-				"A": "#f9a66c"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LRLRLRLLLLLLLLLLLLLLLYLYLYL",
-				"LRRRRRLLLLLLLLLLLLLLLYYYYYL",
-				"RRRRRRAAYYYAAAAAAAAAAYYYYYY",
-				"RRRRRRAAYYYYYAAAAAAAAYYYYYY",
-				"RRRRRRAYYYYYYAARRRRAAYYYYYY",
-				"ARRRRRAYYYYYYARRRRRAAYYYYYA",
-				"AARRRAAYYYYYYARRRRRRAAYYYAA",
-				"AAFFAAAAYYYYAARRRRRRAAAFFAA",
-				"AAFFAAAAAYYAAARRRRRRAAAFFAA",
-				"AAFFAAAAAFFAAAARRRRAAAAFFAA",
-				"AAFFAAAAAFFAAAAAFFAAAAAFFAA",
-				"AAFFAAAAAFFAAAAAFFAAAAAFFAA",
-				"AAFFAAAAFFFAAAAAFFAAAAAFFAA",
-				"AAFFAAAAAFFAAAAAFFAAAAFFFAA",
-				"EEFFEEEEEFFEEEEEFFEEEEEFFEE",
-				"EEFFEEEEEFFEEEEEFFEEEEEFFEE",
-				"EEFFEEEEEFFEEEEEFFEEEEEFFEE",
-				"EEEFEEEEEFFEEEEEFFEEEEEFEEE"
-			]
-		},
-		{
 			"id": "owl-at-dusk",
 			"name": "Owl at Dusk",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"C": "#c57b38",
 				"Y": "#ffd23f",
@@ -607,6 +438,7 @@
 		{
 			"id": "reading-nook",
 			"name": "Reading Nook",
+			"song": { "mode": "major", "spice": "gentle", "lead": "keys" },
 			"palette": {
 				"B": "#8a552c",
 				"R": "#e23838",
@@ -646,51 +478,9 @@
 			]
 		},
 		{
-			"id": "giraffe",
-			"name": "Giraffe",
-			"palette": {
-				"S": "#efd08f",
-				"C": "#c57b38",
-				"K": "#94d4fb",
-				"O": "#7c7d2a",
-				"Y": "#ffd23f",
-				"F": "#1d5a32",
-				"W": "#ffffff"
-			},
-			"art": [
-				"KKKKKKKKKKKKKKKKKKKKKKK",
-				"KKKKKKKKKKKKKKKKKKKKKKK",
-				"KKKKYYKKKKKKKKKKKKKKKKK",
-				"KKKYYYYKKKKKKKKKKKKKKKK",
-				"KKKYYYYKKKKKKKKSSSKKKKK",
-				"KKKKYYKKKKKKKKSSSSKKKKK",
-				"KKKKKKKKKKKKKKSSKKKKKKK",
-				"KKKKKKKKKKKKKKSSKKKKKKK",
-				"KKKKKKKKKKKKKKSSKKKKKKK",
-				"KKKKKKKKKKKKKSSKKKKKKKK",
-				"WWWWWWWWWWWWWCCWWWWWWWW",
-				"WWWWWWWWWWWWWCCWWWWWWWW",
-				"FFFFFWWWWWWWWSCWWWWWWWW",
-				"FFFFFFWWWWWWWSSWWWWWWWW",
-				"FFFFFWWWSSSCCSSWWWWWWWW",
-				"WWFFWWSSSSSCCSWWWWWWWWW",
-				"WWFFWSSSSSSSSSSWWWWWWWW",
-				"WWFFWCSSCCSSSCCWWWWWWWW",
-				"WWFFWCCSCCCSCCWWWWWWWWW",
-				"WWFFWCSSSWWSSCWWWWWWWWW",
-				"WWFFWWSSSWWSSSWWWWWWWWW",
-				"WWFFWWWSSWWSSSWWWWWWWWW",
-				"WWFFWWWSSWWSSSWWWWWWWWW",
-				"WWFFWWOSSWWSSSWWWWWWWWW",
-				"OOFFOOOOOOOSCCOOOOOOOOO",
-				"OOFOOOOOOOOSCCOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOO"
-			]
-		},
-		{
 			"id": "lightning",
 			"name": "Lightning",
+			"song": { "mode": "minor", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"G": "#9c9aa6",
 				"Y": "#ffd23f",
@@ -725,81 +515,9 @@
 			]
 		},
 		{
-			"id": "tractor-at-dusk",
-			"name": "Tractor at Dusk",
-			"palette": {
-				"R": "#e23838",
-				"C": "#34343c",
-				"A": "#f9a66c",
-				"G": "#f2b705",
-				"Q": "#7fe3e0",
-				"S": "#c9c9d2",
-				"P": "#ff6fb0"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"PPPPPPPPRRRRRRRRPPPPPPPPPPPPP",
-				"PPPPPPPPPRQQQQRPPPPPPPPPPPPPP",
-				"PPPPPPPPPRQQQQRPPPPPRPPPPPPPP",
-				"PPPPPPPPPRQQQQRPPPPPRPPPPPPPP",
-				"PPPPPPPPPRQQQQRPPPPPRPPPPPPPP",
-				"PPPPPPPPPRRRRRRRRRRRRRRPPPPPP",
-				"PPPPPPPPCCCCRRRRRRRRRRRPPPPPP",
-				"PPGGPPPCCCCCCCRRRRRRRRRPPGGPP",
-				"GGGGGGCCCCSCCCRRRRRRRRRGGGGGG",
-				"GGGGGGCCCSSSCCCRRRRRCCCGGGGGG",
-				"GGGGGGCCSSSSCCCGGGGCCCCCGGGGG",
-				"GGGGGGCCCSSSCCCGGGGCCCCCGGGGG",
-				"GGGGGGGCCCCCCCGGGGGCCCCCGGGGG",
-				"GGGGGGGCCCCCCCGGGGGGCCCGGGGGG",
-				"GGGGGGGGGCCCGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-			]
-		},
-		{
-			"id": "night-igloo",
-			"name": "Night Igloo",
-			"palette": {
-				"W": "#ffffff",
-				"N": "#1d2f5e",
-				"L": "#cdb6ef",
-				"S": "#94d4fb",
-				"B": "#141418",
-				"P": "#64329a"
-			},
-			"art": [
-				"NNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"PPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-				"PPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-				"PPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-				"PPPPPPPPPPPPSSPPPPPPPPPPPPPP",
-				"PPPPPPPPPSSSSSSSSPPPPPPPPPPP",
-				"PPPPPPPPPSWWWWWSSSPPPPPPPPPP",
-				"PPPPPPPPPSWWWWWSSSSPPPPPPPPP",
-				"PPPPLLSSSSSSSSSSSSSSPPPPPPPP",
-				"LLLLLLSWWWWWSWWWWWSWWWWWSLLL",
-				"LLLLLLSWWWWWSWWWWWSWWWWWSLLL",
-				"LLLLLSSSSSSSSSSSSSSSBBSSSLLL",
-				"LLLLLWWWWSWWWWWSWWWBBBBLLLLL",
-				"LLLLWWWWWSWWWWWSWWWBBBBLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
 			"id": "sheep",
 			"name": "Sheep",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"W": "#ffffff",
 				"B": "#141418",
@@ -832,41 +550,6 @@
 				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
 				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
 				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
-			"id": "airplane-at-dusk",
-			"name": "Airplane at Dusk",
-			"palette": {
-				"W": "#ffffff",
-				"R": "#e23838",
-				"S": "#fa9e8a",
-				"L": "#cdb6ef",
-				"A": "#5aa9f5",
-				"O": "#ff8c2e"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSLLLLSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSLLWWLSSSSSSSSSSSSSSSSSSSSSS",
-				"OOLLWWWOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOWWWWOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOWWWWWOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOWWWWAAAAAAAAAAAAAOOOOOOO",
-				"OOOOWWWWWAAAAAAAAAAAAAOOOOOOO",
-				"OOOOOOOOOWWWRRRROOOOOOOOOOOOO",
-				"OOOOOOOOOOORRRRROOOOOOOOOOOOO",
-				"OOOOOOOOOOORRRROOOOOOOOOOOOOO",
-				"OOOLLLOOOOORRROOOLOOOOOOLLOOO",
-				"OOLLLLLOLLRRROOLLLLLOOLLLLLOO",
-				"OLLLLLLLLLLLLOLLLLLLOOLLLLLLO",
-				"OLLLLLLLLLLLLOLLLLLLLOLLLLLLO",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
 			]
 		}
 	]

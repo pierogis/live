@@ -452,10 +452,10 @@ test('later deals make you wait: waits and long-held linked pairs are common', (
 	assert.ok(withHeld >= later.length * 0.7, `${withHeld} of ${later.length} hold a pair long`);
 });
 
-test('forage level ids are unique and there are at least 200 levels', () => {
+test('forage level ids are unique and there are at least 150 levels', () => {
 	const ids = LEVELS.map((l) => l.id);
 	assert.equal(new Set(ids).size, ids.length);
-	assert.ok(ids.length >= 200);
+	assert.ok(ids.length >= 150);
 });
 
 test('difficulty: cruxes cap and floor the rating from wins', () => {
@@ -535,12 +535,15 @@ test("a level's deal string says which column each colony goes to; a bad one is 
 test('tuned levels: teaching ones have no cruxes, late ones several rule breaks', () => {
 	if (LEVELS.some((l) => l.cruxes === undefined)) return; // not tuned yet
 	for (const l of LEVELS.slice(0, 5)) assert.equal(l.cruxes, 0, l.id);
-	const late = LEVELS.slice(160);
+	// Places in play as parts of the whole: the last fifth is "late".
+	const at = (part: number) => Math.round(part * LEVELS.length);
+	const late = LEVELS.slice(at(0.8));
 	const breaks = late.reduce((n, l) => n + (l.breaks ?? 0), 0) / late.length;
 	assert.ok(breaks >= 2, `late levels average ${breaks.toFixed(1)} rule breaks`);
 	const pips = LEVELS.map((l) => difficultyIndex(l.wins, l)!);
 	const avg = (from: number, to: number) =>
 		pips.slice(from, to).reduce((a, b) => a + b) / (to - from);
-	assert.ok(avg(0, 5) <= 1.2 && avg(160, 200) >= 4, 'rises from 1 to about 5');
-	assert.ok(avg(60, 100) < avg(160, 200) - 0.8, 'the first hundred end in the middle of the curve');
+	const last = avg(at(0.8), LEVELS.length);
+	assert.ok(avg(0, 5) <= 1.2 && last >= 4, 'rises from 1 to about 5');
+	assert.ok(avg(at(0.3), at(0.5)) < last - 0.8, 'the first half ends in the middle of the curve');
 });

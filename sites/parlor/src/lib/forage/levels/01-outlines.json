@@ -4,6 +4,7 @@
 		{
 			"id": "locket",
 			"name": "Locket",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": { "B": "#fff4d6", "K": "#24212b", "R": "#e63946", "P": "#ff7eb6", "C": "#9ad0c2" },
 			"art": [
 				"BBBBBBBBBBBBBBBBBBBB",
@@ -34,6 +35,7 @@
 		{
 			"id": "dunes",
 			"name": "Dunes",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"U": "#3b7dd8",
 				"K": "#24212b",
@@ -74,6 +76,7 @@
 		{
 			"id": "reef-fish",
 			"name": "Reef Fish",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"S": "#2f86c9",
 				"b": "#7fe0d6",
@@ -116,6 +119,7 @@
 		{
 			"id": "drifter",
 			"name": "Drifter",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#8fd3ff",
 				"K": "#24212b",
@@ -162,6 +166,7 @@
 		{
 			"id": "bullseye",
 			"name": "Bullseye",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": { "B": "#a8dcff", "K": "#1c2340", "R": "#e63946", "W": "#ffffff", "Y": "#ffd23f" },
 			"art": [
 				"BBBBBBBBBBBBBBBBBBBBBBBB",
@@ -198,6 +203,7 @@
 		{
 			"id": "pantry-jar",
 			"name": "Pantry Jar",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"B": "#f2c46d",
 				"K": "#24212b",
@@ -243,6 +249,7 @@
 		{
 			"id": "beacon",
 			"name": "Beacon",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"B": "#9fd6f7",
 				"Q": "#000000",
@@ -290,6 +297,7 @@
 		{
 			"id": "mushroom",
 			"name": "Mushroom",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"B": "#9fd6f7",
 				"G": "#2e7d32",
@@ -333,6 +341,7 @@
 		{
 			"id": "sloop",
 			"name": "Sloop",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#a8dcff",
 				"Y": "#ffd23f",
@@ -376,6 +385,7 @@
 		{
 			"id": "crystal",
 			"name": "Crystal",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"B": "#2f3f74",
 				"K": "#000000",
@@ -417,6 +427,7 @@
 		{
 			"id": "liftoff",
 			"name": "Liftoff",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"K": "#141a33",
 				"N": "#2f6f8f",
@@ -466,6 +477,7 @@
 		{
 			"id": "night-tree",
 			"name": "Night Tree",
+			"song": { "mode": "dorian", "spice": "adventurous" },
 			"palette": {
 				"K": "#1c2340",
 				"Y": "#ffe27a",

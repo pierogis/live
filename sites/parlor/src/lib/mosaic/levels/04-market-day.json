@@ -4,6 +4,7 @@
 		{
 			"id": "painted-houses",
 			"name": "Painted Houses",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": {
 				"R": "#e23838",
 				"Y": "#ffd23f",
@@ -40,84 +41,9 @@
 			]
 		},
 		{
-			"id": "morning-tugboat",
-			"name": "Morning Tugboat",
-			"palette": {
-				"R": "#e23838",
-				"W": "#ffffff",
-				"L": "#cdb6ef",
-				"A": "#5aa9f5",
-				"N": "#1d2f5e",
-				"B": "#141418",
-				"S": "#7d776e"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLSSSSLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLSSSSSLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLSSSSLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLSSLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLBBLLLLLLLL",
-				"LLLLLLLLLLLLLWWWWWWLLLBBLLLLLLLL",
-				"LLLLLLLLLLLLLWNNNNWLLLBBLLLLLLLL",
-				"LLLLLLLLLLLWWWWWWWWWWLBBLLLLLLLL",
-				"LLLLLLLLLLLWNNWNNWNNWLBBLLLLLLLL",
-				"LLLLLLLLLLLWNNWNNWNNWLBBLLLLLLLL",
-				"LLLLLLLLLLLWWWWWWWWWWLBBLLLLLLLL",
-				"LLLLLLLLLLLWWWWWWWWWWLBBLLLLLLLL",
-				"LLLLRRRRRRRRRRRRRRRRRRRRRRRRLLLL",
-				"AAAARRRRRRRRRRRRRRRRRRRRRRRRAAAA",
-				"AAAAARRRRRRRRRRRRRRRRRRRRRRAAAAA",
-				"AAAAAARRRRRRRRRRRRRRRRRRRRRAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-			]
-		},
-		{
-			"id": "morning-desert-island",
-			"name": "Morning Desert Island",
-			"palette": {
-				"S": "#efd08f",
-				"B": "#8a552c",
-				"G": "#2e9a50",
-				"L": "#f8c3d0",
-				"U": "#3b82e0",
-				"T": "#33c3c6",
-				"Y": "#ffd23f"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLGLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLGGLLGGLGGGLLLLLLLLLLLL",
-				"LLLLLYYYGGGGGGGGGGLLLLLLLLLLLL",
-				"LLLLLYYYYYGGGGGGLLLLLLLLLLLLLL",
-				"LLLLLYYGGGGGGGGGGGLLLLLLLLLLLL",
-				"LLLLLYGGGGGGGGGGGGGGLLLLLLLLLL",
-				"LLLLLLGGGGGLLBBGGGGLLLLLLLLLLL",
-				"LLLLLLGGGGLLLBBLGGGGLLLLLLLLLL",
-				"LLLLLLGGLLLLLBBBLLGGLLLLLLLLLL",
-				"LLLLLLLLLLLLLBBBLLLLLLLLLLLLLL",
-				"UUUUUUUUUUUUUUBBUUUUUUUUUUUUUU",
-				"UUUUUUUUUUUUUUBBUUUUUUUUUUUUUU",
-				"UUUUUUTTTTTTTTBBUUUUUUUUUUUUUU",
-				"UUUTTTTSSSSSSSBBSSUUUUTTUUUUUU",
-				"UUTTTSSSSSSSSSSSSSSSSSTTTUUUUU",
-				"UUTTTSSSSSSSSSSSSSSSSSTTTUUUUU",
-				"UUTTTTTTSSSSSSSSSSSTTTTTTUUUUU",
-				"UUUUTTTTTTTTTTTTTTTTTTTUUUUUUU",
-				"UUUUUUUTTTTTTTTTTTTTUUUUUUUUUU",
-				"UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU"
-			]
-		},
-		{
 			"id": "mallard",
 			"name": "Mallard",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"S": "#c9c9d2",
 				"F": "#1d5a32",
@@ -155,46 +81,9 @@
 			]
 		},
 		{
-			"id": "snowy-pines",
-			"name": "Snowy Pines",
-			"palette": {
-				"P": "#103d2c",
-				"S": "#94d4fb",
-				"W": "#ffffff",
-				"B": "#8a552c",
-				"Y": "#ffd23f",
-				"L": "#a996ec",
-				"A": "#e8891c"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSYSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSYYYSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSYYYSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSYYYSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSLLSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSLLLLSSSSSSSSSLLLSSSSSSS",
-				"SSSSLLLLLLSSSSSSSSLLLLSSSSSS",
-				"SSSLLLLLLPLSSSSSLLLLLLLSSSSS",
-				"SPLLLLLLLPLLSSSLLLLLLLLLSSSS",
-				"SPLLLLLLLPLLSSWWLLLLLLLLLSSS",
-				"SPLLLLLLLPPLLWWWLLLLLLLLLPPS",
-				"PPLLLLLLPPPLWWWWWWPLLLLLLPPS",
-				"PPPLLLLLPPPLAAAABBPLLLLLLPPP",
-				"PPPLLLLLPPPWAAAAABPPWWWWWPPP",
-				"PPPWWWWWPPPWAAAAABPPWWWWPPPP",
-				"PPPWWWWWPPPWWWAABBPPWWWWWPPP",
-				"PPPWWWWPPPPPWWWWWPPPWWWWPPPP",
-				"PPPPWWWWWPWWWWWWWPPPPWWWPPPP",
-				"WWWWWWWWWWWWWWWWWWPWWWWWWWWW",
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-				"WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-			]
-		},
-		{
 			"id": "layer-cake",
 			"name": "Layer Cake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"T": "#d4a373",
 				"W": "#ffffff",
@@ -236,6 +125,7 @@
 		{
 			"id": "mint-cupcake",
 			"name": "Mint Cupcake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"C": "#2350c8",
 				"A": "#7fe3e0",
@@ -279,6 +169,7 @@
 		{
 			"id": "gift-box",
 			"name": "Gift Box",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"C": "#2350c8",
 				"G": "#f2b705",
@@ -318,6 +209,7 @@
 		{
 			"id": "humpback-whale",
 			"name": "Humpback Whale",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"S": "#4a5566",
 				"A": "#f9a66c",
@@ -353,6 +245,7 @@
 		{
 			"id": "hidden-falls",
 			"name": "Hidden Falls",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"S": "#7d776e",
 				"W": "#ffffff",
@@ -396,6 +289,7 @@
 		{
 			"id": "lantern-festival-by-moonlight",
 			"name": "Lantern Festival by Moonlight",
+			"song": { "mode": "minor", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"R": "#e23838",
 				"N": "#1d2f5e",
@@ -435,6 +329,7 @@
 		{
 			"id": "volcano",
 			"name": "Volcano",
+			"song": { "mode": "phrygian", "spice": "adventurous", "lead": "brass" },
 			"palette": {
 				"C": "#4b2716",
 				"O": "#ff8c2e",
@@ -472,6 +367,7 @@
 		{
 			"id": "night-visitors",
 			"name": "Night Visitors",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "pizz" },
 			"palette": {
 				"S": "#c9c9d2",
 				"A": "#7fe3e0",
@@ -511,6 +407,7 @@
 		{
 			"id": "cherry-tree-at-sunset",
 			"name": "Cherry Tree at Sunset",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"F": "#1d5a32",
 				"C": "#a3123a",
@@ -552,51 +449,9 @@
 			]
 		},
 		{
-			"id": "penguin",
-			"name": "Penguin",
-			"palette": {
-				"C": "#34343c",
-				"R": "#fff1cc",
-				"A": "#5aa9f5",
-				"I": "#c9ecfb",
-				"O": "#ff8c2e",
-				"Y": "#ffd23f",
-				"B": "#2350c8"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAYYYAAA",
-				"AAAAAAAAAAACCAAAAYYYYAAA",
-				"AAAAAAAAACCCCCCAAYYYYAAA",
-				"AAAAAAAAACCCCCCAAAYYYAAA",
-				"AAAAAAAACCCCCCCCAAAAAAAA",
-				"AAAAAAAACCRRRRCCAAAAAAAA",
-				"AAAAAAAACRRRRRRCAAAAAAAA",
-				"AAAAAAAACCRRRRCCAAAAAAAA",
-				"AAAAAAAACOCRRCCCAAAAAAAA",
-				"AAAAAAACOORRRRCCCAAAAAAA",
-				"AAAAAAACCRRRRRRCCAAAAAAA",
-				"AAAAAACCCRRRRRRCCCAAAAAA",
-				"BBBBBBCCCRRRRRRCCCBBBBBB",
-				"BBBBBBCCCRRRRRRCCCBBBBBB",
-				"BBBBBBCCRRRRRRRRCCBBBBBB",
-				"BBBBBCCCRRRRRRRRCCCBBBBB",
-				"BBBBBCCCRRRRRRRRCCCBBBBB",
-				"BBBBBCCCCRRRRRRCCBCBBBBB",
-				"BBBIIIICCRRRRRRCCBBBBBBI",
-				"IIIIIIIICRRRRRRCIIIIIIII",
-				"IIIIIIIICRRRRRRCIIIIIIII",
-				"IIIIIIIIICRRRRCIIIIIIIII",
-				"IIIIIIIIIOORROOIIIIIIIII",
-				"IIIIIIIIIOOOOOOIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIII"
-			]
-		},
-		{
 			"id": "astronaut",
 			"name": "Astronaut",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"W": "#ffffff",
 				"G": "#f2b705",
@@ -641,6 +496,7 @@
 		{
 			"id": "guitar",
 			"name": "Guitar",
+			"song": { "mode": "major", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"A": "#e8891c",
 				"B": "#141418",
@@ -688,6 +544,7 @@
 		{
 			"id": "autumn-lane",
 			"name": "Autumn Lane",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"O": "#ff8c2e",
 				"A": "#5aa9f5",
@@ -726,6 +583,7 @@
 		{
 			"id": "busy-bee",
 			"name": "Busy Bee",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"Y": "#ffd23f",
 				"B": "#141418",
@@ -767,6 +625,7 @@
 		{
 			"id": "red-canyon-at-dawn",
 			"name": "Red Canyon at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"R": "#b5481b",
 				"L": "#cdb6ef",
@@ -808,6 +667,7 @@
 		{
 			"id": "aurora",
 			"name": "Aurora",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"L": "#a8dc42",
 				"N": "#161c38",
@@ -846,6 +706,7 @@
 		{
 			"id": "cactus-on-the-sill-by-moonlight",
 			"name": "Cactus on the Sill by Moonlight",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "string" },
 			"palette": {
 				"R": "#b5481b",
 				"L": "#5cb948",
@@ -894,6 +755,7 @@
 		{
 			"id": "poppies",
 			"name": "Poppies",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"T": "#159a94",
 				"S": "#9db894",
@@ -938,6 +800,7 @@
 		{
 			"id": "planet-and-moons",
 			"name": "Planet and Moons",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"S": "#efd08f",
 				"O": "#ff8c2e",

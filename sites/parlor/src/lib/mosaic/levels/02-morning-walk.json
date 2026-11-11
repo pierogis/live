@@ -2,61 +2,9 @@
 	"name": "Morning Walk",
 	"levels": [
 		{
-			"id": "elephant",
-			"name": "Elephant",
-			"palette": { "G": "#9c9aa6", "S": "#94d4fb", "A": "#efd08f", "Y": "#ffd23f", "W": "#ffffff" },
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSYYSSSSSSSSSSSSSS",
-				"SSSSSSSSSYYYYSSSSSSSSSSSSS",
-				"SSSSSSSSSYYYSSSSSSSSSSSSSS",
-				"SSSSSSSSSSYYSSSSSSSSSSSSSS",
-				"WWWWWWWWWWWWWWWWGGGGGWWWWW",
-				"WWWWWWWWWGGGGGGGGGGGGGWWWW",
-				"WWWWWWWWGGGGGGGGGGGGGGWWWW",
-				"WWWWWWGGGGGGGGGGGGGGGGGWWW",
-				"WWWWWWGGGGGGGGGGGGGGGGGWWW",
-				"WWWWWWGGGGGGGGGGGGGGGGGWWW",
-				"WWWWWGWWGGGGGGGGGGWWGGGGWW",
-				"WWWWWWWWGGGGGGGGGGWWWGGGWW",
-				"WWWWWWWWGGGGGGGGGGWWWGGGWW",
-				"WWWWWWWWGGGGGGGGGGWWWGGGWW",
-				"AAWWAAAAGAGGAAGGAGAAAGGGAA",
-				"AAAAAAAAAAAAAAAAAAAAAGAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAA"
-			]
-		},
-		{
-			"id": "night-village",
-			"name": "Night Village",
-			"palette": { "Y": "#ffd23f", "C": "#fff1cc", "N": "#161c38", "F": "#1d5a32", "I": "#3a3a96" },
-			"art": [
-				"NNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNNN",
-				"IIIIIIIIIIIIIIIIIIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIIIII",
-				"IIIIIIIIIIIIIIIIIIIIIIIIII",
-				"FCCCCCCIFFIIIIIFFIIIIIIIIF",
-				"FCCCCCCFFIIIIIIIFCCCCCCFIF",
-				"FCYYCYYFFCCCCCCFFCYYCYYFFF",
-				"FFYYCYYFFCYYYYYFFCYYCYYFFF",
-				"FCCCCCCFFCYYYYYFFCCCCCCFFF",
-				"FCCCCCCFFCCYYFFFFCCCCCCFFF",
-				"FCCCCCCFFCCYYFFFFCCCCCCFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFF"
-			]
-		},
-		{
 			"id": "morning-white-duck",
 			"name": "Morning White Duck",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": { "W": "#ffffff", "L": "#cdb6ef", "B": "#3b82e0", "O": "#ff8c2e", "R": "#8a552c" },
 			"art": [
 				"LLLLLLLLLLLLLLLLLLLLLLLLL",
@@ -84,6 +32,7 @@
 		{
 			"id": "morning-lemon-tree",
 			"name": "Morning Lemon Tree",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": { "F": "#1d5a32", "Y": "#ffd23f", "B": "#f8c3d0", "L": "#5cb948", "R": "#8a552c" },
 			"art": [
 				"BBBBBBBBBBBBBBBBBBBBBBB",
@@ -114,6 +63,7 @@
 		{
 			"id": "red-fox",
 			"name": "Red Fox",
+			"song": { "mode": "major", "spice": "lively", "lead": "pizz" },
 			"palette": { "A": "#e8891c", "W": "#ffffff", "S": "#9db894", "B": "#141418", "O": "#7c7d2a" },
 			"art": [
 				"SSSSSSSSSSSSSSSSSSSSSS",
@@ -142,66 +92,9 @@
 			]
 		},
 		{
-			"id": "morning-waterfall",
-			"name": "Morning Waterfall",
-			"palette": { "S": "#7d776e", "W": "#ffffff", "L": "#cdb6ef", "B": "#3b82e0", "E": "#5cb948" },
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLL",
-				"LELLLLLLLLLLLLLLLLEL",
-				"LELLLLLLLLLLLLLLLLEL",
-				"LEELLLLLLLLLLLLLEEEL",
-				"EEEEELLLLLLLLLEEEEEE",
-				"EEEEEEELLLLLEEEEEEEE",
-				"EEEEEEEEWWWWEEEEEEEE",
-				"SSSSSSSSWWWWSSSSSSSS",
-				"SSSSSSSSWWWWSSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWWWWWSSSSSSS",
-				"SSSSSSSSWBBWSSSSSSSS",
-				"BBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBB"
-			]
-		},
-		{
-			"id": "night-paper-lanterns",
-			"name": "Night Paper Lanterns",
-			"palette": { "R": "#e23838", "N": "#1f3b78", "P": "#b48ae6", "B": "#0e0e12", "W": "#ffffff" },
-			"art": [
-				"NNNNNNNNNNNNNNNNNNNNNNNNN",
-				"WWNNNNNNNNNNNNNNNNNNNNNWW",
-				"NWWWWWWNNNNNNNNNNNWWWWWWN",
-				"NNRRRRWWWWWWWWWWWWWRRRRNN",
-				"NRRRRRRNNNNRRRNNNNRRRRRRN",
-				"NRRRRRRNNNRRRRRNNNRRRRRRN",
-				"NRRRRRRNNRRRRRRRNNRRRRRRN",
-				"NNNRRRNNNNRRRRRNNNNRRRNNN",
-				"NNNNNNNNNNNRRRNNNNNNNNNNN",
-				"NNNNNNNNNNNNNNNNNNNNNNNNN",
-				"PPPPPPPPPPPPPPPPPPPPPPPPP",
-				"PPPPPPPPPPPPPPPPPPPPPPPPP",
-				"BBBPPPPPPPPPPPPPPPPPPPPPP",
-				"BBBPPPPPPPPPPPPPPPPPPPBBB",
-				"BBBBPPPPPPPPPPPPPPPPPPBBB",
-				"BBBBBBBBBBBPPPPPPPPPPPBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBBBB"
-			]
-		},
-		{
 			"id": "city-bus",
 			"name": "City Bus",
+			"song": { "mode": "major", "spice": "lively", "lead": "brass" },
 			"palette": { "R": "#e23838", "I": "#c9ecfb", "A": "#5aa9f5", "S": "#4a5566", "B": "#141418" },
 			"art": [
 				"AAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -227,6 +120,7 @@
 		{
 			"id": "gas-giant",
 			"name": "Gas Giant",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": { "S": "#efd08f", "O": "#ff8c2e", "N": "#161c38", "I": "#3a3a96", "T": "#5f7f9f" },
 			"art": [
 				"NNNNNNNNNNNNNNNNNNNNNNNN",
@@ -254,6 +148,7 @@
 		{
 			"id": "ice-cream-cone",
 			"name": "Ice Cream Cone",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": { "P": "#ff6fb0", "S": "#94d4fb", "C": "#a3123a", "B": "#8a552c", "T": "#5f7f9f" },
 			"art": [
 				"SSSSSSSSSSCCSSSSSSSS",
@@ -286,35 +181,9 @@
 			]
 		},
 		{
-			"id": "big-wave-at-dusk",
-			"name": "Big Wave at Dusk",
-			"palette": { "C": "#2350c8", "W": "#ffffff", "A": "#f9a66c", "Z": "#5aa9f5", "T": "#33c3c6" },
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAWWAAAAAAAAAAAAAAA",
-				"AAAAAAWWWWWWAAAAAAAAAAAAA",
-				"AAAAAWWTTTTCWCAAAAAAAAAAA",
-				"AAAAWWTTTTTTCWCCCAAAAAAAA",
-				"AAAAWWTTTTTTCCCCCCCCAAAAA",
-				"AAAAWTTTTTTTTCCCCCCCCCAAA",
-				"AAAAWWTTTTTTTCCCCCCCCCCCC",
-				"AAAAWWTTTTTTTTTTTTTTTTTTT",
-				"AAAACTTTTTTTTTTTTTTTTTTTT",
-				"ZZZCCCTTTTTTTTTTTTTTTTTTT",
-				"ZZZCCCCCTTTTTTTTTTTTTTTTT",
-				"ZZCCCCCCCCCCCCCCCCCCCCCCC",
-				"ZZCCCCCCCCCCCCCCCCCCCCCCC",
-				"ZZZZZZZZZZZZZZZZZZZZZZZZZ",
-				"ZZZZZZZZZZZZZZZZZZZZZZZZZ",
-				"ZZZZZZZZZZZZZZZZZZZZZZZZZ",
-				"ZZZZZZZZZZZZZZZZZZZZZZZZZ"
-			]
-		},
-		{
 			"id": "pepperoni-pizza",
 			"name": "Pepperoni Pizza",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"C": "#c57b38",
 				"Y": "#ffd23f",
@@ -351,42 +220,9 @@
 			]
 		},
 		{
-			"id": "red-barn",
-			"name": "Red Barn",
-			"palette": {
-				"R": "#e23838",
-				"S": "#94d4fb",
-				"L": "#5cb948",
-				"C": "#34343c",
-				"W": "#ffffff",
-				"O": "#7c7d2a"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSCCCCSSSSSS",
-				"SSLLLLSSSSSSSSSCCCCCCCSSSSS",
-				"SSLLLLLSSSSSSSSCCCWWCCCSSSS",
-				"SSLLLLLSSSSSSSCCCCWWCCCSSSS",
-				"SSLLLLLLLLLSSSSRRRRRRRRSSSL",
-				"LLLLLLLLLLLLSSSRRRRRRRRLLLL",
-				"LLLLLLLLLLLLSSSRRRRRRRRLLLL",
-				"LLLLLLLLLLLLSSSRRWWWWRRLLLL",
-				"LLLLLLLLLLLLSSSRRWWWWRRLLLL",
-				"LLLLLLLLLLLLSSSRRWWWWRRLLLL",
-				"LLLLLLLLLLLLSSSRRWWWWRRLLLL",
-				"OOOOOOOOOOOOOOOOOWOOWOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOO"
-			]
-		},
-		{
 			"id": "sapphire",
 			"name": "Sapphire",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": { "A": "#5aa9f5", "C": "#2350c8", "N": "#161c38", "R": "#a3123a", "E": "#fff1cc" },
 			"art": [
 				"NNNNNNNNNNNNNNNNNNNNNNN",
@@ -417,6 +253,7 @@
 		{
 			"id": "green-car",
 			"name": "Green Car",
+			"song": { "mode": "major", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"L": "#5cb948",
 				"B": "#141418",
@@ -450,6 +287,7 @@
 		{
 			"id": "morning-sunflower",
 			"name": "Morning Sunflower",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"Y": "#ffd23f",
 				"B": "#8a552c",
@@ -489,90 +327,9 @@
 			]
 		},
 		{
-			"id": "potted-cactus",
-			"name": "Potted Cactus",
-			"palette": {
-				"R": "#b5481b",
-				"G": "#2e9a50",
-				"S": "#9db894",
-				"C": "#4b2716",
-				"P": "#ff6fb0",
-				"L": "#a8dc42"
-			},
-			"art": [
-				"SSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSPSSSSSSSSSS",
-				"SSSSSSSSSPPPSSSSSSSSS",
-				"SSSSSSSSSGPGSSSSSSSSS",
-				"SSSSSSSSSGGGSSSSSSSSS",
-				"SSSSSSSSSGGGSSSSSSSSS",
-				"SSSSSGGSSGGGSSSSSSSSS",
-				"SSSSSGGSSGGGSSSSSSSSS",
-				"SSSSSGGSSGGGSSGSSSSSS",
-				"SSSSSGGSSGGGSSGSSSSSS",
-				"LLLLLGGGGGGGGGGLLLLLL",
-				"LLLLLGGGGGGGGGGLLLLLL",
-				"LLLLLLLLLGGGGGGLLLLLL",
-				"LLLLLLLLLGGGGGGLLLLLL",
-				"LLLLLLLLLGGGLLLLLLLLL",
-				"LLLLLLLLLGGGLLLLCCCLL",
-				"LLLLLLLRRGGGRRLLCCCLL",
-				"LCCCCCRRRRRRRRRCCCCCL",
-				"LCCCCCCRRRRRRRCCCCCCL",
-				"LLLLLLLRRRRRRRLLLLLLL",
-				"LLLLLLLRRRRRRRLLLLLLL",
-				"LLLLLLLRRRRRRRLLLLLLL",
-				"LLLLLLLLRRRRRLLLLLLLL",
-				"LLLLLLLLRRRRRLLLLLLLL",
-				"LLLLLLLLRRRRRLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
-			"id": "morning-kite",
-			"name": "Morning Kite",
-			"palette": {
-				"R": "#e23838",
-				"B": "#f8c3d0",
-				"G": "#2e9a50",
-				"Y": "#ffd23f",
-				"O": "#8a552c",
-				"A": "#f9a66c"
-			},
-			"art": [
-				"BBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBRBBBBBBBBB",
-				"BBBBBBBBBBBBRRBBBBBBBB",
-				"BBBBBBBBBBBYRRBBBBBBBB",
-				"BBBBBBBBBBYYRRRBBBBBBB",
-				"BBBBBBBBBBYYRRRRBBBBBB",
-				"BBBBBBBBBYYYRRRRBBBBBB",
-				"BBBBBBBBRRRRRRRRRRBBBB",
-				"BBBBBBBBBRRRRYYYYBBBBB",
-				"BBBBBBBBBRRRRYYYBBBBBB",
-				"BBBBBBBBBBRRRYYYBBBBBB",
-				"AAAAAAAAAARRRYYAAAAAAA",
-				"AAAAAAAAAAARRYYAAAAAAA",
-				"AAAAAAAAAAAARYAAAAAAAA",
-				"AAAAAAAAAAAARAAAAAAAAA",
-				"AAAAAAAAAAAARAAAAAAAAA",
-				"AAAAAAAAAAAOOAAAAAAAAA",
-				"AAAAAAAAAAAOAAAAAAAAAA",
-				"AAAAAAAAAAOOAAAAAAAAAA",
-				"AAAAAAAAAOAAAAAAAAAAAA",
-				"AAAAAAAAOAAAAAAAAAAAAA",
-				"AAAAAAAOAAAAAAGGGGGGGG",
-				"GGGGGGOOGGGGGGGGGGGGGG",
-				"GGGGGOOGGGGGGGGGGGGGGG",
-				"GGGGGOGGGGGGGGGGGGGGGG",
-				"GGGGOGGGGGGGGGGGGGGGGG"
-			]
-		},
-		{
 			"id": "black-cat-at-night",
 			"name": "Black Cat at Night",
+			"song": { "mode": "minor", "spice": "lively", "lead": "pizz" },
 			"palette": { "C": "#34343c", "S": "#9db894", "B": "#8a552c", "W": "#ffffff", "L": "#a8dc42" },
 			"art": [
 				"SSSSSSSSSSSSSSSSSSSSS",
@@ -602,46 +359,9 @@
 			]
 		},
 		{
-			"id": "ferris-wheel",
-			"name": "Ferris Wheel",
-			"palette": {
-				"W": "#ffffff",
-				"R": "#e23838",
-				"A": "#5aa9f5",
-				"F": "#1d5a32",
-				"Q": "#7fe3e0",
-				"G": "#f2b705"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAWWAAAAAAAAAAA",
-				"AAAAAAAAWWWWWWWWAAAAAAAA",
-				"AAAAAARRRWAAAAWGGGAAAAAA",
-				"AAAAAWRRRAAAAAAGGGWAAAAA",
-				"AAAAAWRRRAAAAAAGGGWAAAAA",
-				"AAAAWWAAWAAAAAAWAAWWAAAA",
-				"AAAAWWAAAWAAAAWAAAWWAAAA",
-				"AAAAWAAAAAWAAWAAAAAWAAAA",
-				"AAAWWAAAAAAWWAAAAAAWWAAA",
-				"AAAWWAAAAAWWWWAAAAAWWAAA",
-				"AARRRAAAAAWWWWAAAAARRRAA",
-				"AARRRAAAAWWWWWWAAAARRRAA",
-				"AQRRRWWWWWWQQWAWAAWRRRQQ",
-				"QQQQQWWWWWWQQWWWWWWQQQQQ",
-				"QQQQQWWWWWWQQWWWWWWQQQQQ",
-				"QQQQQWWWWWQQQQWWWWWQQQQQ",
-				"QQQQQQQQWWWWWWWWQQQQQFQQ",
-				"QQQQQQRRRQWWWWQGGGQQFFQQ",
-				"QQQQQQRRRQQQQQQGGGQFFFFQ",
-				"QQQQQQRRRQQQQQQGGGQFFFFQ",
-				"FFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFF"
-			]
-		},
-		{
 			"id": "night-mushrooms",
 			"name": "Night Mushrooms",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "pizz" },
 			"palette": {
 				"C": "#fff1cc",
 				"V": "#8a55d8",
@@ -677,44 +397,9 @@
 			]
 		},
 		{
-			"id": "watermelon",
-			"name": "Watermelon",
-			"palette": {
-				"F": "#1d5a32",
-				"P": "#ff6fb0",
-				"L": "#fff176",
-				"I": "#a8dc42",
-				"C": "#2350c8",
-				"O": "#7c7d2a"
-			},
-			"art": [
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLFFIIPPPPPPPPPPPIIFFLLLL",
-				"LLLLFFIIPPPPPPPPPPPIIFFLLLL",
-				"LLLLLFIIPPPPPPPPPPPIIFLLLLL",
-				"LLLLLFFIIPPPPPPPPPIIFFLLLLL",
-				"LLLLLLFFIIPPPPPPPIIFFLLLLLL",
-				"LLLLLLFFFIIIPPPIIIFFFLLLLLL",
-				"LLLLLLLFFFIIIIIIIFFFLLLLLLL",
-				"OOOOOOOOOFFFFFFFFFOOOOOOOOO",
-				"OOOOOOOOOOOFFFFFOOOOOOOOOOO",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC",
-				"CCCCCCCCCCCCCCCCCCCCCCCCCCC"
-			]
-		},
-		{
 			"id": "ladybug",
 			"name": "Ladybug",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"B": "#141418",
 				"R": "#e23838",
@@ -753,6 +438,7 @@
 		{
 			"id": "pond-frog",
 			"name": "Pond Frog",
+			"song": { "mode": "major", "spice": "lively", "lead": "pizz" },
 			"palette": { "O": "#7c7d2a", "A": "#5aa9f5", "F": "#1d5a32", "B": "#141418", "T": "#33c3c6" },
 			"art": [
 				"AAAAAAAAAAAAAAAAAAAAAAAAA",

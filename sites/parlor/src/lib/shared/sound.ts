@@ -64,7 +64,7 @@
  * own out-of-tune overtones or frequency modulation, its own way of moving (a
  * scoop, a pluck's settling pitch), and each color its own place left or right.
  */
-import { makeRng, pickOne, type Rng } from './engine.ts';
+import { hashStr, makeRng, pickOne, type Rng } from './engine.ts';
 import { lab } from './palette.ts';
 
 /**
@@ -610,11 +610,19 @@ function pair(r: Rng, loop: number[], start: number, style: Style, m: number[], 
 
 /**
  * Level `seed`'s style; only a game whose rhythm has a `feel` gets 3/4 or swing,
- * or, adventurous, 5/4 or 7/8.
+ * or, adventurous, 5/4 or 7/8 (or the level's `fixed` meter).
  */
-function styleOf(r: Rng, mode: string, feel: boolean, spice: number, drawn = mode): Style {
-	const meter: Meter =
+function styleOf(
+	r: Rng,
+	mode: string,
+	feel: boolean,
+	spice: number,
+	drawn = mode,
+	fixed?: number
+): Style {
+	let meter: Meter =
 		feel && r() < spice * 0.3 ? pickOne([5, 7] as const, r) : feel && r() < 0.3 ? 3 : 4;
+	if (feel && fixed && fixed in STRONG) meter = fixed as Meter;
 	const swing = feel && meter === 4 && r() < 0.4 ? pickOne([0.2, 1 / 3], r) : 0;
 	const lo = Math.floor(r() * 4);
 	const hi = lo + 10 + Math.floor(r() * 3) + (spice > 0.6 ? 2 : 0);
@@ -648,12 +656,51 @@ function spiceUp(v: Rng, notes: Note[], style: Style) {
 }
 
 /**
- * A level's own say over its song (`song` in its level file): its key, a note
- * name like `G` or `F#`, and its mode, like `minor`. The rest stays the seed's.
+ * A level's own say over its song (`song` in its level file), so it suits the
+ * picture; whatever it leaves out stays the seed's.
  */
-export interface SongKey {
-	key: string;
-	mode: string;
+export interface SongSettings {
+	/** Its key, a note name like `G` or `F#`: the song stays in it throughout, C and all. */
+	key?: string;
+	/** Its mode, like `minor` or `lydian` (see `MODES`). */
+	mode?: string;
+	/** How adventurous it is (see `SPICES`). */
+	spice?: string;
+	/** The instrument that leads its tune, like `harp` (see `LEADS`). */
+	lead?: string;
+	/**
+	 * The major key whose notes it uses, like `G`: its tonic is wherever its mode sits
+	 * in them (G's dorian is A, its mixolydian D). A mural's panels share one, so they
+	 * sound like one piece in different moods.
+	 */
+	notes?: string;
+	/** A name its motif is written from, in place of its seed: a mural's panels share their theme. */
+	theme?: string;
+	/** Beats to a bar, in a game whose rhythm has a `feel`: 3, 4, 5, or 7 (eighths). */
+	meter?: number;
+}
+/** Where each mode's tonic sits in the major key with its notes, in semitones above that key's (harmonic minor as minor). */
+const ROTATION: Record<string, number> = {
+	major: 0,
+	dorian: 2,
+	phrygian: 4,
+	lydian: 5,
+	mixolydian: 7,
+	minor: 9,
+	harmonic: 9
+};
+/** How adventurous a level's song can be told to be, as its `spice`. */
+export const SPICES: Record<string, number> = { gentle: 0.1, lively: 0.45, adventurous: 0.9 };
+
+/** What's wrong with a level's song settings, if anything: a mode, spice, lead or meter it can't have. */
+export function songProblem(song: SongSettings): string | null {
+	if (song.key !== undefined && !PITCHES.includes(song.key)) return `key ${song.key}`;
+	if (song.notes !== undefined && !PITCHES.includes(song.notes)) return `notes ${song.notes}`;
+	if (song.mode !== undefined && !MODES[song.mode]) return `mode ${song.mode}`;
+	if (song.spice !== undefined && !(song.spice in SPICES)) return `spice ${song.spice}`;
+	if (song.lead !== undefined && !LEADS.includes(song.lead as Voice)) return `lead ${song.lead}`;
+	if (song.meter !== undefined && !(song.meter in STRONG)) return `meter ${song.meter}`;
+	return null;
 }
 /** Note names, sharps then flats, by pitch class (mod 12). */
 const PITCHES = [
@@ -692,21 +739,30 @@ const PITCHES = [
  * open for A to come back. Each pass writes a new B and C, so the song keeps
  * changing around its theme. `fix` sets its key, and C stays in it.
  */
-export function compose(seed: number, pass = 0, feel = false, fix?: SongKey): Song {
+export function compose(seed: number, pass = 0, feel = false, fix?: SongSettings): Song {
 	const r = makeRng(seed || 1);
-	const spice = r() < 0.35 ? r() * 0.2 : 0.3 + r() * 0.7;
+	// Three songs in five gentle, one lively and one adventurous, unless the level says.
+	const u = r();
+	const w = r();
+	const drawn = u < 0.6 ? w * 0.15 : u < 0.8 ? 0.35 + w * 0.2 : 0.8 + w * 0.2;
+	const spice = fix?.spice !== undefined && fix.spice in SPICES ? SPICES[fix.spice] : drawn;
 	const picked = pickOne(MODE_ODDS, r);
-	const name = fix && MODES[fix.mode] ? fix.mode : picked;
+	const name = fix?.mode && MODES[fix.mode] ? fix.mode : picked;
 	const mode = MODES[name];
 	let tonic = pickOne(TONICS, r);
 	// A fixed key, in the octave nearest the one the seed picked.
-	const pc = fix ? PITCHES.indexOf(fix.key) % 12 : -1;
+	const at = (note: string) => PITCHES.indexOf(note) % 12;
+	const shared = fix?.notes && at(fix.notes) >= 0 ? (at(fix.notes) + ROTATION[name]) % 12 : -1;
+	const pc = fix?.key ? at(fix.key) : shared;
 	if (pc >= 0) tonic += ((pc - (tonic % 12) + 18) % 12) - 6;
 	const home: Key = { tonic, scale: mode.scale };
-	const style = styleOf(r, name, feel, spice, picked);
+	const style = styleOf(r, name, feel, spice, picked, fix?.meter);
 	const loop = pickOne(mode.loops, r);
 	const wide = spice > 0.6;
-	const theme = motif(r, style.leap, wide);
+	// A shared theme is written from its name, so every song on it has the same motif.
+	const theme = fix?.theme
+		? motif(makeRng(hashStr(fix.theme) || 1), 0.3)
+		: motif(r, style.leap, wide);
 	const opening = style.lo + 2 + Math.floor(r() * (style.hi - style.lo - 3));
 	const [a, a2] = pair(r, loop, opening, style, theme, ['open', 'home']);
 
@@ -719,9 +775,10 @@ export function compose(seed: number, pass = 0, feel = false, fix?: SongKey): So
 	const endB: End = v() < spice * 0.5 ? 'deceptive' : 'home';
 	const [b, b2] = pair(v, loopB, a[a.length - 1].deg + 2, style, second, ['open', endB]);
 	// A level that fixes its key stays in it: C goes on in another loop and motif, not another key.
+	const stay = !!fix?.key && pc >= 0;
 	const [awayName, shift] = pickOne(mode.away, v);
-	const away = MODES[fix ? name : awayName];
-	const there: Key = fix ? home : { tonic: home.tonic + shift, scale: away.scale };
+	const away = MODES[stay ? name : awayName];
+	const there: Key = stay ? home : { tonic: home.tonic + shift, scale: away.scale };
 	const [c, c2] = pair(v, pickOne(away.loops, v), opening, style, motif(v, style.leap, wide), [
 		'open',
 		'open'
@@ -1513,7 +1570,7 @@ export class Music {
 	readonly clock = new Clock();
 	#seed = 1;
 	/** The level's own key for its song, if it sets one. */
-	#fix: SongKey | undefined;
+	#fix: SongSettings | undefined;
 	/** The level's song, written the first time it plays. */
 	#written: Song | null = null;
 	#fill = false;
@@ -1571,7 +1628,7 @@ export class Music {
 	 * A new level: its own song, from the top, cool, with anything still ringing
 	 * cut off, and its beat starting now.
 	 */
-	seed(seed: number, rhythm: Rhythm, fix?: SongKey) {
+	seed(seed: number, rhythm: Rhythm, fix?: SongSettings) {
 		this.#seed = seed;
 		this.#fix = fix;
 		this.#pass = 0;
@@ -1608,6 +1665,8 @@ export class Music {
 		const r = makeRng(Math.imul(seed || 1, 0x2545f491) >>> 0 || 1);
 		let lead = pickOne(VOICE_ORDER, r);
 		if (!LEADS.includes(lead)) lead = pickOne(LEADS, r);
+		// Or the level's own, when its picture suggests one.
+		if (LEADS.includes(fix?.lead as Voice)) lead = fix!.lead as Voice;
 		voices.add(lead);
 		this.#lead = LEAD + lead;
 		this.hush();

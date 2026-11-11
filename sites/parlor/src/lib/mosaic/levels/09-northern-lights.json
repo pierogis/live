@@ -4,6 +4,7 @@
 		{
 			"id": "cottage-garden-at-sunset",
 			"name": "Cottage Garden at Sunset",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"C": "#fff1cc",
 				"G": "#f2b705",
@@ -54,6 +55,7 @@
 		{
 			"id": "ufo-over-the-farm",
 			"name": "UFO over the Farm",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"G": "#9c9aa6",
 				"A": "#7fe3e0",
@@ -103,6 +105,7 @@
 		{
 			"id": "blue-tang",
 			"name": "Blue Tang",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"C": "#2350c8",
 				"Y": "#ffd23f",
@@ -151,6 +154,7 @@
 		{
 			"id": "kite-at-dusk",
 			"name": "Kite at Dusk",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "flute", "meter": 3 },
 			"palette": {
 				"C": "#a3123a",
 				"S": "#fa9e8a",
@@ -206,6 +210,7 @@
 		{
 			"id": "bridge-at-sunset",
 			"name": "Bridge at Sunset",
+			"song": { "mode": "mixolydian", "spice": "lively" },
 			"palette": {
 				"R": "#e23838",
 				"C": "#34343c",
@@ -255,6 +260,7 @@
 		{
 			"id": "birthday-cake",
 			"name": "Birthday Cake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"P": "#ffc8a2",
 				"W": "#ffffff",
@@ -306,6 +312,7 @@
 		{
 			"id": "morning-penguin",
 			"name": "Morning Penguin",
+			"song": { "mode": "major", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"B": "#141418",
 				"C": "#fff1cc",
@@ -361,6 +368,7 @@
 		{
 			"id": "lunch-special",
 			"name": "Lunch Special",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"C": "#c57b38",
 				"L": "#5cb948",
@@ -412,6 +420,7 @@
 		{
 			"id": "polar-night",
 			"name": "Polar Night",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"V": "#8a55d8",
 				"N": "#1d2f5e",
@@ -462,6 +471,7 @@
 		{
 			"id": "morning-autumn-lane",
 			"name": "Morning Autumn Lane",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"O": "#ff8c2e",
 				"L": "#cdb6ef",
@@ -513,6 +523,7 @@
 		{
 			"id": "tugboat",
 			"name": "Tugboat",
+			"song": { "mode": "mixolydian", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"R": "#e23838",
 				"W": "#ffffff",
@@ -564,6 +575,7 @@
 		{
 			"id": "row-houses-at-dawn",
 			"name": "Row Houses at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle" },
 			"palette": {
 				"Y": "#ffd23f",
 				"T": "#159a94",
@@ -613,6 +625,7 @@
 		{
 			"id": "desert-island-at-dusk",
 			"name": "Desert Island at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"S": "#efd08f",
 				"C": "#c57b38",
@@ -665,6 +678,7 @@
 		{
 			"id": "night-campsite",
 			"name": "Night Campsite",
+			"song": { "mode": "minor", "spice": "lively", "lead": "string" },
 			"palette": {
 				"R": "#e23838",
 				"O": "#ff8c2e",
@@ -714,6 +728,7 @@
 		{
 			"id": "daisies",
 			"name": "Daisies",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"T": "#159a94",
 				"S": "#9db894",
@@ -767,6 +782,7 @@
 		{
 			"id": "strawberry-cupcake",
 			"name": "Strawberry Cupcake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"T": "#159a94",
 				"P": "#ff6fb0",
@@ -820,6 +836,7 @@
 		{
 			"id": "downtown-at-dawn",
 			"name": "Downtown at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "keys" },
 			"palette": {
 				"I": "#c9ecfb",
 				"S": "#4a5566",
@@ -870,6 +887,7 @@
 		{
 			"id": "bookshelf",
 			"name": "Bookshelf",
+			"song": { "mode": "major", "spice": "gentle", "lead": "keys" },
 			"palette": {
 				"B": "#8a552c",
 				"C": "#a3123a",
@@ -923,6 +941,7 @@
 		{
 			"id": "morning-airplane",
 			"name": "Morning Airplane",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"G": "#9c9aa6",
 				"C": "#2350c8",
@@ -971,6 +990,7 @@
 		{
 			"id": "snowman-at-dusk",
 			"name": "Snowman at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"W": "#ffffff",
 				"S": "#fa9e8a",
@@ -1026,6 +1046,7 @@
 		{
 			"id": "sprinkle-donut",
 			"name": "Sprinkle Donut",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"T": "#d4a373",
 				"L": "#cdb6ef",
@@ -1079,6 +1100,7 @@
 		{
 			"id": "sheep-and-lamb-at-dawn",
 			"name": "Sheep and Lamb at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"C": "#fff1cc",
 				"H": "#34343c",
@@ -1130,6 +1152,7 @@
 		{
 			"id": "little-sub",
 			"name": "Little Sub",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"O": "#ff8c2e",
 				"T": "#159a94",

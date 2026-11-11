@@ -4,6 +4,7 @@
 		{
 			"id": "city-lights-at-dusk",
 			"name": "City Lights at Dusk",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"Y": "#ffd23f",
 				"C": "#34343c",
@@ -45,6 +46,7 @@
 		{
 			"id": "moon-jelly",
 			"name": "Moon Jelly",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes", "meter": 3 },
 			"palette": {
 				"L": "#cdb6ef",
 				"A": "#5aa9f5",
@@ -90,6 +92,7 @@
 		{
 			"id": "garden-snail-at-sunset",
 			"name": "Garden Snail at Sunset",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"O": "#ff8c2e",
 				"T": "#d4a373",
@@ -131,7 +134,7 @@
 		{
 			"id": "deep-sea-sub",
 			"name": "Deep Sea Sub",
-			"song": { "key": "G", "mode": "minor" },
+			"song": { "key": "G", "mode": "minor", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"Y": "#ffd23f",
 				"T": "#159a94",
@@ -171,6 +174,7 @@
 		{
 			"id": "pink-fish",
 			"name": "Pink Fish",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"P": "#ff6fb0",
 				"V": "#8a55d8",
@@ -209,48 +213,9 @@
 			]
 		},
 		{
-			"id": "village-at-sunset",
-			"name": "Village at Sunset",
-			"palette": {
-				"Y": "#ffd23f",
-				"A": "#f9a66c",
-				"F": "#1d5a32",
-				"R": "#e23838",
-				"P": "#ff6fb0",
-				"C": "#fff1cc",
-				"S": "#4a5566",
-				"B": "#f8c3d0"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAARAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAARRRRAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAARRRRAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAARRRAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"PPPPPPPPAAAAAPPPPPPPPPPPPPPPPPPP",
-				"PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
-				"PPPSSPPPPPPPPPPPPPPPPPPPPPSPPPPP",
-				"PPSSSSPPPPPPPPPPPPSSPPPPSSSSPPPP",
-				"PSSSSSSPPPPSPPPPPSSSSPPSSSSSSPPP",
-				"FCCCCCCPPPSSSSPPSSSSSSPCCCCCCFFF",
-				"FCCCCCCPPSSSSSSPCCCCCCFCCCCCCFFF",
-				"FFYYCYYFFBBBBBBFCCCCCCFCYYCYYFFF",
-				"FFYYCYYFFYYBYYBFYYCYYCFCYYCYYFFF",
-				"FFCCCCCFFYYBYYBFYYCYYCFCCCCCCFFF",
-				"FCCSSCCFFFSSSBBFCCSSCCFCCSSSCFFF",
-				"FCCSSCCFFFSSSBBFCCSSCCFCCSSSCFFF",
-				"FCCSSCCFFFSSSBBFCCSSCCFCCSSSCFFF",
-				"FCCSSCCFFFSSSBBFCCSSCCFCCSSSCFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
-				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-			]
-		},
-		{
 			"id": "kite-day",
 			"name": "Kite Day",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute", "meter": 3 },
 			"palette": {
 				"C": "#a3123a",
 				"A": "#5aa9f5",
@@ -296,130 +261,9 @@
 			]
 		},
 		{
-			"id": "elephant-at-sunset",
-			"name": "Elephant at Sunset",
-			"palette": {
-				"G": "#9c9aa6",
-				"A": "#f9a66c",
-				"O": "#f2b705",
-				"R": "#ef8fae",
-				"L": "#7c7d2a",
-				"C": "#fff1cc",
-				"V": "#a996ec",
-				"B": "#141418"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAA",
-				"AAAAAAAAAAAAAGGGGGGARRRGGGAAAAAA",
-				"ALLLLLLAAAAGGGGGGGGRRRRGBGGAAAAA",
-				"LLLLLLLLAGGGGGGGGGGRRRRGBBGAAAAA",
-				"LLLLLLLAGGGGGGGGGGGRRRRGGGGGAAAA",
-				"AALLAAAAGGGGGGGGGGGRRRRGGGGGAAAA",
-				"AALLAAAGGGGGGGGGGGGRRRRGGGGGAAAA",
-				"AALLAAAGGGGGGGGGGGGGRRGGGCCCAAAA",
-				"AAALLAAGGGGGGGGGGGGGGGGAAAGCCAAA",
-				"AAALLGGGGGGGGGGGGGGGGGGAAAGGGAVV",
-				"VVVLGGGGGGGGGGGGGGGGGGGVVVGGGVVV",
-				"VVVGGGGGGGGGGGGGGGGGGGGVVVGGGVVV",
-				"VVVGGGGGGGGGGGGGGGGOGGGOOOGGGVVV",
-				"OOOOGOGOOGGGGGGOOGGOGGGOOOGGGOOO",
-				"OOOOGOGOOGGGGGGOOGGOGGGOOOGOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
-				"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
-			]
-		},
-		{
-			"id": "night-snowman",
-			"name": "Night Snowman",
-			"palette": {
-				"W": "#ffffff",
-				"N": "#1d2f5e",
-				"L": "#cdb6ef",
-				"B": "#141418",
-				"C": "#a3123a",
-				"F": "#1d5a32",
-				"P": "#64329a"
-			},
-			"art": [
-				"NNNNNNNNNNNNNNNNNNNNNNNN",
-				"NNNNNNNNNNBBBBNNNNNNNNNN",
-				"NNNNNNNNNNBBBBNNNNNNNNNN",
-				"NNNNNNNNNNBBBBNNNNNNNNNN",
-				"NNNNNNNNNNBBBBNNNNNNNNNN",
-				"NNNNNNNNNBBBBBBNNNNNNNNN",
-				"NNNNNNNNNNWWWWNNNNNNNNNN",
-				"NNNNNNNNNWBBBBWNNNNNNNNN",
-				"PPPPPPPPPWWWWWWPPPPPPPPP",
-				"PPPPPPPPPWWWWWWPPPPPPPPP",
-				"PPPPPPPPPCCCCCCPPPPPPPPP",
-				"PPPPPPPPPCCCCCCPPPPPPPPP",
-				"PPPPPPPPWWWBBCWWPPPPPPPP",
-				"PPFPPPPPPWWBBCWPPPPPPPPP",
-				"PPFFPPPPWWWWWWWWPPPPPPPP",
-				"PPFFPPPPPWWWWWWPPPPPPFPP",
-				"PPFFPPPPPWWWWWWPPPPPFFPP",
-				"PPFFPPPPPWWWWWWPPPPPFFPP",
-				"PFFFPPPPWWWWWWWWPPPPFFPP",
-				"PPFFPPPWWWWBBWWWWPPPFFPP",
-				"PLFLLPLWWWWBBWWWWPPFLFLL",
-				"LLLLLLLWWWWWWWWWWLLLLLLL",
-				"LLLLLLLWWWWWWWWWWLLLLLLL",
-				"LLLLLLLWWWWWWWWWWLLLLLLL",
-				"LLLLLLLLWWWWWWWWLLLLLLLL",
-				"LLLLLLLLLWWWWWWLLLLLLLLL",
-				"LLLLLLLLLLWWWWLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
-			"id": "school-bus-at-sunset",
-			"name": "School Bus at Sunset",
-			"palette": {
-				"G": "#f2b705",
-				"I": "#c9ecfb",
-				"A": "#f9a66c",
-				"S": "#4a5566",
-				"B": "#141418",
-				"L": "#a996ec",
-				"R": "#e23838",
-				"C": "#2350c8"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAARAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAARRRAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAARRAA",
-				"AAAAAAALLLLAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAALLLLAAAAAAAAALLLLAAAAAAAAA",
-				"AAAAAAALLLLAAAAAAAAALLLLAAAAAAAAA",
-				"ALLGGGGGGGGGGGGGGGGGGGGGGGGGGGLCA",
-				"ALLGIIIGIIIGIIIGIIIGIIIGGIIIGGLCA",
-				"ALLGIIIGIIIGIIIGIIIGIIIGGIIIGGLCA",
-				"ALLGIIIGIIIGIIIGIIIGIIIGGIIIGGLCA",
-				"ALLGGGGGGGGGGGGGGGGGGGGGGIIIGGLCA",
-				"ALLGGGGGGGGGGGGGGGGGGGGGGIIIGGLCA",
-				"ALLGGGGGGGGGGGGGGGGGGGGGGIIIGGLCA",
-				"ALLGGGGGGGGGGGGGGGGGGGGGGIIIGGLCA",
-				"SSSGGGGBBGGGGGGGGGGGGGGBBIIIGGSCS",
-				"SSSGGGBBBBGGGGGGGGGGGGBBBBGGGGSSS",
-				"SSSSSSBBBBSSSSSSSSSSSSBBBBSSSSSSS",
-				"SSSSSSBBBSSSSSSSSSSSSSBBBSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-				"SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
-			]
-		},
-		{
 			"id": "night-fox",
 			"name": "Night Fox",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "pizz" },
 			"palette": {
 				"O": "#ff8c2e",
 				"W": "#ffffff",
@@ -467,6 +311,7 @@
 		{
 			"id": "tulip-bed",
 			"name": "Tulip Bed",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"C": "#a3123a",
 				"Y": "#ffd23f",
@@ -510,6 +355,7 @@
 		{
 			"id": "burger-and-fries",
 			"name": "Burger and Fries",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"C": "#c57b38",
 				"L": "#a8dc42",
@@ -556,6 +402,7 @@
 		{
 			"id": "ruby",
 			"name": "Ruby",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"C": "#ff6f61",
 				"R": "#a3123a",
@@ -600,6 +447,7 @@
 		{
 			"id": "pink-donut",
 			"name": "Pink Donut",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"T": "#d4a373",
 				"P": "#ff6fb0",
@@ -647,6 +495,7 @@
 		{
 			"id": "harvest-farm",
 			"name": "Harvest Farm",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"R": "#e23838",
 				"S": "#94d4fb",
@@ -686,50 +535,9 @@
 			]
 		},
 		{
-			"id": "igloo",
-			"name": "Igloo",
-			"palette": {
-				"W": "#ffffff",
-				"A": "#5aa9f5",
-				"L": "#cdb6ef",
-				"Q": "#7fe3e0",
-				"C": "#34343c",
-				"Y": "#ffd23f",
-				"O": "#2350c8",
-				"B": "#8a552c"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAYYYYAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAYYYYAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAYYYYAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAYYAAAAAAAABBBAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAWWQWWWAAAAAAAAAAAA",
-				"AAAAAAAAAOAAWWWWQWWWWWAAAAAAAAAA",
-				"AAAAAAAOOOOQQQQQQQQQQQQQAAAAAAAA",
-				"OOOOOOOOOOWWWQWWWWWQWWWWOOOOOOOO",
-				"OOOOOOOOOWWWWQWWWWWQWWWWWOOOOOOO",
-				"LLLLLLOOOQQQQQQQQQQQQQQQQQLLLLLL",
-				"LLLLQWWWWWQWWWWWQWWWWWQWWWLLLLLL",
-				"LLLLQWWWWWQWWWWWQWWWWWQWWWLLLLLL",
-				"LLLQQQCCCQQQQQQQQQQQQQQQQQQLLLLL",
-				"LLLLLLCCCCWWWQWWWWWQWWWWWQQLLLLL",
-				"LLLLLCCCCCWWWQWWWWWQWWWWWQQLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
-				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
-			]
-		},
-		{
 			"id": "wrapped-gifts",
 			"name": "Wrapped Gifts",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"C": "#2350c8",
 				"G": "#f2b705",
@@ -776,6 +584,7 @@
 		{
 			"id": "big-wave-at-dawn",
 			"name": "Big Wave at Dawn",
+			"song": { "mode": "lydian", "spice": "lively", "lead": "harp", "meter": 3 },
 			"palette": {
 				"N": "#1d2f5e",
 				"W": "#ffffff",
@@ -816,6 +625,7 @@
 		{
 			"id": "tabby-cat",
 			"name": "Tabby Cat",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"T": "#d4a373",
 				"S": "#9db894",
@@ -864,6 +674,7 @@
 		{
 			"id": "thunderstorm",
 			"name": "Thunderstorm",
+			"song": { "mode": "minor", "spice": "adventurous", "lead": "brass" },
 			"palette": {
 				"G": "#9c9aa6",
 				"L": "#fff176",
@@ -905,6 +716,7 @@
 		{
 			"id": "red-tractor-at-dawn",
 			"name": "Red Tractor at Dawn",
+			"song": { "mode": "lydian", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"R": "#e23838",
 				"B": "#141418",
@@ -947,6 +759,7 @@
 		{
 			"id": "campfire-by-moonlight",
 			"name": "Campfire by Moonlight",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "string" },
 			"palette": {
 				"O": "#ff8c2e",
 				"R": "#e23838",

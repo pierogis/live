@@ -1,4 +1,4 @@
-// Mosaic's level set as a whole: 200 levels that fit a phone, with one picture each that
+// Mosaic's level set as a whole: 180 levels that fit a phone, with one picture each that
 // no single color swamps, and difficulty that rises through play.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -8,8 +8,8 @@ import { loadLevels, loadPacks } from './levels.ts';
 
 const LEVELS = loadLevels();
 
-test('mosaic has 200 levels in packs of a playable size', () => {
-	assert.equal(LEVELS.length, 200);
+test('mosaic has 180 levels in packs of a playable size', () => {
+	assert.equal(LEVELS.length, 180);
 	for (const pack of loadPacks()) {
 		assert.ok(pack.levels.length >= 12 && pack.levels.length <= 24, pack.id);
 		assert.ok(pack.name.trim(), pack.id);
@@ -31,6 +31,7 @@ test('every picture fits a phone and has no color covering half of it', () => {
 test('later levels are harder: the solver score rises through play', () => {
 	const scores = LEVELS.map((lv, i) => reportLevel(lv, i).score);
 	const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
-	const thirds = [0, 1, 2].map((k) => mean(scores.slice(k * 66, k * 66 + 66)));
+	const third = Math.floor(scores.length / 3);
+	const thirds = [0, 1, 2].map((k) => mean(scores.slice(k * third, k * third + third)));
 	assert.ok(thirds[0] < thirds[1] && thirds[1] < thirds[2], `thirds ${thirds.map(Math.round)}`);
 });

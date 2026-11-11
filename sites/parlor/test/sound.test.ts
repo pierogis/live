@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { Clock, compose } from '../src/lib/shared/sound.ts';
+import { Clock, compose, songProblem, type SongSettings } from '../src/lib/shared/sound.ts';
 
 const BAR = { 3: 12, 4: 16, 5: 20, 7: 14 } as const;
 const songs = (fn: (s: ReturnType<typeof compose>, seed: number) => void) => {
@@ -39,16 +40,24 @@ test('every song ends on its tonic over the I chord', () => {
 	});
 });
 
-test('some songs stay gentle and some get adventurous', () => {
+test('most songs stay gentle, about one in five gets adventurous', () => {
 	let gentle = 0;
-	let rich = 0;
+	let wild = 0;
 	for (let seed = 1; seed <= 400; seed++) {
-		const s = compose(seed);
-		if (s.style.spice < 0.2) gentle++;
-		if (s.notes.some((n) => n.seventh || n.rest)) rich++;
+		const { spice } = compose(seed).style;
+		if (spice < 0.2) gentle++;
+		if (spice >= 0.8) wild++;
 	}
-	assert.ok(gentle > 80 && gentle < 200, `gentle ${gentle}`);
-	assert.ok(rich > 200, `rich ${rich}`);
+	assert.ok(gentle > 200 && gentle < 280, `gentle ${gentle}`);
+	assert.ok(wild > 50 && wild < 110, `adventurous ${wild}`);
+});
+
+test('a level\u2019s song settings take over from its seed', () => {
+	const s = compose(7, 0, true, { mode: 'dorian', spice: 'adventurous', meter: 3 });
+	assert.equal(s.home.scale.join(), '0,2,3,5,7,9,10');
+	assert.equal(s.style.spice, 0.9);
+	assert.equal(s.style.meter, 3);
+	assert.equal(compose(7, 0, false, { meter: 3 }).style.meter, 4, 'only a game with a feel');
 });
 
 test('the gear follows the pace of moves, without flickering', () => {
@@ -86,4 +95,33 @@ test('the gear follows how many things are on their way', () => {
 	assert.equal(c.gear, 2, 'stays in eighths until clearly quieter');
 	c.crowd(3);
 	assert.equal(c.gear, 4);
+});
+
+test('every level’s song settings are ones a song can have', () => {
+	for (const game of ['mosaic', 'forage']) {
+		const dir = new URL(`../src/lib/${game}/levels/`, import.meta.url);
+		for (const f of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
+			const { levels } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as {
+				levels: { id: string; song?: SongSettings }[];
+			};
+			for (const l of levels) {
+				assert.ok(l.song, `${game} ${l.id} has no song settings`);
+				assert.equal(songProblem(l.song), null, `${game} ${l.id}`);
+			}
+		}
+	}
+});
+
+test('songs that share notes and a theme stay on those notes, on one motif', () => {
+	const G = new Set([7, 9, 11, 0, 2, 4, 6]);
+	for (const mode of ['major', 'dorian', 'mixolydian', 'lydian', 'minor', 'phrygian']) {
+		for (let seed = 1; seed <= 40; seed++) {
+			const s = compose(seed, seed % 3, true, { notes: 'G', theme: 'a-mural', mode });
+			for (const n of s.notes) {
+				const midi = n.key.tonic + n.key.scale[((n.deg % 7) + 7) % 7];
+				assert.ok(G.has(((midi % 12) + 12) % 12), `${mode} seed ${seed}`);
+			}
+		}
+	}
+	assert.equal(compose(3, 0, false, { notes: 'G', mode: 'dorian' }).home.tonic % 12, 9);
 });

@@ -40,7 +40,11 @@
 
 	const sections = $derived.by(() => {
 		let at = 0;
-		return packs.map((p) => ({ name: p.name, items: p.levels.map((lv) => ({ lv, n: ++at })) }));
+		return packs.map((p) => ({
+			name: p.name,
+			mural: p.mural,
+			items: p.levels.map((lv) => ({ lv, n: ++at }))
+		}));
 	});
 </script>
 
@@ -64,24 +68,54 @@
 	{/each}
 
 	{#each sections as section (section.name)}
-		<h3>{section.name.toLowerCase()}</h3>
-		<div class="grid">
-			{#each section.items as { lv, n } (lv.id)}
-				{@const done = !!save.completed[lv.id]}
-				{@const d = difficulty?.(lv) ?? null}
-				<a
-					class="card inset"
-					class:current={save.level === n - 1}
-					href="{gameHref}/{n}"
-					aria-label="{n}. {lv.name}{d ? `, ${LABELS[d - 1]}` : ''}{done ? ', complete' : ''}"
-				>
-					<span class="thumb" class:unplayed={!done}><canvas {@attach art(lv, 72)}></canvas></span>
-					<span>{n}. {lv.name}</span>
-					{#if d}<Pips difficulty={d} />{/if}
-					{#if done}<span class="done" aria-hidden="true">✓</span>{/if}
-				</a>
-			{/each}
-		</div>
+		{#if section.mural}
+			{@const panel = section.items[0].lv.art}
+			<!-- A mural: its panels side by side as one picture, each a link to its level. -->
+			<h3>
+				{section.name.toLowerCase()} · mural ·
+				{section.items.filter((i) => save.completed[i.lv.id]).length} / {section.items.length}
+			</h3>
+			<div
+				class="mural"
+				style:--cols={section.mural.cols}
+				style:--w={panel[0].length}
+				style:--h={panel.length}
+			>
+				{#each section.items as { lv, n } (lv.id)}
+					{@const done = !!save.completed[lv.id]}
+					<a
+						class="panel"
+						class:unplayed={!done}
+						class:current={save.level === n - 1}
+						href="{gameHref}/{n}"
+						title="{n}. {lv.name}"
+						aria-label="{n}. {lv.name}{done ? ', complete' : ''}"
+					>
+						<canvas {@attach art(lv, 0)}></canvas>
+					</a>
+				{/each}
+			</div>
+		{:else}
+			<h3>{section.name.toLowerCase()}</h3>
+			<div class="grid">
+				{#each section.items as { lv, n } (lv.id)}
+					{@const done = !!save.completed[lv.id]}
+					{@const d = difficulty?.(lv) ?? null}
+					<a
+						class="card inset"
+						class:current={save.level === n - 1}
+						href="{gameHref}/{n}"
+						aria-label="{n}. {lv.name}{d ? `, ${LABELS[d - 1]}` : ''}{done ? ', complete' : ''}"
+					>
+						<span class="thumb" class:unplayed={!done}><canvas {@attach art(lv, 72)}></canvas></span
+						>
+						<span>{n}. {lv.name}</span>
+						{#if d}<Pips difficulty={d} />{/if}
+						{#if done}<span class="done" aria-hidden="true">✓</span>{/if}
+					</a>
+				{/each}
+			</div>
+		{/if}
 	{/each}
 </div>
 
@@ -129,6 +163,42 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
 		gap: 10px;
+	}
+	/* A mural's panels, each dot a whole number of pixels (--s), growing with the page. */
+	.mural {
+		--s: 3;
+		display: grid;
+		grid-template-columns: repeat(var(--cols), max-content);
+		gap: 2px;
+		justify-content: center;
+	}
+	@media (min-width: 520px) {
+		.mural {
+			--s: 5;
+		}
+	}
+	@media (min-width: 780px) {
+		.mural {
+			--s: 7;
+		}
+	}
+	.panel {
+		display: block;
+		line-height: 0;
+	}
+	.panel canvas {
+		width: calc(var(--w) * var(--s) * 1px);
+		height: calc(var(--h) * var(--s) * 1px);
+	}
+	.panel.unplayed canvas {
+		filter: grayscale(0.85) opacity(0.4);
+	}
+	.panel:hover canvas {
+		filter: none;
+	}
+	.panel.current {
+		outline: 3px solid var(--secondary-color);
+		position: relative;
 	}
 	.card {
 		position: relative;

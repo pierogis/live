@@ -8,9 +8,12 @@ function drawArt(canvas: HTMLCanvasElement, lv: Pick<Picture, 'palette' | 'art'>
 	const h = lv.art.length;
 	canvas.width = w;
 	canvas.height = h;
-	const scale = Math.floor(size / Math.max(w, h)) || 1;
-	canvas.style.width = w * scale + 'px';
-	canvas.style.height = h * scale + 'px';
+	// Size 0 leaves the canvas's size to CSS (a mural's panels).
+	if (size) {
+		const scale = Math.floor(size / Math.max(w, h)) || 1;
+		canvas.style.width = w * scale + 'px';
+		canvas.style.height = h * scale + 'px';
+	}
 	const ctx = canvas.getContext('2d');
 	if (!ctx) return;
 	let color: string | undefined;

@@ -4,6 +4,7 @@
 		{
 			"id": "ringed-planet",
 			"name": "Ringed Planet",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"S": "#efd08f",
 				"O": "#ff8c2e",
@@ -50,6 +51,7 @@
 		{
 			"id": "fruit-bowl",
 			"name": "Fruit Bowl",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"W": "#ffffff",
 				"C": "#a3123a",
@@ -98,6 +100,7 @@
 		{
 			"id": "bumblebee",
 			"name": "Bumblebee",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"Y": "#ffd23f",
 				"B": "#141418",
@@ -144,6 +147,7 @@
 		{
 			"id": "morning-elephant",
 			"name": "Morning Elephant",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"G": "#9c9aa6",
 				"P": "#ffc8a2",
@@ -190,6 +194,7 @@
 		{
 			"id": "jellyfish",
 			"name": "Jellyfish",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes", "meter": 3 },
 			"palette": {
 				"P": "#ff6fb0",
 				"A": "#5aa9f5",
@@ -243,6 +248,7 @@
 		{
 			"id": "old-guitar",
 			"name": "Old Guitar",
+			"song": { "mode": "major", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"A": "#e8891c",
 				"B": "#141418",
@@ -297,6 +303,7 @@
 		{
 			"id": "morning-red-barn",
 			"name": "Morning Red Barn",
+			"song": { "mode": "major", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"R": "#b5481b",
 				"B": "#f8c3d0",
@@ -344,6 +351,7 @@
 		{
 			"id": "ferris-wheel-at-dusk",
 			"name": "Ferris Wheel at Dusk",
+			"song": { "mode": "dorian", "spice": "lively", "meter": 3 },
 			"palette": {
 				"C": "#34343c",
 				"R": "#e23838",
@@ -395,6 +403,7 @@
 		{
 			"id": "waterfall",
 			"name": "Waterfall",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"S": "#7d776e",
 				"I": "#c9ecfb",
@@ -447,6 +456,7 @@
 		{
 			"id": "morning-snail",
 			"name": "Morning Snail",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"O": "#ff8c2e",
 				"T": "#d4a373",
@@ -494,6 +504,7 @@
 		{
 			"id": "potted-cactus-at-dusk",
 			"name": "Potted Cactus at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"C": "#c57b38",
 				"G": "#2e9a50",
@@ -549,6 +560,7 @@
 		{
 			"id": "train-in-the-hills-at-sunset",
 			"name": "Train in the Hills at Sunset",
+			"song": { "mode": "mixolydian", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"R": "#e23838",
 				"B": "#141418",
@@ -600,6 +612,7 @@
 		{
 			"id": "morning-giraffe",
 			"name": "Morning Giraffe",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"G": "#f2b705",
 				"B": "#8a552c",
@@ -653,6 +666,7 @@
 		{
 			"id": "paper-lanterns-at-dusk",
 			"name": "Paper Lanterns at Dusk",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"C": "#a3123a",
 				"P": "#ffc8a2",
@@ -698,6 +712,7 @@
 		{
 			"id": "space-explorer",
 			"name": "Space Explorer",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"S": "#eef4fb",
 				"G": "#f2b705",
@@ -751,6 +766,7 @@
 		{
 			"id": "night-snowy-owl",
 			"name": "Night Snowy Owl",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "vibes" },
 			"palette": {
 				"W": "#ffffff",
 				"Y": "#ffd23f",
@@ -806,6 +822,7 @@
 		{
 			"id": "igloo-at-dusk",
 			"name": "Igloo at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"W": "#ffffff",
 				"S": "#fa9e8a",
@@ -853,6 +870,7 @@
 		{
 			"id": "snowy-village",
 			"name": "Snowy Village",
+			"song": { "mode": "major", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"A": "#e8891c",
 				"N": "#1d2f5e",
@@ -898,6 +916,7 @@
 		{
 			"id": "snowy-pines-at-dusk",
 			"name": "Snowy Pines at Dusk",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"P": "#103d2c",
 				"A": "#f9a66c",
@@ -946,6 +965,7 @@
 		{
 			"id": "tractor",
 			"name": "Tractor",
+			"song": { "mode": "mixolydian", "spice": "lively", "lead": "brass" },
 			"palette": {
 				"R": "#e23838",
 				"B": "#141418",
@@ -996,6 +1016,7 @@
 		{
 			"id": "scarlet-parrot",
 			"name": "Scarlet Parrot",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"R": "#e23838",
 				"B": "#3b82e0",
@@ -1051,6 +1072,7 @@
 		{
 			"id": "pink-octopus",
 			"name": "Pink Octopus",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"R": "#ef8fae",
 				"T": "#33c3c6",
@@ -1100,6 +1122,7 @@
 		{
 			"id": "presents",
 			"name": "Presents",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"R": "#e23838",
 				"G": "#f2b705",
@@ -1152,6 +1175,7 @@
 		{
 			"id": "windmill-and-tulips-at-dawn",
 			"name": "Windmill and Tulips at Dawn",
+			"song": { "mode": "lydian", "spice": "gentle", "lead": "harp", "meter": 3 },
 			"palette": {
 				"C": "#a3123a",
 				"B": "#8a552c",

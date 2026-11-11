@@ -36,10 +36,19 @@ export function levelLists(): Plugin {
 				.flatMap((f) => {
 					// Rebuilt when a pack changes, like a save from the picture editor.
 					this.addWatchFile(dir + f);
-					const { levels } = JSON.parse(readFileSync(dir + f, 'utf8')) as { levels: Picture[] };
-					return levels.map((lv) =>
-						Object.fromEntries(Object.entries(lv).filter(([k]) => !PICTURE.has(k)))
-					);
+					const { name, mural, song, levels } = JSON.parse(readFileSync(dir + f, 'utf8')) as {
+						name: string;
+						mural?: object;
+						song?: Picture['song'];
+						levels: Picture[];
+					};
+					return levels.map((lv, k) => ({
+						...Object.fromEntries(Object.entries(lv).filter(([k]) => !PICTURE.has(k))),
+						// The pack's song settings, under the level's own (as levelsFrom does).
+						...(song && { song: { ...song, ...lv.song } }),
+						// A mural's panel knows its place, so the level page can say so.
+						...(mural && { panel: { mural: name, n: k + 1, of: levels.length } })
+					}));
 				});
 			return `export default ${JSON.stringify(list)};`;
 		}

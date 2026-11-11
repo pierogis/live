@@ -4,6 +4,7 @@
 		{
 			"id": "heart",
 			"name": "Heart",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#fff4d6",
 				"C": "#9ad0c2",
@@ -34,6 +35,7 @@
 		{
 			"id": "balloon",
 			"name": "Hot Air Balloon",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute", "meter": 3 },
 			"palette": {
 				"B": "#8fd3ff",
 				"C": "#2f6fc0",
@@ -74,6 +76,7 @@
 		{
 			"id": "sunrise",
 			"name": "Sunrise",
+			"song": { "mode": "lydian", "spice": "gentle" },
 			"palette": {
 				"A": "#6a4c93",
 				"P": "#ff7eb6",
@@ -107,6 +110,7 @@
 		{
 			"id": "lighthouse",
 			"name": "Lighthouse",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#9fd6f7",
 				"P": "#ff9e80",
@@ -148,6 +152,7 @@
 		{
 			"id": "teacup",
 			"name": "Teacup",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"B": "#6cc4b0",
 				"U": "#1f4e8c",
@@ -184,6 +189,7 @@
 		{
 			"id": "desert",
 			"name": "Desert",
+			"song": { "mode": "dorian", "spice": "gentle", "lead": "string" },
 			"palette": {
 				"U": "#3b7dd8",
 				"B": "#a8dcff",
@@ -218,6 +224,7 @@
 		{
 			"id": "peaks",
 			"name": "Mountain Lake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"B": "#a8dcff",
 				"Y": "#ffd23f",
@@ -253,6 +260,7 @@
 		{
 			"id": "sailboat",
 			"name": "Sailboat",
+			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "harp", "meter": 3 },
 			"palette": {
 				"B": "#a8dcff",
 				"W": "#ffffff",
@@ -291,6 +299,7 @@
 		{
 			"id": "blossom",
 			"name": "Night Blossom",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"K": "#1c2340",
 				"N": "#3f5fb0",
@@ -330,6 +339,7 @@
 		{
 			"id": "reef",
 			"name": "Reef",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"S": "#2f86c9",
 				"T": "#152a5e",
@@ -367,6 +377,7 @@
 		{
 			"id": "rocket",
 			"name": "Rocket",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"K": "#141a33",
 				"N": "#2f6f8f",
@@ -411,6 +422,7 @@
 		{
 			"id": "rainbow",
 			"name": "Rainbow",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"N": "#26306e",
 				"B": "#a8dcff",

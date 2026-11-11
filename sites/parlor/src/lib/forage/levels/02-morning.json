@@ -4,6 +4,7 @@
 		{
 			"id": "red-target",
 			"name": "Red Target",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": {
 				"A": "#efe3c1",
 				"K": "#24212b",
@@ -51,6 +52,7 @@
 		{
 			"id": "indigo-gem",
 			"name": "Indigo Gem",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"A": "#7ec2ee",
 				"K": "#24212b",
@@ -99,6 +101,7 @@
 		{
 			"id": "violet-flower",
 			"name": "Violet Flower",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"A": "#c8a2e8",
 				"K": "#24212b",
@@ -149,6 +152,7 @@
 		{
 			"id": "red-mushroom",
 			"name": "Red Mushroom",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"A": "#85c2e4",
 				"K": "#24212b",
@@ -200,6 +204,7 @@
 		{
 			"id": "sky-house",
 			"name": "Sky House",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": {
 				"A": "#474e92",
 				"K": "#24212b",
@@ -254,6 +259,7 @@
 		{
 			"id": "red-fruit-tree",
 			"name": "Red Fruit Tree",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"A": "#e6c87b",
 				"K": "#24212b",
@@ -303,6 +309,7 @@
 		{
 			"id": "pink-fish",
 			"name": "Pink Fish",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"A": "#274071",
 				"K": "#000000",
@@ -349,6 +356,7 @@
 		{
 			"id": "orange-planet",
 			"name": "Orange Planet",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"A": "#332d4b",
 				"B": "#8e0200",
@@ -397,6 +405,7 @@
 		{
 			"id": "brown-cake",
 			"name": "Brown Cake",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"A": "#f5a6b2",
 				"K": "#24212b",
@@ -448,6 +457,7 @@
 		{
 			"id": "magenta-potion",
 			"name": "Magenta Potion",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"A": "#f3db7b",
 				"K": "#24212b",
@@ -497,6 +507,7 @@
 		{
 			"id": "indigo-peaks",
 			"name": "Indigo Peaks",
+			"song": { "mode": "dorian", "spice": "gentle" },
 			"palette": {
 				"A": "#8fd3ff",
 				"K": "#24212b",
@@ -546,6 +557,7 @@
 		{
 			"id": "pink-balloons",
 			"name": "Pink Balloons",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#8fd3ff",
 				"E": "#d94a4e",
@@ -595,6 +607,7 @@
 		{
 			"id": "tan-cat",
 			"name": "Tan Cat",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"A": "#90c0e7",
 				"D": "#52ac61",
@@ -646,6 +659,7 @@
 		{
 			"id": "orange-owl",
 			"name": "Orange Owl",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#1c2340",
 				"B": "#e7e5c2",
@@ -695,6 +709,7 @@
 		{
 			"id": "magenta-snowman",
 			"name": "Magenta Snowman",
+			"song": { "mode": "major", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"A": "#c8a2e8",
 				"K": "#5a3a1a",
@@ -750,6 +765,7 @@
 		{
 			"id": "teal-butterfly",
 			"name": "Teal Butterfly",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#fff4d6",
 				"C": "#1c4465",
@@ -802,6 +818,7 @@
 		{
 			"id": "magenta-rocket",
 			"name": "Magenta Rocket",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"A": "#626abe",
 				"C": "#8d8699",
@@ -852,6 +869,7 @@
 		{
 			"id": "magenta-quilt",
 			"name": "Magenta Quilt",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"A": "#fff4d6",
 				"K": "#000000",
@@ -904,6 +922,7 @@
 		{
 			"id": "lilac-ice-cream",
 			"name": "Lilac Ice Cream",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"A": "#fff4d6",
 				"K": "#24212b",
@@ -952,6 +971,7 @@
 		{
 			"id": "plum-target",
 			"name": "Plum Target",
+			"song": { "mode": "dorian", "spice": "gentle" },
 			"palette": {
 				"F": "#246987",
 				"A": "#90c0e7",
@@ -1003,6 +1023,7 @@
 		{
 			"id": "violet-gem",
 			"name": "Violet Gem",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"A": "#112445",
 				"K": "#f8f8f2",
@@ -1051,6 +1072,7 @@
 		{
 			"id": "red-flower",
 			"name": "Red Flower",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"A": "#a0d0f9",
 				"K": "#24212b",

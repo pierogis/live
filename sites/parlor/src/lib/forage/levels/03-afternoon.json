@@ -4,6 +4,7 @@
 		{
 			"id": "blue-mushroom",
 			"name": "Blue Mushroom",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"A": "#9ad0c2",
 				"D": "#fcd25b",
@@ -58,6 +59,7 @@
 		{
 			"id": "mint-house",
 			"name": "Mint House",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": {
 				"A": "#575da2",
 				"K": "#24212b",
@@ -111,6 +113,7 @@
 		{
 			"id": "white-fruit-tree",
 			"name": "White Fruit Tree",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"A": "#f2c46d",
 				"K": "#24212b",
@@ -169,6 +172,7 @@
 		{
 			"id": "violet-fish",
 			"name": "Violet Fish",
+			"song": { "mode": "major", "spice": "lively", "lead": "harp" },
 			"palette": {
 				"A": "#9ad0c2",
 				"F": "#d32338",
@@ -221,6 +225,7 @@
 		{
 			"id": "yellow-planet",
 			"name": "Yellow Planet",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "keys" },
 			"palette": {
 				"A": "#26213a",
 				"K": "#7a1f3d",
@@ -272,59 +277,9 @@
 			"deal": "00114332100022021114234440433342222231103411144033"
 		},
 		{
-			"id": "brown-cake-2",
-			"name": "Brown Cake II",
-			"palette": {
-				"A": "#f2c46d",
-				"K": "#24212b",
-				"D": "#f4a6b8",
-				"E": "#7456dc",
-				"F": "#79c2f7",
-				"C": "#926d3b",
-				"G": "#af93e4",
-				"H": "#3b2e0a",
-				"B": "#f8f6db"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAKKAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAKKAAAAAAAAAA",
-				"AAAAAAAAAAAAAKKKAKKAAAAAAAAAA",
-				"AAAAAAAAAAAAKDEEKFKAAAAAAAAAA",
-				"AAAAAAAAAAAAKEEEKFKAAAAAAAAAA",
-				"AAAAAAAAAAAAAKEKAKKAAAAAAAAAA",
-				"AAAAAAAAAAAKKDDDKKAAAAAAEAAAA",
-				"AAAAAAAAAAAKDEDDDKAAAAAAAAAAA",
-				"AAAAAAAAAAAKDDDDDKAAAAAAAAAAA",
-				"AAAAAAAAAAAKDDDDDKAAAAAAAAAAA",
-				"AAAAAAAAAAEKECCCEKAAAAAAAAAAA",
-				"AAAAAAAAKKKDDDDDDDKKKAAAAAAAA",
-				"AAAAAAAAKDDDDCDDDDDDKAAAAAAAA",
-				"GGGGGGGGKDDDDDDDDEDFKGGGGGGGG",
-				"GGGGGGGGKDDDDDDDDDDDKGGGGGGGG",
-				"GGGGGGGGKCCCCCCCCHHHKGGGGGGGG",
-				"GGGGGKKKDDDDDDDDDDDDDKKKGGGGG",
-				"GGGGGKDDDDDDDDDDDDDDDDDKGGGGG",
-				"GGGGGKHCECCCECCCECCHEHHKGGGGG",
-				"GGGGGKDDDDDDDDDDDDDDDDDKGGGGG",
-				"GGGGGKHCCCHCCCHCCCHHHHHKGGGGG",
-				"GGGGGKCCCCCCCCCCCCHHHHHKGGGGG",
-				"GGGKKCCCECCCECCCECHHEHHHKKGGG",
-				"GGGKKKKBBBBBBBBBBBBBBBKKKKGGG",
-				"GGGGGGGKKKKKKKKKKKKKKKGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-			],
-			"seed": 3,
-			"wins": 0.56,
-			"breaks": 0,
-			"cruxes": 0,
-			"spread": 0
-		},
-		{
 			"id": "teal-potion",
 			"name": "Teal Potion",
+			"song": { "mode": "dorian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"A": "#383f63",
 				"K": "#000000",
@@ -381,6 +336,7 @@
 		{
 			"id": "forest-peaks",
 			"name": "Forest Peaks",
+			"song": { "mode": "major", "spice": "gentle" },
 			"palette": {
 				"A": "#e0b45d",
 				"K": "#24212b",
@@ -433,6 +389,7 @@
 		{
 			"id": "orange-balloons",
 			"name": "Orange Balloons",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#af93e4",
 				"K": "#24212b",
@@ -482,6 +439,7 @@
 		{
 			"id": "amber-cat",
 			"name": "Amber Cat",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"A": "#f4a6b8",
 				"D": "#3b7dd8",
@@ -533,6 +491,7 @@
 		{
 			"id": "grey-owl",
 			"name": "Grey Owl",
+			"song": { "mode": "dorian", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#12355c",
 				"K": "#000000",
@@ -585,6 +544,7 @@
 		{
 			"id": "red-snowman",
 			"name": "Red Snowman",
+			"song": { "mode": "major", "spice": "gentle", "lead": "vibes" },
 			"palette": {
 				"A": "#27314a",
 				"B": "#f1e2c5",
@@ -639,6 +599,7 @@
 		{
 			"id": "violet-butterfly",
 			"name": "Violet Butterfly",
+			"song": { "mode": "major", "spice": "lively", "lead": "flute" },
 			"palette": {
 				"A": "#9de3db",
 				"H": "#623826",
@@ -690,63 +651,9 @@
 			"deal": "22222001013133311444411230111341100003334344443200033"
 		},
 		{
-			"id": "magenta-rocket-2",
-			"name": "Magenta Rocket II",
-			"palette": {
-				"A": "#6b2f64",
-				"B": "#5d06b1",
-				"E": "#67c5f3",
-				"K": "#24212b",
-				"H": "#bede62",
-				"C": "#8e8696",
-				"D": "#e052bc",
-				"G": "#f4a6b8",
-				"F": "#f6a43c"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAABAAAAA",
-				"AAAAAAAAAAAEAAAKAAAAAAAHHHHAAA",
-				"AAAAAAAAAAAAAAKKAAKAAAAHHHHHAA",
-				"AAAAAAAAAAAACKDEKAKAAAHHHHHHAA",
-				"AAAAAAAAAAAAKDDDBKAAAAAHHHHHAA",
-				"AAAAAAAAAAAAKCCKCKAAAAAHHHHAAA",
-				"AAAAAAAAAAAKDCCCCCKAAAAAAAAAAA",
-				"AAAAAAAAAAAKCCEBCCKAAAAAAAAAAA",
-				"AAAAAAAAAAAKCEEEECKAAAAAAAAAAA",
-				"AAAAAEAAAAAKCEEBECKAAAAEAAAAAA",
-				"AAAAAAAAAAAKDEEEECKAAAAAAAAAAA",
-				"AAAAAAAAAAAKCCEECDKAAAAAAAAAAA",
-				"AAAAAAAAAAAKCCCCCCKAAAAAAAAAAA",
-				"KKAAAAAAAAAKKCCCKCKAAAAAAAAAAA",
-				"GGGGGGGGGGGKCCCCCCKGGGGGGGGGFG",
-				"GGGGGGGGGGGKCCDCCCDKGGGGGGGGGG",
-				"GGGGGGGGGGGKCCCCCCCKGGGGGGGGGG",
-				"GGGGGGGGGKGKKCCCKCCDKGGGGGGCGG",
-				"GGGGGGGGKKGKCCCCCCKDDKGGGGGGGG",
-				"GGGGGBGGKKGGKCDCCKGKDKGGGGGGGG",
-				"GGGGGGGKCKGGKCCCCKGKBCKGGGGGGG",
-				"GGGGGGGKKKGGKCCCKKGKKKKGGGGGGG",
-				"GGGGGGGGGGGGGKCCKGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGKBFKGGGGGGGGKGGGG",
-				"GGGGGGGGGGGGGKFDKGGGGGGGGGGGGG",
-				"GGGGGKGGGGGGGGKKGGGGGGGGGKGGGG",
-				"GGGGGGGGGGGGGGKKGGGGGGGGGGGGGG",
-				"GGGGKGGGGKGGGGGGGGGGBGGGGGGGGG",
-				"GGGGGGGGGKGGGGGGGGGGGGCGGFGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-			],
-			"seed": 1,
-			"wins": 1,
-			"breaks": 0,
-			"cruxes": 0,
-			"spread": 0
-		},
-		{
 			"id": "orange-quilt",
 			"name": "Orange Quilt",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"G": "#845b2b",
 				"A": "#faa2be",
@@ -800,6 +707,7 @@
 		{
 			"id": "white-ice-cream",
 			"name": "White Ice Cream",
+			"song": { "mode": "major", "spice": "gentle", "lead": "kalimba" },
 			"palette": {
 				"A": "#85c1ef",
 				"E": "#338b54",
@@ -853,67 +761,9 @@
 			"spread": 0
 		},
 		{
-			"id": "red-target-2",
-			"name": "Red Target II",
-			"palette": {
-				"A": "#9ad0c2",
-				"B": "#e63946",
-				"K": "#000000",
-				"C": "#ad97d3",
-				"D": "#26b062",
-				"H": "#850341",
-				"E": "#2c5081",
-				"F": "#df9531",
-				"G": "#dc9aa3"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAABAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAAAAAAAAAAAAAAKAAAAAAAAAAABAAA",
-				"AAAAAAAAAAKKKKKBKKKKKAAAAAAAAAA",
-				"AAAAAAAAKKBCBBBBBBBBBKKAAAAAAAA",
-				"AAAAAAAKBBBBBBDCBDBBBBBKAAAAAAA",
-				"AAAAAAKBBBDCBDCBDCBDCBBBKAAAAAA",
-				"AAAAAKBBBDCBDCBDCBDCBDBBBKAAAAA",
-				"AAAAKBBBCBDCBDDDDDBDCBDBBBKAAAA",
-				"AAAKBBBBDCBDDDDDDDDDDCBDBBHKAAA",
-				"AAAKBBBDCBDDDDDDDDDDDBDCBBHKAAA",
-				"AAKCBBDCBDDDDEEEEEFDDDCBDCHHKAA",
-				"AAKBBCBDDDDFEEEEEEEDDDDCBDHHKAA",
-				"AAKBBDCBDDDEEEEBEEEEDDDDCBBHKAA",
-				"AAKBDCBDDDEEEEFFFEEEEDDDBDCHKAA",
-				"AAKBCBDDDDEEEFFBFFEEEDDDDCBHKAA",
-				"AKBBDCBDDDEEECFFFBEEEDDDBDCHHKA",
-				"GGKBBDCDDDEFEFFFFFEEEDDDCBDHKGG",
-				"GGKBDCBDDDEEEEFFFEEEEDDDBDCHKGG",
-				"GGKBBBDCDDDEEEEEEBEEDDDBDCHHKGG",
-				"GGKBBCBDDDFDEEEEEEEDDDDCBDHHKGG",
-				"GGKBBDCBDDDDDEEEEEDEDDBDCBHHKGG",
-				"GGGKBBBDCBDDDDDDDDDDDBDCBHHKGGG",
-				"GGGKBBBCBDCDDDDDDDDDBDCBHHHKGGG",
-				"GGGGKBBBCBDCBDDDDDBDCBDHHHKGGGG",
-				"GGGGGKBBBCBDCBDCBDCBDCHHHKGGGGG",
-				"GGGGGGKDBBDCBDCBDCBDCHHHKGGGGGG",
-				"GGGGGGGKHHHHBCBDCBHHHHHKGGGGGGG",
-				"GGGGGGGGKKHHHHHHHHHHHKKGGGGGGGG",
-				"GGGGGGGGGGKKKKKHKKKKKGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGKGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGBGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
-				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
-			],
-			"seed": 5,
-			"wins": 0.75,
-			"breaks": 1,
-			"cruxes": 2,
-			"spread": 1,
-			"deal": "4011122222200010120011002211333333303324444444334440420211133224303140012241",
-			"push": -1
-		},
-		{
 			"id": "sky-gem",
 			"name": "Sky Gem",
+			"song": { "mode": "lydian", "spice": "adventurous", "lead": "vibes" },
 			"palette": {
 				"A": "#1c2340",
 				"H": "#4eceb8",
@@ -972,6 +822,7 @@
 		{
 			"id": "coral-flower",
 			"name": "Coral Flower",
+			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
 			"palette": {
 				"A": "#f4a6b8",
 				"K": "#24212b",
@@ -1022,6 +873,7 @@
 		{
 			"id": "brown-mushroom",
 			"name": "Brown Mushroom",
+			"song": { "mode": "major", "spice": "gentle", "lead": "pizz" },
 			"palette": {
 				"A": "#96bee8",
 				"D": "#e7e5c2",
@@ -1074,63 +926,9 @@
 			"spread": 0
 		},
 		{
-			"id": "sky-house-2",
-			"name": "Sky House II",
-			"palette": {
-				"A": "#fcd87c",
-				"K": "#5a3a1a",
-				"H": "#ffffff",
-				"D": "#5c4dae",
-				"G": "#8c8797",
-				"C": "#67c5f3",
-				"I": "#2a304e",
-				"E": "#e2403a",
-				"F": "#a7d948",
-				"B": "#1fa2a3"
-			},
-			"art": [
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AAKKKKAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AKHHHKAAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AKHHHHKAAAAAAAAAAAAAAAAAAAAAAAA",
-				"AKHHHKAAAAAAAAAKAAAAAAAAAAAAAAA",
-				"AAKKKKAAKAAAAAKDKAKKKAAAKAAAAAA",
-				"AAAAAAAAAAAAAKDDDKGDKAAAAAAAAAA",
-				"AAAAAAAAAAAAKDDDDDGGKAAAAAAAAAA",
-				"AAAAAAAAAAAKDDDDDDGDKAAAAAAAAAA",
-				"AAAAAAAAAAKDCKGDCKGGKAAAAAAAAAA",
-				"AAAAAAAAAKKGDCKGDCKGDKAAAAAAAAA",
-				"AAAAAAAAKKGDCKGDCKGDCKKAAAAAAAA",
-				"AAAAAAAKKGDCKGDCKGDCKGDKAAAAAAA",
-				"AAAAAAKDDDDDDDDDDDDDDDDDKAAAAAA",
-				"AAAAAAAKCCKCCCKCCCKCCCKKAAAAAAA",
-				"IIIIIIIKCCCCCCCCCCCCCCCKIIIIIII",
-				"IIIIIIIKEFFKFCCCECFKFFCKIIIIIII",
-				"IIIIIIIKCKKKKCCCCCKKKKCKIIIIIII",
-				"IIIIIIIKCFFKFCDCCCFKFFDKIIIIIII",
-				"IIIIIIIKCCCCCEEEECCCCCCKIIIIIII",
-				"IIIIIIIKKCCCKEFEECCCKCCKIIIIIII",
-				"IIIIIIIKCCCCCEEEECCCCCCKIIIIIII",
-				"IIIIIIIKCCECCEEEECECCCEKIIIIIII",
-				"IIIIIIIKCCCCCEEEECCCCCCKIIIIIII",
-				"BBBBBBBKKKKKKKKKKKKKKKKKBBBBBBB",
-				"BDBBBBDBBBBBBBFBBBBBBBBBBBBFBBB",
-				"BBBBEBBBBBBBBBBBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBCBBBBBBBB",
-				"BBBBHBBBBBBBBBEBBBBBBBBBBBBBBBB",
-				"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-			],
-			"seed": 2,
-			"wins": 0.75,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1,
-			"deal": "001101322222403133331111004444330202342344422111100333",
-			"push": 1
-		},
-		{
 			"id": "violet-fruit-tree",
 			"name": "Violet Fruit Tree",
+			"song": { "mode": "major", "spice": "gentle", "lead": "mallet" },
 			"palette": {
 				"A": "#ceb7f5",
 				"K": "#24212b",
