@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { buildPuzzle } from '../src/lib/mosaic/engine.ts';
 import { reportLevel } from '../src/lib/mosaic/report.ts';
 import { loadLevels, loadPacks } from './levels.ts';
 
@@ -40,7 +41,7 @@ test('later levels are harder: the solver score rises through play', () => {
 test('report: a shipped level is clean; a broken one lists its problems', () => {
 	const ok = reportLevel(LEVELS[0], 0);
 	assert.deepEqual(ok.problems, []);
-	assert.ok(ok.moves > 0 && ok.minTray <= 20);
+	assert.ok(ok.moves > 0 && ok.minTray <= buildPuzzle(LEVELS[0], 0).trayCap);
 
 	const bad = reportLevel(
 		{ id: '', name: 'x', palette: { A: '#e63946', B: '#e33b47' }, art: ['AB', 'BAX'] },

@@ -198,6 +198,19 @@
 		return out;
 	});
 
+	/**
+	 * The tray's rows, even: as CSS, the row widths for its slots in 1, 2, 3… rows (each
+	 * holding its share, rounded up), each kept only if it fits, the widest winning. So 20
+	 * slots where 19 fit make two rows of 10, not 19 and 1. The browser does the fitting.
+	 */
+	const trayRows = $derived.by(() => {
+		const n = trayView.length;
+		const per = [...new Set(Array.from({ length: 12 }, (_, k) => Math.ceil(n / (k + 1))))];
+		const w = (p: number) => `(${p} * var(--pitch) - var(--tray-gap))`;
+		const fits = (p: number) => `clamp(0, sign(var(--fit-w) - ${w(p)}) + 1, 1)`;
+		return `max(${per.map((p) => `calc(${w(p)} * ${fits(p)})`).join(', ')})`;
+	});
+
 	const trayState = $derived.by(() => {
 		void ctl.version;
 		const s = game;
@@ -747,6 +760,7 @@
 						class:hidden={!!ctl.overlay}
 						bind:this={trayEl}
 						style:--n={trayView.length}
+						style:--rows={trayRows}
 						onclick={onTray}
 						onpointermove={onTrayHover}
 						onpointerleave={() => (trayHover = -1)}
@@ -1042,8 +1056,8 @@
 	}
 	/*
 	 * Tray: the card's width under the board. Its slots' rows hold as many whole
-	 * slots as fit, or all of them if they fit on one row, centered by a
-	 * whole-pixel left padding.
+	 * slots as fit, or all of them if they fit on one row, evened out where the
+	 * browser can (`trayRows`), centered by whole-pixel padding either side.
 	 */
 	.tray-area {
 		--tray-gap: round(calc(var(--slot) * 0.14), 1px);
@@ -1057,19 +1071,22 @@
 		grid-area: 1 / 1;
 	}
 	.tray {
-		--row-w: min(
-			calc(
-				round(down, calc(var(--room) + var(--tray-gap)), calc(var(--slot) + var(--tray-gap))) -
-					var(--tray-gap)
-			),
-			calc(var(--n) * var(--slot) + (var(--n) - 1) * var(--tray-gap))
-		);
+		--pitch: calc(var(--slot) + var(--tray-gap));
+		/* The widest row of whole slots that fits. */
+		--fit-w: calc(round(down, calc(var(--room) + var(--tray-gap)), var(--pitch)) - var(--tray-gap));
+		--row-w: min(var(--fit-w), calc(var(--n) * var(--pitch) - var(--tray-gap)));
+		--pad: calc(8px + round(down, calc((var(--room) - var(--row-w)) / 2), 1px));
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--tray-gap);
-		padding: 8px;
-		padding-left: calc(8px + round(down, calc((var(--room) - var(--row-w)) / 2), 1px));
+		padding: 8px var(--pad);
 		cursor: default;
+	}
+	/* Even rows, where the browser can compare widths (`sign`). */
+	@supports (width: calc(sign(1px) * 1px)) {
+		.tray {
+			--row-w: var(--rows);
+		}
 	}
 	.slot {
 		width: var(--slot);

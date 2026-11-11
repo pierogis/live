@@ -3,7 +3,7 @@
  * Used by `pnpm -F museum levels` and `pnpm -F museum murals`.
  * Imports use `.ts` so node scripts can load this file directly.
  */
-import { blobSizes, boardGroups, buildSolved, BUILD_TRAY, type Level } from './engine.ts';
+import { blobSizes, boardGroups, buildSolved, type Level } from './engine.ts';
 import { checkPicture } from '../shared/checks.ts';
 
 export interface LevelReport {
@@ -61,7 +61,7 @@ export function reportLevel(lv: Level, index: number): LevelReport {
 	const { state: s, solution: sol } = buildSolved(lv, index);
 	const shuffle = s.attempt ?? -1;
 	const minTray = s.minTray ?? 0;
-	if (shuffle < 0) problems.push(`needs more than a ${BUILD_TRAY}-slot tray`);
+	if (shuffle < 0) problems.push(`needs more than its ${s.trayBase}-slot tray`);
 
 	const groups = boardGroups(s);
 	const clean = groups.filter((g) => new Set(g.cells.map((j) => s.target[j])).size === 1).length;

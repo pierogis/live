@@ -50,7 +50,8 @@ export function gamePages<L extends Picture, S>({
 
 		/**
 		 * The mural you're working on, from your save, as one picture: or, once it's
-		 * finished, the next one up (the first, before you've played).
+		 * finished, the next one up (the first, before you've played). With its name, its
+		 * panels' layout, and which of them you've finished.
 		 */
 		current(cookies: Cookies) {
 			const saved = saveIn(cookies);
@@ -60,7 +61,15 @@ export function gamePages<L extends Picture, S>({
 				packs.findIndex((p) => saved.level < (start += p.levels.length))
 			);
 			const open = packs.slice(at).find((p) => p.levels.some((l) => !saved.completed[l.id]));
-			return packPicture(open ?? packs[at]);
+			const pack = open ?? packs[at];
+			const panels = pack.mural ? pack.levels : pack.levels.slice(0, 1);
+			return {
+				...packPicture(pack),
+				name: pack.name,
+				cols: pack.mural?.cols ?? 1,
+				panel: { w: panels[0].art[0].length, h: panels[0].art.length },
+				done: panels.map((l) => !!saved.completed[l.id])
+			};
 		},
 
 		/** `/<game>`: its murals, with your save so the ✓ marks and the way back are there at once. */

@@ -53,6 +53,8 @@ export interface State {
 	filled: boolean[];
 	tray: Gem[];
 	trayCap: number;
+	/** The level's own tray (`trayFor`), before the bigger-tray option doubles it. */
+	trayBase?: number;
 	moves: number;
 	/** The most tray the solver's path needed. */
 	minTray?: number;
@@ -761,24 +763,32 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 	return null;
 }
 
-/** The standard tray: how many dots it holds. */
-export const TRAY = 40;
+/** About how many of a picture's dots each tray slot is for: a bigger picture gets more room. */
+const DOTS_PER_SLOT = 14;
 /**
- * The tray a level is proven with: half the player's, so every level can be finished
- * with plenty of room to spare (and the shuffles stay the ones levels always had).
+ * How much tighter the tray gets through play, as a share of its room: the lever for
+ * difficulty, apart from the picture's size (0.15 is 15% less room by the last level).
  */
-export const BUILD_TRAY = 20;
-/** The tray in relaxed mode: much bigger, never smaller than the level's own. */
-const RELAXED_TRAY = 80;
+const TRAY_SQUEEZE = 0.15;
 
-/** Give a puzzle the relaxed tray. Changes nothing else, so the level stays the same. */
+/**
+ * The tray for the `index`th level, a picture of `dots` dots: room in proportion to the
+ * picture, so a bigger one isn't harder for its size alone, tightened a little through
+ * play (`TRAY_SQUEEZE`). Each level is built and proven with its own tray.
+ */
+export function trayFor(dots: number, index: number): number {
+	const t = Math.min(1, Math.max(0, index / LAST_LEVEL));
+	return Math.max(8, Math.round((dots / DOTS_PER_SLOT) * (1 - TRAY_SQUEEZE * t)));
+}
+
+/** The bigger tray (the `relaxed` option): twice the level's own. Changes nothing else. */
 export function relax(s: State): State {
-	s.trayCap = Math.max(s.trayCap, RELAXED_TRAY);
+	s.trayCap = Math.max(s.trayCap, 2 * (s.trayBase ?? s.trayCap));
 	return s;
 }
 
 export interface BuildOptions {
-	/** A much bigger tray. */
+	/** The bigger tray: twice the standard. */
 	relaxed?: boolean;
 }
 
@@ -804,25 +814,25 @@ export function blobSizes(index: number): { min: number; max: number } {
 
 /**
  * Same level id and index always give the same puzzle.
- * Tries a few shuffles and keeps the first one the solver can finish with
- * `BUILD_TRAY`, so every level is solvable with the standard tray.
+ * Tries a few shuffles and keeps the first one the solver can finish with the
+ * level's own tray (`trayFor`), so every level is solvable with the tray you get.
  */
 export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
 	const { state } = buildSolved(level, index);
-	state.trayCap = Math.max(state.trayCap, TRAY);
 	if (opts.relaxed) relax(state);
 	return state;
 }
 
 /**
- * The puzzle as proven, with `BUILD_TRAY` (`buildPuzzle` widens it for play), plus the
- * solution that let it keep its shuffle. Drops gather by the room left in the tray, so
- * the solution replays only with the tray it was found with.
+ * The puzzle as proven, with the level's own tray, plus the solution that let it keep
+ * its shuffle. Drops gather by the room left in the tray, so the solution replays only
+ * with the tray it was found with.
  */
 export function buildSolved(level: Level, index: number): Built {
 	const art = parseArt(level);
 	const base = hashStr(level.id);
 	const { min: blobMin, max: blobMax } = blobSizes(index);
+	const tray = trayFor(art.target.filter((c) => c >= 0).length, index);
 
 	const make = (attempt: number): State => {
 		const colorsAt = scramble(art, blobMin, blobMax, makeRng(base + attempt * 7919));
@@ -835,7 +845,8 @@ export function buildSolved(level: Level, index: number): Built {
 			top: colorsAt.map((c) => (c < 0 ? null : { id: id++, c })),
 			filled: art.target.map(() => false),
 			tray: [],
-			trayCap: BUILD_TRAY,
+			trayCap: tray,
+			trayBase: tray,
 			moves: 0
 		};
 	};

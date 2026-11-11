@@ -9,7 +9,7 @@ all things related to [pierogis.live](https://pierogis.live)
   - [`colors`](https://colors.pierogis.live): palettes
   - [`emporium`](https://emporium.pierogis.live): plates
   - [`live`](https://pierogis.live): base camp
-  - [`museum`](https://museum.pierogis.live): in which you can appreciate art
+  - [`museum`](https://museum.pierogis.live): a quiet room with pictures
   - [`stale`](https://stale.pierogis.live): blog
   - [`utensils`](https://utensils.pierogis.live): table manners
 - packages

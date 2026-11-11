@@ -62,16 +62,20 @@
 	</div>
 
 	{#each saves?.options ?? [] as option (option.key)}
-		<label class="option inset">
-			<input
-				type="checkbox"
-				checked={!!options[option.key]}
-				onchange={(e) => toggle(option.key, e.currentTarget.checked)}
-			/>
-			<span
-				><b>{option.label}</b>{#if option.note}<br /><small>{option.note}</small>{/if}</span
-			>
-		</label>
+		<div class="option-card">
+			<Card>
+				<label class="option">
+					<input
+						type="checkbox"
+						checked={!!options[option.key]}
+						onchange={(e) => toggle(option.key, e.currentTarget.checked)}
+					/>
+					<span
+						><b>{option.label}</b>{#if option.note}<br /><small>{option.note}</small>{/if}</span
+					>
+				</label>
+			</Card>
+		</div>
 	{/each}
 
 	{#each sections as section (section.name)}
@@ -151,16 +155,21 @@
 	h2 {
 		font-size: 20px;
 	}
+	/* An option's card hugs its line, at the left. */
+	.option-card {
+		align-self: flex-start;
+	}
+	.option-card :global(.card) {
+		height: auto;
+	}
 	.option {
 		display: flex;
 		gap: 10px;
-		align-items: flex-start;
-		padding: 12px;
-		border-radius: 10px;
+		align-items: center;
 		cursor: pointer;
 	}
 	.option input {
-		margin-top: 3px;
+		margin: 0;
 		width: 18px;
 		height: 18px;
 		accent-color: var(--accent-color);
@@ -178,12 +187,15 @@
 		grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
 		gap: 10px;
 	}
-	/* The card hugs its mural: no padding, and only as wide as the picture. */
+	/*
+	 * The card hugs its mural, only as wide as the picture, which sits just inside the
+	 * card's 2px inner ring, rounded to its curve, so the panels never cover the border.
+	 */
 	.frame {
 		align-self: center;
 	}
 	.frame :global(.card) {
-		padding: 0;
+		padding: 2px;
 		height: auto;
 	}
 	/*
@@ -193,6 +205,8 @@
 	 */
 	.mural {
 		--s: 3px;
+		border-radius: 4px;
+		overflow: hidden;
 		display: grid;
 		grid-template-columns: repeat(var(--cols), max-content);
 		gap: 2px;
@@ -232,8 +246,10 @@
 	.panel:hover canvas {
 		filter: none;
 	}
+	/* Marked inside its own edge, so it never spills onto a neighbor or the card's border. */
 	.panel.current {
 		outline: 3px solid var(--secondary-color);
+		outline-offset: -3px;
 		position: relative;
 	}
 	.card {

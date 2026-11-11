@@ -200,12 +200,8 @@ test('same level always gives the same puzzle', () => {
 test('the report judges a level by the solve that kept its shuffle', () => {
 	LEVELS.slice(0, 3).forEach((lv, i) => {
 		const { state, solution } = E.buildSolved(lv, i);
-		assert.equal(state.trayCap, E.BUILD_TRAY);
-		assert.deepEqual(
-			{ ...state, trayCap: E.TRAY },
-			E.buildPuzzle(lv, i),
-			'the same puzzle the game plays, with its wider tray'
-		);
+		assert.equal(state.trayCap, state.trayBase);
+		assert.deepEqual(state, E.buildPuzzle(lv, i), 'the same puzzle the game plays, tray and all');
 		// Replaying the build's own path wins, even if plain greedy play would not.
 		const r = E.clone(state);
 		for (const a of solution.path) assert.ok(E.move(r, a.sel, a.dst).ok);
@@ -274,15 +270,28 @@ test('the tray always holds as many dots as there are open spots, so play never 
 	}
 });
 
-test('blobs grow all through play, from about half the tray to over twice it', () => {
+test('blobs grow all through play, from about half the first tray to over twice it', () => {
 	let last = E.blobSizes(0);
-	assert.ok(last.max < 2 * E.BUILD_TRAY && last.min < E.BUILD_TRAY);
+	assert.ok(last.max < 40 && last.min < 20);
 	for (let i = 1; i <= E.LAST_LEVEL; i++) {
 		const b = E.blobSizes(i);
 		assert.ok(b.min >= last.min && b.max >= last.max && b.min < b.max, `level ${i + 1}`);
 		last = b;
 	}
 	assert.ok(E.blobSizes(E.LAST_LEVEL).max > E.blobSizes(150).max, 'still growing late in play');
-	assert.ok(last.max > 2 * E.BUILD_TRAY);
+	assert.ok(last.max > 40);
 	assert.deepEqual(E.blobSizes(E.LAST_LEVEL + 50), last, 'and stops at the last level');
+});
+
+test('a level\u2019s tray grows with its picture, tightens a little through play, and the bigger one doubles it', () => {
+	assert.equal(E.trayFor(288, 0), 21);
+	assert.ok(E.trayFor(528, 0) > E.trayFor(288, 0), 'a bigger picture, more room');
+	assert.ok(E.trayFor(528, E.LAST_LEVEL) < E.trayFor(528, 0), 'tighter late in play');
+	assert.ok(E.trayFor(528, E.LAST_LEVEL) >= 0.8 * E.trayFor(528, 0), 'but only a little');
+	LEVELS.slice(0, 5).forEach((lv, i) => {
+		const s = E.buildPuzzle(lv, i);
+		const dots = s.target.filter((c) => c >= 0).length;
+		assert.equal(s.trayCap, E.trayFor(dots, i), lv.id);
+		assert.equal(E.buildPuzzle(lv, i, { relaxed: true }).trayCap, 2 * s.trayCap, lv.id);
+	});
 });

@@ -2,14 +2,8 @@
 import { gameSave, type GameOption } from '../shared/save';
 import LIST from 'virtual:level-list/mosaic';
 
-/** Mosaic's settings, toggled on its pictures page. */
-const OPTIONS: GameOption[] = [
-	{
-		key: 'relaxed',
-		label: 'relaxed mode',
-		note: 'a much bigger tray, so you can lift dots freely'
-	}
-];
+/** Mosaic's settings, toggled on its murals page. */
+const OPTIONS: GameOption[] = [{ key: 'relaxed', label: 'bigger tray' }];
 
 /** See gameSave in shared/save.ts. */
 export const mosaicSave = gameSave('mosaic', () => LIST, OPTIONS);
