@@ -1,22 +1,18 @@
-/*
- * The Black-Figure Vase (Athens, about 540 BC): black figures painted on orange clay.
- * Two warriors play a board game under a grapevine, with a chariot on one side and a
- * ship on the other. Below them a line of animals walks around the foot.
- */
-import type { Canvas } from './canvas.ts';
+// The Black-Figure Vase (Athens, about 540 BC): black figures on orange clay. Warriors at
+// a board game between a chariot and a ship, over a line of animals. Twelve panels of 18 by 16.
+import { points, type Canvas } from './canvas.ts';
 import type { Mural } from './mural.ts';
 
 const PW = 18;
 const PH = 16;
 const COLS = 4;
-const ROWS = 3;
 const W = COLS * PW;
 
-// ---------- top band patterns: each repeats every 6 dots ----------
+// top band patterns, each repeating every 6 dots
 const MEANDER = ['.#####', '.#....', '.#.###', '.#...#', '####.#'];
 const BUDS = ['###rrr', '###rrr', '.#..r.'];
 
-// A warrior bent over the board, facing right. `t` is his cloak, colored when stamped.
+// `t` is the warrior's cloak, colored when stamped
 const WARRIOR = [
 	'.....rrrr....',
 	'...rrrrrrr...',
@@ -104,31 +100,15 @@ const BOAR = [
 	'...##....##.....',
 	'..###...###.....'
 ];
-// How far a ray reaches to each side of its middle, from its tip down to its base.
+// how far a ray reaches to each side of its middle, tip to base
 const RAY = [0, 0, 1, 1, 2];
 
 function draw(c: Canvas) {
 	const { put, rect, disk, line, ring } = c;
 
-	// What each mark in a pattern paints. `t` (a cloak) is set before each warrior.
-	const key: Record<string, string> = { '#': 'K', r: 'R', c: 'C', o: 'O' };
-
-	/**
-	 * Paint a pattern with its top left at (x, y). `flip` mirrors it left to right;
-	 * `swap` trades one color for another.
-	 */
-	const stamp = (
-		pattern: string[],
-		x: number,
-		y: number,
-		flip = false,
-		swap?: Record<string, string>
-	) => {
-		const colors = Object.fromEntries(
-			Object.entries(key).map(([mark, col]) => [mark, swap?.[col] ?? col])
-		);
+	const key: Record<string, string> = { '#': 'K', r: 'R', c: 'C' };
+	const stamp = (pattern: string[], x: number, y: number, flip = false, colors = key) =>
 		c.stamp(pattern, x, y, colors, flip);
-	};
 
 	// ---------- top band: Greek key, then a chain of buds ----------
 	rect(0, 0, W - 1, 4, 'C');
@@ -137,7 +117,6 @@ function draw(c: Canvas) {
 			if (MEANDER[r][x % 6] === '#') put(x, r, 'K');
 		}
 	}
-	// a black line under the key
 	rect(0, 5, W - 1, 5, 'K');
 	for (let x = 0; x < W; x++) {
 		for (let r = 0; r < 3; r++) {
@@ -146,10 +125,8 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// ---------- ground under the scene ----------
+	// ---------- the scene: ground line, then the grapevine ----------
 	rect(0, 31, W - 1, 31, 'R');
-
-	// ---------- grapevine arching over the players ----------
 	// the stem steps up and down every 6 dots, with a joint at each step
 	for (let x = 0; x < 54; x++) {
 		put(x, Math.floor(x / 6) % 2 ? 10 : 11, 'K');
@@ -158,7 +135,7 @@ function draw(c: Canvas) {
 			put(x, 11, 'K');
 		}
 	}
-	/** A bunch of grapes: one row for each width, each centered under the first. */
+	// a bunch of grapes: one row for each width, centered under the first
 	const bunch = (x: number, y: number, widths: number[]) => {
 		widths.forEach((w, i) => {
 			const o = Math.floor((widths[0] - w) / 2);
@@ -166,42 +143,31 @@ function draw(c: Canvas) {
 		});
 	};
 
-	// ---------- the players ----------
-	key.t = 'R';
-	/** A round shield resting on the ground: black rim, colored face, a square boss. */
+	// ---------- the players, their shields, spears and board ----------
 	const shield = (cx: number, cy: number, face: string, boss: string) => {
 		disk(cx, cy, 3.6, 'K');
 		disk(cx, cy, 2.5, face);
 		rect(cx - 1, cy - 1, cx + 1, cy + 1, boss);
 	};
-	// left player: cream cloak, cream shield
 	shield(21, 27, 'C', 'R');
-	// his spear, leaning, with its tip
 	line(21, 11, 25, 22, 'K');
 	put(22, 11, 'K');
 	put(20, 12, 'K');
-	key.t = 'C';
-	stamp(WARRIOR, 23, 13);
-	// right player: red cloak, red shield
+	stamp(WARRIOR, 23, 13, false, { ...key, t: 'C' });
 	shield(50, 27, 'R', 'C');
-	// his spear, leaning the other way
 	line(50, 11, 46, 22, 'K');
 	put(49, 11, 'K');
 	put(51, 12, 'K');
-	key.t = 'R';
-	stamp(WARRIOR, 35, 13, true);
-	// the block with the board on it
+	stamp(WARRIOR, 35, 13, true, { ...key, t: 'R' });
 	rect(34, 26, 37, 30, 'R');
 	rect(35, 27, 36, 28, 'K');
 	rect(33, 25, 38, 25, 'C');
-	// grapes hanging between the players
 	bunch(34, 12, [4, 4, 2, 2]);
 
-	// ---------- chariot, two horses and a driver ----------
+	// ---------- the chariot, with a bunch of grapes and a bird over it ----------
 	// the far horse, in red, shows only its head and back behind the near black one
-	stamp(HORSE.slice(1, 9), 4, 16, false, { K: 'R', C: 'R' });
+	stamp(HORSE.slice(1, 9), 4, 16, false, { '#': 'R', c: 'R' });
 	stamp(HORSE, 6, 16);
-	// wheel, car, driver in a long white robe
 	disk(3, 27, 3.5, 'C');
 	ring(3, 27, 3.5, 'R', 1.0);
 	line(0, 27, 6, 27, 'K');
@@ -211,25 +177,19 @@ function draw(c: Canvas) {
 	put(3, 17, 'K');
 	rect(0, 21, 4, 23, 'R');
 	rect(0, 22, 4, 22, 'K');
-	// the reins
 	line(4, 19, 6, 19, 'K');
-	// over the chariot: more of the vine, a heavy bunch and a bird
 	bunch(9, 12, [5, 5, 3, 1]);
 	stamp(['##..##', '.####.', '..##..'], 1, 13);
 
-	// ---------- ship with a square sail, an eye on the prow, dolphins ----------
-	// mast and yard
+	// ---------- the ship and its dolphins ----------
 	line(63, 9, 63, 20, 'K');
 	line(56, 10, 70, 10, 'K');
-	// the sail and its two red stripes
 	rect(57, 11, 69, 18, 'C');
 	rect(57, 13, 69, 13, 'R');
 	rect(57, 16, 69, 16, 'R');
 	stamp(HULL, 54, 19);
-	// the eye on the prow
 	rect(56, 21, 58, 22, 'C');
 	put(57, 22, 'K');
-	// a red stripe along the hull
 	rect(60, 23, 69, 23, 'R');
 	stamp(DOLPHIN, 54, 26);
 	stamp(DOLPHIN, 63, 27);
@@ -237,24 +197,18 @@ function draw(c: Canvas) {
 	// ---------- bottom: animals in line, rays, the black foot ----------
 	rect(0, 32, W - 1, 39, 'C');
 	rect(0, 40, W - 1, 40, 'R');
-	// one animal to a panel
 	[LION, DEER, GOOSE, BOAR].forEach((animal, k) => stamp(animal, k * PW + 1, 32));
-	// black rays pointing up from the foot
 	for (let y = 41; y < 46; y++) {
 		for (let x = 0; x < W; x++) {
 			if (Math.abs((x % 6) - 2) <= RAY[y - 41]) put(x, y, 'K');
 		}
 	}
 	rect(0, 46, W - 1, 47, 'K');
-	// small fillers, as on the real friezes: a plant under the big beasts, a rosette behind the others
+	// fillers: a plant under each beast, a rosette behind two of them
 	for (const k of [0, 3]) stamp(['.r.', 'rrr'], k * PW + 7, 38);
 	stamp(['.#.', '###'], PW + 6, 38);
 	stamp(['.#.', '###'], 2 * PW + 13, 38);
-	const rosettes: [k: number, dx: number][] = [
-		[1, 5],
-		[2, 4]
-	];
-	for (const [k, dx] of rosettes) stamp(['.r.', 'r#r', '.r.'], k * PW + dx, 32);
+	for (const [k, dx] of points('1,5 2,4')) stamp(['.r.', 'r#r', '.r.'], k * PW + dx, 32);
 }
 
 export const vase: Mural = {
@@ -263,9 +217,8 @@ export const vase: Mural = {
 	prefix: 'greek-vase',
 	notes: 'G',
 	cols: COLS,
-	rows: ROWS,
 	panel: [PW, PH],
-	// Black-figure ware: O orange clay, K black glaze, C cream slip, R dark red.
+	// O orange clay, K black glaze, C cream slip, R dark red
 	palette: { O: '#e9852b', K: '#1d1613', C: '#f6e7c1', R: '#8f2618' },
 	ground: 'O',
 	panels: [

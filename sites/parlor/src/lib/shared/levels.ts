@@ -6,11 +6,16 @@
  */
 import type { Pack, Picture } from './level.ts';
 
+/** One pack file's JSON. */
+export type PackFile<L extends Picture = Picture> = Omit<Pack<L>, 'id'>;
+
 /** Pack files by path, each as its JSON (under `default`, the way a glob gives it). */
-export type PackFiles<L> = Record<
-	string,
-	{ default: { name: string; mural?: { cols: number }; song?: Picture['song']; levels: L[] } }
->;
+export type PackFiles<L extends Picture> = Record<string, { default: PackFile<L> }>;
+
+/** A pack's levels as played: the pack's song settings go to each, under the level's own. */
+export function packLevels<L extends Picture>({ song, levels }: PackFile<L>): L[] {
+	return song ? levels.map((lv) => ({ ...lv, song: { ...song, ...lv.song } })) : levels;
+}
 
 /** The packs in file name order, and every level in play order. */
 export function levelsFrom<L extends Picture>(
@@ -20,11 +25,8 @@ export function levelsFrom<L extends Picture>(
 		.sort()
 		.map((path) => {
 			const pack = files[path].default;
-			// A pack's song settings go to each of its levels, under the level's own.
-			const levels = pack.song
-				? pack.levels.map((lv) => ({ ...lv, song: { ...pack.song, ...lv.song } }))
-				: pack.levels;
-			return { id: path.slice(path.lastIndexOf('/') + 1, -'.json'.length), ...pack, levels };
+			const id = path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
+			return { id, ...pack, levels: packLevels(pack) };
 		});
 	return { PACKS, LEVELS: PACKS.flatMap((p) => p.levels) };
 }

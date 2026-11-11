@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 
 import { GAME_IDS, type GameId } from '../src/lib/games.ts';
-import type { Picture } from '../src/lib/shared/level.ts';
+import { packLevels, type PackFile } from '../src/lib/shared/levels.ts';
 
 const PREFIX = 'virtual:level-list/';
 const LIB = fileURLToPath(new URL('../src/lib/', import.meta.url));
@@ -36,18 +36,12 @@ export function levelLists(): Plugin {
 				.flatMap((f) => {
 					// Rebuilt when a pack changes, like a save from the picture editor.
 					this.addWatchFile(dir + f);
-					const { name, mural, song, levels } = JSON.parse(readFileSync(dir + f, 'utf8')) as {
-						name: string;
-						mural?: object;
-						song?: Picture['song'];
-						levels: Picture[];
-					};
-					return levels.map((lv, k) => ({
+					const pack = JSON.parse(readFileSync(dir + f, 'utf8')) as PackFile;
+					const of = pack.levels.length;
+					return packLevels(pack).map((lv, k) => ({
 						...Object.fromEntries(Object.entries(lv).filter(([k]) => !PICTURE.has(k))),
-						// The pack's song settings, under the level's own (as levelsFrom does).
-						...(song && { song: { ...song, ...lv.song } }),
 						// A mural's panel knows its place, so the level page can say so.
-						...(mural && { panel: { mural: name, n: k + 1, of: levels.length } })
+						...(pack.mural && { panel: { mural: pack.name, n: k + 1, of } })
 					}));
 				});
 			return `export default ${JSON.stringify(list)};`;

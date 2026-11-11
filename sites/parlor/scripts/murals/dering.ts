@@ -10,8 +10,7 @@ const PH = 16;
 const COLS = 4;
 const ROWS = 3;
 
-// The shield: 12 wide and 11 tall, flat on top, its sides curving to a point.
-// Each row's left and right edge, outline included.
+// The shield, 12 wide: each row's left and right edge, outline included.
 const SPAN: [number, number][] = [
 	...Array<[number, number]>(7).fill([0, 11]),
 	[1, 10],
@@ -20,7 +19,6 @@ const SPAN: [number, number][] = [
 	[5, 6]
 ];
 
-/** Is this spot of the 10 by 10 field inside the outline? */
 function inside(u: number, v: number): boolean {
 	const y = v + 1;
 	if (y < 0 || y >= 11) return false;
@@ -28,7 +26,7 @@ function inside(u: number, v: number): boolean {
 	return a < u + 1 && u + 1 < b && y < 10;
 }
 
-/** A design: the color of each spot of the field. */
+/** A design: the color of each spot of the 10 by 10 field. */
 type Field = (u: number, v: number) => string;
 
 /** A charge drawn as rows of `X`, in `col` on `bg`, moved right `du` and down `dv`. */
@@ -105,7 +103,6 @@ const bend: Field = (u, v) => {
 	return Math.abs(u - v) <= 2 ? 'R' : 'L';
 };
 
-// One design per panel, in reading order.
 const DESIGNS: Field[] = [
 	bitmap(LION, 'R', 'Y', 0),
 	(u, v) => ((Math.floor(u / 2) + Math.floor(v / 2)) % 2 === 0 ? 'B' : 'L'),
@@ -121,7 +118,7 @@ const DESIGNS: Field[] = [
 	bitmap(LILIES, 'Y', 'B', 0)
 ];
 
-// The names: blocky marks that look like letters and spell nothing, three dots tall.
+// The names: marks that look like letters and spell nothing.
 const GLYPH: Record<string, string[]> = {
 	I: ['X', 'X', 'X'],
 	L: ['X.', 'X.', 'XX'],
@@ -159,13 +156,11 @@ function draw(c: Canvas) {
 		const w = glyphs.reduce((sum, g) => sum + g[0].length, 0) + glyphs.length - 1;
 		let x = ox + Math.floor((PW - w) / 2);
 		for (const g of glyphs) {
-			g.forEach((row, dy) =>
-				[...row].forEach((ch, dx) => ch === 'X' && c.put(x + dx, oy + dy, 'K'))
-			);
+			c.stamp(g, x, oy, { X: 'K' });
 			x += g[0].length + 1;
 		}
 	};
-	// Three rows, each a light strip for the names over a worn tan band of shields.
+	// each panel: a light strip for the name over a tan band with the shield
 	for (let k = 0; k < COLS * ROWS; k++) {
 		const ox = (k % COLS) * PW;
 		const oy = Math.floor(k / COLS) * PH;
@@ -181,7 +176,6 @@ export const dering: Mural = {
 	prefix: 'dering-roll',
 	notes: 'A',
 	cols: COLS,
-	rows: ROWS,
 	panel: [PW, PH],
 	// L light parchment (also heraldic silver), T worn tan parchment, K ink.
 	palette: {

@@ -218,8 +218,10 @@ function tune(index: number): Result {
 	const targetPips = difficultyIndex(target)!;
 	/** The hasty player's share an easy level needs (0 for the rest: not measured). */
 	const floor = hastyFloor(target);
-	/** How far under that a deal's hasty share is, from `n` games; 0 when it's fine. */
-	const rushed = (s: F.State, n: number) => (floor ? Math.max(0, floor - hastyWins(s, n)) : 0);
+	/** How far under that a hasty share is; 0 when it's fine. */
+	const shortfall = (hasty: number) => (floor ? Math.max(0, floor - hasty) : 0);
+	/** A deal's shortfall from `n` hasty games (none played when there's no floor). */
+	const rushed = (s: F.State, n: number) => (floor ? shortfall(hastyWins(s, n)) : 0);
 	/** How far a measured deal is from the level's target: lower is better. */
 	const miss = (wins: number, a: Analysis, under: number) => {
 		const pips = difficultyIndex(wins, cruxCounts(a))!;
@@ -357,7 +359,7 @@ function tune(index: number): Result {
 			const d = measure(c.s, games);
 			const full = analyze(c.s, { ...THOROUGH, timing: index >= TOP });
 			const hasty = floor ? hastyWins(c.s, 2 * games) : NaN;
-			const m = miss(d.wins, full, floor ? Math.max(0, floor - hasty) : 0);
+			const m = miss(d.wins, full, shortfall(hasty));
 			if (!best || m < best.m) best = { ...c, d, full, hasty, m };
 		}
 	};
@@ -373,11 +375,10 @@ function tune(index: number): Result {
 	const b0 = best;
 	// Far off: push the tuning harder (or easier) and try again. Early levels only get
 	// easier that way when it's the hasty player they're too hard for.
-	if (b0 && b0.m > 0.15) {
+	if (b0 && b0.m > 0.15 && index >= 5) {
 		const tooEasy = b0.d.wins > target;
-		const tooRushed = b0.hasty < floor;
-		if (tooRushed && index >= 5) tryPush(-1);
-		else if (index >= 5 && (tooEasy || index > 40)) tryPush(tooEasy ? 1 : -1);
+		if (b0.hasty < floor) tryPush(-1);
+		else if (tooEasy || index > 40) tryPush(tooEasy ? 1 : -1);
 	}
 	const b = best!;
 	return {

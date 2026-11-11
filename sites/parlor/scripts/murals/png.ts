@@ -37,10 +37,7 @@ function png(w: number, h: number, rgb: Buffer): Buffer {
 	]);
 }
 
-/**
- * A picture's rows as an image, `px` pixels a dot. With a panel size, a `gap` of blank
- * pixels parts the panels, to see each one as its own level.
- */
+/** A picture as an image, `px` pixels a dot, with a `gap` between panels when given a panel size. */
 export function image(
 	rows: string[],
 	palette: Record<string, string>,

@@ -1,50 +1,36 @@
 /*
- * The Bayeux Tapestry (England, about 1070s): a long strip of linen stitched in wool with
- * the story of the Norman conquest, between two borders of little beasts. 6 x 2 panels
- * (144 x 44); each of the six scenes has an upper and a lower half.
+ * The Bayeux Tapestry (England, about 1070s): the Norman conquest stitched in wool on linen,
+ * between two borders of little beasts. 6 x 2 panels (144 x 44); each scene has two halves.
  */
-import { div, int } from './canvas.ts';
-import type { Canvas, Point } from './canvas.ts';
+import { div, int, points } from './canvas.ts';
+import type { Canvas } from './canvas.ts';
 import type { Mural } from './mural.ts';
 
 const W = 144;
 
-// The writing over the scenes: blocky marks that look like letters and spell nothing,
-// three dots tall. Each is three rows of 1 (ink) and 0 (bare linen).
-const GLY: string[][] = [
-	['11', '10', '11'],
-	['1', '1', '1'],
-	['11', '11', '10'],
-	['10', '10', '11'],
-	['11', '01', '01'],
-	['101', '111', '101'],
-	['11', '10', '10'],
-	['1', '1', '1'],
-	['111', '010', '010'],
-	['11', '11', '11']
-];
+// the writing over the scenes: blocky marks, three dots tall, that spell nothing
+const GLY =
+	'11,10,11 1,1,1 11,11,10 10,10,11 11,01,01 101,111,101 11,10,10 1,1,1 111,010,010 11,11,11'
+		.split(' ')
+		.map((g) => g.split(','));
 
-// The little beasts of the borders, as rows of `#`.
 const BIRD = ['...##', '####.', '.#...'];
 const BEAST = ['#..##', '####.', '#..#.'];
 const FISH = ['.##..#', '#####.', '.##..#'];
-
-/** How a standing man differs from the plain one. */
-interface ManLook {
-	hair?: string;
-	/** An arm raised ('up') or held out ('fwd') on the side he faces. */
-	arm?: 'up' | 'fwd';
-	/** A helmet's color, in place of hair. */
-	helm?: string;
-}
 
 function draw(c: Canvas) {
 	const { put, rect, disk, line, dots } = c;
 
 	// ---------- helpers ----------
-	/** A standing man, feet on row `y`: tunic `t`, legs `l`, facing `f` (1 right, -1 left). */
-	const man = (x: number, y: number, t: string, l = 'K', f = 1, look: ManLook = {}) => {
-		const { hair = 'K', arm, helm } = look;
+	// a standing man, feet on row y: tunic t, legs l, facing f (1 right, -1 left), maybe an arm up
+	const man = (
+		x: number,
+		y: number,
+		t: string,
+		l: string,
+		f: number,
+		{ hair = 'K', helm, up }: { hair?: string; helm?: string; up?: boolean } = {}
+	) => {
 		put(x, y - 6, helm || hair);
 		put(x + f, y - 6, helm || hair);
 		if (helm) put(x, y - 7, helm);
@@ -52,113 +38,72 @@ function draw(c: Canvas) {
 		put(x + f, y - 5, 'F');
 		rect(x - 1, y - 4, x + 1, y - 2, t);
 		dots(l, [x - 1, y - 1], [x + 1, y - 1], [x - 1, y], [x + 1, y]);
-		if (arm === 'up') {
+		if (up) {
 			dots(t, [x + 2 * f, y - 5], [x + 3 * f, y - 6]);
 			put(x + 4 * f, y - 7, 'F');
 		}
-		if (arm === 'fwd') {
-			put(x + 2 * f, y - 4, t);
-			put(x + 3 * f, y - 4, 'F');
-		}
 	};
-	/**
-	 * A galloping horse, hooves on row `y`, facing `f`. `bl` is half its body's length,
-	 * `bh` its body's height, and `s` is -1 to draw it upside down.
-	 */
-	const horse = (
-		x: number,
-		y: number,
-		col: string,
-		f = 1,
-		bl = 3,
-		{ s = 1, mane = 'K', hoof = 'K', bh = 3 } = {}
-	) => {
-		const e = bh - 3;
-		const P = (dx: number, dy: number, k = col) => put(x + f * dx, y - s * dy, k);
-		// body
-		for (let dx = -bl; dx <= bl; dx++) for (let dy = 3; dy < 3 + bh; dy++) P(dx, dy);
-		// neck and head
-		const head: Point[] = [
-			[1, 5],
-			[1, 6],
-			[1, 7],
-			[2, 6],
-			[2, 7],
-			[2, 8],
-			[3, 8],
-			[3, 7],
-			[4, 7],
-			[2, 9]
-		];
-		for (const [dx, dy] of head) P(bl + dx, dy + e);
-		P(bl, 6 + e, mane);
-		// front legs, flung forward
+	// a galloping horse facing right, hooves on row y; bl is half its body's length
+	const horse = (x: number, y: number, col: string, bl: number, mane: string) => {
+		const P = (dx: number, dy: number, k = col) => put(x + dx, y - dy, k);
+		for (let dx = -bl; dx <= bl; dx++) for (let dy = 3; dy < 7; dy++) P(dx, dy);
+		for (const [dx, dy] of points('1,6 1,7 1,8 2,7 2,8 2,9 3,9 3,8 4,8 2,10')) P(bl + dx, dy);
+		P(bl, 7, mane);
 		P(bl, 2);
 		P(bl + 1, 1);
-		P(bl + 2, 0, hoof);
+		P(bl + 2, 0, 'K');
 		P(bl - 1, 2);
 		P(bl - 1, 1);
-		P(bl - 1, 0, hoof);
-		// back legs, flung behind
+		P(bl - 1, 0, 'K');
 		P(-bl, 2);
 		P(-bl - 1, 1);
-		P(-bl - 2, 0, hoof);
+		P(-bl - 2, 0, 'K');
 		P(-bl + 1, 2);
 		P(-bl + 1, 1);
-		P(-bl + 1, 0, hoof);
-		// tail
-		P(-bl - 1, 5 + e, mane);
-		P(-bl - 2, 4 + e, mane);
-		P(-bl - 2, 3 + e, mane);
+		P(-bl + 1, 0, 'K');
+		P(-bl - 1, 6, mane);
+		P(-bl - 2, 5, mane);
+		P(-bl - 2, 4, mane);
 	};
-	/** A rider sitting on a horse whose hooves are near row `y`: tunic `t`, one leg hanging down. */
-	const rider = (x: number, y: number, t: string, f = 1, leg = 'K', helm?: string, hair = 'K') => {
+	const rider = (x: number, y: number, t: string, leg: string, helm?: string) => {
 		rect(x - 1, y - 8, x + 1, y - 6, t);
 		put(x, y - 9, 'F');
-		put(x + f, y - 9, 'F');
-		put(x, y - 10, helm || hair);
-		put(x + f, y - 10, helm || hair);
+		put(x + 1, y - 9, 'F');
+		put(x, y - 10, helm || 'K');
+		put(x + 1, y - 10, helm || 'K');
 		if (helm) put(x, y - 11, helm);
-		dots(leg, [x, y - 5], [x, y - 4], [x, y - 3], [x + f, y - 2]);
+		dots(leg, [x, y - 5], [x, y - 4], [x, y - 3], [x + 1, y - 2]);
 	};
-	/** A kite shield, colored `a`, with a boss of `b` in its middle. */
 	const kite = (x: number, y: number, a: string, b: string) => {
 		rect(x, y, x + 2, y + 2, a);
 		put(x + 1, y + 3, a);
 		put(x + 1, y + 4, a);
 		put(x + 1, y + 1, b);
 	};
-	/** A tree as the tapestry draws them: a trunk, two boughs, three knots of leaves. */
-	const tree = (x: number, y: number, h = 8, a = 'S', b = 'T') => {
+	const tree = (x: number, y: number, h: number, a = 'S', b = 'T') => {
 		rect(x, y - h, x + 1, y, 'K');
 		put(x - 1, y, 'K');
 		put(x + 2, y, 'K');
 		line(x, y - h + 3, x - 3, y - h, 'K');
 		line(x, y - h + 3, x + 3, y - h, 'K');
 		disk(x + 0.5, y - h - 2, 2.7, a);
-		disk(x - 4, y - h, 2.0, b);
-		disk(x + 4.5, y - h, 2.0, b);
+		disk(x - 4, y - h, 2, b);
+		disk(x + 4.5, y - h, 2, b);
 		dots('R', [x, y - h - 2], [x - 4, y - h], [x + 4, y - h]);
 	};
-	/** A line of writing from `x0` to no further than `x1`, starting at mark `k0`. */
-	const caption = (x0: number, x1: number, y: number, k0 = 0, col = 'K') => {
+	// a line of writing from x0 to no further than x1, starting at mark k
+	const caption = (x0: number, x1: number, y: number, k = 0) => {
 		let x = x0;
-		let k = k0;
 		while (true) {
 			const g = GLY[k % GLY.length];
 			if (x + g[0].length - 1 > x1) break;
-			for (let r = 0; r < 3; r++) {
-				[...g[r]].forEach((ch, i) => {
-					if (ch === '1') put(x + i, y + r, col);
-				});
-			}
+			c.stamp(g, x, y, { 1: 'K' });
 			// a wider gap after every third mark, like the space between words
 			x += g[0].length + (k % 3 === 2 ? 3 : 1);
 			k += 1;
 		}
 	};
-	const ground = (x0: number, x1: number, y: number, a = 'S', b = 'Y', rows = 2) => {
-		// scalloped turf: humps of two wools
+	const ground = (x0: number, x1: number, y: number, a: string, b: string, rows: number) => {
 		for (let x = x0; x <= x1; x++) {
 			const k = div(x, 6) % 2 === 0 ? a : b;
 			for (let r = 0; r < rows; r++) put(x, y - r, k);
@@ -166,7 +111,6 @@ function draw(c: Canvas) {
 			if (x % 6 === 0 && rows > 1) put(x, y, k === a ? b : a);
 		}
 	};
-	/** A hill: half an oval sitting on row `base`, in three bands from the rim in. */
 	const hill = (cx: number, base: number, rx: number, ry: number, cols = ['S', 'Y', 'T']) => {
 		for (let y = int(base - ry) - 1; y <= base; y++) {
 			for (let x = int(cx - rx) - 1; x < int(cx + rx) + 2; x++) {
@@ -176,15 +120,9 @@ function draw(c: Canvas) {
 		}
 	};
 
-	// ---------- borders: rules, slanted bars and little beasts ----------
-	/** Paint a pattern of `#` rows in one color, mirrored when `flip` is set. */
-	const stamp = (pat: string[], x: number, y: number, col: string, flip = false) =>
-		c.stamp(pat, x, y, { '#': col }, flip);
-	/**
-	 * A border five dots tall with its top rule on row `y0`. Every 12 dots: a pair of
-	 * slanted bars, then a beast. Panels listed in `fishes` get fish for beasts; panels
-	 * listed in `empty` are left bare.
-	 */
+	// ---------- the borders ----------
+	// five dots tall, top rule on row y0; every 12 dots a pair of slanted bars, then a beast.
+	// panels in `fishes` get fish for beasts; panels in `empty` are left bare
 	const border = (y0: number, fishes: number[] = [], empty: number[] = []) => {
 		const low = y0 > 0 ? 1 : 0;
 		rect(0, y0, W - 1, y0, 'K');
@@ -201,13 +139,13 @@ function draw(c: Canvas) {
 				put(x + 2 + i, yy, cb);
 			}
 			const an = ['R', 'N', 'S', 'K', 'T', 'Y'][(u * 5 + low * 2) % 6];
-			if (fishes.includes(div(x, 24))) stamp(FISH, x + 6, y0 + 1, an, u % 2 === 1);
-			else stamp((u + low) % 2 === 0 ? BIRD : BEAST, x + 6, y0 + 1, an, u % 2 === 1);
+			const beast = fishes.includes(div(x, 24)) ? FISH : up ? BIRD : BEAST;
+			c.stamp(beast, x + 6, y0 + 1, { '#': an }, u % 2 === 1);
 		}
 	};
 	border(0);
 	border(39, [3], [4, 5]);
-	// the fallen lie in the lower border under the battle
+	// the fallen lie in the lower border under the battle, among shields and broken spears
 	const fallen = (x: number, y: number, t: string, f = 1) => {
 		put(x, y, 'K');
 		put(x + f, y, 'F');
@@ -221,7 +159,6 @@ function draw(c: Canvas) {
 	fallen(117, 42, 'N', -1);
 	fallen(123, 42, 'S');
 	fallen(141, 42, 'R', -1);
-	// dropped shields and broken spears among them
 	kite(105, 40, 'Y', 'R');
 	kite(131, 40, 'N', 'Y');
 	line(107, 42, 110, 40, 'K');
@@ -229,130 +166,100 @@ function draw(c: Canvas) {
 
 	// ---------- 1. the king in his palace / riders with hawks and hounds ----------
 	caption(5, 18, 6);
-	// the palace: two blue towers with red caps and gold windows
+	// the palace: two towers, a chequered roof on two pillars
 	for (const tx of [0, 21]) {
 		rect(tx, 8, tx + 2, 20, 'N');
 		rect(tx, 7, tx + 2, 7, 'R');
 		put(tx + 1, 6, 'R');
 		dots('Y', [tx + 1, 10], [tx + 1, 14], [tx + 1, 18]);
 	}
-	// a chequered roof of red and gold between them
 	for (let x = 3; x < 21; x++) {
 		put(x, 10, div(x, 2) % 2 ? 'R' : 'Y');
 		put(x, 11, div(x, 2) % 2 ? 'Y' : 'R');
 	}
-	// two green pillars holding it up
 	rect(7, 12, 7, 20, 'T');
 	rect(16, 12, 16, 20, 'T');
 	dots('T', [8, 12], [15, 12], [6, 12], [17, 12], [3, 12], [20, 12]);
-	// throne and king
+	// the king on his throne, crowned, a sceptre in one hand
 	rect(8, 14, 8, 20, 'Y');
 	rect(15, 14, 15, 20, 'Y');
 	put(8, 13, 'R');
 	put(15, 13, 'R');
 	rect(9, 19, 14, 19, 'Y');
-	// his crown, face and hair
 	dots('Y', [10, 12], [13, 12], [10, 13], [11, 13], [12, 13], [13, 13]);
 	rect(11, 14, 12, 15, 'F');
 	put(10, 14, 'K');
 	put(13, 14, 'K');
-	// his blue robe with a red cloak over the shoulders
 	rect(10, 16, 13, 18, 'N');
 	dots('R', [10, 16], [13, 16], [10, 17], [13, 17], [11, 16], [12, 16]);
-	// his hands, and a sceptre in one of them
 	dots('F', [9, 17], [14, 17]);
 	dots('T', [9, 16], [9, 15]);
-	// his red shoes
 	dots('R', [10, 20], [13, 20], [10, 19], [13, 19]);
-	// a courtier on each side
 	man(4, 20, 'S', 'R', 1);
 	man(19, 20, 'R', 'T', -1);
-	// the palace floor, studded with gold
 	rect(0, 21, 23, 21, 'K');
 	for (let x = 1; x < 24; x += 3) put(x, 21, 'Y');
-	// lower: riders
+	// lower: a rider with a hawk on his fist
 	ground(0, 23, 38, 'S', 'Y', 2);
 	hill(18.5, 38, 8.5, 6);
 	caption(13, 23, 22, 2);
-	horse(7, 35, 'R', 1, 3, { mane: 'K', bh: 4 });
-	rider(7, 34, 'T', 1, 'N');
-	// hawk on the fist
+	horse(7, 35, 'R', 3, 'K');
+	rider(7, 34, 'T', 'N');
 	dots('T', [9, 27], [10, 27]);
 	put(11, 27, 'F');
 	dots('K', [11, 26], [12, 25], [11, 25], [12, 26], [13, 25]);
-	/** A running hound. */
 	const hound = (x: number, y: number, k: string) => {
 		rect(x, y - 2, x + 3, y - 1, k);
 		dots(k, [x + 4, y - 3], [x + 5, y - 3], [x + 4, y - 2], [x, y], [x + 3, y], [x - 1, y - 3]);
 	};
 	hound(17, 31, 'K');
 	hound(16, 27, 'N');
-	// a bird put up
 	dots('K', [2, 24], [3, 23], [4, 24], [5, 23]);
 	dots('N', [3, 24], [4, 23]);
 
 	// ---------- 2. the comet / the feast ----------
 	caption(25, 37, 6, 5);
 	ground(24, 47, 21, 'T', 'S', 1);
-	// the comet: a gold star with a red heart and rays
+	// the comet, its tail streaming down to the left
 	disk(43, 9, 2.1, 'Y');
 	rect(42, 8, 44, 10, 'R');
 	put(43, 9, 'Y');
 	dots('Y', [43, 6], [43, 12], [40, 9], [46, 9], [41, 7], [45, 7], [45, 11]);
-	// its tail, streaming down to the left
 	for (let i = 0; i < 4; i++) line(40 - i, 10 + i, 32 - i, 10 + i * 2, i % 2 ? 'R' : 'Y');
-	// a house under it
 	rect(42, 17, 47, 20, 'N');
 	rect(44, 18, 45, 20, 'K');
 	put(42, 18, 'Y');
 	put(47, 18, 'Y');
 	for (let i = 0; i < 3; i++) rect(41 + i, 16 - i, 47, 16 - i, i % 2 === 0 ? 'R' : 'Y');
-	// four men pointing up at the comet
-	const gazers: [x: number, tunic: string, legs: string][] = [
-		[25, 'R', 'N'],
-		[29, 'T', 'K'],
-		[33, 'Y', 'R'],
-		[37, 'N', 'T']
-	];
-	gazers.forEach(([x, t, l], i) => man(x, 20, t, l, 1, { arm: 'up', hair: i % 2 ? 'K' : 'R' }));
-	// feast hall
-	// its roof: a gold ridge over blue and red tiles
+	for (let i = 0; i < 4; i++) {
+		man(25 + i * 4, 20, 'RTYN'[i], 'NKRT'[i], 1, { up: true, hair: i % 2 ? 'K' : 'R' });
+	}
+	// the feast hall: roof, side posts and a beam
 	for (let x = 24; x < 48; x++) {
 		put(x, 23, div(x, 2) % 2 ? 'N' : 'R');
 		put(x, 24, div(x, 2) % 2 ? 'R' : 'N');
 		put(x, 22, 'Y');
 	}
-	// its side posts and a gold beam
 	rect(24, 25, 25, 37, 'T');
 	rect(46, 25, 47, 37, 'T');
 	rect(24, 25, 47, 25, 'Y');
-	// five diners sitting behind the table
-	const diners: [x: number, tunic: string][] = [
-		[28, 'R'],
-		[32, 'N'],
-		[36, 'S'],
-		[40, 'R'],
-		[44, 'N']
-	];
-	diners.forEach(([x, t], i) => {
+	// five diners with drinking horns, behind a table with a striped cloth
+	for (let i = 0; i < 5; i++) {
+		const x = 28 + i * 4;
 		put(x, 27, i % 2 ? 'K' : 'R');
 		put(x + 1, 27, i % 2 ? 'K' : 'R');
 		put(x, 28, 'F');
 		put(x + 1, 28, 'F');
-		rect(x - 1, 29, x + 2, 31, t);
-	});
-	// drinking horns
+		rect(x - 1, 29, x + 2, 31, 'RNSRN'[i]);
+	}
 	dots('K', [30, 29], [30, 28], [31, 27], [42, 29], [42, 28], [41, 27]);
-	// the table, its cloth striped gold and red
 	rect(26, 32, 45, 32, 'K');
 	rect(26, 33, 45, 35, 'Y');
 	for (let x = 26; x < 46; x++) {
 		if (x % 4 === 0 || x % 4 === 1) rect(x, 33, x, 35, 'R');
 	}
-	// gold dishes on it
 	for (const x of [27, 34, 39]) rect(x, 31, x + 1, 31, 'Y');
 	rect(26, 36, 45, 36, 'K');
-	// the tiled floor
 	for (let x = 24; x < 48; x++) {
 		put(x, 37, div(x, 3) % 2 ? 'S' : 'N');
 		put(x, 38, div(x, 3) % 2 ? 'N' : 'S');
@@ -369,134 +276,100 @@ function draw(c: Canvas) {
 	put(53, 14, 'F');
 	dots('K', [53, 13], [53, 12], [53, 11]);
 	dots('N', [54, 11], [55, 11], [54, 12], [55, 12]);
-	// another chopping at the right tree
 	man(61, 20, 'Y', 'T', 1);
-	dots('Y', [63, 16]);
+	put(63, 16, 'Y');
 	put(64, 16, 'F');
-	dots('K', [65, 16]);
+	put(65, 16, 'K');
 	dots('N', [65, 15], [65, 17], [64, 15]);
-	// cut planks, stacked
 	rect(58, 10, 61, 10, 'R');
 	rect(58, 11, 61, 11, 'Y');
 	rect(58, 12, 61, 12, 'R');
 	caption(52, 66, 22, 6);
 	ground(48, 71, 38, 'Y', 'S', 2);
-	// the ship on the stocks: a hull of colored planks, narrowing toward the keel
+	// the ship on the stocks: planks narrowing to the keel, gold-tipped stem and stern, props
 	['R', 'Y', 'N', 'T', 'R'].forEach((k, i) => rect(51 + i, 30 + i, 68 - i, 30 + i, k));
-	// its curling stem and stern, tipped with gold
 	dots('R', [50, 29], [49, 28], [49, 27], [48, 26], [69, 29], [70, 28], [70, 27], [71, 26]);
 	dots('Y', [48, 25], [49, 25], [71, 25], [70, 25]);
-	// the props that hold it up
 	for (const x of [56, 60, 64]) rect(x, 35, x, 37, 'K');
-	// three shipwrights at work in it, each with a hammer raised
-	const shipwrights: [x: number, tunic: string][] = [
-		[54, 'T'],
-		[60, 'S'],
-		[65, 'N']
-	];
-	for (const [x, t] of shipwrights) {
+	[54, 60, 65].forEach((x, i) => {
 		put(x, 26, 'K');
 		put(x + 1, 26, 'K');
 		put(x, 27, 'F');
 		put(x + 1, 27, 'F');
-		rect(x - 1, 28, x + 1, 29, t);
+		rect(x - 1, 28, x + 1, 29, 'TSN'[i]);
 		put(x + 2, 28, 'F');
 		dots('K', [x + 3, 28], [x + 3, 27], [x + 3, 26]);
 		dots('N', [x + 2, 26], [x + 4, 26]);
-	}
+	});
 
 	// ---------- 4. the crossing ----------
-	// the sea: wavy bands of dark blue and blue-green
 	for (let y = 30; y < 39; y++) {
 		for (let x = 72; x < 96; x++) {
 			const yy = y + Math.sin((x * Math.PI) / 6) * 1.6;
-			if (yy >= 31) c.g[y][x] = int(Math.floor((yy - 31) / 2)) % 2 === 0 ? 'N' : 'T';
+			if (yy >= 31) c.g[y][x] = Math.floor((yy - 31) / 2) % 2 === 0 ? 'N' : 'T';
 		}
 	}
 	caption(73, 80, 6, 3);
 	caption(88, 95, 6, 8);
-	// the mast, with a red pennant
 	rect(83, 7, 84, 25, 'K');
 	dots('R', [85, 6], [86, 6], [87, 6], [85, 7], [86, 7]);
-	// the striped sail, wider at the foot
 	for (let y = 10; y < 21; y++) {
 		const hw = 6 + (y - 10) * 0.35;
 		for (let x = 72; x < 96; x++) {
 			if (Math.abs(x - 83.5) <= hw) put(x, y, ['R', 'Y', 'N'][div(x - 72, 3) % 3]);
 		}
 	}
-	// the yard it hangs from
 	rect(76, 9, 91, 9, 'K');
-	// the hull, in colored planks
 	['R', 'Y', 'N', 'R'].forEach((k, i) => rect(75 + i, 27 + i, 92 - i, 27 + i, k));
-	// the prow with its gold beast's head, and the stern
 	dots('R', [93, 26], [94, 25], [94, 24], [94, 23]);
 	dots('Y', [94, 22], [95, 22], [95, 23]);
 	put(94, 21, 'R');
 	dots('R', [74, 26], [73, 25], [73, 24], [73, 23]);
 	dots('Y', [73, 22], [72, 22]);
-	// shields hung along the side
 	for (let i = 0; i < 6; i++) {
 		const x = 76 + i * 3;
 		rect(x, 25, x + 1, 26, ['N', 'Y', 'T', 'R'][i % 4]);
 	}
-	// two sailors
-	const sailors: [x: number, tunic: string][] = [
-		[76, 'T'],
-		[86, 'S']
-	];
-	for (const [x, t] of sailors) {
+	[76, 86].forEach((x, i) => {
 		put(x, 22, 'K');
 		put(x + 1, 22, 'K');
 		put(x, 23, 'F');
 		put(x + 1, 23, 'F');
-		rect(x, 24, x + 1, 24, t);
-	}
-	// two horses looking out over the side
-	const shipHorses: [x: number, color: string][] = [
-		[79, 'K'],
-		[89, 'N']
-	];
-	for (const [x, k] of shipHorses) {
-		dots(
-			k,
-			[x, 24],
-			[x + 1, 24],
-			[x, 23],
-			[x + 1, 23],
-			[x, 22],
-			[x + 1, 22],
-			[x + 2, 22],
-			[x + 3, 22],
-			[x + 3, 23],
-			[x, 21]
-		);
-	}
+		rect(x, 24, x + 1, 24, 'TS'[i]);
+	});
+	[79, 89].forEach((x, i) => {
+		for (const [dx, y] of points('0,24 1,24 0,23 1,23 0,22 1,22 2,22 3,22 3,23 0,21')) {
+			put(x + dx, y, 'KN'[i]);
+		}
+	});
 
 	// ---------- 5. the charge / the shield wall ----------
 	ground(96, 119, 21, 'Y', 'S', 2);
-	// two knights at the gallop: where, half the horse's length, then the colors of the
-	// horse, tunic, shield, pennant and helmet
-	const knights: [number, number, string, string, string, string, string][] = [
-		[100, 2, 'N', 'R', 'T', 'R', 'K'],
-		[112, 3, 'R', 'T', 'Y', 'N', 'N']
-	];
-	for (const [x, bl, hc, tc, sc, pc, hm] of knights) {
-		horse(x, 19, hc, 1, bl, { mane: hc === 'N' ? 'Y' : 'K', bh: 4 });
-		rider(x, 18, tc, 1, 'K', hm);
-		kite(x - 4, 9, sc, 'K');
-		// his arm, and the lance with its pennant
-		put(x + 2, 11, tc);
+	// a knight at the gallop, with shield and lance; bl is half his horse's length
+	const knight = (
+		x: number,
+		bl: number,
+		steed: string,
+		tunic: string,
+		shield: string,
+		pennant: string,
+		helm: string
+	) => {
+		horse(x, 19, steed, bl, steed === 'N' ? 'Y' : 'K');
+		rider(x, 18, tunic, 'K', helm);
+		kite(x - 4, 9, shield, 'K');
+		put(x + 2, 11, tunic);
 		put(x + 3, 10, 'F');
 		line(x + 3, 9, x + 6, 7, 'K');
-		rect(x + 5, 6, x + 7, 6, pc);
-		rect(x + 6, 7, x + 7, 7, pc);
-		rect(x + 7, 8, x + 7, 8, pc);
-	}
-	// arrows in the air
+		rect(x + 5, 6, x + 7, 6, pennant);
+		rect(x + 6, 7, x + 7, 7, pennant);
+		put(x + 7, 8, pennant);
+	};
+	knight(100, 2, 'N', 'R', 'T', 'R', 'K');
+	knight(112, 3, 'R', 'T', 'Y', 'N', 'N');
 	dots('K', [107, 7], [108, 6], [109, 7], [110, 6]);
 	ground(96, 119, 38, 'S', 'T', 2);
-	caption(97, 105, 22, 0);
+	caption(97, 105, 22);
 	// a horse on its back, legs in the air
 	rect(98, 31, 104, 33, 'T');
 	for (const x of [98, 100, 102, 104]) {
@@ -504,7 +377,6 @@ function draw(c: Canvas) {
 		rect(x, outer ? 28 : 29, x, 30, 'T');
 		put(x, outer ? 27 : 28, 'K');
 	}
-	// its head on the ground, and its tail
 	dots('T', [97, 33], [97, 34], [96, 34], [96, 35], [97, 35], [96, 33]);
 	put(98, 34, 'R');
 	dots('K', [105, 32], [105, 33], [105, 34]);
@@ -518,52 +390,42 @@ function draw(c: Canvas) {
 		put(x - 1, 28, 'F');
 		rect(x + 1, 22, x + 1, 29, 'K');
 		put(x + 1, 22, 'N');
-		kite(x - 1, 29, ['R', 'N', 'Y', 'R'][i], ['Y', 'Y', 'R', 'N'][i]);
-		dots(['T', 'S', 'N', 'T'][i], [x - 1, 32], [x + 1, 32]);
+		kite(x - 1, 29, 'RNYR'[i], 'YYRN'[i]);
+		dots('TSNT'[i], [x - 1, 32], [x + 1, 32]);
 		dots('K', [x - 1, 33], [x + 1, 33], [x - 1, 34], [x + 1, 34], [x - 1, 35], [x + 1, 35]);
 	}
 
 	// ---------- 6. the castle on its mound / the king is struck ----------
-	// the mound, in three bands of wool
 	for (let y = 11; y < 22; y++) {
 		for (let x = 120; x < 144; x++) {
 			const d = ((x - 132) / 11.5) ** 2 + ((y - 22) / 8.5) ** 2;
 			if (d <= 1) put(x, y, d > 0.62 ? 'S' : d > 0.3 ? 'Y' : 'T');
 		}
 	}
-	// the red keep, with blue battlements and posts
 	rect(127, 9, 137, 14, 'R');
 	for (let x = 127; x < 138; x += 2) put(x, 8, 'N');
 	for (const x of [129, 135]) rect(x, 10, x, 14, 'N');
-	// its door
 	rect(131, 11, 133, 14, 'K');
 	put(132, 11, 'Y');
-	// a gold banner on the roof
 	rect(132, 6, 132, 7, 'K');
 	dots('Y', [133, 6], [134, 6], [135, 6], [133, 7]);
-	// the bridge that climbs the mound
 	line(120, 20, 126, 14, 'K');
 	line(121, 20, 127, 14, 'K');
 	rect(120, 21, 143, 21, 'K');
 	caption(121, 133, 22, 7);
 	ground(120, 143, 38, 'S', 'Y', 2);
 	hill(139, 38, 6, 6, ['T', 'Y', 'S']);
-	// two archers with their bows bent
-	const archers: [x: number, tunic: string][] = [
-		[121, 'S'],
-		[125, 'Y']
-	];
-	for (const [x, t] of archers) {
-		man(x, 35, t, 'N', 1, { hair: x === 121 ? 'R' : 'K' });
+	[121, 125].forEach((x, i) => {
+		man(x, 35, 'SY'[i], 'N', 1, { hair: 'RK'[i] });
 		dots('N', [x + 2, 29], [x + 3, 30], [x + 3, 31], [x + 2, 32]);
-	}
+	});
 	// the king in his gold crown, with the arrow that strikes him
 	man(133, 35, 'T', 'R', -1, { helm: 'Y' });
 	put(133, 27, 'Y');
 	put(132, 28, 'Y');
 	line(127, 27, 131, 30, 'K');
 	dots('R', [126, 26], [127, 26]);
-	dots('T', [131, 31]);
+	put(131, 31, 'T');
 	put(130, 30, 'F');
 	kite(134, 30, 'R', 'Y');
 	// his standard bearer on the hill, holding the red dragon banner
@@ -580,8 +442,7 @@ export const bayeux: Mural = {
 	prefix: 'bayeux',
 	notes: 'Bb',
 	cols: 6,
-	rows: 2,
-	// Wool on linen: L linen, R terracotta, N dark blue, T blue-green, S sage, Y mustard, K dark brown, F flesh
+	// L linen, R terracotta, N dark blue, T blue-green, S sage, Y mustard, K dark brown, F flesh
 	palette: {
 		L: '#f1e6cb',
 		R: '#b8452c',

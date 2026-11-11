@@ -378,11 +378,16 @@ function gameOf(player: Player, s: F.State, k: number): Game {
 	return playAs(player, s, k * 6007 + (player === 'clean' ? 3 : 5));
 }
 
+/** Share of games 1 to `games` that `won(k)` says were won, 0 to 1. */
+export function wonShare(games: number, won: (k: number) => boolean): number {
+	let n = 0;
+	for (let k = 1; k <= games; k++) if (won(k)) n++;
+	return n / games;
+}
+
 /** Share of the first `games` games of `player` won, 0 to 1. */
 export function winsOf(player: Player, s: F.State, games: number): number {
-	let won = 0;
-	for (let k = 1; k <= games; k++) if (gameOf(player, s, k).won) won++;
-	return won / games;
+	return wonShare(games, (k) => gameOf(player, s, k).won);
 }
 
 /**

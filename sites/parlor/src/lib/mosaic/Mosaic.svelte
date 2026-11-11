@@ -61,6 +61,14 @@
 	let zoom = $state({ cell: 0, scale: 1, tx: 0, ty: 0 });
 	const zoomed = $derived(zoom.cell > 0);
 
+	/** The end panel's line for a win: a mural's panel says which, or that the mural is finished. */
+	function winText(): string {
+		const { name, panel } = ctl.level;
+		if (!panel) return `${name} complete.`;
+		if (ctl.muralDone) return `${name} complete. ${panel.mural} is finished.`;
+		return `${name} complete: panel ${panel.n} of ${panel.of} of ${panel.mural}.`;
+	}
+
 	const ctl = new LevelControl<Level, State>(
 		{
 			save: mosaicSave,
@@ -763,11 +771,7 @@
 						<LevelEnd
 							{...ctl.end}
 							text={ctl.overlay === 'win'
-								? ctl.level.panel
-									? ctl.muralDone
-										? `${ctl.level.name} complete. ${ctl.level.panel.mural} is finished.`
-										: `${ctl.level.name} complete: panel ${ctl.level.panel.n} of ${ctl.level.panel.of} of ${ctl.level.panel.mural}.`
-									: `${ctl.level.name} complete.`
+								? winText()
 								: 'no group fits in the tray or in an open spot'}
 						/>
 					{/if}

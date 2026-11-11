@@ -1,28 +1,22 @@
-/*
- * A mural: one big picture, drawn with code, that becomes a Mosaic pack. Each of its
- * panels is a level. A mural file in this folder exports one `Mural`; index.ts lists
- * them, and `pnpm -F parlor murals` draws them into the pack files.
- */
+/* A mural: one big picture, drawn with code, whose panels are the levels of a Mosaic pack. */
 import type { Level } from '../../src/lib/mosaic/engine.ts';
 import type { SongSettings } from '../../src/lib/shared/sound.ts';
 import { Canvas } from './canvas.ts';
 
-/** A panel in reading order: the end of its id, its name, and its song. */
 export type Panel = [slug: string, name: string, song: SongSettings];
 
 export interface Mural {
-	/** The pack file, without `.json`. Packs play in file name order, easiest mural first. */
+	/** The pack file, without `.json`. Packs play in file name order. */
 	file: string;
 	name: string;
-	/** Starts every panel's id, and names the theme its songs share. */
+	/** Starts every panel's id, and is the theme its songs share. */
 	prefix: string;
 	/** The key whose notes every panel's song keeps to. */
 	notes: string;
+	/** Panels to a row; the panel count sets how many rows. */
 	cols: number;
-	rows: number;
-	/** A panel's size in dots; 24 by 22 unless given. Easier murals use smaller panels. */
+	/** A panel's size in dots; 24 by 22 unless given. */
 	panel?: [w: number, h: number];
-	/** Each letter's color. A panel's own palette lists the ones it uses, in this order. */
 	palette: Record<string, string>;
 	/** The letter the canvas starts filled with. */
 	ground: string;
@@ -30,22 +24,25 @@ export interface Mural {
 	draw(c: Canvas): void;
 }
 
-export const PANEL: [number, number] = [24, 22];
+/** A panel's size in dots, and how many rows of panels the mural has. */
+export function layout(m: Mural) {
+	const [pw, ph] = m.panel ?? [24, 22];
+	const rows = m.panels.length / m.cols;
+	if (!Number.isInteger(rows)) {
+		throw new Error(`${m.file}: ${m.panels.length} panels don't fill rows of ${m.cols}`);
+	}
+	return { pw, ph, rows };
+}
 
-/** The whole picture as rows of letters. */
 export function paint(m: Mural): string[] {
-	const [pw, ph] = m.panel ?? PANEL;
-	const c = new Canvas(m.cols * pw, m.rows * ph, m.ground);
+	const { pw, ph, rows } = layout(m);
+	const c = new Canvas(m.cols * pw, rows * ph, m.ground);
 	m.draw(c);
 	return c.rows();
 }
 
-/** The pack file's contents. */
 export function pack(m: Mural, picture = paint(m)) {
-	const [pw, ph] = m.panel ?? PANEL;
-	if (m.panels.length !== m.cols * m.rows) {
-		throw new Error(`${m.file}: ${m.panels.length} panels named, ${m.cols * m.rows} drawn`);
-	}
+	const { pw, ph } = layout(m);
 	const levels: Level[] = m.panels.map(([slug, name, song], k) => {
 		const px = (k % m.cols) * pw;
 		const py = Math.floor(k / m.cols) * ph;

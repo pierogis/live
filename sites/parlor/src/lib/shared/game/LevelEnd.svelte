@@ -28,13 +28,15 @@
 		{#if state === 'won'}
 			{#if finished && picturesHref}
 				<a class="border inset link-box" href={picturesHref}>see the mural →</a>
-			{:else if nextHref}
-				<a class="border inset link-box" href={nextHref}>next →</a>
-			{:else if onnext}
-				<button class="border inset link-box" onclick={onnext}>next →</button>
-			{/if}
-			{#if picturesHref && !finished}
-				<a class="border inset link-box" href={picturesHref}>all pictures</a>
+			{:else}
+				{#if nextHref}
+					<a class="border inset link-box" href={nextHref}>next →</a>
+				{:else if onnext}
+					<button class="border inset link-box" onclick={onnext}>next →</button>
+				{/if}
+				{#if picturesHref}
+					<a class="border inset link-box" href={picturesHref}>all pictures</a>
+				{/if}
 			{/if}
 		{:else}
 			<button class="border inset link-box" onclick={onundo}>undo</button>

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { Clock, compose, songProblem, type SongSettings } from '../src/lib/shared/sound.ts';
+import type { Picture } from '../src/lib/shared/level.ts';
+import { Clock, compose, songProblem } from '../src/lib/shared/sound.ts';
+import { loadLevels } from './levels.ts';
 
 const BAR = { 3: 12, 4: 16, 5: 20, 7: 14 } as const;
 const songs = (fn: (s: ReturnType<typeof compose>, seed: number) => void) => {
@@ -98,16 +99,10 @@ test('the gear follows how many things are on their way', () => {
 });
 
 test('every level’s song settings are ones a song can have', () => {
-	for (const game of ['mosaic', 'forage']) {
-		const dir = new URL(`../src/lib/${game}/levels/`, import.meta.url);
-		for (const f of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
-			const { levels } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as {
-				levels: { id: string; song?: SongSettings }[];
-			};
-			for (const l of levels) {
-				assert.ok(l.song, `${game} ${l.id} has no song settings`);
-				assert.equal(songProblem(l.song), null, `${game} ${l.id}`);
-			}
+	for (const game of ['mosaic', 'forage'] as const) {
+		for (const l of loadLevels<Picture>(game)) {
+			assert.ok(l.song, `${game} ${l.id} has no song settings`);
+			assert.equal(songProblem(l.song), null, `${game} ${l.id}`);
 		}
 	}
 });

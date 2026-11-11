@@ -18,7 +18,7 @@
 import { checkPicture } from '../shared/editor/checks.ts';
 import { analyze, type Analysis, type Budget } from './cruxes.ts';
 import * as F from './engine.ts';
-import { carelessGame, hastyGame, winsOf } from './player.ts';
+import { carelessGame, hastyGame, winsOf, wonShare } from './player.ts';
 
 export interface Difficulty {
 	/** The best of the players, 0 to 1: what the level's difficulty index comes from. */
@@ -47,9 +47,7 @@ export const GAMES = 16;
 
 /** Share of `rollouts` careless games won. */
 function winShare(s: F.State, rollouts: number): number {
-	let won = 0;
-	for (let k = 1; k <= rollouts; k++) if (carelessGame(s, k)) won++;
-	return won / rollouts;
+	return wonShare(rollouts, (k) => carelessGame(s, k) !== null);
 }
 
 /** `games` games by each player. */
@@ -71,9 +69,7 @@ const HASTE = 15;
  * easy levels to hastyFloor() of these, so "easy" is easy for that player too.
  */
 export function hastyWins(s: F.State, games = GAMES): number {
-	let won = 0;
-	for (let k = 1; k <= games; k++) if (hastyGame(s, k * 31 + 7, HASTE)) won++;
-	return won / games;
+	return wonShare(games, (k) => hastyGame(s, k * 31 + 7, HASTE));
 }
 
 /**

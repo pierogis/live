@@ -75,8 +75,18 @@ import { lab } from './palette.ts';
  * a note sounding out of place; harmonic minor, which has no such key, goes to
  * its plain minor or that minor's relative major, a note apart.
  */
-const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string, number][] }> = {
+const MODES: Record<
+	string,
+	{
+		scale: number[];
+		/** Where its tonic sits in the major key with its notes, in semitones above that key's (harmonic minor as minor). */
+		rotation: number;
+		loops: number[][];
+		away: [string, number][];
+	}
+> = {
 	major: {
+		rotation: 0,
 		scale: [0, 2, 4, 5, 7, 9, 11],
 		// I vi IV V, I IV vi V, I V vi IV, I iii IV V, I vi ii V, I IV I V
 		loops: [
@@ -95,6 +105,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 		]
 	},
 	mixolydian: {
+		rotation: 7,
 		scale: [0, 2, 4, 5, 7, 9, 10],
 		loops: [
 			[0, 6, 3, 0],
@@ -108,6 +119,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 		]
 	},
 	dorian: {
+		rotation: 2,
 		scale: [0, 2, 3, 5, 7, 9, 10],
 		loops: [
 			[0, 3, 0, 6],
@@ -121,6 +133,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 		]
 	},
 	minor: {
+		rotation: 9,
 		scale: [0, 2, 3, 5, 7, 8, 10],
 		loops: [
 			[0, 5, 6, 4],
@@ -137,6 +150,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 	},
 	// Major with a raised fourth: bright and floating, II major.
 	lydian: {
+		rotation: 5,
 		scale: [0, 2, 4, 6, 7, 9, 11],
 		loops: [
 			[0, 1, 0, 4],
@@ -151,6 +165,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 	},
 	// Minor with a raised seventh: V major, a little old-world.
 	harmonic: {
+		rotation: 9,
 		scale: [0, 2, 3, 5, 7, 8, 11],
 		loops: [
 			[0, 3, 4, 0],
@@ -164,6 +179,7 @@ const MODES: Record<string, { scale: number[]; loops: number[][]; away: [string,
 	},
 	// Minor with a lowered second: bII, Spanish.
 	phrygian: {
+		rotation: 4,
 		scale: [0, 1, 3, 5, 7, 8, 10],
 		loops: [
 			[0, 1, 0, 6],
@@ -679,18 +695,8 @@ export interface SongSettings {
 	/** Beats to a bar, in a game whose rhythm has a `feel`: 3, 4, 5, or 7 (eighths). */
 	meter?: number;
 }
-/** Where each mode's tonic sits in the major key with its notes, in semitones above that key's (harmonic minor as minor). */
-const ROTATION: Record<string, number> = {
-	major: 0,
-	dorian: 2,
-	phrygian: 4,
-	lydian: 5,
-	mixolydian: 7,
-	minor: 9,
-	harmonic: 9
-};
 /** How adventurous a level's song can be told to be, as its `spice`. */
-export const SPICES: Record<string, number> = { gentle: 0.1, lively: 0.45, adventurous: 0.9 };
+const SPICES: Record<string, number> = { gentle: 0.1, lively: 0.45, adventurous: 0.9 };
 
 /** What's wrong with a level's song settings, if anything: a mode, spice, lead or meter it can't have. */
 export function songProblem(song: SongSettings): string | null {
@@ -737,7 +743,8 @@ const PITCHES = [
  * and comes home too (or, adventurous, sidesteps to vi); C goes somewhere else,
  * a key with home's notes centered elsewhere, and another motif, and leaves it
  * open for A to come back. Each pass writes a new B and C, so the song keeps
- * changing around its theme. `fix` sets its key, and C stays in it.
+ * changing around its theme. `fix` is the level's song settings (key, notes, mode and
+ * the rest), and C stays in its key.
  */
 export function compose(seed: number, pass = 0, feel = false, fix?: SongSettings): Song {
 	const r = makeRng(seed || 1);
@@ -752,7 +759,7 @@ export function compose(seed: number, pass = 0, feel = false, fix?: SongSettings
 	let tonic = pickOne(TONICS, r);
 	// A fixed key, in the octave nearest the one the seed picked.
 	const at = (note: string) => PITCHES.indexOf(note) % 12;
-	const shared = fix?.notes && at(fix.notes) >= 0 ? (at(fix.notes) + ROTATION[name]) % 12 : -1;
+	const shared = fix?.notes && at(fix.notes) >= 0 ? (at(fix.notes) + mode.rotation) % 12 : -1;
 	const pc = fix?.key ? at(fix.key) : shared;
 	if (pc >= 0) tonic += ((pc - (tonic % 12) + 18) % 12) - 6;
 	const home: Key = { tonic, scale: mode.scale };
@@ -1569,7 +1576,7 @@ export class Music {
 	/** The level's beat, kept even while the sound is off, so play lands on it either way. */
 	readonly clock = new Clock();
 	#seed = 1;
-	/** The level's own key for its song, if it sets one. */
+	/** The level's own song settings, if it sets any. */
 	#fix: SongSettings | undefined;
 	/** The level's song, written the first time it plays. */
 	#written: Song | null = null;

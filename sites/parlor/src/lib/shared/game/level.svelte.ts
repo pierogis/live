@@ -365,12 +365,12 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	#win() {
 		const g = this.#game;
 		const id = this.level.id;
-		// The win that finishes a mural leads back to the pictures, so the game moves on by itself.
-		const last = this.#panels.every((l) => l.id === id || this.save.completed[l.id]);
+		const panels = this.#panels;
 		const next = this.nextIndex;
 		this.#write((s) => {
 			s.completed[id] = true;
-			if (last && this.#panels.length) s.level = next;
+			// The win that finishes a mural leads back to the pictures, so the game moves on by itself.
+			if (panels.length && panels.every((l) => s.completed[l.id])) s.level = next;
 		});
 		this.won = true;
 		this.music?.cadence();
