@@ -37,10 +37,11 @@
 	/** One step of time. Ants walk a tick at a time; each colony sends one every E.DISPATCH_EVERY ticks. */
 	const TICK_MS = 100;
 	/**
-	 * Drawn ants get to their blocks only on the music's eighth notes (this many
-	 * of its sixteenths, a tick each at its usual pace), a little after the
-	 * engine's tick if need be, so every arrival sounds on the beat; they stride
-	 * on it too.
+	 * Drawn ants stride on the music's eighth notes (this many of its sixteenths,
+	 * a tick each at its usual pace), and get to their blocks only on the lines of
+	 * the clock's gear, a little after the engine's tick if need be, so every
+	 * arrival sounds on the beat: quarter notes with few ants out, sixteenths with
+	 * a crowd (`Clock.crowd`).
 	 */
 	const BEAT_TICKS = 2;
 
@@ -289,6 +290,7 @@
 				stageEl!.querySelector(`[data-slot="${d.slot}"]`)?.getBoundingClientRect()
 			])
 		);
+		ctl.clock.crowd(ants.bound.size + list.length);
 		for (const d of list) {
 			const slot = slotRects.get(d.slot);
 			if (!slot) continue;
@@ -303,7 +305,7 @@
 			const size = Math.max(3, Math.round(cellPx * 0.32));
 			// Its block goes on the eta-th tick from the last one (a tap's ants leave between ticks);
 			// the ant gets there on the next eighth, the block in sight till then.
-			const arrives = ctl.clock.next(lastTick + d.eta * TICK_MS, BEAT_TICKS);
+			const arrives = ctl.clock.next(lastTick + d.eta * TICK_MS, ctl.clock.gear);
 			ants.run(path, d.cell, arrives, s.colors[d.c].hex, size);
 		}
 	}

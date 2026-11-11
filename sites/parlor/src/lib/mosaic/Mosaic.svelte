@@ -85,7 +85,15 @@
 			// tune note can take the next one early, so the tune skips along with the dots.
 			// A finished color joins in, harmonizing the tune, rather than taking it over.
 			// Some levels' songs are in 3/4, 5/4 or 7/8, or swing: the dots land on the swung eighths.
-			rhythm: { beat: SIXTEENTH, fill: true, doubles: true, harmonize: true, feel: true },
+			// The pace of moves sets the gear dots land in: quarter notes, eighths or sixteenths.
+			rhythm: {
+				beat: SIXTEENTH,
+				fill: true,
+				doubles: true,
+				harmonize: true,
+				feel: true,
+				paced: true
+			},
 			// T lifts the focused dot's group into the tray, even when its color has an open spot.
 			key: (_e, key) => {
 				if (key === 't') {
@@ -516,17 +524,23 @@
 			pendingTray.delete(id);
 			ctl.music?.note(hex, true, at);
 		};
-		// The first dot lands on an eighth note, so the tune keeps time from move to move, and the
-		// rest an eighth or more after it: the k-th of n on the eighth its share of the cascade puts
-		// it, or the sixteenth after when that one's booked.
+		// Dots land in the gear the pace of play sets (quarter notes or eighths), and a dot or two
+		// on quarter notes either way. The first lands on a line of that gear, so the tune keeps
+		// time from move to move, and the rest after it: the k-th of n on the line its share of
+		// the cascade puts it, or the sixteenth after when that one's booked.
 		const { clock } = ctl;
 		const now = performance.now();
-		const first = clock.nearest(now + FLIGHT, 2);
-		const duration = first - now;
 		const past = clock.step(now);
 		for (const b of booked) if (b < past) booked.delete(b);
+		const gearOf = (n: number) => (n <= 2 ? 4 : clock.gear);
+		const big = Math.max(toSpots.length, res.toTray.length);
+		const first = clock.nearest(now + FLIGHT, gearOf(big));
+		const duration = first - now;
 		const delayOf = (k: number, n: number) => {
-			let step = clock.step(first) + 2 * Math.floor((k * Math.min(n, CASCADE)) / n);
+			const g = gearOf(n);
+			// A cascade spans at most CASCADE lines, or two thirds of that in quarter notes.
+			const lines = Math.min(n, g === 4 ? (CASCADE * 2) / 3 : CASCADE);
+			let step = clock.step(first) + g * Math.floor((k * lines) / n);
 			if (booked.has(step) && !booked.has(step + 1)) step++;
 			booked.add(step);
 			return clock.time(step) - first;

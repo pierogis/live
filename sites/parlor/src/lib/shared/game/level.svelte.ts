@@ -330,7 +330,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.#history.push(before);
 		if (this.#history.length > (this.#game.maxHistory ?? 500)) this.#history.shift();
 		this.#stuckSeen = false;
-		// Quick moves swell the music.
+		// Quick moves swell the music, and (for a paced game) shift its gear, sound or not.
+		if (this.#game.rhythm.paced) this.clock.paced(performance.now());
 		this.music?.move();
 	}
 

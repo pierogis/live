@@ -759,9 +759,17 @@ interface Out {
 	breath: GainNode;
 	input: GainNode;
 	lfo?: OscillatorNode;
+	/** One panner for each place left or right that tune notes sit, shared by all of them. */
+	pans: Map<number, StereoPannerNode>;
 }
 
 let actx: AudioContext | null = null;
+/**
+ * Likely a phone (a touch screen), which plays fewer notes at once (`MAX_RINGING`).
+ * The mix is the same everywhere: built to carry on a phone's speaker (its bass
+ * mostly overtones, see `BASS`) and still sound full on headphones.
+ */
+const PHONE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 /** The echo and limiter, built once: every output feeds them. */
 let effects: AudioNode | null = null;
 let echo: DelayNode | null = null;
@@ -794,7 +802,7 @@ function buildEffects(ctx: AudioContext): AudioNode {
 	glue.connect(limit);
 	const low = ctx.createBiquadFilter();
 	low.type = 'highpass';
-	low.frequency.value = 110;
+	low.frequency.value = 150;
 	low.connect(glue);
 	const dry = ctx.createGain();
 	echo = ctx.createDelay(1);
@@ -811,7 +819,7 @@ function buildEffects(ctx: AudioContext): AudioNode {
 
 /**
  * The output: tune notes through a low-pass that opens as the music swells,
- * chords through a gain that grows with it and one that breathes, then the
+ * chords through a gain that grows with it, a gentle low-pass and one that breathes, then the
  * effects. `hush` cuts it off and the next call makes a fresh one.
  */
 function out(): Out {
@@ -827,7 +835,7 @@ function out(): Out {
 		presence.type = 'peaking';
 		presence.frequency.value = 2800;
 		presence.Q.value = 0.7;
-		presence.gain.value = 3;
+		presence.gain.value = 1.5;
 		presence.connect(input);
 		const tone = ctx.createBiquadFilter();
 		tone.type = 'lowpass';
@@ -836,9 +844,15 @@ function out(): Out {
 		tone.connect(presence);
 		const breath = ctx.createGain();
 		breath.connect(input);
+		// Chords rounded off above their overtones' reach, so they sit soft under the tune.
+		const round = ctx.createBiquadFilter();
+		round.type = 'lowpass';
+		round.frequency.value = 2000;
+		round.Q.value = 0.5;
+		round.connect(breath);
 		const pad = ctx.createGain();
-		pad.connect(breath);
-		outs = { ctx, tone, pad, breath, input };
+		pad.connect(round);
+		outs = { ctx, tone, pad, breath, input, pans: new Map() };
 	}
 	if (outs.ctx.state === 'suspended') void outs.ctx.resume();
 	return outs;
@@ -1062,6 +1076,11 @@ const PANS = [-0.35, 0.35, -0.6, 0.6, -0.15, 0.15, 0];
 
 /** The order a color tries instruments in when its own is taken. */
 const VOICE_ORDER = Object.keys(VOICES) as Voice[];
+/**
+ * The instruments that can lead a tune: all but glass, whose slow swell blurs a
+ * tune's notes, and the accordion, whose beating reeds sound rough carrying one.
+ */
+const LEADS: Voice[] = VOICE_ORDER.filter((v) => v !== 'glass' && v !== 'reed');
 
 /**
  * The instrument for a color by its Lab hue (degrees), colorfulness and
@@ -1090,6 +1109,7 @@ const LEAD = 'lead:';
 /** How loud a landing's color plays under the lead, as a part of it. */
 const LAYER = 0.45;
 const CHORD = 'chord';
+const BASS = 'bass';
 const BELL = 'bell';
 
 /** A wave from its harmonics' levels (index 1 is the fundamental). */
@@ -1117,6 +1137,11 @@ function timbre(ctx: AudioContext, key: string = PLAIN): Timbre {
 	} else if (key === CHORD) {
 		// A slow attack: chords swell in under the tune rather than hit.
 		t = { ...plain, attack: 0.07, pad: true, wave: wave(ctx, [0, 1, 0.3, 0.12, 0.05]) };
+	} else if (key === BASS) {
+		// The chords' root, low: mostly its first overtones, an octave and a twelfth up, over a soft
+		// fundamental. A phone's speaker can't play the fundamental (pushed, it distorts) but
+		// plays these, and the ear hears the low note in them; headphones get it all.
+		t = { ...plain, attack: 0.07, pad: true, wave: wave(ctx, [0, 0.55, 0.75, 0.3]) };
 	} else if (key === BELL) {
 		// A celesta's: the fundamental, a strong double octave and a little sixth
 		// harmonic, struck quickly and left ringing, with a shimmer.
@@ -1160,6 +1185,16 @@ function timbre(ctx: AudioContext, key: string = PLAIN): Timbre {
 
 const hz = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
 
+/** When the tune's notes now ringing end (audio time), to keep from playing more than a phone can. */
+let ringing: number[] = [];
+/** Tune notes at once past which the quiet voices under the tune wait: fewer on a phone. */
+const MAX_RINGING = PHONE ? 14 : 24;
+/** Whether so many notes are ringing at `t` that the quiet voices under the tune should wait. */
+function crowded(t: number) {
+	ringing = ringing.filter((end) => end > t);
+	return ringing.length >= MAX_RINGING;
+}
+
 /** Half a second of white noise, for notes' attacks, made once. */
 let noiseBuf: AudioBuffer | null = null;
 function noise(ctx: BaseAudioContext): AudioBuffer {
@@ -1177,19 +1212,44 @@ function noise(ctx: BaseAudioContext): AudioBuffer {
  * throughout like an organ; their attack noise and out-of-tune overtones come
  * in past that filter, and the voice's place left or right.
  */
-function pluck(o: Out, tb: Timbre, midi: number, t: number, gain: number, len: number): GainNode {
+function pluck(
+	o: Out,
+	tb: Timbre,
+	midi: number,
+	t: number,
+	gain: number,
+	len: number,
+	lite = false
+): GainNode {
 	const { ctx } = o;
 	// Never so short it clicks.
 	len = Math.max(len * tb.len, tb.attack + 0.08);
 	gain *= tb.level ?? 1;
 	const f0 = hz(midi);
+	if (!tb.pad) ringing.push(t + len);
 	let dest: AudioNode = tb.pad ? o.pad : o.tone;
 	if (tb.pan) {
-		const pan = ctx.createStereoPanner();
-		pan.pan.value = tb.pan;
-		pan.connect(dest);
+		let pan = o.pans.get(tb.pan);
+		if (!pan) {
+			pan = ctx.createStereoPanner();
+			pan.pan.value = tb.pan;
+			pan.connect(o.tone);
+			o.pans.set(tb.pan, pan);
+		}
 		dest = pan;
 	}
+	// A quiet voice under the tune (`lite`) is just its tone: the extras below cost a phone
+	// more than they add there, and a phone falling behind pops.
+	if (lite)
+		tb = {
+			...tb,
+			tremolo: 0,
+			partials: undefined,
+			noise: undefined,
+			vibrato: 0,
+			fm: undefined,
+			chorus: 0
+		};
 	const g = ctx.createGain();
 	// Silent until it starts: a gain is 1 until told otherwise, so a note released before
 	// it starts (a rolled chord's, cut off by the next chord) would blare at full volume.
@@ -1245,7 +1305,9 @@ function pluck(o: Out, tb: Timbre, midi: number, t: number, gain: number, len: n
 		band.Q.value = q;
 		const env = ctx.createGain();
 		env.gain.setValueAtTime(0, ctx.currentTime);
-		env.gain.setValueAtTime(gain * ng * 4, t);
+		env.gain.setValueAtTime(0, t);
+		// In over two milliseconds: straight in, it could click.
+		env.gain.linearRampToValueAtTime(gain * ng * 4, t + 0.002);
 		env.gain.exponentialRampToValueAtTime(0.0001, t + nl);
 		src.connect(band).connect(env).connect(dest);
 		// From anywhere in it, so two attacks at once don't add up as one twice as loud.
@@ -1334,12 +1396,17 @@ export interface Rhythm {
 	harmonize?: boolean | 'soft';
 	/** A level's song may be in 3/4 or swing (its landings with it, on the clock's swung lines). */
 	feel?: boolean;
+	/** Moves set the clock's gear by their pace (`Clock.paced`), rather than the game itself. */
+	paced?: boolean;
 }
 
 /** The chord's notes above its root (hot, its root again on top). */
 const TRIAD = [0, 2, 4];
 /** After the song's last note, the home chord rolled up above it. */
 const RING = [2, 4, 7];
+
+/** Sixteenths between landings: a quarter or an eighth note. */
+export type Gear = 2 | 4;
 
 /**
  * A level's steady beat, in `performance.now()` milliseconds: sixteenth notes
@@ -1354,12 +1421,49 @@ export class Clock {
 	 * triplet swing. The first eighth stretches and the second shrinks to make room.
 	 */
 	swing = 0;
+	/**
+	 * Sixteenths between the lines games land things on now, following the play:
+	 * 4, quarter notes, when it's slow; otherwise 2, eighths. (Never sixteenths:
+	 * the tune running that fast sounded crummy. They come only as doubles.) The
+	 * tune and its quiet pattern follow it (see `Music.note`). Mosaic sets it from
+	 * the pace of moves (`paced`), Forage from how many ants are out (`crowd`).
+	 */
+	gear: Gear = 2;
+	/** When the last few moves were made. */
+	#moves: number[] = [];
 
-	/** Start counting sixteenths `ms` long from time `at`, swung `swing`. */
+	/** Start counting sixteenths `ms` long from time `at`, swung `swing`, in eighths. */
 	start(at: number, ms: number, swing = 0) {
 		this.origin = at;
 		this.ms = ms;
 		this.swing = swing;
+		this.gear = 2;
+		this.#moves = [];
+	}
+
+	/**
+	 * A move at time `at`: the gear follows the pace of the last few (the middle of
+	 * their gaps, so one long pause doesn't hold it back), quarter notes when they're
+	 * over two seconds or so apart. It changes only once the pace is clearly past
+	 * the line, so it doesn't flicker.
+	 */
+	paced(at: number) {
+		const m = this.#moves;
+		m.push(at);
+		if (m.length > 4) m.shift();
+		if (m.length < 2) return;
+		const gaps = m
+			.slice(1)
+			.map((t, i) => t - m[i])
+			.sort((a, b) => a - b);
+		const gap = gaps[gaps.length >> 1] / this.ms;
+		const g = this.gear;
+		this.gear = gap > (g === 4 ? 18 : 24) ? 4 : 2;
+	}
+
+	/** `n` things on their way: a few land on quarter notes, more on eighths. */
+	crowd(n: number) {
+		this.gear = n <= (this.gear === 4 ? 5 : 3) ? 4 : 2;
 	}
 
 	/** Sixteenths `s` (any amount) from the origin, as ms from it. */
@@ -1499,8 +1603,11 @@ export class Music {
 		this.#lastMove = -Infinity;
 		timbres.clear();
 		voices.clear();
-		// The tune's instrument, which no color then takes.
-		const lead = pickOne(VOICE_ORDER, makeRng(Math.imul(seed || 1, 0x2545f491) >>> 0 || 1));
+		// The tune's instrument, which no color then takes. A level that draws one that can't lead
+		// (`LEADS`) draws again, so every other level keeps its lead.
+		const r = makeRng(Math.imul(seed || 1, 0x2545f491) >>> 0 || 1);
+		let lead = pickOne(VOICE_ORDER, r);
+		if (!LEADS.includes(lead)) lead = pickOne(LEADS, r);
 		voices.add(lead);
 		this.#lead = LEAD + lead;
 		this.hush();
@@ -1526,6 +1633,7 @@ export class Music {
 		outs?.lfo?.stop();
 		outs = null;
 		this.#held = [];
+		ringing = [];
 	}
 
 	/**
@@ -1626,7 +1734,7 @@ export class Music {
 	#chord(o: Out, t: number, root: number, h: number, strike: Strike = 'block', seventh = false) {
 		this.#release(t);
 		const tb = timbre(o.ctx, CHORD);
-		this.#held.push(pluck(o, tb, this.#midi(root) - 12, t, 0.07, BAR));
+		this.#held.push(pluck(o, timbre(o.ctx, BASS), this.#midi(root) - 12, t, 0.07, BAR));
 		if (strike === 'bass') return;
 		const tones = TRIAD.map((k) => this.#voice(root + k)).sort((x, y) => x - y);
 		if (h > 0.5) tones.push(this.#voice(root) + 12);
@@ -1661,7 +1769,7 @@ export class Music {
 		if (n.rest) return;
 		const m = this.#midi(n.deg);
 		pluck(o, tb, m, t, gain, len);
-		if (h > 0.3) pluck(o, tb, m + 12, t, gain * 0.6 * (h - 0.2), len);
+		if (h > 0.3 && !crowded(t)) pluck(o, tb, m + 12, t, gain * 0.6 * (h - 0.2), len, true);
 		if (!n.chord || chord === false) return;
 		const strike = !n.downbeat || (chord > t && n.strike === 'late') ? 'block' : n.strike;
 		this.#chord(o, chord, n.root, h, strike, n.seventh);
@@ -1753,16 +1861,20 @@ export class Music {
 				step === this.#sung + 1 &&
 				step < this.#due &&
 				!this.#song.notes[this.#i].downbeat;
-			// The quiet pattern, counted from the chord (or, drifting, from the song's start).
+			// The quiet pattern, counted from the chord (or, drifting, from the song's start), a
+			// step each landing at the gear things land in, quarter notes or eighths.
+			const gear = this.clock.gear;
 			const fill = (at: number) => {
 				if (!this.#fill) return;
 				const { root, key } = this.#sounding(at);
 				const { fill, drift } = this.#song.style;
-				const k = Math.floor((drift ? step : step - this.#struck) / 2);
+				const k = Math.floor((drift ? step : step - this.#struck) / gear);
 				const deg = root + fill[((k % fill.length) + fill.length) % fill.length];
-				pluck(o, tb, this.#midi(deg, key), t, gain * 0.4, 0.12);
-				if (color)
-					pluck(o, timbre(o.ctx, color), this.#midi(deg, key), t, gain * 0.4 * LAYER, 0.12);
+				pluck(o, tb, this.#midi(deg, key), t, gain * 0.4, 0.06 * gear, true);
+				if (color && !crowded(t)) {
+					const tc = timbre(o.ctx, color);
+					pluck(o, tc, this.#midi(deg, key), t, gain * 0.4 * LAYER, 0.06 * gear, true);
+				}
 			};
 			if (!early && (soft || at < this.#ends || (step < this.#due && !lull))) {
 				fill(at);
@@ -1789,10 +1901,11 @@ export class Music {
 			// does: stopped at the note, the gap to the beat sounded like the music ducking.
 			const beat = this.clock.next(at - this.clock.ms / 2, this.#pulse);
 			if (n.chord) this.#struck = this.clock.step(beat);
-			const len = n.len >= 8 ? 0.7 : 0.45;
+			// In quarter notes, each landing is a tune note: it walks broad, and rings.
+			const len = n.len >= 8 || gear === 4 ? 0.7 : 0.45;
 			this.#sing(o, tb, n, t, gain, len, h, when(beat));
 			const m = this.#midi(n.deg);
-			if (color) pluck(o, timbre(o.ctx, color), m, t, gain * LAYER, len);
+			if (color && !crowded(t)) pluck(o, timbre(o.ctx, color), m, t, gain * LAYER, len, true);
 			if (this.#harmony > 0) {
 				this.#harmony--;
 				// The harmony's line: a third above the tune's note, or a sixth when that's the
@@ -1835,7 +1948,7 @@ export class Music {
 	/** A move that sets things going (an ant sent off): a short quiet note on the chord's root, in the lead. */
 	tap() {
 		this.#play((o, now, when) => {
-			pluck(o, timbre(o.ctx, this.#lead), this.#midi(this.#root), when(now), 0.04, 0.12);
+			pluck(o, timbre(o.ctx, this.#lead), this.#midi(this.#root), when(now), 0.04, 0.12, true);
 		});
 	}
 
