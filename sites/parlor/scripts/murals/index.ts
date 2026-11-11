@@ -1,25 +1,7 @@
-/* Every mural, in play order: easiest first. A mural's `file` name sets its place. */
-import { babel } from './babel.ts';
-import { bayeux } from './bayeux.ts';
-import { bestiary } from './bestiary.ts';
-import { carta } from './carta.ts';
-import { dering } from './dering.ts';
-import { games } from './games.ts';
-import { garden } from './garden.ts';
-import { lascaux } from './lascaux.ts';
+/* Every game's murals, each game's in play order: easiest first. */
+import type { GameId } from '../../src/lib/games.ts';
+import { MURALS as forage } from './forage/index.ts';
+import { MURALS as mosaic } from './mosaic/index.ts';
 import type { Mural } from './mural.ts';
-import { sea } from './sea.ts';
-import { vase } from './vase.ts';
 
-export const MURALS: Mural[] = [
-	lascaux,
-	dering,
-	bestiary,
-	vase,
-	sea,
-	babel,
-	carta,
-	bayeux,
-	garden,
-	games
-];
+export const MURALS: Record<GameId, Mural[]> = { mosaic, forage };

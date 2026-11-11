@@ -1,7 +1,7 @@
 // Olaus Magnus, Carta Marina (1539): a sea chart of the north, its waters full of
 // monsters and ships, its land full of mountains, towns and kings. 5 by 4 panels.
-import { inell, int, points, round, SIDES, type Canvas, type Point } from './canvas.ts';
-import type { Mural } from './mural.ts';
+import { inell, int, points, round, SIDES, type Canvas, type Point } from '../canvas.ts';
+import type { Mural } from '../mural.ts';
 
 const W = 120;
 const H = 88;

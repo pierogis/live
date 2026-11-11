@@ -1,7 +1,7 @@
 // A Page of Beasts: one illuminated page from a medieval bestiary. Twelve panels of
 // 18 by 16, each a framed miniature over its caption.
-import { points, type Canvas } from './canvas.ts';
-import type { Mural } from './mural.ts';
+import { points, type Canvas } from '../canvas.ts';
+import type { Mural } from '../mural.ts';
 
 const PW = 18;
 const PH = 16;

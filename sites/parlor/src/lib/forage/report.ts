@@ -82,20 +82,15 @@ export function hastyFloor(target: number): number {
 }
 
 /**
- * Places in play order the difficulty ramp spans after the teaching levels: to about
- * level 155, where the packs end (154 levels). Set it again when the count changes much.
- */
-const RAMP = 150;
-
-/**
  * Share of games (see Difficulty.wins) a level at this place in play order should let you win.
  * The first five teach the game, so you basically always win; then it falls
  * steadily to about 1 in 5 by the last level, with an easier breather every sixth.
  */
 export function targetWins(index: number): number {
-	const t = Math.min(1, Math.max(0, index - 4) / RAMP);
+	const t = Math.min(1, F.progress(index));
 	const base = 1 - 0.8 * t ** 0.8;
-	const breather = index % 6 === 5 ? 0.2 : 0;
+	// Never the last level: the game ends on its hardest.
+	const breather = index % 6 === 5 && index < F.LAST_LEVEL ? 0.2 : 0;
 	return Math.min(1, base + breather);
 }
 

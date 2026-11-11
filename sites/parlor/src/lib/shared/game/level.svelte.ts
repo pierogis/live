@@ -139,6 +139,14 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		() => this.#panels.length > 0 && this.#panels.every((l) => this.save.completed[l.id])
 	);
 
+	/** The end panel's line for a win, `done` being the game's word: a mural's panel says which, or that the mural is finished. */
+	wonText(done: string): string {
+		const { name, panel } = this.level;
+		if (!panel) return `${name} ${done}.`;
+		if (this.muralDone) return `${name} ${done}. ${panel.mural} is finished.`;
+		return `${name} ${done}: panel ${panel.n} of ${panel.of} of ${panel.mural}.`;
+	}
+
 	#game: LevelGame<L, S>;
 	#props: () => LevelProps<L, S>;
 	#store: SaveStore;

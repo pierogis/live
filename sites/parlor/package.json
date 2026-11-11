@@ -13,8 +13,7 @@
     "test": "node --test \"test/**/*.test.ts\"",
     "levels": "node scripts/check-levels.ts",
     "murals": "node scripts/make-murals.ts",
-    "forage:tune": "node scripts/tune-forage.ts",
-    "forage:pictures": "node scripts/make-forage-pictures.ts"
+    "forage:tune": "node scripts/tune-forage.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "catalog:",

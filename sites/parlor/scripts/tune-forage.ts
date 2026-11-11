@@ -26,7 +26,7 @@
 // `--results <file>` also appends each level's result to that file as a JSON line, as it
 // comes in, so a long run's work isn't lost if it stops early.
 import { spawn } from 'node:child_process';
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, readFileSync } from 'node:fs';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -498,6 +498,19 @@ if (worker) {
 	console.log(`tuned ${results.length} levels in ${((performance.now() - t0) / 1000).toFixed(0)}s`);
 	if (args.dry) console.log('dry run: level packs left as they were');
 	else {
-		for (const p of packs) await writePack(p.path, { name: p.name, levels: p.levels });
+		// Only the tuning changes. The rest of each file stays as written (its mural, its
+		// song settings, each level's own song under them), not as loaded with the pack's merged in.
+		const tuned = new Set<string>(F.TUNED);
+		for (const p of packs) {
+			const file = JSON.parse(readFileSync(p.path, 'utf8')) as { levels: F.Level[] };
+			file.levels = file.levels.map((raw, k) => {
+				const kept = Object.entries(raw).filter(([key]) => !tuned.has(key));
+				const set = Object.entries(p.levels[k]).filter(
+					([key, v]) => tuned.has(key) && v !== undefined
+				);
+				return Object.fromEntries([...kept, ...set]) as F.Level;
+			});
+			await writePack(p.path, file);
+		}
 	}
 }

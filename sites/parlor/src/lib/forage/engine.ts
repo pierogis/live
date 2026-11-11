@@ -1247,8 +1247,16 @@ export interface Tuning {
 	 * open at different times make the longest waits.
 	 */
 	waitChance: number;
-	/** Colony sizes to choose from; a waiting colony wants this much more than it can reach. */
+	/**
+	 * Colony sizes to choose from, before they're grown to fit the picture (see `sends`);
+	 * a waiting colony wants this much more than it can reach.
+	 */
 	chunks: number[];
+	/**
+	 * About how many sends the play should take. A big picture grows its colonies to
+	 * keep near it, so a bigger picture means bigger colonies, not more clicks.
+	 */
+	sends: number;
 	/**
 	 * Linked groups: each links a colony that eats right away with one that has to
 	 * wait, and maybe more of either.
@@ -1291,32 +1299,48 @@ export interface Tuning {
 }
 
 /**
+ * The last level's place in play order (from 0). A level's difficulty, and when each kind
+ * of pressure starts, go by how far it sits between the teaching levels and this one, so
+ * adding murals stretches the game rather than piling on. A test keeps it at the last
+ * level: set it again when levels are added or removed, then run forage:tune.
+ */
+export const LAST_LEVEL = 95;
+
+/** How far through play a level is, after the five teaching levels: 0, rising to 1 at the last. */
+export function progress(index: number): number {
+	return Math.max(0, index - 4) / (LAST_LEVEL - 4);
+}
+
+/**
  * How a level's place in play order sets its difficulty. The first five teach
  * the game: few waits, no linked groups until the fifth. After that every kind
- * of pressure grows until about level 170.
+ * of pressure grows until the last level.
  */
 export function tuning(level: Level, index: number): Tuning {
-	// 0 for the teaching levels, rising to 1 by about level 170; `push` moves it along.
-	const p = Math.min(1.2, Math.max(0, (index - 4) / 165 + 0.2 * (level.push ?? 0)));
+	const t = progress(index);
+	// 0 for the teaching levels, rising to 1 at the last; `push` moves it along.
+	const p = Math.min(1.2, t + 0.2 * (level.push ?? 0));
 	const teach = index < 5 && (level.push ?? 0) <= 0;
 	return {
 		columns: index < 2 ? 3 : index < 20 ? 4 : 5,
 		slots: 5,
 		waitChance: teach ? 0.1 + 0.05 * index : Math.min(0.95, 0.3 + 0.65 * p),
+		// A wide spread, from a handful to a crowd; the big ones join as play goes on.
 		chunks: teach
-			? [8, 10, 12, 15, 20]
-			: [10, 12, 15, 20, 25, 30, 35, 40].slice(0, 5 + Math.min(3, Math.round(3 * p))),
+			? [5, 8, 12, 17, 24, 32]
+			: [5, 8, 12, 17, 24, 32, 42, 54].slice(0, 6 + Math.min(2, Math.round(2 * p))),
+		sends: Math.round(25 + 15 * t),
 		links: index < 4 ? 0 : 1 + Math.round(9 * p),
 		group: teach || index < 12 ? 2 : Math.min(4, 2 + Math.round(2.6 * p)),
-		// Stacks from about level 40, and from about level 80 the one behind is often a mystery.
-		stack: index < 40 ? 0 : Math.min(0.45, 0.15 + 0.35 * p),
-		stackMystery: index < 80 ? 0 : Math.min(0.7, 0.3 + 0.4 * p),
+		// Stacks from a quarter of the way through play, and from halfway the one behind is often a mystery.
+		stack: t < 0.25 ? 0 : Math.min(0.45, 0.15 + 0.35 * p),
+		stackMystery: t < 0.5 ? 0 : Math.min(0.7, 0.3 + 0.4 * p),
 		behind: teach ? 0 : Math.min(1, 0.3 + 0.7 * p),
 		runs: teach ? 0 : Math.min(0.95, 0.2 + 0.75 * p),
-		locks: index < 2 ? 0 : index < 8 ? 1 : index < 80 ? 2 : 3,
-		mystery: index < 5 ? 0 : Math.min(0.35, 0.1 + (index - 5) * 0.002),
-		// Dispensers from level 100, in a little over half the levels after it.
-		dispensers: index < 99 || hashStr(`${level.id}:dispense`) % 100 >= 55 ? 0 : p > 1 ? 2 : 1,
+		locks: index < 2 ? 0 : index < 8 ? 1 : t < 0.5 ? 2 : 3,
+		mystery: index < 5 ? 0 : Math.min(0.35, 0.1 + 0.3 * t),
+		// Dispensers from about 60% of the way through, in a little over half the levels after.
+		dispensers: t < 0.6 || hashStr(`${level.id}:dispense`) % 100 >= 55 ? 0 : p > 1 ? 2 : 1,
 		dispenseColors: Math.min(3, 1 + Math.round(2 * Math.max(0, p - 0.55) * 2)),
 		late: 0,
 		...level.tuning
@@ -1578,6 +1602,11 @@ export function planPlay(
 	const feeds: number[][] = [];
 	const openedAt = new Array(art.target.length).fill(Infinity);
 	for (const i of foodOf(sim, outside(sim)).flat()) openedAt[i] = 0;
+	// Colonies grow with the picture, so the play takes about `tune.sends` sends.
+	const food = unassigned.reduce((a, b) => a + b, 0);
+	const grow = (mean: number) => Math.max(1, food / (tune.sends * mean));
+	const scale = grow(tune.chunks.reduce((a, b) => a + b, 0) / tune.chunks.length);
+	tune.chunks = tune.chunks.map((n) => Math.round(n * scale));
 	const meanChunk = tune.chunks.reduce((a, b) => a + b, 0) / tune.chunks.length;
 	/** About how many steps the play takes, to spread the linked groups over it. */
 	const steps = Math.max(1, unassigned.reduce((a, b) => a + b, 0) / meanChunk);

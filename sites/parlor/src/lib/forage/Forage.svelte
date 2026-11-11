@@ -572,7 +572,7 @@
 								<LevelEnd
 									{...ctl.end}
 									text={ctl.overlay === 'win'
-										? `${ctl.level.name} cleared.`
+										? ctl.wonText('cleared')
 										: 'every slot is busy and no colony at the front can finish'}
 								/>
 							{/if}

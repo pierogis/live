@@ -1,7 +1,7 @@
 // The Black-Figure Vase (Athens, about 540 BC): black figures on orange clay. Warriors at
 // a board game between a chariot and a ship, over a line of animals. Twelve panels of 18 by 16.
-import { points, type Canvas } from './canvas.ts';
-import type { Mural } from './mural.ts';
+import { points, type Canvas } from '../canvas.ts';
+import type { Mural } from '../mural.ts';
 
 const PW = 18;
 const PH = 16;

@@ -2,9 +2,9 @@
  * The Sea Creatures: a homage to the marine-life floor mosaic from the House of the
  * Faun, Pompeii. 4 x 4 panels of 20 x 18 dots (80 x 72).
  */
-import { int, mod, points, round } from './canvas.ts';
-import type { Canvas, Point } from './canvas.ts';
-import type { Mural } from './mural.ts';
+import { int, mod, points, round } from '../canvas.ts';
+import type { Canvas, Point } from '../canvas.ts';
+import type { Mural } from '../mural.ts';
 
 const PW = 20;
 const PH = 18;

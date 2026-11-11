@@ -2,8 +2,8 @@
  * Pieter Bruegel the Elder, Children's Games (1560): a town square seen from above,
  * packed with children, every group playing a different game. 5 by 4 panels (120 x 88).
  */
-import { int, mod, points, round, type Canvas } from './canvas.ts';
-import type { Mural } from './mural.ts';
+import { int, mod, points, round, type Canvas } from '../canvas.ts';
+import type { Mural } from '../mural.ts';
 
 const W = 120;
 const H = 88;

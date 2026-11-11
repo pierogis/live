@@ -385,11 +385,13 @@ test('a patient pick times ants the same way the board does, tick by tick', () =
 test('difficulty: the first levels are easy, the last very hard, with breathers', () => {
 	for (let i = 0; i < 5; i++) assert.equal(difficultyIndex(targetWins(i)), 1, `level ${i + 1}`);
 	const last = LEVELS.length - 1;
+	/** The level `part` of the way through play, after the teaching levels. */
+	const at = (part: number) => 4 + Math.round(part * (last - 4));
 	assert.equal(difficultyIndex(targetWins(last)), 5);
-	// The top tier is about the last 35 levels; the middle of the game is around 3.
-	assert.equal(difficultyIndex(targetWins(130)), 5);
-	assert.equal(difficultyIndex(targetWins(110)), 4);
-	assert.equal(difficultyIndex(targetWins(60)), 3);
+	// The top tier is about the last sixth of play; the middle of the game is around 3.
+	assert.equal(difficultyIndex(targetWins(at(0.85))), 5);
+	assert.equal(difficultyIndex(targetWins(at(0.7))), 4);
+	assert.equal(difficultyIndex(targetWins(at(0.4))), 3);
 	for (let i = 11; i < last; i += 6) {
 		assert.ok(targetWins(i) > targetWins(i - 1), `level ${i + 1} is a breather`);
 	}
@@ -453,10 +455,14 @@ test('later deals make you wait: waits and long-held linked pairs are common', (
 	assert.ok(withHeld >= later.length * 0.7, `${withHeld} of ${later.length} hold a pair long`);
 });
 
-test('forage level ids are unique and there are at least 150 levels', () => {
+test('forage level ids are unique, and LAST_LEVEL is the last level', () => {
 	const ids = LEVELS.map((l) => l.id);
 	assert.equal(new Set(ids).size, ids.length);
-	assert.ok(ids.length >= 150);
+	assert.equal(
+		F.LAST_LEVEL,
+		LEVELS.length - 1,
+		'set LAST_LEVEL in engine.ts, then run forage:tune'
+	);
 });
 
 test('difficulty: cruxes cap and floor the rating from wins', () => {
@@ -531,6 +537,25 @@ test("a level's deal string says which column each colony goes to; a bad one is 
 	}
 	const bad = F.buildPuzzle({ ...lv, deal: '9'.repeat(placement.length) }, i);
 	assert.deepEqual(bad.columns, random.columns, 'falls back to the seed’s own deal');
+});
+
+test('tuned levels: each mural is about as hard as the one before or harder', () => {
+	if (LEVELS.some((l) => l.cruxes === undefined)) return; // not tuned yet
+	// Panels vary within a mural; the murals' averages climb.
+	const means = packs.map((p) => {
+		const pips = p.levels.map((l) => difficultyIndex(l.wins, l)!);
+		return pips.reduce((a, b) => a + b) / pips.length;
+	});
+	means.slice(1).forEach((m, k) => {
+		assert.ok(
+			m >= means[k] - 0.25,
+			`${packs[k + 1].id} averages ${m.toFixed(2)}, after ${means[k].toFixed(2)}`
+		);
+	});
+	assert.ok(
+		means.at(-1)! - means[0] >= 2,
+		`from ${means[0].toFixed(2)} to ${means.at(-1)!.toFixed(2)}`
+	);
 });
 
 test('tuned levels: teaching ones have no cruxes, late ones several rule breaks', () => {

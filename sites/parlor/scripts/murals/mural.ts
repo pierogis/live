@@ -1,5 +1,5 @@
-/* A mural: one big picture, drawn with code, whose panels are the levels of a Mosaic pack. */
-import type { Level } from '../../src/lib/mosaic/engine.ts';
+/* A mural: one big picture, drawn with code, whose panels are the levels of a game's pack. */
+import type { Picture } from '../../src/lib/shared/level.ts';
 import type { SongSettings } from '../../src/lib/shared/sound.ts';
 import { Canvas } from './canvas.ts';
 
@@ -43,7 +43,7 @@ export function paint(m: Mural): string[] {
 
 export function pack(m: Mural, picture = paint(m)) {
 	const { pw, ph } = layout(m);
-	const levels: Level[] = m.panels.map(([slug, name, song], k) => {
+	const levels: Picture[] = m.panels.map(([slug, name, song], k) => {
 		const px = (k % m.cols) * pw;
 		const py = Math.floor(k / m.cols) * ph;
 		const art = picture.slice(py, py + ph).map((row) => row.slice(px, px + pw));
