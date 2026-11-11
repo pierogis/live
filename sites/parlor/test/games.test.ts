@@ -20,7 +20,7 @@ test('every game folder with levels is in the games list', () => {
 test('every game has its own routes', () => {
 	const routes = new URL('../src/routes/', import.meta.url);
 	for (const id of GAME_IDS) {
-		for (const page of ['', '[n]/', 'pictures/', 'edit/']) {
+		for (const page of ['', '[id]/', 'pictures/', 'edit/']) {
 			assert.ok(existsSync(new URL(`${id}/${page}+page.svelte`, routes)), `${id}/${page}`);
 		}
 	}

@@ -26,20 +26,22 @@ export function gamePages<L extends Picture, S>({ game, levels, save, build }: G
 		/** `/<game>`: level 1, or straight on to the level your save is on. */
 		start(cookies: Cookies) {
 			const saved = saveIn(cookies);
-			if (saved.level > 0) redirect(307, `/${game.id}/${saved.level + 1}`);
+			if (saved.level > 0) redirect(307, `/${game.id}/${levels[saved.level].id}`);
 			first ??= build(levels[0], 0);
 			return { title: `${game.name} · parlor`, description: game.about, initial: first };
 		},
 
 		/** Every level's page, for prerendering. */
-		entries: () => levels.map((_, i) => ({ n: String(i + 1) })),
+		entries: () => levels.map((lv) => ({ id: lv.id })),
 
-		/** `/<game>/N`, with the level's starting state built ahead so the page needn't build it. */
-		level(n: string) {
-			const index = Number(n) - 1;
+		/**
+		 * `/<game>/<level id>`, with the level's starting state built ahead so the page needn't
+		 * build it. Ids, not places in play, so a link keeps its picture when packs are added.
+		 */
+		level(id: string) {
+			const index = levels.findIndex((lv) => lv.id === id);
 			const level = levels[index];
-			// Only the number as the site writes it, so /mosaic/05 isn't a second /mosaic/5.
-			if (!level || n !== String(index + 1)) error(404, 'No such level');
+			if (!level) error(404, 'No such level');
 			return {
 				index,
 				title: `${level.name} · ${game.name} · parlor`,

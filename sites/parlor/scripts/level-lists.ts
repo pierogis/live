@@ -21,6 +21,21 @@ const PICTURE = new Set(['palette', 'art']);
 export function levelLists(): Plugin {
 	return {
 		name: 'parlor-level-lists',
+		// A pack file added or removed changes a game's list too; changes to one already
+		// listed are caught by addWatchFile below.
+		configureServer(server) {
+			const repack = (file: string) => {
+				const game = /\/src\/lib\/([a-z]+)\/levels\/[^/]+\.json$/.exec(file)?.[1];
+				if (!game) return;
+				for (const env of Object.values(server.environments)) {
+					const mod = env.moduleGraph.getModuleById(`\0${PREFIX}${game}`);
+					if (mod) env.moduleGraph.invalidateModule(mod);
+				}
+				server.ws.send({ type: 'full-reload' });
+			};
+			server.watcher.on('add', repack);
+			server.watcher.on('unlink', repack);
+		},
 		resolveId(id) {
 			if (!id.startsWith(PREFIX)) return;
 			const game = id.slice(PREFIX.length);

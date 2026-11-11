@@ -17,7 +17,7 @@
 		/** The game's name, for the title. */
 		game: string;
 		packs: Pack<L>[];
-		/** The game page; each picture links to `${gameHref}/N`. */
+		/** The game page; each picture links to `${gameHref}/<level id>`. */
 		gameHref: string;
 		save: Save;
 		/** A level's difficulty from 1 to 5, when the game has one. */
@@ -39,6 +39,9 @@
 		});
 	}
 
+	/** The level your save is on, or the first. */
+	const saved = $derived(packs.flatMap((p) => p.levels)[save.level] ?? packs[0].levels[0]);
+
 	const sections = $derived.by(() => {
 		let at = 0;
 		return packs.map((p) => ({
@@ -52,7 +55,7 @@
 <div class="pictures">
 	<div class="bar">
 		<h2>{game} · pictures</h2>
-		<a class="border inset link-box" href="{gameHref}/{save.level + 1}">back to the game</a>
+		<a class="border inset link-box" href="{gameHref}/{saved.id}">back to the game</a>
 	</div>
 
 	{#each saves?.options ?? [] as option (option.key)}
@@ -90,7 +93,7 @@
 								class="panel"
 								class:unplayed={!done}
 								class:current={save.level === n - 1}
-								href="{gameHref}/{n}"
+								href="{gameHref}/{lv.id}"
 								title="{n}. {lv.name}"
 								aria-label="{n}. {lv.name}{done ? ', complete' : ''}"
 							>
@@ -109,7 +112,7 @@
 					<a
 						class="card inset"
 						class:current={save.level === n - 1}
-						href="{gameHref}/{n}"
+						href="{gameHref}/{lv.id}"
 						aria-label="{n}. {lv.name}{d ? `, ${LABELS[d - 1]}` : ''}{done ? ', complete' : ''}"
 					>
 						<span class="thumb" class:unplayed={!done}><canvas {@attach art(lv, 72)}></canvas></span
