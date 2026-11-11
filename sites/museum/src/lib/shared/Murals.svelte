@@ -79,7 +79,7 @@
 			{@const panel = section.items[0].lv.art}
 			<!-- A mural: its panels side by side as one picture in a card, each a link to its level. -->
 			<h3>
-				{section.name.toLowerCase()} · mural ·
+				{section.name.toLowerCase()} ·
 				{section.items.filter((i) => save.completed[i.lv.id]).length} / {section.items.length}
 			</h3>
 			<div class="frame">
