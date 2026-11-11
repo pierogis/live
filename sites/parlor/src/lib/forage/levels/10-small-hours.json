@@ -65,13 +65,14 @@
 				"MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM",
 				"FMMMFMMMFMMMFMMMFMMMFMMMFMMMFMMMFMMMFM"
 			],
-			"seed": 1,
-			"wins": 0.13,
-			"breaks": 6,
-			"cruxes": 7,
+			"seed": 2,
+			"wins": 0.19,
+			"breaks": 7,
+			"cruxes": 4,
 			"spread": 3,
 			"push": -1,
-			"deal": "002111000000111111111110000024444433343244222232331133333224422232004444443333410"
+			"deal": "2311013400000000011114440444444441440001111004000022233222444433223232402322000033411124",
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "lime-frog",
@@ -132,12 +133,12 @@
 				"JIJIJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJIJ"
 			],
 			"tuning": { "late": 1 },
-			"seed": 1,
-			"deal": "1131111120000000001144444444411143333222232333234440000222000002",
-			"wins": 0,
-			"breaks": 7,
-			"cruxes": 5,
-			"spread": 3
+			"seed": 0,
+			"wins": 0.19,
+			"breaks": 4,
+			"cruxes": 4,
+			"spread": 2,
+			"push": -1
 		},
 		{
 			"id": "red-mushroom-house",
@@ -202,13 +203,14 @@
 				"BBCBBBBCBBBBBGIIIIIIIIIIBBBBBBBBBBBDBB",
 				"BBBBBBBBBBBBBIIIIIIIIIIIIBBBBBBBBBBBBB"
 			],
-			"seed": 0,
-			"wins": 0.19,
-			"breaks": 3,
-			"cruxes": 4,
-			"spread": 3,
+			"seed": 3,
+			"wins": 0.31,
+			"breaks": 4,
+			"cruxes": 5,
+			"spread": 2,
 			"push": -1,
-			"deal": "11021111000000002222222200333333113324114444444142244333342220110342222333433"
+			"deal": "44111000111100000000414444000011041111440111133111333333410414220002000024000021",
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "orange-kite",
@@ -267,13 +269,13 @@
 				"DFJCDFJCDFJCDFJCDFJCDNJCNFJCDFJCDGGGGG",
 				"JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJGGGG"
 			],
-			"seed": 0,
-			"wins": 0.19,
-			"breaks": 6,
-			"cruxes": 4,
+			"seed": 4,
+			"wins": 0.25,
+			"breaks": 2,
+			"cruxes": 2,
 			"spread": 2,
 			"push": -1,
-			"deal": "1110010000111111100030430322433444244444244132222022100041421311"
+			"deal": "14001113200000011100100011001114422222334222233334422434414222232222241113222234"
 		},
 		{
 			"id": "green-snowman",
@@ -334,13 +336,13 @@
 				"CCECCCECCCECCCECKKKKKKECCCECCCECCCECCC",
 				"CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
 			],
-			"seed": 1,
-			"deal": "1111100004200000233333223444142444422222211343333342200001413221111001044033",
-			"wins": 0.44,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2,
-			"push": -1
+			"seed": 2,
+			"deal": "000100111100114130011140040040440104440044212003213212011111222430013",
+			"wins": 0.31,
+			"breaks": 5,
+			"cruxes": 5,
+			"spread": 3,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "magenta-robot",
@@ -402,13 +404,13 @@
 				"BBBBBBBBBBBBBBBBBBBBBBBBBBBBCBBBBCBBFB",
 				"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
 			],
-			"seed": 1,
-			"wins": 0.06,
-			"breaks": 5,
-			"cruxes": 5,
+			"seed": 2,
+			"wins": 0.13,
+			"breaks": 3,
+			"cruxes": 4,
 			"spread": 3,
-			"deal": "4101111100001100011110122222200244444444333333333222222244431332401200433333000",
-			"push": -1
+			"deal": "02010000011011111100000001110001144444444444444444411103333322323323222223222333",
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "magenta-lantern",
@@ -468,11 +470,12 @@
 				"FFFFFFFFFFFFFFKDBKFFFFDFFFFFFFFFFFFFFF",
 				"FFFFFFFFFFFFFFKKKKFFFFFFFFFFFFFFFFFFFF"
 			],
-			"seed": 4,
-			"wins": 0.06,
-			"breaks": 5,
-			"cruxes": 4,
-			"spread": 3
+			"seed": 0,
+			"wins": 0.13,
+			"breaks": 3,
+			"cruxes": 3,
+			"spread": 2,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "orange-butterfly",
@@ -536,12 +539,11 @@
 				"OOOLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOO"
 			],
 			"seed": 1,
-			"wins": 0.06,
+			"wins": 0.25,
 			"breaks": 4,
 			"cruxes": 5,
 			"spread": 3,
-			"push": -1,
-			"deal": "300012100111111440404444444001331332222222222233330314000001111233334"
+			"deal": "300012100111111444404444444000333332222222222233331030000011111003333"
 		},
 		{
 			"id": "navy-anchor",
@@ -604,12 +606,12 @@
 				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL",
 				"ELLLELLLELLLELLLELLLELLLELLLELLLELLLELL"
 			],
-			"seed": 1,
-			"wins": 0.06,
-			"breaks": 6,
-			"cruxes": 5,
+			"seed": 3,
+			"wins": 0,
+			"breaks": 5,
+			"cruxes": 4,
 			"spread": 3,
-			"deal": "00000311111220000011101333301000033343222224443333334224224412104441000001311"
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "lime-apple",
@@ -676,13 +678,11 @@
 				"DBACDBACDBACDBACDBACDBACDBACDBACDBACDBA",
 				"BACDBACDBACDBACDBACDBACDBACDBACDBACDBAC"
 			],
-			"seed": 1,
-			"wins": 0.06,
-			"breaks": 3,
-			"cruxes": 4,
-			"spread": 2,
-			"push": -1,
-			"deal": "0111000110010100001203222332233221303333321344044442224020041011111112222244244334333"
+			"seed": 4,
+			"wins": 0.5,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2
 		},
 		{
 			"id": "tan-pear",
@@ -753,10 +753,10 @@
 			],
 			"seed": 3,
 			"wins": 0.19,
-			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2,
-			"push": -1
+			"breaks": 2,
+			"cruxes": 6,
+			"spread": 3,
+			"deal": "2033000011111111110000443333344442220222442222330004014244243333311111000044333"
 		},
 		{
 			"id": "coral-cherries",
@@ -820,11 +820,11 @@
 			],
 			"seed": 0,
 			"wins": 0,
-			"breaks": 4,
+			"breaks": 11,
 			"cruxes": 5,
 			"spread": 3,
-			"push": -1,
-			"deal": "0012244301111111000044004404444433333132222222441122211213333440000000222244"
+			"push": 1,
+			"deal": "0012244300001101000044401114111133313334222212221422232333342410040004232224"
 		},
 		{
 			"id": "yellow-quilt",
@@ -894,12 +894,12 @@
 				"NNNNNNNNHHHHHHPPPHHHHHHHNNNNNNNNNNNNNNNN"
 			],
 			"tuning": { "late": 1 },
-			"seed": 1,
+			"seed": 2,
 			"wins": 0.19,
-			"breaks": 4,
-			"cruxes": 7,
+			"breaks": 3,
+			"cruxes": 5,
 			"spread": 3,
-			"push": -1
+			"deal": "3200004411100001101001111000011111444444444441044033334222212332222233233334223332222"
 		},
 		{
 			"id": "coral-volcano",
@@ -964,14 +964,13 @@
 				"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
 				"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
 			],
-			"seed": 4,
+			"seed": 2,
 			"wins": 0.06,
-			"breaks": 8,
-			"cruxes": 6,
+			"breaks": 4,
+			"cruxes": 4,
 			"spread": 3,
 			"tuning": { "late": 1 },
-			"push": -1,
-			"deal": "000004011113000001111111111000001000011444044422222424022444424000443333332242"
+			"deal": "24311100001011101110013110044404440104440222222444420424202343233322332434342"
 		}
 	]
 }

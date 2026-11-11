@@ -18,7 +18,7 @@
 import { checkPicture } from '../shared/editor/checks.ts';
 import { analyze, type Analysis, type Budget } from './cruxes.ts';
 import * as F from './engine.ts';
-import { carelessGame, winsOf } from './player.ts';
+import { carelessGame, hastyGame, winsOf } from './player.ts';
 
 export interface Difficulty {
 	/** The best of the players, 0 to 1: what the level's difficulty index comes from. */
@@ -61,13 +61,40 @@ export function measure(s: F.State, games = GAMES): Difficulty {
 	return { wins: Math.max(strong, clean, look, careless), strong, clean, look, careless };
 }
 
-/** Places in play order the difficulty ramp spans after the teaching levels: to level 200. */
-const RAMP = 195;
+/** Ticks between a hasty player's sends: a tap every second and a half. */
+const HASTE = 15;
+
+/**
+ * Share of `games` hasty games won (see hastyGame() in player.ts), 0 to 1. The
+ * players in measure() know which sends finish, park well and wait for the board;
+ * a person on an early level does none of those reliably. `forage:tune` holds
+ * easy levels to hastyFloor() of these, so "easy" is easy for that player too.
+ */
+export function hastyWins(s: F.State, games = GAMES): number {
+	let won = 0;
+	for (let k = 1; k <= games; k++) if (hastyGame(s, k * 31 + 7, HASTE)) won++;
+	return won / games;
+}
+
+/**
+ * The least hastyWins() a level with this target should have: 9 in 10 where the
+ * target is to always win, less as levels get harder, nothing once the target is
+ * to lose one game in four (by then it's meant to take care).
+ */
+export function hastyFloor(target: number): number {
+	return Math.max(0, 0.9 - 3.5 * (1 - target));
+}
+
+/**
+ * Places in play order the difficulty ramp spans after the teaching levels: to about
+ * level 155, where the packs end (154 levels). Set it again when the count changes much.
+ */
+const RAMP = 150;
 
 /**
  * Share of games (see Difficulty.wins) a level at this place in play order should let you win.
  * The first five teach the game, so you basically always win; then it falls
- * steadily to about 1 in 5 by level 200, with an easier breather every sixth.
+ * steadily to about 1 in 5 by the last level, with an easier breather every sixth.
  */
 export function targetWins(index: number): number {
 	const t = Math.min(1, Math.max(0, index - 4) / RAMP);

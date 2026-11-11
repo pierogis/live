@@ -384,15 +384,16 @@ test('a patient pick times ants the same way the board does, tick by tick', () =
 
 test('difficulty: the first levels are easy, the last very hard, with breathers', () => {
 	for (let i = 0; i < 5; i++) assert.equal(difficultyIndex(targetWins(i)), 1, `level ${i + 1}`);
-	assert.equal(difficultyIndex(targetWins(199)), 5);
-	// The top tier is the last 40 to 50 levels; the middle of the game is around 3.
-	assert.equal(difficultyIndex(targetWins(160)), 5);
-	assert.equal(difficultyIndex(targetWins(145)), 4);
-	assert.equal(difficultyIndex(targetWins(75)), 3);
-	for (let i = 11; i < 200; i += 6) {
+	const last = LEVELS.length - 1;
+	assert.equal(difficultyIndex(targetWins(last)), 5);
+	// The top tier is about the last 35 levels; the middle of the game is around 3.
+	assert.equal(difficultyIndex(targetWins(130)), 5);
+	assert.equal(difficultyIndex(targetWins(110)), 4);
+	assert.equal(difficultyIndex(targetWins(60)), 3);
+	for (let i = 11; i < last; i += 6) {
 		assert.ok(targetWins(i) > targetWins(i - 1), `level ${i + 1} is a breather`);
 	}
-	for (let i = 6; i < 200; i++) {
+	for (let i = 6; i <= last; i++) {
 		if (i % 6 !== 5 && (i - 1) % 6 !== 5) assert.ok(targetWins(i) <= targetWins(i - 1));
 	}
 });

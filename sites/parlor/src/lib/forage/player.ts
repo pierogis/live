@@ -402,3 +402,26 @@ export function carelessGame(s0: F.State, seed: number): number[] | null {
 	}
 	return path;
 }
+
+/**
+ * One game by a hasty player, closer to a person on an easy level than the ones
+ * above: it follows the rule of thumb (a send that would finish, at random) but
+ * parks any colony when it has to, and it doesn't wait for the board to settle:
+ * it sends again `ticks` ticks after each send, while others are still eating
+ * (see F.hurry()). With nothing to send it waits. True when it won.
+ */
+export function hastyGame(s0: F.State, seed: number, ticks: number): boolean {
+	const s = F.clone(s0);
+	const rng = makeRng(seed);
+	while (!F.isWon(s)) {
+		const all = options(s);
+		if (!all.length) {
+			if (F.isStuck(s)) return false;
+			F.tick(s);
+			continue;
+		}
+		const clean = all.filter((o) => !o.parked);
+		F.hurry(s, pickOne(clean.length ? clean : all, rng).col, ticks);
+	}
+	return true;
+}

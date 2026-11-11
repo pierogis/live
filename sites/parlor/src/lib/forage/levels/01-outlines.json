@@ -157,7 +157,7 @@
 				"CCCCCCCCCCCCCCCCCCCC",
 				"CCCCCCCCCCCCCCCCCCCC"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
@@ -288,7 +288,7 @@
 				"SSSSSSSSSSSSSSSSSSSS",
 				"SSSSSSSSSSSSSSSSSSSS"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
@@ -514,7 +514,7 @@
 				"HHHHHHHHHHHHHHHHHHHHHHHH",
 				"HHHHHHHHHHHHHHHHHHHHHHHH"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,

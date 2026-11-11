@@ -50,11 +50,13 @@
 				"BBBBBBBBBBGBBBKKBBBBBKGGKBCBBBB",
 				"BBBBBBBBBBBBBBKKBBBBBKKKKBBBBBB"
 			],
-			"seed": 7,
-			"wins": 0.38,
+			"seed": 0,
+			"wins": 0.69,
 			"breaks": 1,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"push": -1,
+			"deal": "13321100122111000022211044443433344444133334210220013444300022124344"
 		},
 		{
 			"id": "red-planet",
@@ -107,12 +109,12 @@
 				"GGGGGGGGGGGGGGGGGEGGGGGGGGGGGGG",
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 			],
-			"seed": 1,
-			"wins": 0.56,
-			"breaks": 2,
+			"seed": 0,
+			"wins": 0.94,
+			"breaks": 0,
 			"cruxes": 1,
 			"spread": 1,
-			"deal": "200231122311021103323042244404400000224444433131311111120"
+			"deal": "44012010221002020000200011210014333402331444404420011440332324"
 		},
 		{
 			"id": "navy-peaks",
@@ -159,8 +161,8 @@
 				"KFFFFFFFFFFFFFFFFFFFFFFFFFFFFK",
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"
 			],
-			"seed": 0,
-			"wins": 0.5,
+			"seed": 6,
+			"wins": 0.69,
 			"breaks": 1,
 			"cruxes": 1,
 			"spread": 1
@@ -212,12 +214,12 @@
 				"HHHHHHHHHKHHHHHHHHHHKHHHHHHHHH",
 				"HHHHHHHHHKHHHHHHHHHHKHHHHHHHHH"
 			],
-			"seed": 3,
+			"seed": 8,
 			"wins": 0.63,
-			"breaks": 2,
-			"cruxes": 1,
+			"breaks": 1,
+			"cruxes": 2,
 			"spread": 1,
-			"deal": "1122220130230223344410324100222241031031121111104422"
+			"deal": "10022432101144122123300400314331332233001033223000431"
 		},
 		{
 			"id": "white-cat",
@@ -265,8 +267,8 @@
 				"IIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
 				"IIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
 			],
-			"seed": 7,
-			"wins": 0.94,
+			"seed": 3,
+			"wins": 0.63,
 			"breaks": 1,
 			"cruxes": 1,
 			"spread": 1
@@ -320,11 +322,12 @@
 				"CCCCCCCCCCCCCCKKKCCCCCCCCCCCCCC",
 				"CCBCCCBCCCBCCCBCCCBCCCBCCCBCCCB"
 			],
-			"seed": 3,
-			"wins": 0.56,
+			"seed": 19,
+			"wins": 0.44,
 			"breaks": 1,
-			"cruxes": 3,
-			"spread": 2
+			"cruxes": 1,
+			"spread": 1,
+			"push": 1
 		},
 		{
 			"id": "blue-butterfly",
@@ -376,11 +379,12 @@
 				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCF",
 				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 			],
-			"seed": 2,
-			"wins": 1,
-			"breaks": 0,
-			"cruxes": 0,
-			"spread": 0
+			"seed": 0,
+			"wins": 0.56,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"push": -1
 		},
 		{
 			"id": "orange-rocket",
@@ -429,11 +433,10 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 			],
 			"seed": 0,
-			"wins": 0.56,
-			"breaks": 1,
-			"cruxes": 2,
-			"spread": 1,
-			"push": 1
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "coral-quilt",
@@ -482,8 +485,8 @@
 				"HEEKKKKEEEIEEEEKEEEEEIEEKKKKEEH",
 				"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 			],
-			"seed": 0,
-			"wins": 0.75,
+			"seed": 3,
+			"wins": 0.56,
 			"breaks": 1,
 			"cruxes": 1,
 			"spread": 1
@@ -538,12 +541,12 @@
 				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
 				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 			],
-			"seed": 2,
-			"wins": 0.69,
+			"seed": 15,
+			"wins": 0.31,
 			"breaks": 1,
 			"cruxes": 1,
 			"spread": 1,
-			"deal": "004112000121111222020444441333344333244332200241000222331343101"
+			"push": 1
 		},
 		{
 			"id": "violet-target",
@@ -596,12 +599,12 @@
 				"HHHHHHHHAAAAAAAAAAAAAAAAHHHHHHHH",
 				"HHHHHHHHHHAAAAAAAAAAAAHHHHHHHHHH"
 			],
-			"seed": 2,
-			"wins": 0.44,
-			"breaks": 1,
-			"cruxes": 2,
+			"seed": 7,
+			"wins": 0.63,
+			"breaks": 2,
+			"cruxes": 1,
 			"spread": 1,
-			"push": 1
+			"push": -1
 		},
 		{
 			"id": "pink-flower",
@@ -651,11 +654,12 @@
 				"BBBBBBBBBBBBBBKKBBBBBBBBBBBBBBB"
 			],
 			"seed": 6,
-			"wins": 0.69,
-			"breaks": 0,
-			"cruxes": 0,
-			"spread": 0,
-			"push": 1
+			"wins": 0.38,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 1,
+			"push": 1,
+			"deal": "00121100224441444212223030331111333244444222"
 		},
 		{
 			"id": "cream-house",
@@ -705,11 +709,11 @@
 				"BBGBBBBBDBBBIIIIIIIIBBBCBBBBDBBB",
 				"BBBBBBBBBBBIIIIIIIIIIBBBBBBBBBBB"
 			],
-			"seed": 8,
-			"wins": 0.75,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 1,
+			"wins": 0.5,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1
 		},
 		{
 			"id": "amber-planet",
@@ -761,12 +765,11 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 			],
-			"seed": 4,
-			"wins": 0.69,
-			"breaks": 2,
-			"cruxes": 1,
-			"spread": 1,
-			"deal": "012221113002220101110011144343440432034333334400223004420113"
+			"seed": 3,
+			"wins": 0.88,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0
 		},
 		{
 			"id": "pink-cake",
@@ -821,12 +824,13 @@
 				"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
 				"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 			],
-			"seed": 3,
-			"wins": 0.69,
-			"breaks": 0,
-			"cruxes": 0,
-			"spread": 0,
-			"push": -1
+			"seed": 2,
+			"wins": 0.44,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"push": -1,
+			"deal": "24021020001210122100222222444333333011001124040021332220340411144"
 		}
 	]
 }

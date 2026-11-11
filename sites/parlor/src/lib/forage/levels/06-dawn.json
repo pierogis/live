@@ -60,11 +60,11 @@
 			],
 			"tuning": { "late": 1 },
 			"seed": 4,
-			"wins": 0.25,
+			"wins": 0.19,
 			"breaks": 2,
-			"cruxes": 2,
+			"cruxes": 4,
 			"spread": 2,
-			"push": -1
+			"deal": "0033120112112002124444444441111112222211033333332142004333334114444020022"
 		},
 		{
 			"id": "yellow-sailboat",
@@ -120,10 +120,13 @@
 				"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
 			],
 			"seed": 0,
-			"wins": 0.56,
-			"breaks": 1,
-			"cruxes": 2,
-			"spread": 2
+			"wins": 0.44,
+			"breaks": 5,
+			"cruxes": 4,
+			"spread": 2,
+			"tuning": { "late": 1 },
+			"push": -1,
+			"deal": "31130100010111001101044144444411010411140044010003334331223412223"
 		},
 		{
 			"id": "grey-target",
@@ -179,11 +182,12 @@
 				"EEEEEEEEAAAAAAAAAAAAABAAAAEEEEEEEE",
 				"EEEEEEEEEEAAAAAAAAAAAAAAEEEEEEEEEE"
 			],
-			"seed": 4,
-			"wins": 0.31,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 3,
+			"wins": 0.13,
+			"breaks": 6,
+			"cruxes": 5,
+			"spread": 2,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "grey-whale",
@@ -237,10 +241,10 @@
 				"FFFFFFFIIIFFDFFFFFFFFFFFFFFFFFFFF",
 				"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 			],
-			"seed": 1,
-			"deal": "00140002041110221124142431334324444111122310410341243322",
-			"wins": 0.19,
-			"breaks": 2,
+			"seed": 4,
+			"deal": "3000421011040003334144424232224112312221100333230300410221244204",
+			"wins": 0.5,
+			"breaks": 4,
 			"cruxes": 2,
 			"spread": 2
 		},
@@ -298,13 +302,12 @@
 				"EEEEEEBHEEHEEEEHEEHEEHECEEHEEHEEEE",
 				"EEEEHEEHEEHEEEEHEEHEEHEEEEHEEHEEHE"
 			],
-			"seed": 3,
-			"wins": 0.5,
+			"seed": 9,
+			"wins": 0.75,
 			"breaks": 1,
 			"cruxes": 2,
-			"spread": 2,
-			"tuning": { "late": 1 },
-			"deal": "01301130022000011111111000000144444443232322033323433332222444442411"
+			"spread": 1,
+			"deal": "111330001100001111110202222224444342400024444333300023332204442"
 		},
 		{
 			"id": "brown-fox",
@@ -362,12 +365,12 @@
 				"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 			],
 			"tuning": { "late": 1 },
-			"seed": 1,
-			"wins": 0.38,
-			"breaks": 2,
-			"cruxes": 3,
-			"spread": 2,
-			"push": 1
+			"seed": 0,
+			"wins": 0.44,
+			"breaks": 3,
+			"cruxes": 5,
+			"spread": 3,
+			"push": -1
 		},
 		{
 			"id": "tan-rabbit",
@@ -425,11 +428,12 @@
 				"JJDJDJJJJJJEJJJJJJJJJJJJJJJJJJJJJJ",
 				"JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"
 			],
-			"seed": 8,
-			"wins": 0.63,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 7,
+			"wins": 0.5,
+			"breaks": 2,
+			"cruxes": 3,
+			"spread": 1,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "yellow-flower",
@@ -483,13 +487,11 @@
 				"IIIIIIIIEIIIIIIIFKAKIIIIIIIIIIIIII",
 				"IIIIIIIIIIIIIIIIIKKKIIIIIIIIIIIIII"
 			],
-			"seed": 2,
-			"deal": "1111420000011010101111044444141444333333102322220034000",
-			"wins": 0.5,
-			"breaks": 3,
+			"seed": 4,
+			"wins": 0.38,
+			"breaks": 2,
 			"cruxes": 3,
-			"spread": 2,
-			"tuning": { "late": 1 }
+			"spread": 2
 		},
 		{
 			"id": "orange-bee",
@@ -542,13 +544,14 @@
 				"KEKFFFFFKGGGGKFFFFFKGGEGKFFFFFFKK",
 				"KKFFFFFFFKKKKKFFFFFFKKKKKFFFFFFKK"
 			],
-			"seed": 2,
-			"wins": 0.38,
+			"seed": 3,
+			"wins": 0.06,
 			"breaks": 4,
-			"cruxes": 2,
+			"cruxes": 3,
 			"spread": 2,
-			"deal": "42210100110000111122233304424304232442300003442340233131110",
-			"push": -1
+			"deal": "000112213100100444144140014404001114440444404022224442233103203333222",
+			"push": -1,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "orange-ladybug",
@@ -602,12 +605,14 @@
 				"IBIIIIIIIIIIIIIIIIIIIIIIIKKKKKKKI",
 				"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
 			],
-			"seed": 3,
-			"deal": "111010332200004444300133321111220333004442244411123344222240",
-			"wins": 0.38,
-			"breaks": 8,
-			"cruxes": 4,
-			"spread": 2
+			"seed": 0,
+			"deal": "3011000111111000444444440414440031303333333301023222222331432244",
+			"wins": 0.19,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2,
+			"tuning": { "late": 1 },
+			"push": -1
 		},
 		{
 			"id": "red-cactus",
@@ -664,10 +669,10 @@
 				"BJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJB",
 				"JJEJJJEJJJEJJJEJJJEJJJEJJJEJJJEJJJ"
 			],
-			"seed": 0,
-			"wins": 0.44,
-			"breaks": 3,
-			"cruxes": 3,
+			"seed": 9,
+			"wins": 0.38,
+			"breaks": 1,
+			"cruxes": 1,
 			"spread": 1
 		},
 		{
@@ -725,10 +730,11 @@
 				"LLLLLKKLLLLLLLLLKKKLLLLLLLLLLLLLL"
 			],
 			"seed": 1,
-			"wins": 0.5,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"wins": 0.63,
+			"breaks": 3,
+			"cruxes": 2,
+			"spread": 1,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "rose-house",
@@ -787,12 +793,14 @@
 				"BBBBBBBBBBFBMMMMMMMMMBFBBBBBBBBCB",
 				"BBBBBBBBBBBBMMMMMMMMMBBBBBBBBBBBB"
 			],
-			"seed": 3,
+			"seed": 4,
 			"wins": 0.38,
-			"breaks": 3,
-			"cruxes": 3,
+			"breaks": 2,
+			"cruxes": 4,
 			"spread": 2,
-			"deal": "011400311000131011000444444334222232222213311244244444200004444"
+			"deal": "11420000111114404444400000110404400111114333333333333024322222222",
+			"tuning": { "late": 1 },
+			"push": 1
 		},
 		{
 			"id": "green-teapot",
@@ -849,13 +857,12 @@
 				"LACDLACDLACDLACDLACDLACDLACDLACDLA",
 				"ACDLACDLACDLACDLACDLACDLACDLACDLAC"
 			],
-			"seed": 3,
-			"deal": "2011110100110110000111114444444400404221222222014222230443333333",
-			"wins": 0.56,
+			"seed": 2,
+			"deal": "221011110000000011110100044122322222434343234222343434042434144",
+			"wins": 0.44,
 			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2,
-			"tuning": { "late": 1 }
+			"cruxes": 3,
+			"spread": 3
 		},
 		{
 			"id": "amber-guitar",
@@ -910,14 +917,14 @@
 				"HHHHHHHHHHHLLLLKKKKLHHHHHHHHHHHHHH",
 				"HHHHHHHHHHHLLLLLLLLLHHHHHHHHHHHHHH"
 			],
-			"seed": 3,
-			"wins": 0.63,
-			"breaks": 3,
+			"seed": 4,
+			"wins": 0.19,
+			"breaks": 4,
 			"cruxes": 3,
-			"spread": 2,
+			"spread": 1,
 			"tuning": { "late": 1 },
 			"push": -1,
-			"deal": "1000034410111111104444400044404014401101000100002233333232222222"
+			"deal": "112003100010001111011100010011004442424222222244244233333334433433"
 		},
 		{
 			"id": "teal-bicycle",
@@ -977,13 +984,13 @@
 				"HHHDHHHHCHHHHHMHHHDHHCHHHHHHHHHHHHH",
 				"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 			],
-			"seed": 0,
-			"wins": 0.5,
+			"seed": 4,
+			"wins": 0.44,
 			"breaks": 2,
 			"cruxes": 3,
 			"spread": 2,
 			"push": 1,
-			"deal": "0000031244111111113333322222224444440003330111333344444222322"
+			"deal": "0001400111311010111010122222333300334444444444442222220100011333443422444"
 		},
 		{
 			"id": "orange-umbrella",
@@ -1041,12 +1048,12 @@
 				"BBBBBBBBBBBBBIIIIIKKKKIIIIIIIBBBBB",
 				"BBDBBBDBBBDBBBDBBBDBBBDBBBDBBBDBBB"
 			],
-			"seed": 0,
-			"wins": 0.38,
+			"seed": 8,
+			"wins": 0.44,
 			"breaks": 2,
 			"cruxes": 2,
 			"spread": 1,
-			"deal": "002411110411100000044233433122242222222133100111121111000"
+			"deal": "000001311411110101444444442222102233230333333332022334100004444"
 		}
 	]
 }
