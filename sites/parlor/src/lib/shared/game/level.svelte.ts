@@ -127,6 +127,17 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	});
 	/** The level after this one, wrapping around to the first. */
 	nextIndex = $derived.by(() => (this.index + 1) % this.#props().levels.length);
+	/** The other panels of this level's mural; empty when it isn't a panel. */
+	#panels = $derived.by(() => {
+		const panel = this.level?.panel;
+		if (!panel) return [];
+		const first = this.index - (panel.n - 1);
+		return this.#props().levels.slice(first, first + panel.of);
+	});
+	/** Every panel of this level's mural is complete. */
+	muralDone = $derived.by(
+		() => this.#panels.length > 0 && this.#panels.every((l) => this.save.completed[l.id])
+	);
 
 	#game: LevelGame<L, S>;
 	#props: () => LevelProps<L, S>;
@@ -354,8 +365,12 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	#win() {
 		const g = this.#game;
 		const id = this.level.id;
+		// The win that finishes a mural leads back to the pictures, so the game moves on by itself.
+		const last = this.#panels.every((l) => l.id === id || this.save.completed[l.id]);
+		const next = this.nextIndex;
 		this.#write((s) => {
 			s.completed[id] = true;
+			if (last && this.#panels.length) s.level = next;
 		});
 		this.won = true;
 		this.music?.cadence();
@@ -440,6 +455,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 			state: this.overlay === 'win' ? ('won' as const) : ('stuck' as const),
 			nextHref: this.nextHref,
 			onnext: this.next,
+			finished: this.muralDone,
 			onundo: this.undo,
 			onrestart: () => this.restart(true),
 			picturesHref: this.#props().picturesHref

@@ -764,7 +764,9 @@
 							{...ctl.end}
 							text={ctl.overlay === 'win'
 								? ctl.level.panel
-									? `${ctl.level.name} complete: panel ${ctl.level.panel.n} of ${ctl.level.panel.of} of ${ctl.level.panel.mural}.`
+									? ctl.muralDone
+										? `${ctl.level.name} complete. ${ctl.level.panel.mural} is finished.`
+										: `${ctl.level.name} complete: panel ${ctl.level.panel.n} of ${ctl.level.panel.of} of ${ctl.level.panel.mural}.`
 									: `${ctl.level.name} complete.`
 								: 'no group fits in the tray or in an open spot'}
 						/>

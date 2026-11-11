@@ -12,9 +12,9 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "node --test \"test/**/*.test.ts\"",
     "levels": "node scripts/check-levels.ts",
+    "murals": "node scripts/make-murals.ts",
     "forage:tune": "node scripts/tune-forage.ts",
-    "forage:pictures": "node scripts/make-forage-pictures.ts",
-    "mosaic:pictures": "node scripts/make-mosaic-pictures.ts"
+    "forage:pictures": "node scripts/make-forage-pictures.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "catalog:",

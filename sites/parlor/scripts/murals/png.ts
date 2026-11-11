@@ -1,7 +1,6 @@
-/* A tiny PNG writer (RGB, no dependencies) and a contact sheet of level pictures. */
+/* A tiny PNG writer (RGB, no dependencies), for looking at a mural while drawing it. */
 import { deflateSync } from 'node:zlib';
 
-import type { Picture } from '../../src/lib/shared/level.ts';
 import { hexToRgb } from '../../src/lib/shared/palette.ts';
 
 function png(w: number, h: number, rgb: Buffer): Buffer {
@@ -38,29 +37,33 @@ function png(w: number, h: number, rgb: Buffer): Buffer {
 	]);
 }
 
-/** Pictures in a grid, `cols` across, each cell `px` pixels, on a dark ground. */
-export function sheet(pics: Picture[], cols: number, px: number): Buffer {
-	// Room for the biggest picture, 36 cells, and a 1-cell gap.
-	const box = 37 * px;
-	const W = cols * box;
-	const rows = Math.ceil(pics.length / cols);
-	const H = rows * box;
-	const img = Buffer.alloc(W * H * 3, 0x30);
-	pics.forEach((lv, n) => {
-		const ox = (n % cols) * box + px;
-		const oy = Math.floor(n / cols) * box + px;
-		lv.art.forEach((row, y) =>
-			[...row].forEach((ch, x) => {
-				const c = ch === '.' ? [0x30, 0x30, 0x30] : hexToRgb(lv.palette[ch]);
-				for (let dy = 0; dy < px; dy++)
-					for (let dx = 0; dx < px; dx++) {
-						const o = ((oy + y * px + dy) * W + ox + x * px + dx) * 3;
-						img[o] = c[0];
-						img[o + 1] = c[1];
-						img[o + 2] = c[2];
-					}
-			})
-		);
-	});
+/**
+ * A picture's rows as an image, `px` pixels a dot. With a panel size, a `gap` of blank
+ * pixels parts the panels, to see each one as its own level.
+ */
+export function image(
+	rows: string[],
+	palette: Record<string, string>,
+	px: number,
+	panel?: [number, number],
+	gap = 0
+): Buffer {
+	const [pw, ph] = panel ?? [rows[0].length, rows.length];
+	const at = (i: number, size: number) => gap + i * px + Math.floor(i / size) * gap;
+	const W = at(rows[0].length - 1, pw) + px + gap;
+	const H = at(rows.length - 1, ph) + px + gap;
+	const img = Buffer.alloc(W * H * 3, 0xf0);
+	rows.forEach((row, y) =>
+		[...row].forEach((ch, x) => {
+			const c = hexToRgb(palette[ch]);
+			for (let dy = 0; dy < px; dy++)
+				for (let dx = 0; dx < px; dx++) {
+					const o = ((at(y, ph) + dy) * W + at(x, pw) + dx) * 3;
+					img[o] = c[0];
+					img[o + 1] = c[1];
+					img[o + 2] = c[2];
+				}
+		})
+	);
 	return png(W, H, img);
 }

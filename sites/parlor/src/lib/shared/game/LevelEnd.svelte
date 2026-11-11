@@ -1,6 +1,7 @@
 <!--
 	How a level ended, shown in place, not as a pop-up: a cleared picture offers the
-	next one; a stuck game offers undo or starting over.
+	next one, or the pictures page when it finished a mural; a stuck game offers undo or
+	starting over.
 -->
 <script lang="ts">
 	interface Props {
@@ -11,23 +12,30 @@
 		nextHref?: string;
 		onnext?: () => void;
 		picturesHref?: string;
+		/** This win finished a mural, so the way on is back to the pictures. */
+		finished?: boolean;
 		onundo: () => void;
 		onrestart: () => void;
 	}
 
-	let { state, text, nextHref, onnext, picturesHref, onundo, onrestart }: Props = $props();
+	let { state, text, nextHref, onnext, picturesHref, finished, onundo, onrestart }: Props =
+		$props();
 </script>
 
 <div class="end" role="status">
 	<p>{text}</p>
 	<div class="row">
 		{#if state === 'won'}
-			{#if nextHref}
+			{#if finished && picturesHref}
+				<a class="border inset link-box" href={picturesHref}>see the mural →</a>
+			{:else if nextHref}
 				<a class="border inset link-box" href={nextHref}>next →</a>
 			{:else if onnext}
 				<button class="border inset link-box" onclick={onnext}>next →</button>
 			{/if}
-			{#if picturesHref}<a class="border inset link-box" href={picturesHref}>all pictures</a>{/if}
+			{#if picturesHref && !finished}
+				<a class="border inset link-box" href={picturesHref}>all pictures</a>
+			{/if}
 		{:else}
 			<button class="border inset link-box" onclick={onundo}>undo</button>
 			<button class="border inset link-box" onclick={onrestart}>start over</button>

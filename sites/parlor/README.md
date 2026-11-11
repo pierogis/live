@@ -7,9 +7,9 @@ pnpm -F parlor dev      # http://localhost:5179
 pnpm -F parlor test     # engine and level tests
 pnpm -F parlor check    # svelte-check
 pnpm -F parlor levels   # check every level and print its stats
+pnpm -F parlor murals   # draw mosaic's murals into their pack files (a name draws one; --look <dir> saves images; --dry writes nothing)
 pnpm -F parlor forage:pictures  # regenerate the drawn forage pictures (packs 02 on; --start-pack 6 for 06 on)
 pnpm -F parlor forage:tune      # pick each forage level's deal to hit its difficulty
-pnpm -F parlor mosaic:pictures  # regenerate the drawn mosaic pictures (packs 02 on; --sheet out.png for a contact sheet)
 ```
 
 ## layout
@@ -29,7 +29,7 @@ Each game lives in `src/lib/<game>/`, is listed in `src/lib/games.ts` for the ho
 
 A new game brings its engine, its component, its levels, a `save.ts`, a `rules.ts` with its level checks and an `editor.ts` that adds the packs and the game to play-test, plus one entry in `src/lib/games.ts`. The routes, the editor, `pnpm -F parlor levels` and the tests find it from there.
 
-`scripts/` holds the level check (`check-levels.ts`), the editor's dev-server save (`levels-plugin.ts`), the picture makers (`make-mosaic-pictures.ts` with its templates in `scripts/mosaic/`, `make-forage-pictures.ts`, both drawing with `shapes.ts`), `tune-forage.ts`, and `write-pack.ts`, which writes a pack file formatted the way Prettier would, for the editor's save and the scripts. `test/levels.ts` reads the packs from disk for the tests and scripts.
+`scripts/` holds the level check (`check-levels.ts`), the editor's dev-server save (`levels-plugin.ts`), the mural maker (`make-murals.ts`, with one file per mural in `scripts/murals/`), Forage's picture maker (`make-forage-pictures.ts`, drawing with `shapes.ts`), `tune-forage.ts`, and `write-pack.ts`, which writes a pack file formatted the way Prettier would, for the editor's save and the scripts. `test/levels.ts` reads the packs from disk for the tests and scripts.
 
 ## mosaic
 
@@ -40,7 +40,7 @@ Lift dots off a picture, sort them by color, and fill the picture back in. The r
 - `flights.ts`: dots flying between the board and the tray
 - `report.ts`: one level's checks and stats, shared by the editor and `pnpm -F parlor levels`
 - `rules.ts` and `editor.ts`: what the shared editor checks for a mosaic level (`rules.ts` also runs in the editor's worker and in `pnpm -F parlor levels`)
-- `levels/`: the level packs, 200 levels in all. `01-first-light` was drawn by hand; packs 02 to 09 come from `pnpm -F parlor mosaic:pictures`, which draws original pictures from 72 seeded templates in `scripts/mosaic/` (landscapes, weather, sea, towns, animals, plants, vehicles, food, space and still lifes), in big flat areas with no speckle. Play grows from about 22 cells across in 5 colors to 36 in up to 12, with more and smaller parts as it goes; no color covers more than 45% of a picture, and every pair of colors is easy to tell apart. The script then nudges each picture a few places toward its measured difficulty so the solver's score rises through play.
+- `levels/`: the level packs. Every pack is a mural: one big picture, after a famous old artwork, cut into panels that are each a level (`"mural": { "cols": n }` in the pack file gives the panels per row). Packs play in file name order, easiest first: the first murals have small panels (18 by 16 dots) in a few flat colors, the last ones 24 by 22 in up to 14. No color covers more than half of a panel, and every pair of colors is easy to tell apart. A pack's `"song"` gives its panels one theme and one set of notes. The pack files are written by `pnpm -F parlor murals` from `scripts/murals/`: each mural is a file that paints one big grid of color letters with shapes and formulas (`canvas.ts`), and names its panels and their songs. To change a mural, change its file and run the command; a test checks that every pack file is what its script draws.
 
 A level can't get stuck: lifting dots to the tray uncovers as many spots as it fills, so open spots always match the dots in the tray, and one of them always fits. Difficulty is effort and planning instead: how many dots and colors there are, how broken up the picture is, and how the scattered blobs compare to the 20-slot tray. Blobs grow through all 200 levels (`blobSizes` in `engine.ts`), from 10 to 28 dots at the start, which often fit the tray whole, to 16 to 48 at the end, which rarely do.
 

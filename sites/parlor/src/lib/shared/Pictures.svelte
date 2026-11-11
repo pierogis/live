@@ -4,6 +4,7 @@
 	The game's options show above the pictures as toggles.
 -->
 <script lang="ts" generics="L extends Picture">
+	import { Card } from '@pierogis/utensils';
 	import { untrack } from 'svelte';
 
 	import { art } from './art';
@@ -70,30 +71,34 @@
 	{#each sections as section (section.name)}
 		{#if section.mural}
 			{@const panel = section.items[0].lv.art}
-			<!-- A mural: its panels side by side as one picture, each a link to its level. -->
+			<!-- A mural: its panels side by side as one picture in a card, each a link to its level. -->
 			<h3>
 				{section.name.toLowerCase()} · mural ·
 				{section.items.filter((i) => save.completed[i.lv.id]).length} / {section.items.length}
 			</h3>
-			<div
-				class="mural"
-				style:--cols={section.mural.cols}
-				style:--w={panel[0].length}
-				style:--h={panel.length}
-			>
-				{#each section.items as { lv, n } (lv.id)}
-					{@const done = !!save.completed[lv.id]}
-					<a
-						class="panel"
-						class:unplayed={!done}
-						class:current={save.level === n - 1}
-						href="{gameHref}/{n}"
-						title="{n}. {lv.name}"
-						aria-label="{n}. {lv.name}{done ? ', complete' : ''}"
+			<div class="frame">
+				<Card>
+					<div
+						class="mural"
+						style:--cols={section.mural.cols}
+						style:--w={panel[0].length}
+						style:--h={panel.length}
 					>
-						<canvas {@attach art(lv, 0)}></canvas>
-					</a>
-				{/each}
+						{#each section.items as { lv, n } (lv.id)}
+							{@const done = !!save.completed[lv.id]}
+							<a
+								class="panel"
+								class:unplayed={!done}
+								class:current={save.level === n - 1}
+								href="{gameHref}/{n}"
+								title="{n}. {lv.name}"
+								aria-label="{n}. {lv.name}{done ? ', complete' : ''}"
+							>
+								<canvas {@attach art(lv, 0)}></canvas>
+							</a>
+						{/each}
+					</div>
+				</Card>
 			</div>
 		{:else}
 			<h3>{section.name.toLowerCase()}</h3>
@@ -121,6 +126,7 @@
 
 <style>
 	.pictures {
+		container-type: inline-size;
 		width: 100%;
 		max-width: 760px;
 		display: flex;
@@ -164,22 +170,39 @@
 		grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
 		gap: 10px;
 	}
-	/* A mural's panels, each dot a whole number of pixels (--s), growing with the page. */
+	/* The card hugs its mural: no padding, and only as wide as the picture. */
+	.frame {
+		align-self: center;
+	}
+	.frame :global(.card) {
+		padding: 0;
+		height: auto;
+	}
+	/*
+	 * A mural's panels. Each dot is a whole number of pixels (--s): as many as fit the page
+	 * for this mural's width in dots, up to 7. The steps by page width are for browsers
+	 * without round().
+	 */
 	.mural {
-		--s: 3;
+		--s: 3px;
 		display: grid;
 		grid-template-columns: repeat(var(--cols), max-content);
 		gap: 2px;
 		justify-content: center;
 	}
-	@media (min-width: 520px) {
+	@media (min-width: 560px) {
 		.mural {
-			--s: 5;
+			--s: 5px;
 		}
 	}
 	@media (min-width: 780px) {
 		.mural {
-			--s: 7;
+			--s: 7px;
+		}
+	}
+	@supports (width: round(down, 1px, 1px)) {
+		.mural {
+			--s: clamp(2px, round(down, (100cqi - 24px) / (var(--cols) * var(--w)), 1px), 7px);
 		}
 	}
 	.panel {
@@ -187,8 +210,8 @@
 		line-height: 0;
 	}
 	.panel canvas {
-		width: calc(var(--w) * var(--s) * 1px);
-		height: calc(var(--h) * var(--s) * 1px);
+		width: calc(var(--w) * var(--s));
+		height: calc(var(--h) * var(--s));
 	}
 	.panel.unplayed canvas {
 		filter: grayscale(0.85) opacity(0.4);
