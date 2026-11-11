@@ -9,7 +9,7 @@ all things related to [pierogis.live](https://pierogis.live)
   - [`colors`](https://colors.pierogis.live): palettes
   - [`emporium`](https://emporium.pierogis.live): plates
   - [`live`](https://pierogis.live): base camp
-  - [`parlor`](https://parlor.pierogis.live): a room for games
+  - [`museum`](https://museum.pierogis.live): in which you can appreciate art
   - [`stale`](https://stale.pierogis.live): blog
   - [`utensils`](https://utensils.pierogis.live): table manners
 - packages
@@ -33,7 +33,7 @@ pnpm -F emporium dev  # 5175, see sites/emporium/README.md for the database
 pnpm -F live dev      # 5176
 pnpm -F utensils dev  # 5177
 pnpm -F stale dev     # 5178
-pnpm -F parlor dev    # 5179
+pnpm -F museum dev    # 5179
 ```
 
 The sites resolve `@pierogis/utensils` and `ui` from source, so edits to the packages reach a running dev server without a build.

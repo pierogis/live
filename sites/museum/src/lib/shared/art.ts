@@ -1,0 +1,47 @@
+import type { Attachment } from 'svelte/attachments';
+
+import type { Picture } from './level';
+
+/**
+ * Draw a level's picture in its colors, at the biggest whole-pixel scale that fits in `size`.
+ * Each dot is `dot` canvas pixels: more than 1 for a picture CSS scales down to fit, so
+ * its dots stay even.
+ */
+function drawArt(
+	canvas: HTMLCanvasElement,
+	lv: Pick<Picture, 'palette' | 'art'>,
+	size: number,
+	dot = 1
+) {
+	const w = lv.art[0].length;
+	const h = lv.art.length;
+	canvas.width = w * dot;
+	canvas.height = h * dot;
+	// Size 0 leaves the canvas's size to CSS (a mural's panels).
+	if (size) {
+		const scale = Math.floor(size / Math.max(w, h)) || 1;
+		canvas.style.width = w * scale + 'px';
+		canvas.style.height = h * scale + 'px';
+	}
+	const ctx = canvas.getContext('2d');
+	if (!ctx) return;
+	let color: string | undefined;
+	lv.art.forEach((row, y) => {
+		for (let x = 0; x < w; x++) {
+			const ch = row[x];
+			if (ch === '.') continue;
+			if (lv.palette[ch] !== color) {
+				color = lv.palette[ch];
+				ctx.fillStyle = color;
+			}
+			ctx.fillRect(x * dot, y * dot, dot, dot);
+		}
+	});
+}
+
+/** `{@attach art(level, size)}` on a canvas; `dot` as in `drawArt`. */
+export const art =
+	(lv: Pick<Picture, 'palette' | 'art'>, size: number, dot = 1): Attachment<HTMLCanvasElement> =>
+	(canvas) => {
+		drawArt(canvas, lv, size, dot);
+	};

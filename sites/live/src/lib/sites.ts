@@ -8,7 +8,11 @@ export interface Site {
 export const MAIN: Site[] = [
 	{ title: 'stale', tagline: 'well beyond the pale', href: 'https://stale.pierogis.live' },
 	{ title: 'emporium', tagline: 'a place for plates', href: 'https://emporium.pierogis.live' },
-	{ title: 'parlor', tagline: 'a room for games', href: 'https://parlor.pierogis.live' }
+	{
+		title: 'museum',
+		tagline: 'in which you can appreciate art',
+		href: 'https://museum.pierogis.live'
+	}
 ];
 
 /** The rest, listed on /other. */
