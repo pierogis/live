@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 
 import type { Picture } from '../src/lib/shared/level.ts';
+import type { SongSettings } from '../src/lib/shared/sound.ts';
 import { TUNED } from '../src/lib/forage/engine.ts';
 import { writePack } from './write-pack.ts';
 
@@ -33,6 +34,7 @@ const SLUG = /^[a-z0-9-]+$/;
 
 interface PackData {
 	name: string;
+	song?: SongSettings;
 	levels: Picture[];
 }
 
@@ -126,6 +128,14 @@ export function levelsPlugin(): Plugin {
 						packs.set(f.slice(0, -'.json'.length), JSON.parse(await readFile(dir + f, 'utf8')));
 					}
 					if (!packs.has(pack)) packs.set(pack, { name: String(packName || pack), levels: [] });
+					const target = packs.get(pack)!;
+					// The editor has the level's song with its pack's settings merged in (see
+					// packLevels): keep only the level's own. A new level gets the defaults.
+					clean.song = Object.fromEntries(
+						Object.entries(level.song ?? {}).filter(
+							([k, v]) => target.song?.[k as keyof SongSettings] !== v
+						)
+					);
 
 					// The level as it was saved before, if it still is.
 					const from =
@@ -139,7 +149,6 @@ export function levelsPlugin(): Plugin {
 						if (clash) return reply(409, { error: `${id} already has a level "${clean.id}"` });
 					}
 
-					const target = packs.get(pack)!;
 					let index: number;
 					if (from && from.pack === pack) {
 						index = target.levels.findIndex((l) => l.id === from.id);

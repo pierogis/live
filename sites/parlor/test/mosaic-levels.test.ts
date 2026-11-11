@@ -1,4 +1,4 @@
-// Mosaic's level set as a whole: 180 levels that fit a phone, with one picture each that
+// Mosaic's level set as a whole: levels that fit a phone, with one picture each that
 // no single color swamps, and difficulty that rises through play.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
