@@ -34,6 +34,8 @@
 	 * whose eighth is taken (the second of a pair, or another move's) lands a sixteenth
 	 * later, so the tune skips along in sixteenths instead of two notes merging into one.
 	 */
+	// Only the timing reads it, never the page, so it needn't be reactive.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	const booked = new Set<number>();
 	const MAX_ZOOM = 4;
 	/** Whether the last tap was a finger, which gets a wider reach than a mouse. */
@@ -418,6 +420,7 @@
 		const grid = { w: s.w, h: s.h, cell: m.cell, step: m.step, reach };
 		const [lx, ly] = local(x, y);
 		// A tap on a dot by its group's edge takes the bigger group beside it, if one's that close.
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- this tap's own lookup, not state
 		const sizes = new Map<number, number>();
 		for (const g of E.boardGroups(s)) for (const c of g.cells) sizes.set(c, g.cells.length);
 		const near = m.step * (touchTap ? 0.75 : 0.6);
