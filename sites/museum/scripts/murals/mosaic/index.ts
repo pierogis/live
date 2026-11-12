@@ -7,6 +7,7 @@ import { games } from './games.ts';
 import { garden } from './garden.ts';
 import { hamza } from './hamza.ts';
 import { lascaux } from './lascaux.ts';
+import { madaba } from './madaba.ts';
 import { marsh } from './marsh.ts';
 import type { Mural } from '../mural.ts';
 import { sea } from './sea.ts';
@@ -24,5 +25,6 @@ export const MURALS: Mural[] = [
 	garden,
 	games,
 	marsh,
-	hamza
+	hamza,
+	madaba
 ];
