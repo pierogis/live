@@ -13,7 +13,7 @@ function tiny(
 	palette: Record<string, string> = { A: '#000', B: '#fff' }
 ): E.State {
 	const lv: E.Level = { id: 't', name: 't', palette, art };
-	const s = E.buildPuzzle(lv, 0);
+	const s = E.buildPuzzle(lv);
 	s.top = top.map((c, id) => ({ id, c }));
 	s.tray = [];
 	s.trayCap = trayCap;
@@ -21,9 +21,9 @@ function tiny(
 }
 
 for (const relaxed of [false, true]) {
-	LEVELS.forEach((lv, i) => {
+	LEVELS.forEach((lv) => {
 		test(`${lv.id}${relaxed ? ' (relaxed)' : ''}: builds and solves`, () => {
-			const s = E.buildPuzzle(lv, i, { relaxed });
+			const s = E.buildPuzzle(lv, { relaxed });
 
 			const need: Record<number, number> = {};
 			const have: Record<number, number> = {};
@@ -69,13 +69,12 @@ test('a move lifts a group into the tray or onto open spots of its color', () =>
 test('more dots than room: the ones closest to the picked dot move', () => {
 	const s = tiny(['AAAABB', 'BBBBAA'], [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0], 2);
 	let r = E.move(s, { from: 'board', cell: 5 }, { to: 'tray' });
-	assert.ok(r.ok && r.toTray.length === 2 && r.left === 4, 'tray takes 2');
+	assert.ok(r.ok && r.toTray.length === 2, 'tray takes 2');
 	assert.deepEqual(r.toTray.map((p) => p.from).sort(), [4, 5]);
 	r = E.move(s, { from: 'board', cell: 0 }, { to: 'spot', cell: 5 });
-	assert.ok(r.ok && r.toBoard.length === 2 && r.left === 2);
+	assert.ok(r.ok && r.toBoard.length === 2);
 	assert.deepEqual(r.toBoard.map((p) => p.from).sort(), [0, 1], 'dots nearest the picked dot move');
 	assert.equal(r.toBoard[0].cell, 5, 'first dot lands on the tapped spot');
-	assert.ok(s.top[r.leftCell], 'leftover dot still on the board');
 });
 
 test('fewer dots than spots: they fill the spots closest to the tapped one', () => {
@@ -95,7 +94,7 @@ test("dots that the tapped area has no room for go on to the color's other open 
 	assert.ok(lift.ok && lift.toTray.length === 3);
 	assert.deepEqual(E.dropSpots(s, 4), [4, 2, 0]);
 	const r = E.move(s, { from: 'board', cell: 5 }, { to: 'spot', cell: 4 });
-	assert.ok(r.ok && r.left === 0);
+	assert.ok(r.ok);
 	assert.deepEqual(
 		r.toBoard.map((p) => p.cell),
 		[4, 2, 0]
@@ -108,9 +107,8 @@ test("with room to spare, more of the color's board dots come too, nearest first
 	assert.ok(E.move(s, { from: 'board', cell: 11 }, { to: 'tray' }).ok);
 	s.trayCap = 12;
 	assert.ok(E.move(s, { from: 'board', cell: 0 }, { to: 'tray' }).ok);
-	assert.equal(E.dropCount(s, { from: 'board', cell: 6 }, 0), 2);
 	const r = E.move(s, { from: 'board', cell: 6 }, { to: 'spot', cell: 0 });
-	assert.ok(r.ok && r.left === 0);
+	assert.ok(r.ok);
 	assert.deepEqual(
 		r.toBoard.map((p) => [p.from, p.cell, p.order]),
 		[
@@ -136,7 +134,7 @@ test('diagonal spots count as touching', () => {
 		'open spots touching at the corner form one area'
 	);
 	const r = E.move(s, { from: 'board', cell: 1 }, { to: 'spot', cell: 0 });
-	assert.ok(r.ok && r.toBoard.length === 2 && r.left === 0);
+	assert.ok(r.ok && r.toBoard.length === 2);
 });
 
 test('the tray keeps dots grouped by color', () => {
@@ -153,7 +151,6 @@ test('the tray keeps dots grouped by color', () => {
 
 test('with room to spare, the tray takes more of the color, nearest first', () => {
 	const s = tiny(['ABABA'], [0, 1, 0, 1, 0], 2);
-	assert.equal(E.parkCount(s, { from: 'board', cell: 2 }), 2);
 	const r = E.move(s, { from: 'board', cell: 2 }, { to: 'tray' });
 	assert.ok(r.ok && r.toTray.length === 2 && r.toTray[0].from === 2);
 	assert.ok(s.top[0] || s.top[4], 'one A is left on the board');
@@ -198,15 +195,10 @@ test('a level\u2019s tray grows with its picture, tightens a little with difficu
 	assert.ok(E.trayFor(528, 0) > E.trayFor(288, 0), 'a bigger picture, more room');
 	assert.ok(E.trayFor(528, 1) < E.trayFor(528, 0), 'tighter when harder');
 	assert.ok(E.trayFor(528, 1) >= 0.8 * E.trayFor(528, 0), 'but only a little');
-	LEVELS.slice(0, 5).forEach((lv, i) => {
-		const s = E.buildPuzzle(lv, i);
+	LEVELS.slice(0, 5).forEach((lv) => {
+		const s = E.buildPuzzle(lv);
 		const dots = s.target.filter((c) => c >= 0).length;
 		assert.equal(s.trayCap, E.trayFor(dots, lv.difficulty ?? 0), lv.id);
-		assert.equal(E.buildPuzzle(lv, i, { relaxed: true }).trayCap, 2 * s.trayCap, lv.id);
+		assert.equal(E.buildPuzzle(lv, { relaxed: true }).trayCap, 2 * s.trayCap, lv.id);
 	});
-});
-
-test('a level is the same puzzle wherever it sits in play', () => {
-	const lv = LEVELS[30];
-	assert.deepEqual(E.buildPuzzle(lv, 30), E.buildPuzzle(lv, 3));
 });

@@ -1140,7 +1140,6 @@ function dispenserRoom(s: State): number[] {
 
 export function buildPuzzle(
 	level: Level,
-	index?: number,
 	override: Partial<Tuning> = {},
 	seed = level.seed ?? 0
 ): State {

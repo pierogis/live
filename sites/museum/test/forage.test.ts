@@ -19,7 +19,7 @@ function make(art: string[], columns: [number, number][][], slots = 5): F.State 
 		palette: { A: '#e63946', B: '#3b7dd8', C: '#ffd23f' },
 		art
 	};
-	const s = F.buildPuzzle(lv, 0, { columns: 3, links: 0, locks: 0, mystery: 0 });
+	const s = F.buildPuzzle(lv, { columns: 3, links: 0, locks: 0, mystery: 0 });
 	let id = 0;
 	s.columns = columns.map((col) => col.map(([c, n]) => ({ id: id++, c, n })));
 	s.locks = s.columns.map(() => -1);
@@ -331,7 +331,7 @@ test('a linked group of three goes out together and holds its slots until all ar
 
 test('a patient pick times ants the same way the board does, tick by tick', () => {
 	const lv = packs[0].levels[3];
-	const s0 = F.buildPuzzle(lv, 3);
+	const s0 = F.buildPuzzle(lv);
 	const a = F.clone(s0);
 	const b = F.clone(s0);
 	const rng = makeRng(5);
@@ -371,9 +371,8 @@ test('difficulty: teaching levels take one try, the hardest several, the sharpes
 	}
 });
 
-test("a level's deal comes from its own difficulty, not its place in play", () => {
+test("a level's deal gets harder with its difficulty", () => {
 	const lv = LEVELS.find((l) => (l.difficulty ?? 0) >= F.TEACH)!;
-	assert.deepEqual(F.buildPuzzle(lv, 3).columns, F.buildPuzzle(lv, 70).columns);
 	const harder = F.tuning({ ...lv, difficulty: 0.9 });
 	assert.ok(harder.links > F.tuning(lv).links && harder.waitChance > F.tuning(lv).waitChance);
 });
@@ -402,7 +401,7 @@ for (const pack of packs) {
 		test(`forage ${pack.id}/${lv.id}: builds, counts add up, the built-in play wins`, () => {
 			const used = new Set(lv.art.join('').replace(/\./g, ''));
 			assert.deepEqual(closePairs(lv.palette, used), []);
-			const s = F.buildPuzzle(lv, i);
+			const s = F.buildPuzzle(lv);
 			const blocks: number[] = s.colors.map(() => 0);
 			s.target.forEach((c) => c >= 0 && blocks[c]++);
 			for (const d of s.dispensers ?? []) d.colors.forEach((c, k) => (blocks[c] += d.amounts[k]));
@@ -422,7 +421,7 @@ for (const pack of packs) {
 				assert.deepEqual(saved, lv.tries, 'the attempts saved are this deal\u2019s');
 				assert.ok(t.worst <= GIVE_UP, 'learners win it');
 			}
-			assert.deepEqual(F.buildPuzzle(lv, i).columns, s.columns, 'same level, same deal');
+			assert.deepEqual(F.buildPuzzle(lv).columns, s.columns, 'same level, same deal');
 		});
 	}
 }

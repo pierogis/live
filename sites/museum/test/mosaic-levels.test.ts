@@ -22,7 +22,7 @@ test('every picture fits a phone and has no color covering half of it', () => {
 test('report: a shipped level is clean; a broken one lists its problems', () => {
 	const ok = reportLevel(LEVELS[0]);
 	assert.deepEqual(ok.problems, []);
-	assert.ok(ok.moves > 0 && ok.minTray <= buildPuzzle(LEVELS[0], 0).trayCap);
+	assert.ok(ok.moves > 0 && ok.minTray <= buildPuzzle(LEVELS[0]).trayCap);
 
 	const bad = reportLevel({
 		id: '',

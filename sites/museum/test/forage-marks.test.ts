@@ -118,8 +118,8 @@ test('forage: rails stay whole pixels, off colonies, above the counts, and in th
 
 test('forage: every level gives each of its linked groups its own color', () => {
 	let levels = 0;
-	loadLevels<Level>('forage').forEach((lv, i) => {
-		const deal = buildPuzzle(lv, i);
+	loadLevels<Level>('forage').forEach((lv) => {
+		const deal = buildPuzzle(lv);
 		const colors = linkColors(deal);
 		const ids = new Set(deal.columns.flat().flatMap((e) => (e.link === undefined ? [] : [e.link])));
 		assert.equal(colors.size, ids.size);

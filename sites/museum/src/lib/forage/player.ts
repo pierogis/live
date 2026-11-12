@@ -136,10 +136,6 @@ export function rememberSends(n: number) {
 	while (sends.size > n) sends.delete(sends.keys().next().value!);
 }
 
-export function forgetSends() {
-	sends.clear();
-}
-
 const pictures = new WeakMap<number[], number>();
 let nextPicture = 0;
 

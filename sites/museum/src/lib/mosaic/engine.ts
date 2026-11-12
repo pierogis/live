@@ -67,9 +67,6 @@ export type MoveResult =
 			toBoard: Required<Flight>[];
 			toTray: (Flight & { from: number })[];
 			fromTray: (Flight & { cell: number })[];
-			left: number;
-			leftCell: number;
-			leftCells?: number[];
 	  };
 
 export interface Group {
@@ -236,12 +233,12 @@ export function openRegion(s: State, cell: number): number[] {
 	return queue;
 }
 
-export interface Held {
+interface Held {
 	cell: number;
 	gem: Gem;
 }
 
-export function selectionDots(s: State, sel: Sel | null): Held[] | null {
+function selectionDots(s: State, sel: Sel | null): Held[] | null {
 	if (!sel) return null;
 	if (sel.from === 'board') {
 		if (sel.cells) {
@@ -340,28 +337,6 @@ function gather(s: State, color: number, held: Held[], want: number, near: numbe
 	return out;
 }
 
-export function parkCount(s: State, sel: Sel | null): number {
-	const dots = selectionDots(s, sel);
-	if (!dots || sel?.from !== 'board') return 0;
-	const free = Math.max(0, s.trayCap - s.tray.length);
-	if (free <= dots.length) return free;
-	let all = 0;
-	for (const q of s.top) if (q?.c === dots[0].gem.c) all++;
-	return Math.min(free, all);
-}
-
-export function dropCount(s: State, sel: Sel, cell: number): number {
-	const dots = selectionDots(s, sel);
-	if (!dots) return 0;
-	const spots = dropSpots(s, cell).length;
-	if (spots <= dots.length) return spots;
-	const color = dots[0].gem.c;
-	const taken = new Set(dots.map((d) => d.gem.id));
-	let all = dots.length;
-	for (const q of s.top) if (q?.c === color && !taken.has(q.id)) all++;
-	return Math.min(spots, all);
-}
-
 function outward(s: State, cells: number[], center: number): number[] {
 	const inGroup = new Set(cells);
 	const seen = new Set([center]);
@@ -448,15 +423,8 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 			}
 		}
 	}
-	const left = Math.max(0, size - n);
-	let leftCell = -1;
-	let leftCells: number[] | undefined;
-	if (left && sel.from === 'board') {
-		leftCell = dots[n].cell;
-		leftCells = dots.slice(n).map((d) => d.cell);
-	}
 	s.moves++;
-	return { ok: true, toBoard, toTray, fromTray, left, leftCell, leftCells };
+	return { ok: true, toBoard, toTray, fromTray };
 }
 
 export function isStuck(s: State): boolean {
@@ -712,7 +680,7 @@ export function joinFor(difficulty: number): number {
 	return 1 - depth(difficulty);
 }
 
-export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
+export function buildPuzzle(level: Level, opts: BuildOptions = {}): State {
 	const { state } = buildSolved(level);
 	if (opts.relaxed) relax(state);
 	return state;

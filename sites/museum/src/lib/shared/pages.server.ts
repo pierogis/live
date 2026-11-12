@@ -10,7 +10,7 @@ interface GameParts<L extends Picture, S> {
 	levels: L[];
 	packs: Pack<L>[];
 	save: GameSave;
-	build(level: L, index: number): S;
+	build(level: L): S;
 }
 
 export function gamePages<L extends Picture, S>({
@@ -33,7 +33,7 @@ export function gamePages<L extends Picture, S>({
 				index,
 				title: `${level.name} · ${game.name} · museum`,
 				description: `${game.name} level ${index + 1}: ${level.name}`,
-				initial: build(level, index)
+				initial: build(level)
 			};
 		},
 

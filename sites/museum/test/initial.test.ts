@@ -8,16 +8,16 @@ import { loadLevels } from './levels.ts';
 const roundTrip = <T>(s: T): T => JSON.parse(JSON.stringify(s));
 
 test('every mosaic start state is plain data', () => {
-	loadLevels('mosaic').forEach((lv, i) => {
-		const s = M.buildPuzzle(lv, i);
+	loadLevels('mosaic').forEach((lv) => {
+		const s = M.buildPuzzle(lv);
 		assert.deepStrictEqual(roundTrip(s), s, lv.id);
-		assert.deepStrictEqual(M.relax(roundTrip(s)), M.buildPuzzle(lv, i, { relaxed: true }), lv.id);
+		assert.deepStrictEqual(M.relax(roundTrip(s)), M.buildPuzzle(lv, { relaxed: true }), lv.id);
 	});
 });
 
 test('every forage start state is plain data', () => {
-	loadLevels<F.Level>('forage').forEach((lv, i) => {
-		const s = F.buildPuzzle(lv, i);
+	loadLevels<F.Level>('forage').forEach((lv) => {
+		const s = F.buildPuzzle(lv);
 		assert.deepStrictEqual(roundTrip(s), s, lv.id);
 	});
 });

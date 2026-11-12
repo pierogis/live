@@ -126,7 +126,7 @@ const DIRS: Node[] = [
 
 const nodeOf = (m: Spot): Node => [2 * m.col + 1, 2 * m.depth + 1];
 
-function inChannels(i: number, j: number, ni: number, nj: number, stub: boolean): boolean {
+function inChannels(i: number, j: number, nj: number, stub: boolean): boolean {
 	if (j === nj) return j === 0 || stub;
 	if (i % 2 === 0) return true;
 	return stub && Math.min(j, nj) === 0;
@@ -163,7 +163,7 @@ function route(a: Node, b: Node, g: number, grid: RailGrid, used: Used): Node[] 
 			const end = ni === b[0] && nj === b[1];
 			if (!end && !free(ni, nj)) continue;
 			const start = i === a[0] && j === a[1];
-			if (grid.channels && !inChannels(i, j, ni, nj, start || end)) continue;
+			if (grid.channels && !inChannels(i, j, nj, start || end)) continue;
 			let step =
 				Math.abs(size(sub(xAt(ni), xAt(i)))) + Math.abs(size(sub(yAt(nj, grid), yAt(j, grid))));
 			if (!start && nd !== d) step += BEND;
