@@ -1,4 +1,4 @@
-// The Codex Borgia (central Mexico, before 1500): a screenfold book of the ritual calendar,
+// Codex Borgia (central Mexico, before 1500): a screenfold book of the ritual calendar,
 // painted on deerskin coated with white plaster. Everything is ringed in heavy black and
 // filled with flat color, and red frame bands cut the pages into sections. Across the top
 // the feathered serpent faces Tezcatlipoca, and Tlaloc brings the rain; below, a jaguar
@@ -836,7 +836,7 @@ function draw(c: Canvas) {
 
 export const borgia: Mural = {
 	file: 'codex-borgia',
-	name: 'The Codex Borgia',
+	name: 'Codex Borgia',
 	prefix: 'codex-borgia',
 	notes: 'F#',
 	cols: 4,

@@ -1,5 +1,5 @@
 {
-	"name": "The Bayeux Tapestry",
+	"name": "Bayeux Tapestry",
 	"mural": { "cols": 6 },
 	"difficulty": 0.4,
 	"song": { "notes": "Bb", "theme": "bayeux" },

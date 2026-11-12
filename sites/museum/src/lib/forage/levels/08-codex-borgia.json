@@ -1,5 +1,5 @@
 {
-	"name": "The Codex Borgia",
+	"name": "Codex Borgia",
 	"mural": { "cols": 4 },
 	"difficulty": 0.95,
 	"song": { "notes": "F#", "theme": "codex-borgia" },

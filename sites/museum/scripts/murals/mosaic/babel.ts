@@ -1,4 +1,4 @@
-// The Tower of Babel, after Bruegel (1563): a huge round tower, still being built, rising
+// Tower of Babel, after Bruegel (1563): a huge round tower, still being built, rising
 // through the clouds over a town and a harbour. Twenty panels of 24 by 22.
 import { div, int, mod, points, round, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
@@ -409,7 +409,7 @@ function draw(c: Canvas) {
 
 export const babel: Mural = {
 	file: 'tower-of-babel',
-	name: 'The Tower of Babel',
+	name: 'Tower of Babel',
 	prefix: 'tower-of-babel',
 	notes: 'B',
 	difficulty: 0.3,

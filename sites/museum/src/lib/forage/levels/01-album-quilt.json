@@ -1,5 +1,5 @@
 {
-	"name": "The Album Quilt",
+	"name": "Baltimore Album Quilt",
 	"mural": { "cols": 4 },
 	"difficulty": 0.05,
 	"song": { "notes": "F", "theme": "album-quilt" },

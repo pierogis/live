@@ -1,4 +1,4 @@
-// The Hall of the Bulls (Lascaux cave, France, about 17,000 years ago): animals in
+// Hall of the Bulls (Lascaux cave, France, about 17,000 years ago): animals in
 // charcoal and ochre on a cave wall. Eight panels of 18 by 16.
 import { inell, int, points, SIDES, type Canvas, type Point } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
@@ -149,7 +149,7 @@ function draw(c: Canvas) {
 
 export const lascaux: Mural = {
 	file: 'lascaux',
-	name: 'The Hall of the Bulls',
+	name: 'Hall of the Bulls',
 	prefix: 'lascaux',
 	notes: 'C',
 	difficulty: 0,

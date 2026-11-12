@@ -1,4 +1,4 @@
-// A Dalarna bonad (Sweden, late 1700s): a wall hanging painted on paper for Christmas and
+// Dalmålning (Dalarna, Sweden, late 1700s): a wall hanging painted on paper for Christmas and
 // weddings. Bible stories are told with people in the painter's own country clothes: men in
 // long coats, knee breeches and tricorn hats, women in caps and striped aprons. "Kurbits"
 // flower trees, onion buds cupped in curling scrolls and edged with white dashes, grow from
@@ -706,7 +706,7 @@ function draw(c: Canvas) {
 
 export const bonad: Mural = {
 	file: 'bonad',
-	name: 'The Dalarna Bonad',
+	name: 'Dalmålning',
 	prefix: 'bonad',
 	notes: 'G',
 	cols: 6,

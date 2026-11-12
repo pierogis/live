@@ -1,5 +1,5 @@
 /*
- * The Dering Roll (England, about 1270): a strip of parchment painted with rows of
+ * Dering Roll (England, about 1270): a strip of parchment painted with rows of
  * knights' shields, a name written over each. One shield to a panel.
  */
 import type { Canvas } from '../canvas.ts';
@@ -172,7 +172,7 @@ function draw(c: Canvas) {
 
 export const dering: Mural = {
 	file: 'dering-roll',
-	name: 'The Dering Roll',
+	name: 'Dering Roll',
 	prefix: 'dering-roll',
 	notes: 'A',
 	difficulty: 0.05,

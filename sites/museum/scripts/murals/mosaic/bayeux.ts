@@ -1,5 +1,5 @@
 /*
- * The Bayeux Tapestry (England, about 1070s): the Norman conquest stitched in wool on linen,
+ * Bayeux Tapestry (England, about 1070s): the Norman conquest stitched in wool on linen,
  * between two borders of little beasts. 6 x 2 panels (144 x 44); each scene has two halves.
  */
 import { div, int, points } from '../canvas.ts';
@@ -438,7 +438,7 @@ function draw(c: Canvas) {
 
 export const bayeux: Mural = {
 	file: 'bayeux-tapestry',
-	name: 'The Bayeux Tapestry',
+	name: 'Bayeux Tapestry',
 	prefix: 'bayeux',
 	notes: 'Bb',
 	difficulty: 0.4,

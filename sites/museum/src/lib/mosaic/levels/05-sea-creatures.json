@@ -1,5 +1,5 @@
 {
-	"name": "The Sea Creatures",
+	"name": "Sea Creatures",
 	"mural": { "cols": 4 },
 	"difficulty": 0.2,
 	"song": { "notes": "D", "theme": "sea-creatures" },

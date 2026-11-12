@@ -1,4 +1,4 @@
-// A Baltimore album quilt (Maryland, 1840s): appliqué blocks in turkey red and green on
+// Baltimore Album Quilt (Maryland, 1840s): appliqué blocks in turkey red and green on
 // cream, each sewn by a different hand: wreaths, baskets, birds, an eagle, a ship. The
 // cream is quilted in a diagonal grid. Twelve blocks of 26 by 26, each framed in green.
 import { around as ring, turn, type Canvas } from '../canvas.ts';
@@ -322,7 +322,7 @@ function draw(c: Canvas) {
 
 export const quilt: Mural = {
 	file: 'album-quilt',
-	name: 'The Album Quilt',
+	name: 'Baltimore Album Quilt',
 	prefix: 'album-quilt',
 	notes: 'F',
 	cols: COLS,

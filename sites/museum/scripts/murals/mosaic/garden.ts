@@ -1,4 +1,4 @@
-// Hieronymus Bosch, The Garden of Earthly Delights (about 1500): Eden on the left, the
+// Hieronymus Bosch, Garden of Earthly Delights (about 1500): Eden on the left, the
 // crowded garden in the middle, and hell on the right. 6 by 4 panels.
 import { int, mod, points, round, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
@@ -502,7 +502,7 @@ function draw(c: Canvas) {
 
 export const garden: Mural = {
 	file: 'earthly-delights',
-	name: 'The Garden of Earthly Delights',
+	name: 'Garden of Earthly Delights',
 	prefix: 'earthly-delights',
 	notes: 'D',
 	difficulty: 0.45,

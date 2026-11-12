@@ -1,4 +1,4 @@
-// The Mice Bury the Cat, a Russian lubok print (early 1700s): a woodcut in black on
+// Mice Bury the Cat, a Russian lubok print (early 1700s): a woodcut in black on
 // off-white paper, colored by hand in red, yellow, green, lilac and ochre that slop past
 // the lines. A funeral in three rows: musicians lead the way; the dead cat lies on its
 // back with its paws tied, on a sledge pulled by mice; behind come mice with food and
@@ -547,7 +547,7 @@ function draw(c: Canvas) {
 
 export const mice: Mural = {
 	file: 'mice-bury-the-cat',
-	name: 'The Mice Bury the Cat',
+	name: 'Mice Bury the Cat',
 	prefix: 'mice-bury-the-cat',
 	notes: 'A',
 	cols: COLS,

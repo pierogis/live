@@ -1,4 +1,4 @@
-// The Apocalypse Tapestry at Angers, France (woven 1377–1382): the Book of Revelation as a
+// Apocalypse Tapestry at Angers, France (woven 1377–1382): the Book of Revelation as a
 // long run of scenes, each on a ground of madder red or indigo, turn and turn about, sown
 // with leafy sprigs, flowers and butterflies. St John watches from his Gothic pavilion; the
 // four horsemen ride; angels sound their trumpets; locusts with human faces swarm from the
@@ -754,7 +754,7 @@ function draw(c: Canvas) {
 
 export const apocalypse: Mural = {
 	file: 'apocalypse-tapestry',
-	name: 'The Apocalypse Tapestry',
+	name: 'Apocalypse Tapestry',
 	prefix: 'apocalypse',
 	notes: 'C',
 	cols: COLS,
