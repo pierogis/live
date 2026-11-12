@@ -5,6 +5,7 @@ import { carta } from './carta.ts';
 import { dering } from './dering.ts';
 import { games } from './games.ts';
 import { garden } from './garden.ts';
+import { hamza } from './hamza.ts';
 import { lascaux } from './lascaux.ts';
 import { marsh } from './marsh.ts';
 import type { Mural } from '../mural.ts';
@@ -22,5 +23,6 @@ export const MURALS: Mural[] = [
 	bayeux,
 	garden,
 	games,
-	marsh
+	marsh,
+	hamza
 ];
