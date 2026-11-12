@@ -1,6 +1,7 @@
 {
 	"name": "The Dering Roll",
 	"mural": { "cols": 4 },
+	"difficulty": 0.05,
 	"song": { "notes": "A", "theme": "dering-roll" },
 	"levels": [
 		{

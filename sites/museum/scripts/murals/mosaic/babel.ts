@@ -408,10 +408,11 @@ function draw(c: Canvas) {
 }
 
 export const babel: Mural = {
-	file: '00f-tower-of-babel',
+	file: 'tower-of-babel',
 	name: 'The Tower of Babel',
 	prefix: 'tower-of-babel',
 	notes: 'B',
+	difficulty: 0.3,
 	cols: 5,
 	// S sky, W white, B sea blue, G grass, L light grass, D dark green, C cream stone,
 	// O ochre stone, R red brick, M dark red-brown, K near black, N grey

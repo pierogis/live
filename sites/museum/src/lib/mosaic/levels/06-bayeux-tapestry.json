@@ -1,6 +1,7 @@
 {
 	"name": "The Bayeux Tapestry",
 	"mural": { "cols": 6 },
+	"difficulty": 0.4,
 	"song": { "notes": "Bb", "theme": "bayeux" },
 	"levels": [
 		{

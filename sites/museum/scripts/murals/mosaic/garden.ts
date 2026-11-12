@@ -501,10 +501,11 @@ function draw(c: Canvas) {
 }
 
 export const garden: Mural = {
-	file: '00i-earthly-delights',
+	file: 'earthly-delights',
 	name: 'The Garden of Earthly Delights',
 	prefix: 'earthly-delights',
 	notes: 'D',
+	difficulty: 0.45,
 	cols: 6,
 	// S sky, W cloud, G and L the lawn's two greens, D dark leaves, F skin, N night, V dusk.
 	palette: {

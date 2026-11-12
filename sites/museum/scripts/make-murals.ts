@@ -3,7 +3,16 @@
 // No names draws them all. `--look` saves images of each, whole and in panels; `--dry`
 // writes no pack file. Prints each panel's stats and how many dots changed. A Forage
 // panel whose picture comes out the same keeps what forage:tune saved for it.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+// Pack files are numbered in play order (`playOrder`): when Mosaic's order changes, any
+// mural's file is renamed to its new place, drawn or not.
+import {
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	renameSync,
+	writeFileSync
+} from 'node:fs';
 import { parseArgs } from 'node:util';
 
 import { TUNED } from '../src/lib/forage/engine.ts';
@@ -11,8 +20,9 @@ import { reportForage } from '../src/lib/forage/report.ts';
 import type { GameId } from '../src/lib/games.ts';
 import { reportLevel } from '../src/lib/mosaic/report.ts';
 import { checkPicture, pct } from '../src/lib/shared/checks.ts';
+import { packLevels } from '../src/lib/shared/levels.ts';
 import type { Picture } from '../src/lib/shared/level.ts';
-import { MURALS } from './murals/index.ts';
+import { fileOf, MURALS, playOrder } from './murals/index.ts';
 import { layout, pack, paint } from './murals/mural.ts';
 import { image } from './murals/png.ts';
 import { writePack } from './write-pack.ts';
@@ -29,8 +39,8 @@ const GAMES: Record<
 	}
 > = {
 	mosaic: {
-		report(lv, index) {
-			const r = reportLevel(lv, index);
+		report(lv) {
+			const r = reportLevel(lv);
 			return { note: `score ${String(r.score).padStart(3)}`, problems: r.problems };
 		},
 		half: true,
@@ -62,16 +72,24 @@ const same = (a: Picture, b: Picture) =>
 let failed = false;
 for (const [id, game] of Object.entries(GAMES) as [GameId, (typeof GAMES)[GameId]][]) {
 	const dir = new URL(`../src/lib/${id}/levels/`, import.meta.url);
-	// A panel's place in play sets how hard it's made, so count from the game's first mural on.
+	const packs = readdirSync(dir).filter((f) => f.endsWith('.json'));
+	// A Forage panel's place in play sets how hard it's made, so count from the first mural on.
 	let index = 0;
-	for (const m of MURALS[id]) {
+	for (const [place, m] of playOrder(id).entries()) {
 		const first = index;
 		index += m.panels.length;
+		const name = `${fileOf(m, place)}.json`;
+		const file = new URL(name, dir);
+		const was = packs.find((f) => f.replace(/^[^-]+-/, '') === `${m.file}.json`);
+		if (was && was !== name) {
+			console.log(`${id}: ${was} is now ${name}`);
+			if (!args.dry) renameSync(new URL(was, dir), file);
+		}
 		if (!wanted.includes(m)) continue;
 		const picture = paint(m);
 		const data = pack(m, picture);
-		const file = new URL(`${m.file}.json`, dir);
-		const old: Picture[] = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')).levels : [];
+		const from = was && args.dry ? new URL(was, dir) : file;
+		const old: Picture[] = existsSync(from) ? JSON.parse(readFileSync(from, 'utf8')).levels : [];
 		data.levels = data.levels.map((lv) => {
 			const was = old.find((o) => o.id === lv.id && same(o, lv));
 			if (!was) return lv;
@@ -81,13 +99,15 @@ for (const [id, game] of Object.entries(GAMES) as [GameId, (typeof GAMES)[GameId
 			};
 		});
 		const { pw, ph, rows } = layout(m);
+		// As the game plays them (its difficulty mixed panel by panel).
+		const played = packLevels(data);
 
-		console.log(`\n${id}: ${m.name} (${m.file}), ${m.cols} by ${rows} panels of ${pw} by ${ph}`);
+		console.log(`\n${id}: ${m.name} (${name}), ${m.cols} by ${rows} panels of ${pw} by ${ph}`);
 		data.levels.forEach((lv, k) => {
 			const { counts, pixels } = checkPicture(lv);
 			const [top, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
 			const share = pct(n / pixels);
-			const r = game.report(lv, first + k);
+			const r = game.report(played[k], first + k);
 			const problems = [...r.problems];
 			if (game.half && 2 * n > pixels) problems.push(`${top} covers ${share} of it`);
 			if (problems.length) failed = true;

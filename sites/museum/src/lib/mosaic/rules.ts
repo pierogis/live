@@ -5,8 +5,8 @@ import { reportLevel } from './report.ts';
 
 export const rules: Rules<Level> = {
 	id: 'mosaic',
-	row(level, index) {
-		const r = reportLevel(level, index);
+	row(level) {
+		const r = reportLevel(level);
 		return {
 			problems: r.problems,
 			warnings: r.warnings,

@@ -835,7 +835,7 @@ function draw(c: Canvas) {
 }
 
 export const borgia: Mural = {
-	file: '08-codex-borgia',
+	file: 'codex-borgia',
 	name: 'The Codex Borgia',
 	prefix: 'codex-borgia',
 	notes: 'F#',

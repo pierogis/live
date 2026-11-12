@@ -242,10 +242,11 @@ function draw(c: Canvas) {
 }
 
 export const bestiary: Mural = {
-	file: '00c-bestiary',
+	file: 'bestiary',
 	name: 'A Page of Beasts',
 	prefix: 'bestiary',
 	notes: 'F',
+	difficulty: 0.1,
 	cols: COLS,
 	panel: [PW, PH],
 	// P parchment and pale beasts, B blue ground, R vermilion ground, Y gold leaf, K ink, S grey

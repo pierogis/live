@@ -136,13 +136,17 @@ function neighbors(w: number, h: number, i: number): number[] {
 /**
  * Build the top layer as random blobs of color:
  *   1. grow blobs of `blobMin`..`blobMax` dots from random seed spots. Each blob is a
- *      color that still has dots left, and stays inside the area of same-colored
- *      spots it started in, so lifting it opens one clean patch of a single color
+ *      color that still has dots left, and keeps to the area of same-colored spots it
+ *      started in, so lifting it opens one clean patch. A new blob beside a blob in the
+ *      next area takes that blob's color as often as `join` (0 to 1) says, so the two
+ *      touch and lift as one group; otherwise it takes a color no blob beside it has, and
+ *      stays apart. A busy picture's small areas leave many small groups and lone dots
+ *      when blobs stay apart; joined, they come out in fewer, bigger groups.
  *   2. swap dots so as few as possible sit on a spot of their own color
  * Every color ends up with exactly as many dots as the picture has spots for it.
  * Returns the dot color for each spot (-1 for empty pixels).
  */
-function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[] {
+function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng: Rng): number[] {
 	const { w, h, target } = art;
 	const cells: number[] = [];
 	target.forEach((c, i) => {
@@ -173,13 +177,18 @@ function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[
 		if (next >= order.length) break;
 		const seed = order[next];
 		blobId += 1;
-		// Pick a color for the new blob: not the color its spots need, and not a color
-		// already touching it, so blobs don't merge across areas. Weighted by dots left.
-		const safe: number[] = [];
+		// Pick a color for the new blob, never the color its spots need, weighted by dots
+		// left: as often as `join` says, one already beside it, to join that blob; else one
+		// not beside it, to stay apart.
+		const home = target[seed];
+		const beside: number[] = [];
+		const apart: number[] = [];
 		left.forEach((n, k) => {
-			if (n > 0 && k !== target[seed] && !touchesColor(seed, k, -1)) safe.push(k);
+			if (n > 0 && k !== home) (touchesColor(seed, k, -1) ? beside : apart).push(k);
 		});
-		const c = safe.length ? pickWeighted(safe, (k) => left[k], rng) : pickColor(target[seed]);
+		const joins = beside.length > 0 && rng() < join;
+		const pool = joins ? beside : apart;
+		const c = pool.length ? pickWeighted(pool, (k) => left[k], rng) : pickColor(home);
 		const size = Math.min(left[c], blobMin + Math.floor(rng() * (blobMax - blobMin + 1)));
 		colorsAt[seed] = c;
 		blobOf[seed] = blobId;
@@ -187,14 +196,11 @@ function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[
 		let grown = 1;
 		const frontier: number[] = [];
 		const inFrontier = new Set<number>();
-		const home = target[seed];
 		const addAround = (i: number) => {
 			for (const j of square4(i)) {
-				// Only grow over spots that need the same color as the seed spot.
-				if (colorsAt[j] === null && target[j] === home && !inFrontier.has(j)) {
-					inFrontier.add(j);
-					frontier.push(j);
-				}
+				if (colorsAt[j] !== null || inFrontier.has(j) || target[j] !== home) continue;
+				inFrontier.add(j);
+				frontier.push(j);
 			}
 		};
 		addAround(seed);
@@ -204,8 +210,8 @@ function scramble(art: Art, blobMin: number, blobMax: number, rng: Rng): number[
 			frontier[k] = frontier[frontier.length - 1];
 			frontier.pop();
 			if (colorsAt[j] !== null) continue;
-			// Don't grow into a spot touching another blob of the same color.
-			if (touchesColor(j, c, blobId)) continue;
+			// A blob that stays apart doesn't grow into touching another of its color.
+			if (!joins && touchesColor(j, c, blobId)) continue;
 			colorsAt[j] = c;
 			blobOf[j] = blobId;
 			left[c]--;
@@ -327,6 +333,32 @@ export function openCount(s: State, color: number): number {
 		if (s.target[i] === color && !s.top[i] && !s.filled[i]) n++;
 	}
 	return n;
+}
+
+/** The open spot of `color` nearest `cell`, or -1. */
+export function nearestOpen(s: State, color: number, cell: number): number {
+	const x = cell % s.w;
+	const y = Math.floor(cell / s.w);
+	let best = -1;
+	let bestD = Infinity;
+	s.target.forEach((c, i) => {
+		if (c !== color || s.top[i] || s.filled[i]) return;
+		const d = Math.hypot((i % s.w) - x, Math.floor(i / s.w) - y);
+		if (d < bestD) [best, bestD] = [i, d];
+	});
+	return best;
+}
+
+/**
+ * What a tap on board dot `cell` does in the game: its group goes home to the nearest open
+ * spot of its color (and on to the color's others), or, with none open, into the tray.
+ */
+export function tapMove(s: State, cell: number): { sel: Sel; dst: Dst } {
+	const spot = nearestOpen(s, s.top[cell]!.c, cell);
+	return {
+		sel: { from: 'board', cell, cells: groupAt(s, cell)!.cells },
+		dst: spot >= 0 ? { to: 'spot', cell: spot } : { to: 'tray' }
+	};
 }
 
 /**
@@ -766,19 +798,21 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 /** About how many of a picture's dots each tray slot is for: a bigger picture gets more room. */
 const DOTS_PER_SLOT = 14;
 /**
- * How much tighter the tray gets through play, as a share of its room: the lever for
- * difficulty, apart from the picture's size (0.15 is 15% less room by the last level).
+ * How much tighter the tray gets with difficulty, as a share of its room: the lever, apart
+ * from the picture's size (0.15 is 15% less room at difficulty 1).
  */
 const TRAY_SQUEEZE = 0.15;
 
+/** A difficulty kept to 0 to 1. */
+const depth = (difficulty = 0) => Math.min(1, Math.max(0, difficulty));
+
 /**
- * The tray for the `index`th level, a picture of `dots` dots: room in proportion to the
- * picture, so a bigger one isn't harder for its size alone, tightened a little through
- * play (`TRAY_SQUEEZE`). Each level is built and proven with its own tray.
+ * The tray for a picture of `dots` dots at `difficulty` (its mural's): room in proportion
+ * to the picture, so a bigger one isn't harder for its size alone, tightened a little with
+ * difficulty (`TRAY_SQUEEZE`). Each level is built and proven with its own tray.
  */
-export function trayFor(dots: number, index: number): number {
-	const t = Math.min(1, Math.max(0, index / LAST_LEVEL));
-	return Math.max(8, Math.round((dots / DOTS_PER_SLOT) * (1 - TRAY_SQUEEZE * t)));
+export function trayFor(dots: number, difficulty: number): number {
+	return Math.max(8, Math.round((dots / DOTS_PER_SLOT) * (1 - TRAY_SQUEEZE * depth(difficulty))));
 }
 
 /** The bigger tray (the `relaxed` option): twice the level's own. Changes nothing else. */
@@ -798,27 +832,32 @@ export interface Built {
 	solution: Solution;
 }
 
-/** Where play ends: the last level's index. Blob sizes stop growing there. */
-export const LAST_LEVEL = 199;
-
 /**
- * How big the scattered blobs of dots are for the `index`th level. They grow all through
- * play, from about half the build tray (10 to 28 dots) at the first level to more than twice
- * it (16 to 48) at the last, so later groups rarely fit the tray whole. Pictures grow
- * faster than the blobs, so later levels still have more groups to sort.
+ * How big the scattered blobs of dots are at `difficulty` (its mural's): from 10 to 28 dots
+ * at 0, which often fit a small tray whole, to 16 to 48 at 1, which rarely fit one.
  */
-export function blobSizes(index: number): { min: number; max: number } {
-	const t = Math.min(1, Math.max(0, index / LAST_LEVEL));
+export function blobSizes(difficulty: number): { min: number; max: number } {
+	const t = depth(difficulty);
 	return { min: Math.round(10 + 6 * t), max: Math.round(28 + 20 * t) };
 }
 
 /**
- * Same level id and index always give the same puzzle.
+ * How often a scattered blob joins a same-colored one in the next area at `difficulty`
+ * (see `scramble`): always at 0, so even a busy picture scrambles into fewer, bigger
+ * groups with few lone dots; never at 1, so its small areas leave many to hunt for.
+ */
+export function joinFor(difficulty: number): number {
+	return 1 - depth(difficulty);
+}
+
+/**
+ * Same level always gives the same puzzle, wherever it sits in play: its mural's
+ * difficulty (`Level.difficulty`) sets how hard. (`index` is the game interface's; unused.)
  * Tries a few shuffles and keeps the first one the solver can finish with the
  * level's own tray (`trayFor`), so every level is solvable with the tray you get.
  */
 export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
-	const { state } = buildSolved(level, index);
+	const { state } = buildSolved(level);
 	if (opts.relaxed) relax(state);
 	return state;
 }
@@ -828,14 +867,15 @@ export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}
  * its shuffle. Drops gather by the room left in the tray, so the solution replays only
  * with the tray it was found with.
  */
-export function buildSolved(level: Level, index: number): Built {
+export function buildSolved(level: Level): Built {
 	const art = parseArt(level);
 	const base = hashStr(level.id);
-	const { min: blobMin, max: blobMax } = blobSizes(index);
-	const tray = trayFor(art.target.filter((c) => c >= 0).length, index);
+	const { min: blobMin, max: blobMax } = blobSizes(level.difficulty ?? 0);
+	const tray = trayFor(art.target.filter((c) => c >= 0).length, level.difficulty ?? 0);
 
 	const make = (attempt: number): State => {
-		const colorsAt = scramble(art, blobMin, blobMax, makeRng(base + attempt * 7919));
+		const join = joinFor(level.difficulty ?? 0);
+		const colorsAt = scramble(art, blobMin, blobMax, join, makeRng(base + attempt * 7919));
 		let id = 0;
 		return {
 			w: art.w,

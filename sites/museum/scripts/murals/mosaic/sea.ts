@@ -361,10 +361,11 @@ function draw(c: Canvas) {
 }
 
 export const sea: Mural = {
-	file: '00e-sea-creatures',
+	file: 'sea-creatures',
 	name: 'The Sea Creatures',
 	prefix: 'sea-creatures',
 	notes: 'D',
+	difficulty: 0.2,
 	cols: COLS,
 	panel: [PW, PH],
 	palette: {

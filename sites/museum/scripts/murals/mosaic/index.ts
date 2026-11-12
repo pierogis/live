@@ -1,4 +1,4 @@
-/* Mosaic's murals, in play order: easiest first. A mural's `file` name sets its place. */
+/* Mosaic's murals. They play in the order they measure, easiest first (`playOrder`). */
 import { babel } from './babel.ts';
 import { bayeux } from './bayeux.ts';
 import { bestiary } from './bestiary.ts';

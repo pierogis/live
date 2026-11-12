@@ -31,7 +31,7 @@ test('every picture fits a phone and has no color covering half of it', () => {
 });
 
 test('later levels are harder: the solver score rises through play', () => {
-	const scores = LEVELS.map((lv, i) => reportLevel(lv, i).score);
+	const scores = LEVELS.map((lv) => reportLevel(lv).score);
 	const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 	const third = Math.floor(scores.length / 3);
 	const thirds = [0, 1, 2].map((k) => mean(scores.slice(k * third, k * third + third)));
@@ -39,14 +39,16 @@ test('later levels are harder: the solver score rises through play', () => {
 });
 
 test('report: a shipped level is clean; a broken one lists its problems', () => {
-	const ok = reportLevel(LEVELS[0], 0);
+	const ok = reportLevel(LEVELS[0]);
 	assert.deepEqual(ok.problems, []);
 	assert.ok(ok.moves > 0 && ok.minTray <= buildPuzzle(LEVELS[0], 0).trayCap);
 
-	const bad = reportLevel(
-		{ id: '', name: 'x', palette: { A: '#e63946', B: '#e33b47' }, art: ['AB', 'BAX'] },
-		0
-	);
+	const bad = reportLevel({
+		id: '',
+		name: 'x',
+		palette: { A: '#e63946', B: '#e33b47' },
+		art: ['AB', 'BAX']
+	});
 	assert.ok(bad.problems.includes('needs an id'));
 	assert.ok(bad.problems.includes('rows are not all the same width'));
 	assert.ok(bad.problems.includes('"X" has no color'));

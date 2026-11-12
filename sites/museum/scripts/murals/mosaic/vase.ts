@@ -212,10 +212,11 @@ function draw(c: Canvas) {
 }
 
 export const vase: Mural = {
-	file: '00d-greek-vase',
+	file: 'greek-vase',
 	name: 'The Black-Figure Vase',
 	prefix: 'greek-vase',
 	notes: 'G',
+	difficulty: 0.35,
 	cols: COLS,
 	panel: [PW, PH],
 	// O orange clay, K black glaze, C cream slip, R dark red

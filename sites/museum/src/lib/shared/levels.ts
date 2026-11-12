@@ -12,9 +12,17 @@ export type PackFile<L extends Picture = Picture> = Omit<Pack<L>, 'id'>;
 /** Pack files by path, each as its JSON (under `default`, the way a glob gives it). */
 export type PackFiles<L extends Picture> = Record<string, { default: PackFile<L> }>;
 
-/** A pack's levels as played: the pack's song settings go to each, under the level's own. */
-export function packLevels<L extends Picture>({ song, levels }: PackFile<L>): L[] {
-	return song ? levels.map((lv) => ({ ...lv, song: { ...song, ...lv.song } })) : levels;
+/**
+ * A pack's levels as played: the pack's song settings go to each, under the level's own,
+ * and so does its difficulty, for a level that doesn't set its own.
+ */
+export function packLevels<L extends Picture>({ song, difficulty, levels }: PackFile<L>): L[] {
+	if (!song && difficulty === undefined) return levels;
+	return levels.map((lv) => ({
+		...lv,
+		...(song && { song: { ...song, ...lv.song } }),
+		...(difficulty !== undefined && { difficulty: lv.difficulty ?? difficulty })
+	}));
 }
 
 /** The packs in file name order, and every level in play order. */

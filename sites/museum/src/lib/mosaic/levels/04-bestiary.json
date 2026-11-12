@@ -1,6 +1,7 @@
 {
 	"name": "A Page of Beasts",
 	"mural": { "cols": 3 },
+	"difficulty": 0.1,
 	"song": { "notes": "F", "theme": "bestiary" },
 	"levels": [
 		{

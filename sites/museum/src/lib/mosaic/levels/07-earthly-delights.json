@@ -1,6 +1,7 @@
 {
 	"name": "The Garden of Earthly Delights",
 	"mural": { "cols": 6 },
+	"difficulty": 0.45,
 	"song": { "notes": "D", "theme": "earthly-delights" },
 	"levels": [
 		{

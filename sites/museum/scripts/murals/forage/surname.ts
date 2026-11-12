@@ -638,7 +638,7 @@ function draw(c: Canvas) {
 }
 
 export const surname: Mural = {
-	file: '06-surname-i-vehbi',
+	file: 'surname-i-vehbi',
 	name: 'Surname-i Vehbi',
 	prefix: 'surname-i-vehbi',
 	notes: 'D',

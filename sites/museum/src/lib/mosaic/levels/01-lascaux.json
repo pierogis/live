@@ -1,6 +1,7 @@
 {
 	"name": "The Hall of the Bulls",
 	"mural": { "cols": 4 },
+	"difficulty": 0,
 	"song": { "notes": "C", "theme": "lascaux" },
 	"levels": [
 		{

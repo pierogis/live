@@ -546,7 +546,7 @@ function draw(c: Canvas) {
 }
 
 export const mice: Mural = {
-	file: '03-mice-bury-the-cat',
+	file: 'mice-bury-the-cat',
 	name: 'The Mice Bury the Cat',
 	prefix: 'mice-bury-the-cat',
 	notes: 'A',

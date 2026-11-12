@@ -1,6 +1,7 @@
 {
 	"name": "Children's Games",
 	"mural": { "cols": 5 },
+	"difficulty": 0.5,
 	"song": { "notes": "F", "theme": "childrens-games" },
 	"levels": [
 		{

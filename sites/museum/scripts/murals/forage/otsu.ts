@@ -677,7 +677,7 @@ function draw(c: Canvas) {
 }
 
 export const otsu: Mural = {
-	file: '04-otsu-e',
+	file: 'otsu-e',
 	name: 'Ōtsu-e',
 	prefix: 'otsu-e',
 	notes: 'E',

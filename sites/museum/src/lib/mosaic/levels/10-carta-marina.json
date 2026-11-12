@@ -1,6 +1,7 @@
 {
 	"name": "Carta Marina",
 	"mural": { "cols": 5 },
+	"difficulty": 0.35,
 	"song": { "notes": "E", "theme": "carta-marina" },
 	"levels": [
 		{

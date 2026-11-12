@@ -577,10 +577,11 @@ function draw(c: Canvas) {
 }
 
 export const carta: Mural = {
-	file: '00g-carta-marina',
+	file: 'carta-marina',
 	name: 'Carta Marina',
 	prefix: 'carta-marina',
 	notes: 'E',
+	difficulty: 0.35,
 	cols: 5,
 	// S, B, T the sea's three blues; C sand and L meadow; N brown, also the coastline; K ink.
 	palette: {

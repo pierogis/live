@@ -644,7 +644,7 @@ function draw(c: Canvas) {
 }
 
 export const thief: Mural = {
-	file: '02-strawberry-thief',
+	file: 'strawberry-thief',
 	name: 'The Strawberry Thief',
 	prefix: 'strawberry-thief',
 	notes: 'D',

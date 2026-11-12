@@ -1,4 +1,4 @@
-/* Forage's murals, in play order: easiest first. A mural's `file` name sets its place. */
+/* Forage's murals, in play order: easiest first. */
 import type { Mural } from '../mural.ts';
 import { apocalypse } from './apocalypse.ts';
 import { bonad } from './bonad.ts';

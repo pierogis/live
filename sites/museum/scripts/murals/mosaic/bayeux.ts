@@ -437,10 +437,11 @@ function draw(c: Canvas) {
 }
 
 export const bayeux: Mural = {
-	file: '00h-bayeux-tapestry',
+	file: 'bayeux-tapestry',
 	name: 'The Bayeux Tapestry',
 	prefix: 'bayeux',
 	notes: 'Bb',
+	difficulty: 0.4,
 	cols: 6,
 	// L linen, R terracotta, N dark blue, T blue-green, S sage, Y mustard, K dark brown, F flesh
 	palette: {

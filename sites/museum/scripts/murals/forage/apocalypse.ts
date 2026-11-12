@@ -753,7 +753,7 @@ function draw(c: Canvas) {
 }
 
 export const apocalypse: Mural = {
-	file: '07-apocalypse-tapestry',
+	file: 'apocalypse-tapestry',
 	name: 'The Apocalypse Tapestry',
 	prefix: 'apocalypse',
 	notes: 'C',

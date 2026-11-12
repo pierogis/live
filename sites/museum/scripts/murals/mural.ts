@@ -3,10 +3,11 @@ import type { Picture } from '../../src/lib/shared/level.ts';
 import type { SongSettings } from '../../src/lib/shared/sound.ts';
 import { Canvas } from './canvas.ts';
 
-export type Panel = [slug: string, name: string, song: SongSettings];
+/** A panel: its id's end, its name, its song, and its own difficulty when not the mural's. */
+export type Panel = [slug: string, name: string, song: SongSettings, difficulty?: number];
 
 export interface Mural {
-	/** The pack file, without `.json`. Packs play in file name order. */
+	/** The pack file's name, without `.json` or the number that sets its place (`fileOf`). */
 	file: string;
 	name: string;
 	/** Starts every panel's id, and is the theme its songs share. */
@@ -15,6 +16,11 @@ export interface Mural {
 	notes: string;
 	/** Panels to a row; the panel count sets how many rows. */
 	cols: number;
+	/**
+	 * How hard its panels are made, 0 to 1 (Mosaic: see `Pack.difficulty`), unless a panel
+	 * sets its own.
+	 */
+	difficulty?: number;
 	/** A panel's size in dots; 24 by 22 unless given. */
 	panel?: [w: number, h: number];
 	palette: Record<string, string>;
@@ -43,17 +49,25 @@ export function paint(m: Mural): string[] {
 
 export function pack(m: Mural, picture = paint(m)) {
 	const { pw, ph } = layout(m);
-	const levels: Picture[] = m.panels.map(([slug, name, song], k) => {
+	const levels: Picture[] = m.panels.map(([slug, name, song, difficulty], k) => {
 		const px = (k % m.cols) * pw;
 		const py = Math.floor(k / m.cols) * ph;
 		const art = picture.slice(py, py + ph).map((row) => row.slice(px, px + pw));
 		const used = new Set(art.join(''));
 		const palette = Object.fromEntries(Object.entries(m.palette).filter(([ch]) => used.has(ch)));
-		return { id: `${m.prefix}-${slug}`, name, song, palette, art };
+		return {
+			id: `${m.prefix}-${slug}`,
+			name,
+			song,
+			...(difficulty !== undefined && { difficulty }),
+			palette,
+			art
+		};
 	});
 	return {
 		name: m.name,
 		mural: { cols: m.cols },
+		...(m.difficulty !== undefined && { difficulty: m.difficulty }),
 		song: { notes: m.notes, theme: m.prefix },
 		levels
 	};

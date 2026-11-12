@@ -148,10 +148,11 @@ function draw(c: Canvas) {
 }
 
 export const lascaux: Mural = {
-	file: '00a-lascaux',
+	file: 'lascaux',
 	name: 'The Hall of the Bulls',
 	prefix: 'lascaux',
 	notes: 'C',
+	difficulty: 0,
 	cols: COLS,
 	panel: [PW, PH],
 	// L pale stone, T tan stone, D dark rock floor, K charcoal, R red ochre, Y yellow ochre

@@ -120,20 +120,6 @@
 		return { from: 'board', cell, cells: E.groupAt(game!, cell)!.cells };
 	}
 
-	/** The open spot of `color` nearest `cell`, or -1. */
-	function nearestOpen(s: State, color: number, cell: number): number {
-		const x = cell % s.w;
-		const y = Math.floor(cell / s.w);
-		let best = -1;
-		let bestD = Infinity;
-		s.target.forEach((c, i) => {
-			if (c !== color || s.top[i] || s.filled[i]) return;
-			const d = Math.hypot((i % s.w) - x, Math.floor(i / s.w) - y);
-			if (d < bestD) [best, bestD] = [i, d];
-		});
-		return best;
-	}
-
 	// ---------- what to draw ----------
 	const boardView = $derived.by(() => {
 		void ctl.version;
@@ -463,10 +449,8 @@
 		if (!s || ctl.overlay || E.isWon(s)) return;
 		focusCell = i;
 		if (!s.top[i]) return;
-		// A dot's group goes home to the nearest open spot of its color (and on to the
-		// color's others), or, with none open, into the tray.
-		const spot = nearestOpen(s, s.top[i]!.c, i);
-		tryMove(pickBoard(i), spot >= 0 ? { to: 'spot', cell: spot } : { to: 'tray' });
+		const { sel, dst } = E.tapMove(s, i);
+		tryMove(sel, dst);
 	}
 
 	/**

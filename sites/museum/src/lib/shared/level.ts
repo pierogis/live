@@ -9,6 +9,8 @@ export interface Picture {
 	art: string[];
 	/** Its song's settings, so the music suits the picture (see `SongSettings`). */
 	song?: SongSettings;
+	/** How hard it's made, 0 to 1: its own, or its pack's (see `Pack.difficulty`). */
+	difficulty?: number;
 }
 
 /** A level as a game's level list has it: everything but its picture (scripts/level-lists.ts). */
@@ -29,5 +31,11 @@ export interface Pack<L extends Picture = Picture> {
 	mural?: { cols: number };
 	/** Song settings all its levels share (each level's own come on top): a mural's theme and notes. */
 	song?: SongSettings;
+	/**
+	 * How hard its levels are made, 0 to 1, in Mosaic (how big and how confined its scattered
+	 * groups, how tight its tray), for each that doesn't set its own. A pack's own, not its
+	 * place in play, so adding one changes no other.
+	 */
+	difficulty?: number;
 	levels: L[];
 }

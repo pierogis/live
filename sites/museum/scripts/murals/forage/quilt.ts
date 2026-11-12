@@ -321,7 +321,7 @@ function draw(c: Canvas) {
 }
 
 export const quilt: Mural = {
-	file: '01-album-quilt',
+	file: 'album-quilt',
 	name: 'The Album Quilt',
 	prefix: 'album-quilt',
 	notes: 'F',

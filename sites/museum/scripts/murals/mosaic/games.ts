@@ -514,10 +514,11 @@ function draw(c: Canvas) {
 }
 
 export const games: Mural = {
-	file: '00j-childrens-games',
+	file: 'childrens-games',
 	name: "Children's Games",
 	prefix: 'childrens-games',
 	notes: 'F',
+	difficulty: 0.5,
 	cols: 5,
 	// O and T the square's two sands, E stone, N brick and wood, G and L grass, D dark leaves,
 	// S water and sky, F skin

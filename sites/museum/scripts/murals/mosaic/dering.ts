@@ -171,10 +171,11 @@ function draw(c: Canvas) {
 }
 
 export const dering: Mural = {
-	file: '00b-dering-roll',
+	file: 'dering-roll',
 	name: 'The Dering Roll',
 	prefix: 'dering-roll',
 	notes: 'A',
+	difficulty: 0.05,
 	cols: COLS,
 	panel: [PW, PH],
 	// L light parchment (also heraldic silver), T worn tan parchment, K ink.

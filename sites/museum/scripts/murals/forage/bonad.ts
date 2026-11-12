@@ -705,7 +705,7 @@ function draw(c: Canvas) {
 }
 
 export const bonad: Mural = {
-	file: '05-bonad',
+	file: 'bonad',
 	name: 'The Dalarna Bonad',
 	prefix: 'bonad',
 	notes: 'G',
