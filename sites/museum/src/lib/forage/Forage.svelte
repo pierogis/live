@@ -80,7 +80,6 @@
 	const ctl = new LevelControl<Level, State>(
 		{
 			save: forageSave,
-			build: E.buildPuzzle,
 			clone: E.clone,
 			isWon: E.isWon,
 			isStuck: E.isStuck,

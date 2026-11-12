@@ -19,8 +19,7 @@
  * `o=relaxed` or `o=-relaxed`. An option missing from `o` reads as its default.
  *
  * Each game makes its own save functions with `gameSave`. A game's level
- * controller reads and writes through a `SaveStore`: the cookie, or a store in
- * memory for play that shouldn't touch it (like a test).
+ * controller reads and writes through its `SaveStore`, the cookie.
  */
 import { hashStr } from './engine.ts';
 
@@ -87,18 +86,6 @@ function merge(current: Save, fn: (current: Save) => Save | void): Save {
 		for (const id in done) if (done[id]) completed[id] = true;
 	}
 	return { ...next, completed, options: { ...next.options } };
-}
-
-/** A save kept in memory only, starting from `start`: for play that mustn't touch the cookie. */
-export function memoryStore(start: Save = blank()): SaveStore {
-	let saved = copy(start);
-	return {
-		load: () => copy(saved),
-		update: (fn) => {
-			saved = merge(saved, fn);
-			return copy(saved);
-		}
-	};
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';

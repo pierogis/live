@@ -19,48 +19,30 @@ import { goto } from '$app/navigation';
 
 import type { Listed, Picture } from '../level';
 import { hashStr } from '../engine';
-import { memoryStore, type GameSave, type Save, type SaveStore } from '../save';
+import type { GameSave, Save } from '../save';
 import { music, type Clock, type Music, type Rhythm } from '../sound';
 import { Cue } from './cue.svelte';
 
-interface CommonProps<S> {
-	/** Start on this level instead of the saved one. */
-	start?: number;
-	/** The `start` level's state as `build` makes it, built ahead of time (say, at prerender). */
-	initial?: S;
-	/** Keep progress in memory only, never in the cookie: for play-testing a draft. */
-	sandbox?: boolean;
+/**
+ * The props every game component takes; the controller reads them through a getter.
+ * Each level has its own page, which builds it ahead; moving to another level goes there.
+ */
+export interface LevelProps<L extends Picture, S> {
+	/** Every level in play order, without its picture: enough to name and save each one. */
+	levels: Listed<L>[];
+	/** The page's level. */
+	start: number;
+	/** The `start` level's starting state, built ahead (at prerender). */
+	initial: S;
+	levelHref: (index: number) => string;
 	/** Where the page of all the murals lives; omit to hide the link. */
 	muralsHref?: string;
 }
 
-/** Each level has its own page, which builds it ahead; moving to another level goes there. */
-interface PagedProps<L extends Picture, S> extends CommonProps<S> {
-	/** Every level in play order, without its picture: enough to name and save each one. */
-	levels: Listed<L>[];
-	start: number;
-	initial: S;
-	levelHref: (index: number) => string;
-}
-
-/** Every level built and played in place, on one page (the site gives each level its own). */
-interface InPlaceProps<L extends Picture, S> extends CommonProps<S> {
-	levels: L[];
-	levelHref?: undefined;
-}
-
-/** The props every game component takes; the controller reads them through a getter. */
-export type LevelProps<L extends Picture, S> = PagedProps<L, S> | InPlaceProps<L, S>;
-
 /** What a game tells the controller about itself. */
-export interface LevelGame<L extends Picture, S> {
+export interface LevelGame<S> {
 	/** The game's save: its cookie store, option defaults and options. */
 	save: GameSave;
-	/**
-	 * Level `index`'s starting state. Pure, with no options applied, so it also
-	 * runs on the server and ahead of time (the `initial` prop).
-	 */
-	build(level: L, index: number): S;
 	clone(s: S): S;
 	isWon(s: S): boolean;
 	/** No way left to win from here. */
@@ -147,9 +129,8 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		return `${name} ${done}: panel ${panel.n} of ${panel.of} of ${panel.mural}.`;
 	}
 
-	#game: LevelGame<L, S>;
+	#game: LevelGame<S>;
 	#props: () => LevelProps<L, S>;
-	#store: SaveStore;
 	/** A plain array: every change to it comes with a `version` bump. */
 	#history: S[] = [];
 	#stuckSeen = false;
@@ -158,60 +139,48 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	#timers = new Set<ReturnType<typeof setTimeout>>();
 	#cues: Cue<unknown>[] = [];
 	#motion: MediaQueryList | null = null;
-	/** Mounted with the game's own save: the level in progress is kept through a reload. */
+	/** Mounted: the level in progress is kept through a reload. */
 	#keeping = false;
 
 	/**
 	 * Call while the component starts. `props` gives the component's props object
 	 * (`() => props`), which the controller reads as it changes.
 	 */
-	constructor(game: LevelGame<L, S>, props: () => LevelProps<L, S>) {
+	constructor(game: LevelGame<S>, props: () => LevelProps<L, S>) {
 		this.#game = game;
 		this.#props = props;
 		this.save = game.save.blank();
-		this.#store = untrack(() =>
-			props().sandbox ? memoryStore(game.save.blank()) : game.save.store
-		);
 		// The page's own level, built right away (on the server too).
-		untrack(() => {
-			const { start } = props();
-			if (start !== undefined) this.#build(this.#clamp(start));
-		});
+		untrack(() => this.#build(this.#clamp(props().start)));
 		// Moving between level pages reuses the component with a new `start`.
 		$effect(() => {
 			const next = props().start;
 			untrack(() => {
-				if (next !== undefined && this.#clamp(next) !== this.index) this.start(this.#clamp(next));
+				if (this.#clamp(next) !== this.index) this.start(this.#clamp(next));
 			});
 		});
 	}
 
 	/**
-	 * Call from `onMount`: reads the save, then either resumes the saved level or,
-	 * when the page's level is built already, fits it to the saved options and
-	 * remembers it. With the game's own save, it then picks up a game kept through
-	 * a reload and keeps the game whenever the page is hidden. Returns the cleanup.
+	 * Call from `onMount`: reads the save, fits the page's level (built already) to
+	 * the saved options and remembers it, then picks up a game kept through a reload
+	 * and keeps the game whenever the page is hidden. Returns the cleanup.
 	 */
 	mount(): () => void {
 		this.#motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-		this.save = this.#store.load();
-		if (this.#props().start === undefined) {
-			this.start(this.#clamp(this.save.level | 0));
-		} else {
-			const { state, initial } = this;
-			const apply = this.#game.applyOptions;
-			if (apply && state && initial) {
-				apply(state, this.save.options);
-				apply(initial, this.save.options);
-				this.options = this.save.options;
-				this.touch();
-			}
-			const index = this.index;
-			this.#write((s) => {
-				s.level = index;
-			});
+		this.save = this.#game.save.store.load();
+		const { state, initial } = this;
+		const apply = this.#game.applyOptions;
+		if (apply && state && initial) {
+			apply(state, this.save.options);
+			apply(initial, this.save.options);
+			this.options = this.save.options;
+			this.touch();
 		}
-		if (this.#store !== this.#game.save.store) return () => this.destroy();
+		const index = this.index;
+		this.#write((s) => {
+			s.level = index;
+		});
 		this.#resume();
 		this.#keeping = true;
 		const keep = () => this.#keep();
@@ -282,17 +251,13 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		});
 	}
 
-	/** Another level: its own page when there is one, else in place. */
-	go = (i: number) => {
-		const href = this.#props().levelHref;
-		if (href) goto(href(i));
-		else this.start(i);
-	};
+	/** Another level: its own page. */
+	go = (i: number) => goto(this.#props().levelHref(i));
 
 	next = () => this.go(this.nextIndex);
 
-	get nextHref(): string | undefined {
-		return this.#props().levelHref?.(this.nextIndex);
+	get nextHref(): string {
+		return this.#props().levelHref(this.nextIndex);
 	}
 
 	/** LevelNav's props: `<LevelNav {...ctl.nav} />`. */
@@ -330,13 +295,11 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.say(`${this.level.name}.`);
 	}
 
-	/** Level i's starting state: the page's own, built ahead, or built here. */
+	/** Level i's starting state: its page's own, built ahead. */
 	#starting(i: number): S {
 		const props = this.#props();
-		if (props.initial && i === props.start) return this.#game.clone(props.initial);
-		// A level with its own page is only played there, where it's built ahead.
-		if (props.levelHref) throw new Error(`level ${i + 1} is built on its own page`);
-		return this.#game.build(props.levels[i], i);
+		if (i !== props.start) throw new Error(`level ${i + 1} is built on its own page`);
+		return this.#game.clone(props.initial);
 	}
 
 	#clamp(i: number) {
@@ -544,7 +507,7 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 	// ---------- saving and timers ----------
 	/** Change the save through the store, which keeps progress made in another tab. */
 	#write(fn: (s: Save) => void) {
-		this.save = this.#store.update(fn);
+		this.save = this.#game.save.store.update(fn);
 	}
 
 	/** Run `fn` after `ms` (now, for 0), unless the level changes first. */

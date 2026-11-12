@@ -66,7 +66,6 @@
 	const ctl = new LevelControl<Level, State>(
 		{
 			save: mosaicSave,
-			build: E.buildPuzzle,
 			clone: E.clone,
 			isWon: E.isWon,
 			isStuck: E.isStuck,

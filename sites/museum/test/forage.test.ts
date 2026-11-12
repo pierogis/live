@@ -3,7 +3,7 @@ import { test } from 'node:test';
 
 import { difficultyIndex } from '../src/lib/forage/difficulty.ts';
 import * as F from '../src/lib/forage/engine.ts';
-import { analyze, QUICK, THOROUGH } from '../src/lib/forage/cruxes.ts';
+import { analyze, THOROUGH } from '../src/lib/forage/cruxes.ts';
 import { options, playAs, strongGame, winsOf } from '../src/lib/forage/player.ts';
 import { measure, pressure, targetWins } from '../src/lib/forage/report.ts';
 import { makeRng } from '../src/lib/shared/engine.ts';
@@ -508,12 +508,13 @@ test('cruxes: a teaching level has none, and the walked line wins', () => {
 	const t = F.clone(s);
 	for (const col of a.line) assert.ok(F.pick(t, col).ok);
 	assert.ok(F.isWon(t));
-	// Cheap enough for a quick look: it stops on time, with what it found so far.
+	// A search stops on time, with what it found so far.
 	const quick = analyze(F.buildPuzzle(LEVELS.at(-1)!, LEVELS.length - 1), {
-		...QUICK,
-		ms: 300
+		ms: 300,
+		playouts: 1,
+		nodes: 4
 	});
-	assert.ok(quick.ms < 1500, `quick check took ${quick.ms.toFixed(0)}ms`);
+	assert.ok(quick.ms < 1500, `the search took ${quick.ms.toFixed(0)}ms`);
 });
 
 test("a level's deal string says which column each colony goes to; a bad one is ignored", () => {

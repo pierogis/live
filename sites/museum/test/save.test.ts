@@ -9,7 +9,6 @@ import {
 	encode,
 	gameSave,
 	idHash,
-	memoryStore,
 	type GameOption
 } from '../src/lib/shared/save.ts';
 import { loadLevels } from './levels.ts';
@@ -167,24 +166,4 @@ test('options read as their defaults until set, and an off option stays off', ()
 	// Bad keys are refused when a game declares them, and skipped when read.
 	assert.throws(() => gameSave('bad', () => levels, [{ key: 'a.b', label: '' }]));
 	assert.deepEqual(decode('o=ok.-%21%21.-', ids(1)).options, { ok: true });
-});
-
-test('a memory store merges like the cookie and never writes it', () => {
-	const jar = fakeCookies();
-	const store = memoryStore(blank({ relaxed: false }));
-	store.update((s) => {
-		s.completed.a = true;
-		s.level = 2;
-	});
-	const back = store.update((s) => ({ ...s, completed: { b: true }, muted: true }));
-	assert.deepEqual(back, {
-		level: 2,
-		completed: { a: true, b: true },
-		muted: true,
-		options: { relaxed: false }
-	});
-	// What it hands out is a copy.
-	store.load().completed.c = true;
-	assert.equal(store.load().completed.c, undefined);
-	assert.equal(jar.size, 0);
 });

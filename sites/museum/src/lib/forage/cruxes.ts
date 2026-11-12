@@ -53,8 +53,6 @@ export interface Budget {
 
 /** For forage:tune and `pnpm levels --measure`. */
 export const THOROUGH: Budget = { ms: 90_000, playouts: 6, nodes: 40 };
-/** A quick look: cheap, and fine to stop partway. */
-export const QUICK: Budget = { ms: 900, playouts: 1, nodes: 4 };
 
 /**
  * What a crux asks of you:
