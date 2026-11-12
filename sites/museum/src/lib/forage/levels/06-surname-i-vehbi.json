@@ -172,13 +172,13 @@
 				"RWRWRWRWRWRWGLKKKKKKKKBBBMMWMMGG",
 				"RWRWRWRWRWRWGKKKKKKKKKKGKGKGKGGG"
 			],
-			"seed": 2,
+			"seed": 3,
 			"wins": 0.06,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2,
-			"tries": [1, 4, 7.8],
-			"focus": 0.81
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [3, 4, 5.8],
+			"focus": 1
 		},
 		{
 			"id": "surname-i-vehbi-fireworks",
@@ -698,13 +698,14 @@
 				"BBBGMMMGRRRGCCCGOOOGRRRGBBBGMMMG"
 			],
 			"seed": 6,
-			"wins": 0.5,
-			"breaks": 2,
-			"cruxes": 1,
-			"spread": 1,
-			"tries": [2, 4.5, 6.6],
-			"push": -1,
-			"focus": 0.23
+			"wins": 0.13,
+			"breaks": 1,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [2, 3, 3.8],
+			"push": 1,
+			"focus": 1,
+			"deal": "004110101244442222333332111130033331144444"
 		}
 	]
 }

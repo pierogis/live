@@ -710,15 +710,14 @@
 				"KKKKKKKKSGGGSGGWLLWLSGOGSYGGSGGG",
 				"GYSGGGSWGGSGGYSGLWLLWGSGGGSGGGSG"
 			],
-			"seed": 1,
-			"push": -1,
-			"wins": 0.06,
-			"breaks": 2,
+			"seed": 0,
+			"push": 1,
+			"wins": 0.38,
+			"breaks": 1,
 			"cruxes": 2,
 			"spread": 2,
-			"deal": "3101111011001441044444444001303342222222",
-			"tries": [2.4, 5, 12],
-			"focus": 0.15,
+			"tries": [2, 4.5, 9.6],
+			"focus": 0.12,
 			"tuning": { "late": 1 }
 		}
 	]
