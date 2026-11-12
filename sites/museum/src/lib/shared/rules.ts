@@ -20,5 +20,5 @@ export interface Rules<L extends Picture = Picture> {
 	/** The game's name; also the folder its packs live in: src/lib/<id>/levels. */
 	id: GameId;
 	/** A shipped level's line; `measure` asks for the slow measurements too. */
-	row: (level: L, index: number, measure: boolean) => Row;
+	row: (level: L, measure: boolean) => Row;
 }

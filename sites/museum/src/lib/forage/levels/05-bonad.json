@@ -1,6 +1,7 @@
 {
 	"name": "The Dalarna Bonad",
 	"mural": { "cols": 6 },
+	"difficulty": 0.55,
 	"song": { "notes": "G", "theme": "bonad" },
 	"levels": [
 		{
@@ -52,12 +53,14 @@
 				"LLWLBBBBLLWLBBBBLLWLBBBBLLWLBB",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 1,
-			"deal": "0004313211444241400342340113223332",
-			"wins": 0.63,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 9,
+			"wins": 0.38,
+			"breaks": 2,
+			"cruxes": 3,
+			"spread": 2,
+			"tries": [1, 2, 2],
+			"focus": 1,
+			"deal": "441021012220010044230333334004411111"
 		},
 		{
 			"id": "bonad-gold",
@@ -107,12 +110,14 @@
 				"BBLLWLBBBBLLWLBBBBLLWLBBBBLLWL",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 0,
-			"deal": "0210130002022140031211100342042223303",
-			"wins": 0.5,
-			"breaks": 3,
+			"seed": 5,
+			"wins": 1,
+			"breaks": 1,
 			"cruxes": 2,
-			"spread": 2
+			"spread": 2,
+			"push": -1,
+			"tries": [1.2, 2, 3.8],
+			"focus": 1
 		},
 		{
 			"id": "bonad-incense",
@@ -164,12 +169,15 @@
 				"BBBBLLWLBBBBLLWLBBBBLLWLBBBBLL",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"tuning": { "late": 1 },
-			"seed": 3,
-			"wins": 0.06,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 1,
+			"wins": 0.44,
+			"breaks": 0,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 2, 3],
+			"focus": 1,
+			"push": -1,
+			"deal": "004111111000011113333231412302424240333301433"
 		},
 		{
 			"id": "bonad-myrrh",
@@ -221,12 +229,13 @@
 				"WLBBBBLLWLBBBBLLWLBBBBLLWLBBBB",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 4,
-			"push": 1,
-			"wins": 0.31,
-			"breaks": 4,
+			"seed": 5,
+			"wins": 0.13,
+			"breaks": 2,
 			"cruxes": 2,
-			"spread": 1
+			"spread": 2,
+			"tries": [3.2, 4, 5],
+			"focus": 0.96
 		},
 		{
 			"id": "bonad-the-star",
@@ -278,14 +287,13 @@
 				"LLWLBBBBLLWLBBBBLLWLBBBBLLWLBB",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"tuning": { "late": 1 },
-			"seed": 3,
-			"push": -1,
-			"deal": "001131114404314000040001023222333333",
-			"wins": 0.31,
-			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 4,
+			"wins": 0.5,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 2.5, 4],
+			"focus": 0.19
 		},
 		{
 			"id": "bonad-the-stable",
@@ -335,13 +343,14 @@
 				"BBLLWLBBBBLLWLBBBBLLWLBBBBLLWL",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 6,
-			"push": -1,
-			"deal": "10421000444442333334410404244402140131",
-			"wins": 0.56,
+			"seed": 8,
+			"deal": "0220000111100333134144323114433422133122",
+			"wins": 0.13,
 			"breaks": 1,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"tries": [2.2, 3, 3.8],
+			"focus": 0.1
 		},
 		{
 			"id": "bonad-oil-seller",
@@ -391,12 +400,15 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 1,
-			"deal": "111320100013111313222212124023234243000402",
-			"wins": 0.06,
-			"breaks": 3,
-			"cruxes": 3,
-			"spread": 2
+			"seed": 0,
+			"wins": 0.44,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [1.2, 2, 3.8],
+			"push": -1,
+			"deal": "12402011400111322033342320441444032034120",
+			"focus": 0.61
 		},
 		{
 			"id": "bonad-midnight-cry",
@@ -446,12 +458,15 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 2,
-			"push": -1,
-			"wins": 0.19,
+			"seed": 16,
+			"wins": 0.69,
 			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 2, 3.8],
+			"focus": 0.56,
+			"push": 1,
+			"deal": "3420100111122201100000443444432223443331444000333"
 		},
 		{
 			"id": "bonad-shut-door",
@@ -502,11 +517,14 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 0,
+			"seed": 17,
 			"wins": 0.38,
 			"breaks": 2,
 			"cruxes": 2,
-			"spread": 1
+			"spread": 2,
+			"deal": "111240002431304421222221333304431114100222244",
+			"tries": [1, 2, 3],
+			"focus": 0.94
 		},
 		{
 			"id": "bonad-wise-virgins",
@@ -555,13 +573,14 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"tuning": { "late": 1 },
-			"seed": 1,
-			"deal": "1100112400401100444404122221302323333333330300",
-			"wins": 0.44,
+			"seed": 5,
+			"wins": 0.63,
 			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 1, 2.8],
+			"focus": 1,
+			"deal": "431221110033300422244442441130002"
 		},
 		{
 			"id": "bonad-fiddler",
@@ -611,14 +630,14 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"tuning": { "late": 1 },
-			"seed": 4,
-			"push": -1,
-			"deal": "1144332200011001011110001444444304432022333222",
-			"wins": 0.31,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 7,
+			"push": 1,
+			"wins": 0.88,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 2, 2],
+			"focus": 1
 		},
 		{
 			"id": "bonad-bride-and-groom",
@@ -667,12 +686,14 @@
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 				"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
 			],
-			"seed": 7,
-			"push": -1,
-			"wins": 0.63,
-			"breaks": 1,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 6,
+			"wins": 0.5,
+			"breaks": 2,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 1, 1],
+			"focus": 1,
+			"deal": "31301000021122214444334244333231"
 		}
 	]
 }

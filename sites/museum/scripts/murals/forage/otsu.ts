@@ -682,6 +682,7 @@ export const otsu: Mural = {
 	prefix: 'otsu-e',
 	notes: 'E',
 	cols: COLS,
+	difficulty: 0.45,
 	panel: [PW, PH],
 	// W buff paper, K ink, R vermilion, Y ochre, G dull green, B gray-blue, D indigo,
 	// S white, F flesh, N brown, P wisteria

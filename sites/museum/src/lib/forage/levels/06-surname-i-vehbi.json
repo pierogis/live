@@ -1,6 +1,7 @@
 {
 	"name": "Surname-i Vehbi",
 	"mural": { "cols": 4 },
+	"difficulty": 0.7,
 	"song": { "notes": "D", "theme": "surname-i-vehbi" },
 	"levels": [
 		{
@@ -53,13 +54,13 @@
 				"GGGKRYRRYRRYRRYRRYRRYRRYRRYRKLGG",
 				"GGGKYBBBBBBBBBBBBBBBBBBBBBBRKGGG"
 			],
-			"seed": 3,
-			"push": -1,
-			"deal": "0043000341110011112222002223333444020233441322113",
-			"wins": 0.19,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 7,
+			"wins": 0.56,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [2.2, 4, 5.6],
+			"focus": 0.47
 		},
 		{
 			"id": "surname-i-vehbi-obelisk",
@@ -112,13 +113,14 @@
 				"GGYGGLGGGGKPKPKGGGKBWYWGYGYRYYBW",
 				"KYKGGGGGGGKPPPKGGGKKKKKKKKKKKKKW"
 			],
-			"seed": 3,
-			"push": -1,
-			"deal": "00013011111010041442222222244321342430024444330",
-			"wins": 0.38,
-			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 1,
+			"wins": 0.56,
+			"breaks": 0,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 1, 1],
+			"deal": "0113110000013300030023331122224443222243330",
+			"focus": 1
 		},
 		{
 			"id": "surname-i-vehbi-rope-walkers",
@@ -171,11 +173,12 @@
 				"RWRWRWRWRWRWGKKKKKKKKKKGKGKGKGGG"
 			],
 			"seed": 2,
-			"deal": "20300130001110300333222221442433444421111232231134",
-			"wins": 0.38,
+			"wins": 0.06,
 			"breaks": 2,
-			"cruxes": 3,
-			"spread": 2
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [1, 4, 7.8],
+			"focus": 0.81
 		},
 		{
 			"id": "surname-i-vehbi-fireworks",
@@ -226,14 +229,15 @@
 				"KWKKTTKTKKKTKTTKTTKTTKTRKTTKTTKT",
 				"KWKKKKKKKRKKKKKKKKKKKKKYKKKKKKKK"
 			],
-			"tuning": { "late": 1 },
-			"seed": 3,
-			"push": -1,
-			"deal": "14013011310100000044444443012332203212222311",
-			"wins": 0.13,
-			"breaks": 4,
-			"cruxes": 3,
-			"spread": 2
+			"seed": 6,
+			"wins": 0.75,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"deal": "0000411221000111013330332242443333322433332",
+			"tries": [1, 3, 4.8],
+			"focus": 1,
+			"push": -1
 		},
 		{
 			"id": "surname-i-vehbi-viziers",
@@ -285,12 +289,13 @@
 				"GGRRWRRGGGGGGKWKGGGGGLKWKGKGKKGK",
 				"GGGKGKGGGGGGGKKGGGGGGGKKGGGGGGGG"
 			],
-			"seed": 3,
-			"deal": "11110031101220214444403221423331001223",
-			"wins": 0.13,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 4,
+			"wins": 1,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1.2, 2, 2.8],
+			"focus": 1
 		},
 		{
 			"id": "surname-i-vehbi-tumblers",
@@ -341,12 +346,13 @@
 				"KYYYYKKKKKKKKKKKKKKKGLGRRYRRGLGG",
 				"KKKKKKKKKKKKKKKKKKKKKGGGKGKGGGGG"
 			],
-			"seed": 9,
-			"push": 1,
-			"wins": 0.69,
+			"seed": 16,
+			"wins": 0,
 			"breaks": 1,
-			"cruxes": 2,
-			"spread": 2
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [3.2, 4.5, 11.6],
+			"focus": 0.91
 		},
 		{
 			"id": "surname-i-vehbi-sugar-garden",
@@ -399,14 +405,13 @@
 				"GRRYRRGBBYBBGMMYMMGCCYCCGOOYOOGG",
 				"GGKGKGGGKGKGGGKGKGGGKGKGGGKGKGGG"
 			],
-			"tuning": { "late": 1 },
-			"seed": 1,
-			"push": -1,
-			"deal": "0021002111414310040044343032223211300234340",
-			"wins": 0.13,
-			"breaks": 3,
-			"cruxes": 3,
-			"spread": 2
+			"seed": 9,
+			"wins": 0.31,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 1.5, 2.8],
+			"focus": 1
 		},
 		{
 			"id": "surname-i-vehbi-wedding-palms",
@@ -459,13 +464,14 @@
 				"GBBWBBGRRWRRGOOWOOGMMWMMGRRWRRGG",
 				"GGKGKGGGKGKGGGKGKGGGKGKGGGKGKGGG"
 			],
-			"seed": 3,
-			"push": -1,
-			"deal": "4420001130004441143042132134243133243433330",
-			"wins": 0.31,
-			"breaks": 3,
-			"cruxes": 3,
-			"spread": 2
+			"seed": 4,
+			"wins": 0.19,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [3, 5, 7.8],
+			"focus": 0.79,
+			"push": 1
 		},
 		{
 			"id": "surname-i-vehbi-band",
@@ -517,12 +523,13 @@
 				"GGGGGLGGKTKGGLGGKTKGGLTGGCCRCCGG",
 				"GGGGGGGGKKGGGGGGKKGGGGTGGGKGKGGG"
 			],
-			"seed": 3,
-			"deal": "3401241014133333040301441412242333321122220",
-			"wins": 0.19,
-			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 7,
+			"wins": 0.25,
+			"breaks": 1,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1.2, 2.5, 3.8],
+			"focus": 1
 		},
 		{
 			"id": "surname-i-vehbi-ship",
@@ -572,12 +579,14 @@
 				"OOWOOLGGGGKKKLGGGGKKKLGGGGKKKLGG",
 				"GKGKGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 			],
-			"seed": 0,
-			"deal": "110010143100111034003414044032224441444444012232",
-			"wins": 0,
-			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 16,
+			"wins": 0.38,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1.2, 3.5, 6.6],
+			"focus": 0.95,
+			"push": 1
 		},
 		{
 			"id": "surname-i-vehbi-spectators",
@@ -628,12 +637,15 @@
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
 				"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
 			],
-			"seed": 1,
-			"deal": "210110111012222333222333330144444044442200000000343",
-			"wins": 0.38,
-			"breaks": 2,
+			"seed": 7,
+			"deal": "4420002110003131144424333243302443210322111103",
+			"wins": 0.19,
+			"breaks": 1,
 			"cruxes": 2,
-			"spread": 2
+			"spread": 2,
+			"tries": [1, 1, 2],
+			"focus": 0.4,
+			"push": -1
 		},
 		{
 			"id": "surname-i-vehbi-janissaries",
@@ -685,11 +697,14 @@
 				"BBBGMMMGRRRGCCCGOOOGRRRGBBBGMMMG",
 				"BBBGMMMGRRRGCCCGOOOGRRRGBBBGMMMG"
 			],
-			"seed": 1,
-			"wins": 0.31,
-			"breaks": 1,
-			"cruxes": 3,
-			"spread": 1
+			"seed": 6,
+			"wins": 0.5,
+			"breaks": 2,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [2, 4.5, 6.6],
+			"push": -1,
+			"focus": 0.23
 		}
 	]
 }

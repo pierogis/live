@@ -840,6 +840,7 @@ export const borgia: Mural = {
 	prefix: 'codex-borgia',
 	notes: 'F#',
 	cols: 4,
+	difficulty: 0.95,
 	panel: [PW, PH],
 	// W plaster, K black, R red, Y yellow, O orange, T turquoise, G jade green, B blue,
 	// L pale blue, S skin, D dark brown, A gray, P pink, M purple

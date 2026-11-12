@@ -326,6 +326,8 @@ export const quilt: Mural = {
 	prefix: 'album-quilt',
 	notes: 'F',
 	cols: COLS,
+	// The first five teach the game, a step each (see TEACH in engine.ts).
+	difficulty: 0.05,
 	panel: [PW, PH],
 	// W cream, Q quilting, G green, L light green, R turkey red, P pink, Y yellow, B blue, K brown
 	palette: {
@@ -341,11 +343,16 @@ export const quilt: Mural = {
 	},
 	ground: 'W',
 	panels: [
-		['rose-wreath', 'Rose Wreath', { mode: 'major', spice: 'gentle', lead: 'harp' }],
-		['four-hearts', 'Four Hearts', { mode: 'pentatonic', spice: 'gentle', lead: 'kalimba' }],
-		['cherry-bird', 'Cherry Bird', { mode: 'mixolydian', spice: 'gentle', lead: 'flute' }],
-		['pineapple', 'Pineapple', { mode: 'lydian', spice: 'gentle', lead: 'vibes' }],
-		['flower-basket', 'Flower Basket', { mode: 'minor-pentatonic', spice: 'lively', lead: 'pizz' }],
+		['rose-wreath', 'Rose Wreath', { mode: 'major', spice: 'gentle', lead: 'harp' }, 0],
+		['four-hearts', 'Four Hearts', { mode: 'pentatonic', spice: 'gentle', lead: 'kalimba' }, 0.01],
+		['cherry-bird', 'Cherry Bird', { mode: 'mixolydian', spice: 'gentle', lead: 'flute' }, 0.02],
+		['pineapple', 'Pineapple', { mode: 'lydian', spice: 'gentle', lead: 'vibes' }, 0.03],
+		[
+			'flower-basket',
+			'Flower Basket',
+			{ mode: 'minor-pentatonic', spice: 'lively', lead: 'pizz' },
+			0.04
+		],
 		['lyre', 'The Lyre', { mode: 'dorian', spice: 'gentle', lead: 'harp' }],
 		['cornucopia', 'Cornucopia', { mode: 'mixolydian', spice: 'lively', lead: 'mallet' }],
 		['urn', 'The Urn', { mode: 'major', spice: 'gentle', lead: 'string' }],

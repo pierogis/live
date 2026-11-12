@@ -45,29 +45,39 @@ import type { Picture } from '../shared/level.ts';
 
 /** A level as stored: its picture, plus how its deal is tuned. */
 export interface Level extends Picture {
-	/** Override the tuning that the level's place in play order sets. */
+	/** Override the tuning that the level's difficulty sets. */
 	tuning?: Partial<Tuning>;
 	/** Which deal of colonies to use; `pnpm -F museum forage:tune` picks it to hit a difficulty. */
 	seed?: number;
 	/**
-	 * Deal as if this many steps further along in play order (each a fifth of the
-	 * way from first to last; negative is easier). `forage:tune` sets it when no
-	 * seed lands near the level's target with the usual tuning.
+	 * Deal as if this many steps harder (each a fifth of the way from easiest to
+	 * hardest; negative is easier). `forage:tune` sets it when no seed lands near
+	 * the level's target with the usual tuning.
 	 */
 	push?: number;
 	/**
-	 * Share of games a good player wins with this deal: the best of the players
-	 * in report.ts, measured by `forage:tune`. The level's difficulty index comes
-	 * from it, capped by its cruxes (see difficulty.ts).
+	 * Share of fresh games a good player wins with this deal: the best of the players
+	 * in report.ts, measured by `forage:tune`.
 	 */
 	wins?: number;
+	/**
+	 * Attempts people who retry take to win this deal (learner.ts): the best (sharp and
+	 * lucky), typical and worst learners', measured by `forage:tune`. The level's
+	 * difficulty index comes from the typical (see difficulty.ts).
+	 */
+	tries?: number[];
+	/**
+	 * Share of those learners' lost attempts that fell in short passes whose mistakes soon
+	 * show (`Expression.focus` in learner.ts): how much of its difficulty is cruxes you learn.
+	 */
+	focus?: number;
 	/**
 	 * Which column each colony of the play is dealt into, one digit each in play
 	 * order. `forage:tune` searches for one that makes the level's cruxes (see
 	 * cruxes.ts); without it, or if it no longer fits the play, the seed deals at random.
 	 */
 	deal?: string;
-	/** Rule breaks and real cruxes `forage:tune` measured (see cruxes.ts); they cap the difficulty index. */
+	/** Rule breaks and real cruxes `forage:tune` measured (see cruxes.ts); they shape its deal search. */
 	breaks?: number;
 	cruxes?: number;
 	/** Thirds of the game the real cruxes are spread over, 0 to 3. */
@@ -81,6 +91,8 @@ export const TUNED = [
 	'push',
 	'deal',
 	'wins',
+	'tries',
+	'focus',
 	'breaks',
 	'cruxes',
 	'spread'
@@ -1064,7 +1076,7 @@ function grewFood(
 }
 
 /** Whether no ant is on its way and no working colony has food it can send one to. */
-function isQuiet(s: State): boolean {
+export function isQuiet(s: State): boolean {
 	if (s.walking.length) return false;
 	const out = outside(s);
 	return s.slots.every((e) => !e || e.n === 0 || exposedIn(s, out, e.c).length === 0);
@@ -1226,6 +1238,15 @@ export function hurry(s: State, col: number, ticks: number): boolean {
 	return true;
 }
 
+/**
+ * Wait until nothing more can be eaten, sending nothing: what a person does when
+ * they stop to let the board settle. Mutates s; give it a board of its own (a clone).
+ */
+export function settle(s: State): void {
+	own(s);
+	onOwnGround(s, () => settleTicks(s));
+}
+
 /** Columns whose front colony can be sent out right now. */
 export function legalPicks(s: State): number[] {
 	const out: number[] = [];
@@ -1298,47 +1319,53 @@ export interface Tuning {
 	late: number;
 }
 
-/**
- * The last level's place in play order (from 0). A level's difficulty, and when each kind
- * of pressure starts, go by how far it sits between the teaching levels and this one, so
- * adding murals stretches the game rather than piling on. A test keeps it at the last
- * level: set it again when levels are added or removed, then run forage:tune.
- */
-export const LAST_LEVEL = 95;
+/** The most linked groups a deal has: each gets its own mark color (LINK_MARKS in marks.ts). */
+export const MAX_LINKS = 8;
 
-/** How far through play a level is, after the five teaching levels: 0, rising to 1 at the last. */
-export function progress(index: number): number {
-	return Math.max(0, index - 4) / (LAST_LEVEL - 4);
+/**
+ * Below this difficulty a level teaches the game, a step every hundredth: 3 columns and no
+ * locks below 0.02, no linked groups below 0.04, few waits and no mystery colonies below
+ * this. The first mural's first panels set their own difficulties to walk through it.
+ */
+export const TEACH = 0.05;
+
+/**
+ * How far past teaching a difficulty (`Level.difficulty`, 0 to 1) is: 0 up to `TEACH`,
+ * rising to 1 at the hardest. A level's own, never its place in play, so adding a mural
+ * changes no other.
+ */
+export function progress(difficulty = 0): number {
+	return Math.min(1, Math.max(0, (difficulty - TEACH) / (1 - TEACH)));
 }
 
 /**
- * How a level's place in play order sets its difficulty. The first five teach
- * the game: few waits, no linked groups until the fifth. After that every kind
- * of pressure grows until the last level.
+ * How a level's difficulty sets its deal. The easiest teach the game: few waits,
+ * no linked groups until near `TEACH`. Past that every kind of pressure grows with it.
  */
-export function tuning(level: Level, index: number): Tuning {
-	const t = progress(index);
-	// 0 for the teaching levels, rising to 1 at the last; `push` moves it along.
+export function tuning(level: Level): Tuning {
+	const d = level.difficulty ?? 0;
+	const t = progress(d);
+	// 0 while teaching, rising to 1 at the hardest; `push` moves it along.
 	const p = Math.min(1.2, t + 0.2 * (level.push ?? 0));
-	const teach = index < 5 && (level.push ?? 0) <= 0;
+	const teach = d < TEACH && (level.push ?? 0) <= 0;
 	return {
-		columns: index < 2 ? 3 : index < 20 ? 4 : 5,
+		columns: d < 0.02 ? 3 : t < 0.18 ? 4 : 5,
 		slots: 5,
-		waitChance: teach ? 0.1 + 0.05 * index : Math.min(0.95, 0.3 + 0.65 * p),
+		waitChance: teach ? 0.1 + 5 * Math.max(0, d) : Math.min(0.95, 0.3 + 0.65 * p),
 		// A wide spread, from a handful to a crowd; the big ones join as play goes on.
 		chunks: teach
 			? [5, 8, 12, 17, 24, 32]
 			: [5, 8, 12, 17, 24, 32, 42, 54].slice(0, 6 + Math.min(2, Math.round(2 * p))),
 		sends: Math.round(25 + 15 * t),
-		links: index < 4 ? 0 : 1 + Math.round(9 * p),
-		group: teach || index < 12 ? 2 : Math.min(4, 2 + Math.round(2.6 * p)),
+		links: d < 0.04 ? 0 : Math.min(MAX_LINKS, 1 + Math.round(9 * p)),
+		group: teach || t < 0.09 ? 2 : Math.min(4, 2 + Math.round(2.6 * p)),
 		// Stacks from a quarter of the way through play, and from halfway the one behind is often a mystery.
 		stack: t < 0.25 ? 0 : Math.min(0.45, 0.15 + 0.35 * p),
 		stackMystery: t < 0.5 ? 0 : Math.min(0.7, 0.3 + 0.4 * p),
 		behind: teach ? 0 : Math.min(1, 0.3 + 0.7 * p),
 		runs: teach ? 0 : Math.min(0.95, 0.2 + 0.75 * p),
-		locks: index < 2 ? 0 : index < 8 ? 1 : t < 0.5 ? 2 : 3,
-		mystery: index < 5 ? 0 : Math.min(0.35, 0.1 + 0.3 * t),
+		locks: d < 0.02 ? 0 : t < 0.04 ? 1 : t < 0.5 ? 2 : 3,
+		mystery: d < TEACH ? 0 : Math.min(0.35, 0.1 + 0.3 * t),
 		// Dispensers from about 60% of the way through, in a little over half the levels after.
 		dispensers: t < 0.6 || hashStr(`${level.id}:dispense`) % 100 >= 55 ? 0 : p > 1 ? 2 : 1,
 		dispenseColors: Math.min(3, 1 + Math.round(2 * Math.max(0, p - 0.55) * 2)),
@@ -1515,27 +1542,27 @@ function dispenserRoom(s: State): number[] {
 }
 
 /**
- * Same level id and index always give the same puzzle. The colonies come from
- * playing the picture out (see planPlay), dealt into the columns in the order
- * they were played: at random, or as the level's `deal` says.
+ * The same level always gives the same puzzle, wherever it sits in play (`index` is the
+ * game interface's; unused). The colonies come from playing the picture out (see
+ * planPlay), dealt into the columns in the order they were played: at random, or as the
+ * level's `deal` says.
  */
 export function buildPuzzle(
 	level: Level,
-	index: number,
+	index?: number,
 	override: Partial<Tuning> = {},
 	seed = level.seed ?? 0
 ): State {
-	return buildWithPlan(level, index, override, seed).s;
+	return buildWithPlan(level, override, seed).s;
 }
 
 /** buildPuzzle(), with the play it dealt from (for dealing it other ways). */
 export function buildWithPlan(
 	level: Level,
-	index: number,
 	override: Partial<Tuning> = {},
 	seed = level.seed ?? 0
 ): { plan: Plan; s: State } {
-	const plan = planPlay(level, index, override, seed);
+	const plan = planPlay(level, override, seed);
 	if (level.deal) {
 		const fixed = dealAs(plan, [...level.deal].map(Number));
 		if (fixed && wins(fixed)) return { plan, s: fixed };
@@ -1547,7 +1574,7 @@ export function buildWithPlan(
 		if (wins(built)) return { plan, s: built };
 	}
 	if (seed >= 1e6) throw new Error(`${level.id}: could not build a winnable deal`);
-	return buildWithPlan({ ...level, deal: undefined }, index, override, seed + 1000);
+	return buildWithPlan({ ...level, deal: undefined }, override, seed + 1000);
 }
 
 /**
@@ -1566,13 +1593,12 @@ export function buildWithPlan(
  */
 export function planPlay(
 	level: Level,
-	index: number,
 	override: Partial<Tuning> = {},
 	seed = level.seed ?? 0
 ): Plan {
 	const art = parseArt(level);
 	const rng = makeRng(hashStr(level.id) + 7919 + seed * 104729);
-	const tune = { ...tuning(level, index), ...override };
+	const tune = { ...tuning(level), ...override };
 	const base: State = {
 		w: art.w,
 		h: art.h,

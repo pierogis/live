@@ -1,12 +1,14 @@
 {
 	"name": "The Album Quilt",
 	"mural": { "cols": 4 },
+	"difficulty": 0.05,
 	"song": { "notes": "F", "theme": "album-quilt" },
 	"levels": [
 		{
 			"id": "album-quilt-rose-wreath",
 			"name": "Rose Wreath",
 			"song": { "mode": "major", "spice": "gentle", "lead": "harp" },
+			"difficulty": 0,
 			"palette": {
 				"W": "#f3ead3",
 				"Q": "#bfa06a",
@@ -47,12 +49,15 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-four-hearts",
 			"name": "Four Hearts",
 			"song": { "mode": "pentatonic", "spice": "gentle", "lead": "kalimba" },
+			"difficulty": 0.01,
 			"palette": { "W": "#f3ead3", "Q": "#bfa06a", "G": "#2e7d32", "R": "#c0272d", "Y": "#f2b134" },
 			"art": [
 				"RGGGGGGGGGGGGGGGGGGGGGGGGR",
@@ -86,12 +91,15 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-cherry-bird",
 			"name": "Cherry Bird",
 			"song": { "mode": "mixolydian", "spice": "gentle", "lead": "flute" },
+			"difficulty": 0.02,
 			"palette": {
 				"W": "#f3ead3",
 				"Q": "#bfa06a",
@@ -133,12 +141,15 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-pineapple",
 			"name": "Pineapple",
 			"song": { "mode": "lydian", "spice": "gentle", "lead": "vibes" },
+			"difficulty": 0.03,
 			"palette": {
 				"W": "#f3ead3",
 				"Q": "#bfa06a",
@@ -180,12 +191,15 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-flower-basket",
 			"name": "Flower Basket",
 			"song": { "mode": "minor-pentatonic", "spice": "lively", "lead": "pizz" },
+			"difficulty": 0.04,
 			"palette": {
 				"W": "#f3ead3",
 				"Q": "#bfa06a",
@@ -228,7 +242,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-lyre",
@@ -275,7 +291,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-cornucopia",
@@ -320,11 +338,13 @@
 				"GWWWWWWWWWWWWWWWWWWWWWWWWG",
 				"RGGGGGGGGGGGGGGGGGGGGGGGGR"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-urn",
@@ -372,7 +392,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-eagle",
@@ -416,11 +438,13 @@
 				"GWWWWWWWWWWWWWWWWWWWWRWWWG",
 				"RGGGGGGGGGGGGGGGGGGGGGGGGR"
 			],
-			"seed": 0,
+			"seed": 2,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-ship",
@@ -463,11 +487,13 @@
 				"GWWWWWWWWWWWWWWWWWWWWWWWWG",
 				"RGGGGGGGGGGGGGGGGGGGGGGGGR"
 			],
-			"seed": 4,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-brick-church",
@@ -514,7 +540,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "album-quilt-grape-wreath",
@@ -563,7 +591,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		}
 	]
 }

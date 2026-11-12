@@ -643,6 +643,7 @@ export const surname: Mural = {
 	prefix: 'surname-i-vehbi',
 	notes: 'D',
 	cols: 4,
+	difficulty: 0.7,
 	panel: [PW, PH],
 	// G green, L grass, K outline, W white, F skin, R red, P pink, Y gold, B lapis,
 	// C turquoise, N night, M purple, T brown, O orange

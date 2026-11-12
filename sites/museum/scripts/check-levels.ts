@@ -27,7 +27,7 @@ function checkGame<L extends Picture>(rules: Rules<L>) {
 	const game = rules.id;
 	const lines: Line[] = loadPacks<L>(game)
 		.flatMap((pack) => pack.levels.map((lv) => ({ pack: pack.id, lv })))
-		.map(({ pack, lv }, index) => ({ pack, id: lv.id, ...rules.row(lv, index, !!flags.measure) }));
+		.map(({ pack, lv }) => ({ pack, id: lv.id, ...rules.row(lv, !!flags.measure) }));
 
 	const seen = new Map<string, string>();
 	for (const l of lines) {

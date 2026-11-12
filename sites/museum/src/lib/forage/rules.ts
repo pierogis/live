@@ -2,20 +2,21 @@
 import { pct } from '../shared/checks.ts';
 import type { Rules } from '../shared/rules.ts';
 import { cruxCounts, THOROUGH } from './cruxes.ts';
-import { difficultyIndex } from './difficulty.ts';
+import { fromTries } from './difficulty.ts';
 import type { Level } from './engine.ts';
 import { GAMES, reportForage } from './report.ts';
 
 export const rules: Rules<Level> = {
 	id: 'forage',
-	row(level, index, measure) {
+	row(level, measure) {
 		// Measuring every level takes minutes; by default trust what forage:tune saved.
-		const r = reportForage(level, index, measure ? GAMES : 0, measure ? THOROUGH : undefined);
+		const r = reportForage(level, measure ? GAMES : 0, measure ? THOROUGH : undefined);
 		const wins = measure ? r.difficulty.wins : (level.wins ?? NaN);
 		const a = r.cruxes;
 		const saved = { breaks: level.breaks, cruxes: level.cruxes, spread: level.spread };
 		const c = a ? cruxCounts(a) : saved;
-		const d = Number.isNaN(wins) ? null : difficultyIndex(wins, c);
+		const tries = r.tries ? [r.tries.best, r.tries.typical, r.tries.worst] : level.tries;
+		const d = tries ? fromTries(tries[1]) : null;
 		return {
 			problems: r.problems,
 			warnings: r.warnings,
@@ -32,6 +33,8 @@ export const rules: Rules<Level> = {
 				spread: c.spread ?? '—',
 				wins: Number.isNaN(wins) ? '—' : pct(wins),
 				target: pct(r.target),
+				tries: tries ? tries.map((t) => Math.round(t)).join('/') : '—',
+				focus: level.focus === undefined ? '—' : pct(level.focus),
 				pips: d ?? '—',
 				...(measure
 					? {

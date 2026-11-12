@@ -1,6 +1,7 @@
 {
 	"name": "The Codex Borgia",
 	"mural": { "cols": 4 },
+	"difficulty": 0.95,
 	"song": { "notes": "F#", "theme": "codex-borgia" },
 	"levels": [
 		{
@@ -49,13 +50,16 @@
 				"RRKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
 				"RRKRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
+			"seed": 4,
+			"wins": 0.13,
+			"breaks": 1,
+			"cruxes": 2,
+			"spread": 2,
 			"tuning": { "late": 1 },
-			"seed": 2,
-			"deal": "21100000331100001114422444224330112233",
-			"wins": 0.06,
-			"breaks": 4,
-			"cruxes": 4,
-			"spread": 3
+			"deal": "00000441311100111044144044222222233223",
+			"push": 1,
+			"tries": [5, 8, 13.8],
+			"focus": 1
 		},
 		{
 			"id": "codex-borgia-smoking-mirror",
@@ -108,12 +112,14 @@
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"seed": 0,
-			"deal": "14311011111400000111011222442222233222203334333",
-			"wins": 0.25,
+			"seed": 1,
+			"wins": 0.19,
 			"breaks": 3,
-			"cruxes": 3,
-			"spread": 3
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [2.6, 7.5, 9.8],
+			"focus": 0.7,
+			"push": -1
 		},
 		{
 			"id": "codex-borgia-rain-god",
@@ -165,12 +171,14 @@
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKR",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRKR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 1,
-			"wins": 0.06,
+			"seed": 3,
+			"wins": 0.44,
 			"breaks": 3,
-			"cruxes": 2,
-			"spread": 2
+			"cruxes": 3,
+			"spread": 1,
+			"tries": [5, 9.5, 12.8],
+			"focus": 0.12,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "codex-borgia-first-days",
@@ -219,12 +227,14 @@
 				"RKRWWWWWWWWWWWWWRWWWWWWWWWWWWWRKRR",
 				"RKRRRRRRRRRRRRRRRRRRRRRRRRRRRRRKRR"
 			],
-			"seed": 0,
-			"push": -1,
-			"wins": 0.06,
-			"breaks": 1,
-			"cruxes": 4,
-			"spread": 2
+			"seed": 2,
+			"wins": 0.94,
+			"breaks": 0,
+			"cruxes": 2,
+			"spread": 1,
+			"tries": [1.4, 5.5, 8],
+			"tuning": { "late": 1 },
+			"focus": 0
 		},
 		{
 			"id": "codex-borgia-jaguar",
@@ -265,12 +275,13 @@
 				"RRKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
 				"RRKRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 1,
-			"wins": 0,
-			"breaks": 4,
-			"cruxes": 4,
-			"spread": 2
+			"seed": 4,
+			"wins": 1,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [2.2, 5, 7.8],
+			"focus": 0.96
 		},
 		{
 			"id": "codex-borgia-temple",
@@ -322,12 +333,14 @@
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"seed": 4,
-			"deal": "4230010011011133333222224434440432033333332004000",
-			"wins": 0.56,
+			"seed": 2,
+			"wins": 0,
 			"breaks": 3,
-			"cruxes": 3,
-			"spread": 2
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [2, 5.5, 11.2],
+			"focus": 0.24,
+			"tuning": { "late": 1 }
 		},
 		{
 			"id": "codex-borgia-blood-sun",
@@ -376,14 +389,16 @@
 				"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKR",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRKR"
 			],
+			"seed": 9,
+			"wins": 0.31,
+			"breaks": 2,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [2, 5.5, 9.6],
+			"focus": 0.9,
 			"tuning": { "late": 1 },
-			"seed": 0,
-			"push": -1,
-			"deal": "120003101000111144444443333300034422122320",
-			"wins": 0.13,
-			"breaks": 7,
-			"cruxes": 3,
-			"spread": 3
+			"push": 1,
+			"deal": "020000111113444411114400202000003333333331100"
 		},
 		{
 			"id": "codex-borgia-counted-days",
@@ -435,14 +450,14 @@
 				"RKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKRR",
 				"RKRRRRRRRRRRRRRRRRRRRRRRRRRRRRRKRR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 1,
-			"push": 1,
-			"deal": "441200000131101111111102444444344333342111",
-			"wins": 0.31,
-			"breaks": 3,
-			"cruxes": 4,
-			"spread": 3
+			"seed": 3,
+			"wins": 1,
+			"breaks": 2,
+			"cruxes": 2,
+			"spread": 2,
+			"tries": [1.2, 2, 3.8],
+			"focus": 0.96,
+			"push": 1
 		},
 		{
 			"id": "codex-borgia-lord-of-dead",
@@ -493,12 +508,14 @@
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 2,
-			"wins": 0.31,
-			"breaks": 2,
+			"seed": 6,
+			"wins": 0.69,
+			"breaks": 1,
 			"cruxes": 2,
-			"spread": 2
+			"spread": 1,
+			"tries": [1, 1, 3.8],
+			"focus": 0.83,
+			"push": -1
 		},
 		{
 			"id": "codex-borgia-earth-crocodile",
@@ -549,12 +566,14 @@
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 0,
-			"wins": 0.44,
-			"breaks": 2,
+			"seed": 1,
+			"wins": 0.06,
+			"breaks": 5,
 			"cruxes": 3,
-			"spread": 2
+			"spread": 3,
+			"tries": [4.2, 8, 14.8],
+			"focus": 0.75,
+			"deal": "1130004130200444430332344444042214343443331"
 		},
 		{
 			"id": "codex-borgia-water-goddess",
@@ -607,13 +626,14 @@
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
-			"tuning": { "late": 1 },
-			"seed": 4,
-			"deal": "22000001100414011144444444100011004131330202330303",
-			"wins": 0.19,
-			"breaks": 4,
-			"cruxes": 4,
-			"spread": 3
+			"seed": 0,
+			"wins": 0.38,
+			"breaks": 1,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [3.2, 4.5, 6.8],
+			"focus": 1,
+			"push": -1
 		},
 		{
 			"id": "codex-borgia-skull-rack",
@@ -662,11 +682,14 @@
 				"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
 			],
 			"seed": 2,
-			"deal": "14010401010000200012411144420333320333331",
-			"wins": 0,
-			"breaks": 3,
-			"cruxes": 4,
-			"spread": 2
+			"wins": 0.63,
+			"breaks": 0,
+			"cruxes": 1,
+			"spread": 1,
+			"push": 1,
+			"tries": [2.2, 3, 4.8],
+			"focus": 0.79,
+			"deal": "2000040341111100222222444441333133311111140443324022"
 		}
 	]
 }

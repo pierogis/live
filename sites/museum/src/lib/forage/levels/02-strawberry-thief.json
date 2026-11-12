@@ -1,6 +1,7 @@
 {
 	"name": "The Strawberry Thief",
 	"mural": { "cols": 4 },
+	"difficulty": 0.15,
 	"song": { "notes": "D", "theme": "strawberry-thief" },
 	"levels": [
 		{
@@ -48,7 +49,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-berry-thief",
@@ -93,11 +96,13 @@
 				"IIIIIWLLLIIBIIIIRYRIIWIBIWIL",
 				"IIIIIWIIIIIIIBIWIRWBIIBIIIIL"
 			],
-			"seed": 1,
+			"seed": 0,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-wings-up",
@@ -142,12 +147,13 @@
 				"LIWWIIIIWIWIBWIIIWIIIIIIWIWI",
 				"LIWIWIIIIWIIWIWIWIWWIIWIIWII"
 			],
-			"seed": 1,
-			"push": 1,
-			"wins": 0.94,
+			"seed": 0,
+			"wins": 1,
 			"breaks": 0,
-			"cruxes": 1,
-			"spread": 1
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-daisy",
@@ -192,11 +198,13 @@
 				"IILGLIIIIIWWILGLGGLGIIIRIIII",
 				"IILLLGIIWWWLLLGGLLGGGIIIIWII"
 			],
-			"seed": 5,
+			"seed": 2,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-resting-thrush",
@@ -241,11 +249,13 @@
 				"IIIIIIWWLLIIIIIIWIIIIWIIIIIW",
 				"IIILIBWWBLLIIBLLLLLIIWIIBIII"
 			],
-			"seed": 1,
-			"wins": 0.69,
+			"seed": 0,
+			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-red-tulip",
@@ -289,11 +299,13 @@
 				"WBLLLIIGLGLLGIIWIWIIILIIIIII",
 				"ILLBIIIGGGLLGIIIWIIIIWIIWIII"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-hanging-bells",
@@ -340,7 +352,9 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-pecking-thrush",
@@ -385,11 +399,13 @@
 				"WIWIIIIIIIIIIIBIIILLWWIIIIII",
 				"IIIBIIIIILLLLLIIILLWBWIIIWII"
 			],
-			"seed": 0,
+			"seed": 1,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-carnation",
@@ -433,13 +449,13 @@
 				"IIIIIIIIIIILLIIIIIIIIIIIIIIB",
 				"IIBIIBIIIIILIBIIIIIIIIIIIIIB"
 			],
-			"seed": 3,
-			"push": 1,
-			"deal": "0303242001111424443123122220000",
-			"wins": 0.81,
-			"breaks": 1,
+			"seed": 1,
+			"wins": 0.88,
+			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-singing-thrush",
@@ -484,13 +500,13 @@
 				"BIBIBIIWIIIIIWWBLLLILLLGGGLL",
 				"BIBIIIIIIIIIIWWWBWLLLLGGGLIL"
 			],
-			"seed": 1,
-			"push": 1,
-			"deal": "4002211044221443433100401142100132",
-			"wins": 0.56,
+			"seed": 2,
+			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-hopping-thrush",
@@ -535,11 +551,13 @@
 				"LLGGLLLLILLLWBWIIIWWIIIIIBBI",
 				"LILGGGLLLLWWWBWIBBIIIIIIIBIB"
 			],
-			"seed": 5,
-			"wins": 0.69,
+			"seed": 0,
+			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "strawberry-thief-blossoms",
@@ -582,11 +600,13 @@
 				"BWIWIWIIIILIIIIIIIIIIIIIILLI",
 				"IIWIIIIIIIIIIIIIIIIIIBBIBBLI"
 			],
-			"seed": 2,
+			"seed": 0,
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		}
 	]
 }

@@ -32,9 +32,10 @@ export interface Pack<L extends Picture = Picture> {
 	/** Song settings all its levels share (each level's own come on top): a mural's theme and notes. */
 	song?: SongSettings;
 	/**
-	 * How hard its levels are made, 0 to 1, in Mosaic (how big and how confined its scattered
-	 * groups, how tight its tray), for each that doesn't set its own. A pack's own, not its
-	 * place in play, so adding one changes no other.
+	 * How hard its levels are made, 0 to 1, for each that doesn't set its own: in Mosaic how
+	 * big its scattered groups and how tight its tray, in Forage what its deals ask of you
+	 * (see `tuning` in forage/engine.ts). A pack's own, not its place in play, so adding one
+	 * changes no other; play order is measured from it.
 	 */
 	difficulty?: number;
 	levels: L[];

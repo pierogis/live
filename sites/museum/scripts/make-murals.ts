@@ -3,8 +3,8 @@
 // No names draws them all. `--look` saves images of each, whole and in panels; `--dry`
 // writes no pack file. Prints each panel's stats and how many dots changed. A Forage
 // panel whose picture comes out the same keeps what forage:tune saved for it.
-// Pack files are numbered in play order (`playOrder`): when Mosaic's order changes, any
-// mural's file is renamed to its new place, drawn or not.
+// Pack files are numbered in play order (`playOrder`, measured): when a game's order
+// changes, any mural's file is renamed to its new place, drawn or not.
 import {
 	existsSync,
 	mkdirSync,
@@ -27,11 +27,11 @@ import { layout, pack, paint } from './murals/mural.ts';
 import { image } from './murals/png.ts';
 import { writePack } from './write-pack.ts';
 
-/** What each game says about a panel at a place in play, and what a redraw keeps. */
+/** What each game says about a panel, and what a redraw keeps. */
 const GAMES: Record<
 	GameId,
 	{
-		report(lv: Picture, index: number): { note: string; problems: string[] };
+		report(lv: Picture): { note: string; problems: string[] };
 		/** No color may cover more than half a panel. */
 		half: boolean;
 		/** Fields a panel keeps from its pack file while its picture stays the same. */
@@ -47,8 +47,8 @@ const GAMES: Record<
 		keep: []
 	},
 	forage: {
-		report(lv, index) {
-			const r = reportForage(lv, index, 0);
+		report(lv) {
+			const r = reportForage(lv, 0);
 			return { note: `${String(r.colonies).padStart(3)} colonies`, problems: r.problems };
 		},
 		half: false,
@@ -73,11 +73,7 @@ let failed = false;
 for (const [id, game] of Object.entries(GAMES) as [GameId, (typeof GAMES)[GameId]][]) {
 	const dir = new URL(`../src/lib/${id}/levels/`, import.meta.url);
 	const packs = readdirSync(dir).filter((f) => f.endsWith('.json'));
-	// A Forage panel's place in play sets how hard it's made, so count from the first mural on.
-	let index = 0;
 	for (const [place, m] of playOrder(id).entries()) {
-		const first = index;
-		index += m.panels.length;
 		const name = `${fileOf(m, place)}.json`;
 		const file = new URL(name, dir);
 		const was = packs.find((f) => f.replace(/^[^-]+-/, '') === `${m.file}.json`);
@@ -107,7 +103,7 @@ for (const [id, game] of Object.entries(GAMES) as [GameId, (typeof GAMES)[GameId
 			const { counts, pixels } = checkPicture(lv);
 			const [top, n] = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
 			const share = pct(n / pixels);
-			const r = game.report(played[k], first + k);
+			const r = game.report(played[k]);
 			const problems = [...r.problems];
 			if (game.half && 2 * n > pixels) problems.push(`${top} covers ${share} of it`);
 			if (problems.length) failed = true;

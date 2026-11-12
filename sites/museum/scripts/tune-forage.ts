@@ -1,27 +1,31 @@
-// Pick each Forage level's deal so it's about as hard as its place in play order asks for:
+// Pick each Forage level's deal so it's about as hard as its difficulty (its mural's) asks for:
 //   pnpm -F museum forage:tune [--seeds 10] [--games 16] [--screen 4] [--climb 80] [--hard-ms 420000] [--jobs <n>]
 //                              [--only <id>] [--levels 0,5,20] [--dry] [--cruxes-only] [--results <file>]
-// Hard has two parts (see src/lib/forage/report.ts and cruxes.ts):
-//   - how often a good player wins: the best of a strong player, two that follow the rule
-//     of thumb (send a colony that finishes right away), and a careless one, `--games` each
+// Hard is how many attempts people who retry take to win (learner.ts): the best (sharp and
+// lucky), typical and worst of a dozen learners, against targetTries() in report.ts. Finding
+// deals near that is guided by (see src/lib/forage/report.ts and cruxes.ts):
+//   - how often a good player wins a fresh game: the best of a strong player, two that follow
+//     the rule of thumb (send a colony that finishes right away), and a careless one,
+//     `--games` each
 //   - on easy levels, how often a hasty player wins too (hastyWins() in report.ts): one
 //     who parks anything and doesn't wait for the board. An easy level has to be easy
 //     for that player as well, or it only measures easy (see hastyFloor()).
 //   - its cruxes: stretches where only some sends win, found with a solver, and its rule
-//     breaks, where every send that finishes right away loses. Each place in play order
-//     wants a number of them (see want()): none while the game teaches, one in the middle,
-//     several spread through the game at the end.
+//     breaks, where every send that finishes right away loses. Each difficulty wants a
+//     number of them (see want()): none while the game teaches, one in the middle, several
+//     spread through the game at the hardest.
 // For each level it deals `--seeds` seeds and screens each with a quick look (`--screen`
 // games each, a fast crux search). The closest few then have their deal searched: colonies
 // moved between columns (the play and so the way to win stay the same) until the cruxes are
 // what the level wants, for up to `--climb` tries. The deals that come out of that are
-// measured properly and the closest to the target kept. When nothing lands near it, it
+// measured properly, learners and all, and the closest to the target kept. When nothing lands near it, it
 // pushes the tuning harder (or easier) and tries again.
 // Hard levels also try late pressure (`tuning.late`) on half their seeds.
-// Writes `seed`, `push`, `deal` (the columns found), `tuning.late`, the measured win share
-// `wins` and the crux counts `breaks`, `cruxes` and `spread` into the level packs; together
-// they set the level's difficulty index (the hasty share is only printed). `--dry` only prints. `--cruxes-only` keeps each
-// level's deal and win share and only measures its cruxes again. Levels are shared out to
+// Writes `seed`, `push`, `deal` (the columns found), `tuning.late`, the learners' attempts
+// `tries` (which set the level's difficulty index), the win share `wins` and the crux counts
+// `breaks`, `cruxes` and `spread` into the level packs (the hasty share is only printed).
+// `--dry` only prints. `--cruxes-only` keeps each level's deal and win share and only measures
+// its cruxes and attempts again. Levels are shared out to
 // `--jobs` workers (one per core but one, by default).
 // `--results <file>` also appends each level's result to that file as a JSON line, as it
 // comes in, so a long run's work isn't lost if it stops early.
@@ -39,14 +43,16 @@ import {
 	type Analysis,
 	type Budget
 } from '../src/lib/forage/cruxes.ts';
-import { crux, difficultyIndex, levelDifficulty } from '../src/lib/forage/difficulty.ts';
+import { fromTries, levelDifficulty } from '../src/lib/forage/difficulty.ts';
 import * as F from '../src/lib/forage/engine.ts';
+import { GIVE_UP, learn, type Expression, type Tries } from '../src/lib/forage/learner.ts';
 import { rememberSends } from '../src/lib/forage/player.ts';
 import {
 	hastyFloor,
 	hastyWins,
 	measure,
 	pressure,
+	targetTries,
 	targetWins,
 	UNMEASURED,
 	type Difficulty,
@@ -98,20 +104,38 @@ interface Want {
 }
 
 /**
- * What a level at this place in play order wants, from the difficulty its target
- * win share asks for: none while the game teaches, a rule break or so in the middle,
- * several spread through the game at the end (more for the top tier).
+ * The least share of a level's lost attempts that should fall in passes learners soon see
+ * (`Expression.focus` in learner.ts): its difficulty should come from cruxes you learn,
+ * not mistakes that show long after.
  */
-function want(index: number): Want {
-	const pips = difficultyIndex(targetWins(index))!;
+const FOCUS = 0.7;
+
+/**
+ * The most attempts the worst learners (the 80th percentile) may take on any level: past
+ * this, real players give up (see targetTries() in report.ts, whose hardest is this).
+ */
+const CEILING = 15;
+
+/** Whether a level teaches the game (see `TEACH` in engine.ts). */
+const teaches = (lv: F.Level) => (lv.difficulty ?? 0) < F.TEACH;
+
+/** Whether a level is in the top tier: its timing is checked too (it's slow). */
+const top = (lv: F.Level) => F.progress(lv.difficulty) >= 0.8;
+
+/**
+ * What a level wants, from the rating its target attempts ask for: none while the game
+ * teaches, a rule break or so in the middle, several spread through the game at the
+ * hardest (more for the top tier).
+ */
+function want(lv: F.Level): Want {
+	const pips = fromTries(targetTries(lv.difficulty).typical);
 	const none = { real: 0, breaks: 0, spread: 0 };
-	if (index < 5) return { min: none, max: { real: 0, breaks: 0 } };
+	if (teaches(lv)) return { min: none, max: { real: 0, breaks: 0 } };
 	if (pips === 1) return { min: none, max: { real: 1, breaks: 0 } };
 	if (pips === 2) return { min: none, max: { real: 2, breaks: 1 } };
 	if (pips === 3) return { min: { real: 1, breaks: 1, spread: 1 }, max: { real: 3, breaks: 2 } };
 	if (pips === 4) return { min: { real: 2, breaks: 2, spread: 2 }, max: { real: 9, breaks: 9 } };
-	if (index >= TOP)
-		return { min: { real: 4, breaks: 3, spread: 3 }, max: { real: 99, breaks: 99 } };
+	if (top(lv)) return { min: { real: 4, breaks: 3, spread: 3 }, max: { real: 99, breaks: 99 } };
 	return { min: { real: 3, breaks: 2, spread: 2 }, max: { real: 99, breaks: 99 } };
 }
 
@@ -143,6 +167,12 @@ function hardness(a: Analysis): number {
 }
 
 interface Result extends Difficulty, CruxFields {
+	/** Learners' attempts: best, typical, worst (see learner.ts); empty when not measured. */
+	tries: number[];
+	/** Share of learners' losses in passes they soon see (see learner.ts); NaN when not measured. */
+	focus: number;
+	/** Its passes, like "12-15:39%/10" (sends, share of losses, sends until seen). */
+	passes: string;
 	index: number;
 	id: string;
 	seed: number;
@@ -173,14 +203,30 @@ interface CruxFields {
 	detail: string;
 }
 
-function cruxFields(a: Analysis, index: number): CruxFields {
+function cruxFields(a: Analysis, lv: F.Level): CruxFields {
 	return {
 		...cruxCounts(a),
 		byThird: a.byThird,
 		sequences: a.sequences,
-		timing: index >= TOP ? a.timing : -1,
+		timing: top(lv) ? a.timing : -1,
 		detail: describe(a)
 	};
+}
+
+/** What a Result says about where learners lose. */
+function passFields(e: Expression): Pick<Result, 'focus' | 'passes'> {
+	return {
+		focus: e.focus,
+		passes: e.passes
+			.map((p) => `${p.from}-${p.to}:${Math.round(p.share * 100)}%/${p.gap}`)
+			.join(' ')
+	};
+}
+
+/** What a Result says about how learners do on a deal. */
+function learned(s: F.State): Pick<Result, 'tries' | 'focus' | 'passes'> {
+	const { tries, expression: e } = learn(s);
+	return { tries: [tries.best, tries.typical, tries.worst], ...passFields(e) };
 }
 
 /** The level with late pressure on or off (see Tuning.late), dropping an empty tuning. */
@@ -195,8 +241,6 @@ function withLate(lv: F.Level, late: boolean): F.Level {
 
 const packs = loadPacks<F.Level>('forage');
 const levels = packs.flatMap((p) => p.levels);
-/** Levels from here on are the top tier (the last 20): their timing is checked too (it's slow). */
-const TOP = levels.length - 20;
 
 /** A crux list, short: where it starts, its sends, orderings, tightness and kinds. */
 function describe(a: Analysis): string {
@@ -213,24 +257,32 @@ function describe(a: Analysis): string {
 function tune(index: number): Result {
 	const t0 = performance.now();
 	const lv: F.Level = { ...levels[index], deal: undefined };
-	const target = targetWins(index);
-	const w = want(index);
-	const targetPips = difficultyIndex(target)!;
+	const target = targetWins(lv.difficulty);
+	const goal = targetTries(lv.difficulty);
+	const w = want(lv);
+	const targetPips = fromTries(goal.typical);
 	/** The hasty player's share an easy level needs (0 for the rest: not measured). */
 	const floor = hastyFloor(target);
 	/** How far under that a hasty share is; 0 when it's fine. */
 	const shortfall = (hasty: number) => (floor ? Math.max(0, floor - hasty) : 0);
 	/** A deal's shortfall from `n` hasty games (none played when there's no floor). */
 	const rushed = (s: F.State, n: number) => (floor ? shortfall(hastyWins(s, n)) : 0);
-	/** How far a measured deal is from the level's target: lower is better. */
-	const miss = (wins: number, a: Analysis, under: number) => {
-		const pips = difficultyIndex(wins, cruxCounts(a))!;
+	/**
+	 * How far a measured deal is from the level's target, lower better: the typical
+	 * learner's attempts off by a factor of 2 is 1, and the best or the worst learners
+	 * going past theirs counts double. Past `CEILING` for the worst is a deal no real
+	 * player should get: it counts so much it's kept only if nothing else turns up. Losses
+	 * that don't fall in passes soon seen count too: missing `FOCUS` by a tenth is 0.2.
+	 */
+	const miss = (t: Tries, e: Expression, a: Analysis, under: number) => {
+		const over = (x: number, cap: number) => Math.max(0, Math.log2(x / cap));
 		return (
-			Math.abs(wins - target) +
-			(wins > target ? 0.02 : 0) +
-			(wins === 0 ? 0.3 : 0) +
-			0.25 * short(a, w) +
-			0.15 * Math.abs(pips - targetPips) +
+			Math.abs(Math.log2(t.typical / goal.typical)) +
+			2 * Math.max(0, FOCUS - e.focus) +
+			2 * over(t.best, goal.best) +
+			2 * over(t.worst, goal.worst) +
+			(t.worst > CEILING ? 5 : 0) +
+			0.1 * short(a, w) +
 			under
 		);
 	};
@@ -256,7 +308,7 @@ function tune(index: number): Result {
 			const late = lateToo && k % 2 === 1;
 			const seed = lateToo ? k >> 1 : k;
 			const level = withLate({ ...lv, push }, late);
-			const { plan, s } = F.buildWithPlan(level, index, {}, seed);
+			const { plan, s } = F.buildWithPlan(level, {}, seed);
 			const a = analyze(s, FAST);
 			const quick = measure(s, screen).wins;
 			// Hasty games are cheap, and a few say little: screen with twice as many.
@@ -347,6 +399,8 @@ function tune(index: number): Result {
 
 	interface Best extends Candidate {
 		d: Difficulty;
+		tries: Tries;
+		e: Expression;
 		full: Analysis;
 		hasty: number;
 		m: number;
@@ -357,17 +411,18 @@ function tune(index: number): Result {
 	const consider = (list: Candidate[]) => {
 		for (const c of list) {
 			const d = measure(c.s, games);
-			const full = analyze(c.s, { ...THOROUGH, timing: index >= TOP });
+			const full = analyze(c.s, { ...THOROUGH, timing: top(lv) });
 			const hasty = floor ? hastyWins(c.s, 2 * games) : NaN;
-			const m = miss(d.wins, full, shortfall(hasty));
-			if (!best || m < best.m) best = { ...c, d, full, hasty, m };
+			const { tries, expression: e } = learn(c.s);
+			const m = miss(tries, e, full, shortfall(hasty));
+			if (!best || m < best.m) best = { ...c, d, tries, e, full, hasty, m };
 		}
 	};
 	const tryPush = (push: number) => {
 		const ranked = screenSeeds(push);
 		for (const c of ranked.slice(0, targetPips >= 4 ? SEARCHED + 1 : SEARCHED)) {
 			// Close enough already: don't spend the time on another seed.
-			if (best && best.m < 0.08) break;
+			if (best && best.m < 0.15) break;
 			consider(climb(c));
 		}
 	};
@@ -375,10 +430,10 @@ function tune(index: number): Result {
 	const b0 = best;
 	// Far off: push the tuning harder (or easier) and try again. Early levels only get
 	// easier that way when it's the hasty player they're too hard for.
-	if (b0 && b0.m > 0.15 && index >= 5) {
-		const tooEasy = b0.d.wins > target;
+	if (b0 && b0.m > 0.4 && !teaches(lv)) {
+		const tooEasy = b0.tries.typical < goal.typical;
 		if (b0.hasty < floor) tryPush(-1);
-		else if (tooEasy || index > 40) tryPush(tooEasy ? 1 : -1);
+		else if (tooEasy || F.progress(lv.difficulty) > 0.4) tryPush(tooEasy ? 1 : -1);
 	}
 	const b = best!;
 	return {
@@ -390,7 +445,9 @@ function tune(index: number): Result {
 		hasty: b.hasty,
 		deal: b.placement ? b.placement.join('') : '',
 		...b.d,
-		...cruxFields(b.full, index),
+		tries: [b.tries.best, b.tries.typical, b.tries.worst],
+		...passFields(b.e),
+		...cruxFields(b.full, lv),
 		pressure: pressure(b.s),
 		screened,
 		searched,
@@ -398,12 +455,12 @@ function tune(index: number): Result {
 	};
 }
 
-/** The level's saved deal, with only its cruxes measured again. */
+/** The level's saved deal, with only its cruxes and attempts measured again. */
 function remeasure(index: number): Result {
 	const t0 = performance.now();
 	const lv = levels[index];
-	const s = F.buildPuzzle(lv, index);
-	const full = analyze(s, { ...THOROUGH, timing: index >= TOP });
+	const s = F.buildPuzzle(lv);
+	const full = analyze(s, { ...THOROUGH, timing: top(lv) });
 	return {
 		index,
 		id: lv.id,
@@ -414,7 +471,8 @@ function remeasure(index: number): Result {
 		deal: lv.deal ?? '',
 		...UNMEASURED,
 		wins: lv.wins ?? NaN,
-		...cruxFields(full, index),
+		...learned(s),
+		...cruxFields(full, lv),
 		pressure: pressure(s),
 		screened: 0,
 		searched: 0,
@@ -472,17 +530,21 @@ if (worker) {
 					if (r.deal) lv.deal = r.deal;
 					else delete lv.deal;
 					lv.wins = Math.round(r.wins * 100) / 100;
+					if (r.tries.length) lv.tries = r.tries.map((t) => Math.round(t * 10) / 10);
+					if (!Number.isNaN(r.focus)) lv.focus = Math.round(r.focus * 100) / 100;
 					lv.breaks = r.breaks;
 					lv.cruxes = r.cruxes;
 					lv.spread = r.spread;
-					const pips = levelDifficulty(lv)!;
-					const cap = crux(lv);
+					const pips = levelDifficulty(lv) ?? 0;
+					const goal = targetTries(lv.difficulty);
+					const n = (t: number) => (t > GIVE_UP ? ' X' : t.toFixed(0).padStart(2));
 					const p = r.pressure;
 					console.log(
 						[
 							`${String(r.index + 1).padStart(3)} ${r.id.padEnd(22)}`,
-							`target ${pc(targetWins(r.index))}  wins ${pc(r.wins)} (strong ${pc(r.strong)} clean ${pc(r.clean)} look ${pc(r.look)} careless ${pc(r.careless)} hasty ${pc(r.hasty)})`,
-							`${LABELS[pips - 1].padEnd(9)} (${pips}, cruxes allow ${cap.least}-${cap.most})`,
+							`tries ${r.tries.map(n).join('/')} (target ${[goal.best, goal.typical, goal.worst].map(n).join('/')})`,
+							`${(LABELS[pips - 1] ?? '-').padEnd(9)} (${pips})  focus ${pc(r.focus)} [${r.passes}]`,
+							`wins ${pc(r.wins)} (strong ${pc(r.strong)} clean ${pc(r.clean)} look ${pc(r.look)} careless ${pc(r.careless)} hasty ${pc(r.hasty)})`,
 							`cruxes ${r.cruxes} breaks ${r.breaks} thirds ${r.byThird.join('/')} sequences ${r.sequences >= 1e6 ? 'many' : r.sequences}${r.timing >= 0 ? ` timing ${r.timing}` : ''}`,
 							`seed ${String(r.seed).padStart(2)} push ${r.push >= 0 ? '+' : ''}${r.push}${r.late ? ' late' : ''}${r.deal ? ' searched deal' : ''}`,
 							`waits ${p.waits}/${p.sends} held groups ${p.heldPairs}`,

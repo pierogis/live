@@ -551,6 +551,7 @@ export const mice: Mural = {
 	prefix: 'mice-bury-the-cat',
 	notes: 'A',
 	cols: COLS,
+	difficulty: 0.3,
 	panel: [PW, PH],
 	// W paper, K ink, R cinnabar, Y yellow, G green, L lilac, B blue, O ochre, M mouse gray, P pink
 	palette: {

@@ -649,6 +649,7 @@ export const thief: Mural = {
 	prefix: 'strawberry-thief',
 	notes: 'D',
 	cols: COLS,
+	difficulty: 0.15,
 	panel: [PW, PH],
 	// I indigo, B pale blue, W cream, G green, L light green, R red, Y yellow, T thrush brown, K dark
 	palette: {

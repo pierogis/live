@@ -2,8 +2,10 @@
  * One report per Forage level: is the picture usable, what got dealt, how hard
  * the deal is, and how much it makes you wait. Used by `pnpm -F museum levels`,
  * `pnpm -F museum murals` and `forage:tune`.
- * Difficulty is how often a good player wins, measured by playing it many times
- * with each of these (see player.ts):
+ * Difficulty is how many attempts people who retry take to win it (learner.ts),
+ * against `targetTries`. A quicker guide, for forage:tune's search, is how often a
+ * good player wins a fresh game, measured by playing it many times with each of
+ * these (see player.ts):
  *   strong: a careful player who thinks a move or two ahead
  *   clean: the rule of thumb: send a colony that finishes right away when there
  *     is one, else park the best-looking one
@@ -11,12 +13,15 @@
  *   careless: sends any colony that can go
  * A level's win share is the best of them: a deal whose trap catches one
  * player's habits isn't hard if another way of playing walks through it.
- * Then its cruxes (cruxes.ts) say whether it's hard the way a person finds it:
- * where the rule of thumb breaks, and how often.
+ * Its cruxes (cruxes.ts) say where it's hard: where the rule of thumb breaks, and
+ * how often.
  * Imports use `.ts` so node scripts can load this file directly.
  */
 import { checkPicture } from '../shared/checks.ts';
+import { muralMeasure } from '../shared/difficulty.ts';
 import { analyze, type Analysis, type Budget } from './cruxes.ts';
+import { levelHardness } from './difficulty.ts';
+import { triesOf, type Tries } from './learner.ts';
 import * as F from './engine.ts';
 import { carelessGame, hastyGame, winsOf, wonShare } from './player.ts';
 
@@ -82,16 +87,41 @@ export function hastyFloor(target: number): number {
 }
 
 /**
- * Share of games (see Difficulty.wins) a level at this place in play order should let you win.
- * The first five teach the game, so you basically always win; then it falls
- * steadily to about 1 in 5 by the last level, with an easier breather every sixth.
+ * Share of fresh games (see Difficulty.wins) a level of this difficulty (0 to 1) should
+ * let you win: a rough guide for forage:tune's search, whose target is `targetTries`.
+ * Teaching levels you basically always win; past them it falls steadily to about 1 in 5
+ * at the hardest.
  */
-export function targetWins(index: number): number {
-	const t = Math.min(1, F.progress(index));
-	const base = 1 - 0.8 * t ** 0.8;
-	// Never the last level: the game ends on its hardest.
-	const breather = index % 6 === 5 && index < F.LAST_LEVEL ? 0.2 : 0;
-	return Math.min(1, base + breather);
+export function targetWins(difficulty = 0): number {
+	return 1 - 0.8 * F.progress(difficulty) ** 0.8;
+}
+
+/** At the hardest, the attempts (learner.ts) the best, typical and worst learners should take. */
+const HARDEST: Tries = { best: 5, typical: 8, worst: 15 };
+
+/**
+ * Attempts to win (see learner.ts) a level of this difficulty (0 to 1) should take: one
+ * for everyone while teaching, rising evenly in ratio to `HARDEST` at difficulty 1. The
+ * best learners, sharp and lucky, never grind; the worst may take a while.
+ */
+export function targetTries(difficulty = 0): Tries {
+	const t = F.progress(difficulty);
+	return {
+		best: HARDEST.best ** t,
+		typical: HARDEST.typical ** t,
+		worst: HARDEST.worst ** t
+	};
+}
+
+/**
+ * How hard a mural is, for putting murals in order: its panels' measured hardness
+ * (`levelHardness`, from what forage:tune saved) in a power mean (`muralMeasure`). A panel
+ * not tuned yet counts as what its difficulty aims for.
+ */
+export function muralHardness(levels: F.Level[]): number {
+	return muralMeasure(
+		levels.map((lv) => levelHardness(lv) ?? Math.log2(targetTries(lv.difficulty).typical))
+	);
 }
 
 /** How much the built-in play makes you wait: the pressure a deal puts on the slots. */
@@ -150,6 +180,8 @@ export interface ForageReport {
 	locks: number;
 	mystery: number;
 	difficulty: Difficulty;
+	/** Attempts people who retry take (learner.ts); null when not asked for. */
+	tries: Tries | null;
 	/** Where it's hard (see cruxes.ts); null when not asked for. */
 	cruxes: Analysis | null;
 	pressure: Pressure | null;
@@ -161,19 +193,14 @@ export interface ForageReport {
 }
 
 /**
- * Check a level as if it were the `index`th level in play order. `games` games
- * by each player measure how hard it is (0 skips that); `budget` finds its
- * cruxes (none skips that).
+ * Check a level, as hard as its difficulty makes it. `games` games by each player
+ * measure how often it's won fresh (0 skips that); `budget` finds its cruxes and how many
+ * attempts learners take (none skips those: they're slow).
  */
-export function reportForage(
-	lv: F.Level,
-	index: number,
-	games = GAMES,
-	budget?: Budget
-): ForageReport {
+export function reportForage(lv: F.Level, games = GAMES, budget?: Budget): ForageReport {
 	const picture = checkPicture(lv);
 	const { problems, warnings } = picture;
-	const target = targetWins(index);
+	const target = targetWins(lv.difficulty);
 	if (problems.length) {
 		return {
 			w: picture.w,
@@ -185,6 +212,7 @@ export function reportForage(
 			locks: 0,
 			mystery: 0,
 			difficulty: UNMEASURED,
+			tries: null,
 			cruxes: null,
 			pressure: null,
 			target,
@@ -192,7 +220,7 @@ export function reportForage(
 			warnings
 		};
 	}
-	const s = F.buildPuzzle(lv, index);
+	const s = F.buildPuzzle(lv);
 	const colonies = s.columns.flat();
 	return {
 		w: s.w,
@@ -204,6 +232,7 @@ export function reportForage(
 		locks: s.locks.filter((k) => k >= 0).length,
 		mystery: colonies.filter((c) => c.mystery).length,
 		difficulty: games ? measure(s, games) : UNMEASURED,
+		tries: budget ? triesOf(s) : null,
 		cruxes: budget ? analyze(s, budget) : null,
 		pressure: pressure(s),
 		target,

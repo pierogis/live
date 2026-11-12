@@ -1,6 +1,7 @@
 {
 	"name": "The Mice Bury the Cat",
 	"mural": { "cols": 4 },
+	"difficulty": 0.3,
 	"song": { "notes": "A", "theme": "mice-bury-the-cat" },
 	"levels": [
 		{
@@ -48,13 +49,13 @@
 				"OKOOGKOOOKOOOGOOOKOOOKGOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 1,
-			"push": 1,
-			"deal": "12100211010004421112033322343224",
-			"wins": 0.69,
-			"breaks": 1,
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-drummer",
@@ -102,11 +103,12 @@
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
 			"seed": 0,
-			"deal": "11202231000334241140422324201433",
-			"wins": 0.88,
-			"breaks": 0,
+			"wins": 1,
+			"breaks": 1,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-fiddler",
@@ -154,12 +156,13 @@
 				"OKGOOKOOOKOGOKOOOKOOGKOOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 6,
-			"deal": "224204110222111003333233343333042344410",
-			"wins": 0.19,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-horn",
@@ -208,11 +211,12 @@
 				"OOKOOOGOGOKOOOKOOOKOOOKOOOKO"
 			],
 			"seed": 0,
-			"deal": "01010201111444411113333031334124",
-			"wins": 0.69,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-sledge-team",
@@ -259,12 +263,14 @@
 				"OKOOGKOOOKOOOGOOOKOOOKGOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 1,
-			"deal": "24211111230042220204033433440101423333221",
-			"wins": 0.69,
+			"seed": 0,
+			"wins": 0.5,
 			"breaks": 0,
-			"cruxes": 1,
-			"spread": 1
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 3.5, 6],
+			"focus": 1,
+			"deal": "311112302222224422301134320300"
 		},
 		{
 			"id": "mice-bury-the-cat-cats-head",
@@ -314,7 +320,10 @@
 			"wins": 1,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1.5, 2],
+			"focus": 0.9,
+			"push": 1
 		},
 		{
 			"id": "mice-bury-the-cat-tied-paws",
@@ -359,12 +368,12 @@
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
 			"seed": 0,
-			"push": 1,
-			"deal": "140110322131342111224432403334",
-			"wins": 0.31,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-rider",
@@ -411,12 +420,13 @@
 				"OGOOOKOOOKGOOKOOOKOGOKOOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 2,
-			"deal": "14103042102133033334423210011331233",
-			"wins": 0.38,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 5,
+			"wins": 0.56,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1.5, 2],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-pancakes",
@@ -463,12 +473,13 @@
 				"OKOOGKOOOKOOOGOOOKOOOKGOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 0,
-			"deal": "331210223124200444113442231111120004",
-			"wins": 0.31,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 4,
+			"wins": 0.75,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [2, 3, 3.8],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-fish",
@@ -514,12 +525,14 @@
 				"OKOGOKOOOKOOGKOOOKOOOGOOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 4,
-			"push": 1,
-			"wins": 0.56,
+			"seed": 0,
+			"wins": 1,
 			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"cruxes": 0,
+			"spread": 0,
+			"deal": "100302412113323143230400013044343132242110",
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-beer-barrel",
@@ -566,11 +579,13 @@
 				"OKGOOKOOOKOGOKOOOKOOGKOOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 5,
-			"wins": 0.44,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "mice-bury-the-cat-pie-and-flasks",
@@ -617,12 +632,13 @@
 				"OGOOOKOOOKGOOKOOOKOGOKOOOKOO",
 				"OOKOOOKOOOKOOOKOOOKOOOKOOOKO"
 			],
-			"seed": 1,
-			"deal": "2000012012232120233134024340033214121",
-			"wins": 0.88,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 2,
+			"wins": 0.5,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		}
 	]
 }

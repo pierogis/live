@@ -710,6 +710,7 @@ export const bonad: Mural = {
 	prefix: 'bonad',
 	notes: 'G',
 	cols: 6,
+	difficulty: 0.55,
 	panel: [PW, PH],
 	// W paper, K black, N dark blue, B blue, S pale blue, R red, D dark red, P pink, G green,
 	// L light green, Y yellow, O ochre

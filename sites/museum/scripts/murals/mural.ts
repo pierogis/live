@@ -17,8 +17,8 @@ export interface Mural {
 	/** Panels to a row; the panel count sets how many rows. */
 	cols: number;
 	/**
-	 * How hard its panels are made, 0 to 1 (Mosaic: see `Pack.difficulty`), unless a panel
-	 * sets its own.
+	 * How hard its panels are made, 0 to 1 (see `Pack.difficulty`), unless a panel sets its
+	 * own. Its place in play is measured from what this makes (`playOrder`).
 	 */
 	difficulty?: number;
 	/** A panel's size in dots; 24 by 22 unless given. */

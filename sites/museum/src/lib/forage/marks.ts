@@ -27,7 +27,8 @@ export const LOCK_MARKS = ['#e0a400', '#2b9be0', '#d4479c'];
 /**
  * Colors for linked groups: soft, mid-tone, and away from the lock colors
  * (no yellow, sky blue or magenta). The first ones are the most distinct,
- * since most levels have only two or three groups; the biggest late levels have up to 8.
+ * since most levels have only two or three groups; the hardest have up to MAX_LINKS (8)
+ * in engine.ts, one color each.
  */
 const LINK_MARKS = [
 	'#8466cc',

@@ -1,6 +1,7 @@
 {
 	"name": "Ōtsu-e",
 	"mural": { "cols": 4 },
+	"difficulty": 0.45,
 	"song": { "notes": "E", "theme": "otsu-e" },
 	"levels": [
 		{
@@ -47,12 +48,13 @@
 				"WKKKWWKRRRRRKWWWWWWKRRRRRKWWWW",
 				"WWKWWWWSKSKKWWWWWWWWSKSKSWWWWW"
 			],
-			"seed": 0,
-			"deal": "13311102213032340433322004442332",
-			"wins": 0.19,
+			"seed": 8,
+			"wins": 0.31,
 			"breaks": 1,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"tries": [1.2, 2, 2.8],
+			"focus": 0.78
 		},
 		{
 			"id": "otsu-e-wisteria-maiden",
@@ -99,12 +101,13 @@
 				"WWKRSRSRSRSRSRSRSRSRSRSKWWWWWW",
 				"WWKKKKKKKKKKKKKKKKKKKKKKWWYWWW"
 			],
-			"seed": 1,
-			"deal": "011111222221033330422404211411133333314",
-			"wins": 0.5,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 3,
+			"wins": 0.25,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [2, 3, 4.8],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-thunder-god",
@@ -151,11 +154,13 @@
 				"WWBWWWBWWWBWWWBWWBWBWWYWWKKYKY",
 				"WWWWWWBWWWWWWWBWWWWBWWNWWKYKWW"
 			],
-			"seed": 1,
-			"wins": 0.88,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 0,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-hawk",
@@ -203,12 +208,13 @@
 				"WWKNKWYYWYWYWYWYWKKKKKWYKNKWWW",
 				"WWWKWWYWWWWWWWWWWWWWWWWYWKWWWW"
 			],
-			"seed": 2,
-			"deal": "13112221011112032222044444340031313144041",
-			"wins": 0.38,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 2
+			"seed": 1,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-benkei",
@@ -254,11 +260,14 @@
 				"WYWWWWKFFFFKWWWWWWWKFFFFKWWWWW",
 				"WWWWWYWYFYKWWWWWWWWWKYFYWYWWWW"
 			],
-			"seed": 1,
-			"wins": 0.5,
-			"breaks": 1,
+			"seed": 3,
+			"wins": 0.56,
+			"breaks": 0,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"tries": [1, 1.5, 2],
+			"focus": 1,
+			"deal": "1301111223214003334443434113413103412"
 		},
 		{
 			"id": "otsu-e-the-ladder",
@@ -306,12 +315,13 @@
 				"YKKKKKKKKKKKKKKKKKKKKKWWNWWWWK"
 			],
 			"seed": 1,
-			"push": 1,
-			"deal": "2012023333333130222344003333330243",
-			"wins": 0.75,
+			"wins": 1,
 			"breaks": 1,
 			"cruxes": 1,
-			"spread": 1
+			"spread": 1,
+			"tries": [1, 2.5, 3],
+			"focus": 0.91,
+			"deal": "022244104000011143304012232333443231"
 		},
 		{
 			"id": "otsu-e-lost-drum",
@@ -358,11 +368,12 @@
 				"SBDDBSSBDDBSSBDDBSSBDDBSSBDDBS"
 			],
 			"seed": 8,
-			"deal": "3003411400204112443232000144",
-			"wins": 0.63,
-			"breaks": 1,
-			"cruxes": 2,
-			"spread": 2
+			"wins": 0.31,
+			"breaks": 0,
+			"cruxes": 1,
+			"spread": 1,
+			"tries": [1, 2.5, 4.6],
+			"focus": 0.91
 		},
 		{
 			"id": "otsu-e-spear-man",
@@ -408,13 +419,13 @@
 				"KWWWYYYFKKWWWWWWWWWWWWWWKYYYWW",
 				"KWWWWWWKWWWWWWWWWWWWWWWWWWNWWW"
 			],
-			"seed": 0,
-			"push": -1,
-			"deal": "3211024001224043444431202103132124410131",
-			"wins": 0.44,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 1,
+			"wins": 1,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-monkey",
@@ -462,12 +473,13 @@
 				"SBBBBBWWWWWWWKKBBBKKKYYYYYYYYY",
 				"BWWWWWBBSWWWKBWWWWWBWKKKKKKKKK"
 			],
-			"seed": 5,
-			"deal": "40012002222201414334331011004430033",
-			"wins": 0.63,
-			"breaks": 1,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 2,
+			"wins": 0.88,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 3, 3],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-catfish",
@@ -514,12 +526,13 @@
 				"YYYYYYYYYYYYYYKKKKKWWWBBBBWWWW",
 				"KKKKKKKKKKKKKKBWWSWWBBWWWWBBWW"
 			],
-			"seed": 1,
-			"deal": "2231221001011200203242433344410000003230",
-			"wins": 0.25,
-			"breaks": 2,
-			"cruxes": 2,
-			"spread": 1
+			"seed": 2,
+			"wins": 0.31,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1, 1, 2],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-cat-and-rat",
@@ -566,12 +579,13 @@
 				"KGGGGGGKGGGGGGKGGGGGGKGGGGGGKW",
 				"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 			],
-			"seed": 1,
-			"push": 1,
-			"wins": 0.69,
-			"breaks": 2,
-			"cruxes": 1,
-			"spread": 1
+			"seed": 0,
+			"wins": 0.31,
+			"breaks": 0,
+			"cruxes": 0,
+			"spread": 0,
+			"tries": [1.2, 2, 3.8],
+			"focus": 1
 		},
 		{
 			"id": "otsu-e-blind-man",
@@ -617,11 +631,15 @@
 				"WGWNWKFFFKGWWWWKFFFKSKWWWKSKWW",
 				"GWGNWWKFKGYGWWWWKFKKKWWWWKKWGW"
 			],
-			"seed": 0,
-			"wins": 0.56,
+			"seed": 1,
+			"wins": 0.63,
 			"breaks": 0,
 			"cruxes": 0,
-			"spread": 0
+			"spread": 0,
+			"tries": [1, 1, 1],
+			"focus": 1,
+			"push": -1,
+			"deal": "2221210111340001134011110412342033244122"
 		}
 	]
 }

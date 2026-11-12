@@ -23,7 +23,7 @@
  * random among moves scoring close to the best, so many games give a win share.
  * It sees every colony a person sees. Looking ahead plays sends out, so it can
  * learn a mystery colony's color one send early: a small edge a person lacks.
- * It doesn't back up and retry; the solver in cruxes.ts does.
+ * It doesn't back up and retry; the learners in learner.ts do, and the solver in cruxes.ts.
  * Imports use `.ts` so node scripts can load this file directly.
  */
 import { makeRng, pickOne, type Rng } from '../shared/engine.ts';
@@ -45,7 +45,7 @@ const MARGIN = 2;
  * How much a player cares about each thing it scores. People weigh these
  * differently, so each game jitters them a little (see style()).
  */
-interface Style {
+export interface Style {
 	/** Times FREE. */
 	free: number;
 	/** Per colony left waiting. */
@@ -92,7 +92,7 @@ const STYLE: Style = {
 };
 
 /** This game's weights: each one 0.6 to 1.4 times the usual, and any eagerness to park. */
-function style(rng: Rng): Style {
+export function style(rng: Rng): Style {
 	const s = { ...STYLE };
 	for (const k of Object.keys(s) as (keyof Style)[]) s[k] *= 0.6 + 0.8 * rng();
 	s.early = rng();
@@ -312,7 +312,7 @@ function sendFrom(s: F.State, col: number, key: string | null): Sent | null {
 }
 
 /** The best-looking of `list`, at random among those within MARGIN of it; null if empty. */
-function best(list: Choice[], rng: Rng, w: Style): Choice | null {
+export function best(list: Choice[], rng: Rng, w: Style): Choice | null {
 	if (!list.length) return null;
 	const scored = list.map((o) => ({ o, v: score(o.t, o.eaten, o.unlocked, w) }));
 	const top = Math.max(...scored.map((x) => x.v));

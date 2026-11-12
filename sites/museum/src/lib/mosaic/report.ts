@@ -18,6 +18,7 @@ import {
 	type State
 } from './engine.ts';
 import { checkPicture } from '../shared/checks.ts';
+import { muralMeasure } from '../shared/difficulty.ts';
 import { makeRng } from '../shared/engine.ts';
 
 export interface LevelReport {
@@ -97,20 +98,9 @@ export function quickPlay(s0: State, seed: number): { taps: number; glances: num
 	return isWon(s) ? { taps, glances } : { taps: Infinity, glances };
 }
 
-/**
- * How much a mural's hardest panels outweigh its easy ones in `muralScore`: 1 would be a
- * plain mean, and the higher, the closer to just its hardest panel.
- */
-const PEAK = 1.5;
-
-/**
- * How hard a mural is, for putting murals in order: its panels' scores in a power mean
- * (`PEAK`). One very hard panel among easy ones counts for more than in a plain mean, so
- * 11 easy panels and the game's hardest rank above 12 fairly easy ones, but below 12 medium.
- */
+/** How hard a mural is, for putting murals in order: its panels' scores (`muralMeasure`). */
 export function muralScore(levels: Level[]): number {
-	const scores = levels.map((lv) => reportLevel(lv).score);
-	return (scores.reduce((a, s) => a + s ** PEAK, 0) / scores.length) ** (1 / PEAK);
+	return muralMeasure(levels.map((lv) => reportLevel(lv).score));
 }
 
 /** Check a level, as hard as its mural's difficulty makes it. */

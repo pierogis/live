@@ -758,6 +758,7 @@ export const apocalypse: Mural = {
 	prefix: 'apocalypse',
 	notes: 'C',
 	cols: COLS,
+	difficulty: 0.85,
 	panel: [PW, PH],
 	// R madder red, B indigo, K dark brown, W cream, Y gold, O orange, P rose, N brown,
 	// G olive green, S sage, L pale blue, A gray

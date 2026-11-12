@@ -148,7 +148,7 @@ const TIGHT = 0.4;
 const MANY = 1e6;
 
 /** A board's identity: columns, slots and food left. */
-function stateKey(s: F.State): string {
+export function stateKey(s: F.State): string {
 	let k = '';
 	for (const col of s.columns) k += col.length + ',';
 	k += '|';
@@ -156,8 +156,8 @@ function stateKey(s: F.State): string {
 	return `${k}|${F.blocksKey(s)}`;
 }
 
-/** Remembers which boards win; shared by every question in one walk. */
-class Solver {
+/** Remembers which boards win; shared by every question in one walk (or one level's learners). */
+export class Solver {
 	known = new Map<string, boolean>();
 	until: number;
 	unsure = 0;
