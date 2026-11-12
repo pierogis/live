@@ -30,8 +30,8 @@ on:
         description: 'deploy live'
         type: boolean
         default: false
-      parlor:
-        description: 'deploy parlor'
+      museum:
+        description: 'deploy museum'
         type: boolean
         default: false
       stale:
