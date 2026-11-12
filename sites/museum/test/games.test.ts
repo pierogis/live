@@ -1,4 +1,3 @@
-// The site's list of games (src/lib/games.ts) has every game folder, and only those, and each has its routes.
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';

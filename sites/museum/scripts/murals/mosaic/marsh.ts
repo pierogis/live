@@ -1,8 +1,4 @@
-// Nebamun Hunting in the Marshes (Thebes, about 1350 BC), a tomb painting: Nebamun strides
-// on a reed skiff, throwstick raised, three decoy herons in his other hand, his wife behind
-// him and his daughter at his feet. A ginger cat leaps in the papyrus thicket with birds in
-// its claws; birds and butterflies burst out of the papyrus, and fish swim in the zigzag
-// water below. No writing: the hieroglyph columns are left out. Twelve panels of 24 by 22.
+// Nebamun Hunting in the Marshes (Thebes, about 1350 BC).
 import { points, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -11,21 +7,14 @@ const PH = 22;
 const COLS = 4;
 const W = COLS * PW;
 const H = 3 * PH;
-/** The water's surface and the skiff's deck. */
 const WATER = 50;
 const DECK = 46;
 
-// a duck flying right: `w` its wing, `b` its body
 const DUCK = ['...ww....', '..wwww...', 'Kbbbbbbb.', '.bbbbbbK>', '...bb....'];
-// a goose standing, facing right
 const GOOSE = ['.....KK.', '.....bK>', '.....b..', '.bbbbb..', 'bwwwbb..', '.bbbb...', '..K.K...'];
-// a heron held by its legs, head down
 const HERON = ['.K.', '.K.', 'ww.', 'www', 'www', '.ww', '.w.', '.wK', '.K.'];
-// a butterfly
 const FLY = ['y.y', 'yKy', 'y.y'];
-// a tilapia swimming right: `b` its body
 const FISH = ['..bb....', '.bbbbbb.', 'bbbbbbKb', '.bbbbbb.', '..r..r..'];
-// the ginger cat leaping left: `o` its fur
 const CAT = [
 	'..........o.o',
 	'.........oooo',
@@ -36,7 +25,6 @@ const CAT = [
 	'.oo.......oo.',
 	'oo.........oo'
 ];
-// a papyrus umbel: a fan of rays, `l` the light tips
 const UMBEL = [
 	'l.l.l.l.l.l',
 	'ggggggggggg',
@@ -52,7 +40,6 @@ function draw(c: Canvas) {
 	const stamp = (p: string[], x: number, y: number, key: Record<string, string>, flip = false) =>
 		c.stamp(p, x, y, key, flip);
 
-	// ---------- the water: blue, with zigzag ripples, fish and lotus ----------
 	rect(0, WATER, W - 1, H - 1, 'U');
 	for (let y = WATER + 2; y < H; y += 4) {
 		for (let x = 0; x < W; x++) put(x, y + (Math.abs((x % 6) - 3) > 1 ? 0 : 1), 'K');
@@ -64,17 +51,14 @@ function draw(c: Canvas) {
 	)) {
 		fish(x, y, ['W', 'Y', 'R'][k], k === 1);
 	}
-	// lotus flowers floating, one the daughter reaches for
 	for (const x of [37, 58, 70, 90]) {
 		stamp(['W.W.W', '.WWW.', '..G..'], x, WATER - 2, { W: 'W', G: 'G' });
 	}
 
-	// ---------- the border: painted blocks along the top, as on a tomb wall ----------
 	for (let x = 0; x < W; x++) put(x, 0, 'RUGY'[Math.floor(x / 3) % 4]);
 	for (let x = 0; x < W; x += 3) put(x, 0, 'K');
 	rect(0, 1, W - 1, 1, 'K');
 
-	// ---------- the papyrus thicket: stalks from the water, umbels fanned out ----------
 	const umbel = (x: number, y: number) => stamp(UMBEL, x - 5, y, { g: 'G', l: 'L' });
 	const stalk = (x: number, top: number) => {
 		line(x, top + 6, x + ((x * 7) % 3) - 1, WATER - 1, 'G');
@@ -85,15 +69,12 @@ function draw(c: Canvas) {
 	)) {
 		stalk(x, top);
 	}
-	// a clump behind the wife, at the left edge
 	for (const [x, top] of points('2,4 5,14 1,24')) stalk(x, top);
 	for (const [x, y] of points('58,30 66,26 74,30 82,32 90,28 70,38 86,40 62,40')) {
 		stamp(['.L.', 'LLL', '.G.'], x, y, { L: 'L', G: 'G' });
 	}
-	// a nest with eggs in the thicket
 	stamp(['GGGGG', 'GWWWG', '.GGG.'], 78, 42, { G: 'G', W: 'W' });
 
-	// ---------- birds and butterflies everywhere over the marsh ----------
 	const duck = (x: number, y: number, body: string, wing: string, flip = false) =>
 		stamp(DUCK, x, y, { b: body, w: wing, K: 'K', '>': 'Y' }, flip);
 	for (const [x, y, k] of points<[number, number, number]>(
@@ -105,13 +86,11 @@ function draw(c: Canvas) {
 		stamp(FLY, x, y, { y: 'Y', K: 'K' });
 	}
 
-	// ---------- the cat on the stalks, a bird in its jaws and two in its claws ----------
 	stamp(CAT, 46, 27, { o: 'O', K: 'K' });
 	duck(42, 24, 'W', 'R', true);
 	duck(44, 34, 'R', 'W', true);
 	duck(56, 33, 'U', 'W');
 
-	// ---------- the skiff: a bundle of papyrus, bound, its ends curled up ----------
 	rect(4, DECK, 54, DECK + 3, 'L');
 	for (let x = 6; x < 54; x += 4) line(x, DECK, x, DECK + 3, 'K');
 	for (let k = 0; k < 5; k++) {
@@ -120,7 +99,6 @@ function draw(c: Canvas) {
 	}
 	stamp(UMBEL, 53, DECK - 9, { g: 'G' });
 
-	// ---------- the wife behind him: tall cone, long wig, a long white dress ----------
 	stamp(['.W.', 'WYW', 'WWW'], 9, 3, { W: 'W', Y: 'Y' });
 	disk(10, 10, 3.6, 'K');
 	rect(8, 10, 11, 18, 'K');
@@ -132,11 +110,9 @@ function draw(c: Canvas) {
 		rect(11 - half, y, 12 + Math.min(half, 3), y, 'W');
 	}
 	line(10, 22, 10, DECK - 1, 'Y');
-	// her arm round him, and a lotus bouquet in her hand
 	line(13, 18, 18, 24, 'Y');
 	stamp(['W.W', 'WWW', '.G.', '.G.'], 17, 17, { W: 'W', G: 'G' });
 
-	// ---------- Nebamun striding, throwstick up, three herons forward ----------
 	disk(30, 9, 3.6, 'K');
 	rect(31, 7, 33, 12, 'R');
 	put(32, 8, 'W');
@@ -144,19 +120,16 @@ function draw(c: Canvas) {
 	rect(26, 14, 34, 15, 'U');
 	rect(26, 16, 34, 16, 'Y');
 	for (let y = 17; y < 25; y++) rect(27 + Math.floor((y - 17) / 4), y, 33, y, 'R');
-	// the raised arm and the throwstick
 	line(27, 15, 22, 7, 'R');
 	line(26, 15, 21, 7, 'R');
 	line(19, 2, 23, 6, 'Y');
 	line(20, 2, 24, 6, 'Y');
 	put(19, 1, 'K');
-	// the forward arm, holding the herons by their legs
 	line(33, 17, 39, 20, 'R');
 	line(33, 18, 39, 21, 'R');
 	stamp(HERON, 38, 9, { w: 'W', K: 'K' });
 	stamp(HERON, 40, 10, { w: 'W', K: 'K' });
 	stamp(HERON, 42, 9, { w: 'W', K: 'K' });
-	// kilt with its belt, then the legs in mid-stride
 	rect(26, 25, 35, 25, 'Y');
 	for (let y = 26; y < 33; y++)
 		rect(26 - Math.floor((y - 26) / 3), y, 35 + Math.floor((y - 26) / 3), y, 'W');
@@ -165,15 +138,12 @@ function draw(c: Canvas) {
 	line(34, 33, 38, DECK - 1, 'R');
 	line(35, 33, 39, DECK - 1, 'R');
 
-	// ---------- the daughter at his feet, reaching for the lotus ----------
 	disk(31, 39, 1.6, 'K');
 	rect(32, 38, 33, 40, 'Y');
 	rect(30, 41, 34, 45, 'W');
 	line(34, 42, 37, 47, 'Y');
 
-	// ---------- a geese pair and a flock at the left, over the wife ----------
 	stamp(GOOSE, 0, 37, { b: 'R', w: 'W', K: 'K', '>': 'Y' });
-	// his goose on the prow, and more of the flock round his head
 	stamp(GOOSE, 41, 39, { b: 'W', w: 'R', K: 'K', '>': 'Y' });
 	duck(37, 27, 'U', 'R', true);
 	for (const [x, y] of points('31,3 45,2 37,21 43,32 25,35')) stamp(FLY, x, y, { y: 'Y', K: 'K' });
@@ -187,8 +157,6 @@ export const marsh: Mural = {
 	difficulty: 0.25,
 	cols: COLS,
 	panel: [PW, PH],
-	// B buff plaster, K black, R red-brown skin, Y yellow, W white linen, G papyrus green,
-	// L reed green, U water blue, O the cat's ginger
 	palette: {
 		B: '#d2ae6e',
 		K: '#1e1712',

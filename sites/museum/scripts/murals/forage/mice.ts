@@ -1,22 +1,15 @@
-// Mice Bury the Cat, a Russian lubok print (early 1700s): a woodcut in black on
-// off-white paper, colored by hand in red, yellow, green, lilac and ochre that slop past
-// the lines. A funeral in three rows: musicians lead the way; the dead cat lies on its
-// back with its paws tied, on a sledge pulled by mice; behind come mice with food and
-// drink for the wake. Old script runs beside the figures. 4 by 3 panels of 28 by 28;
-// the cat spans the middle two of the middle row.
+// Mice Bury the Cat, a Russian lubok print (early 1700s).
 import { SIDES, inell, mod, round, type Canvas, type Point } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const PW = 28;
 const PH = 28;
 const COLS = 4;
-/** The row, in a panel, the figures stand on. */
 const FEET = 24;
 
 type Fill = string | ((x: number, y: number) => string);
 const paint = (f: Fill, x: number, y: number) => (typeof f === 'string' ? f : f(x, y));
 
-// a mouse's head, facing left: round ear, pointed snout, one eye
 const HEAD = [
 	'......KK...',
 	'.....KeeK..',
@@ -28,7 +21,6 @@ const HEAD = [
 	'....KKKKK..'
 ];
 const LEGS = ['.KbK.KbK.', '.KbK.KbK.', 'KKKK.KKK.'];
-// a little mouse, facing left
 const MINI = [
 	'.....KK...',
 	'....KeeK..',
@@ -45,7 +37,6 @@ const MINI = [
 	'.KKK.KKK..'
 ];
 
-// the dead cat's face, eyes shut
 const CAT = [
 	'.KK...........KK.',
 	'.KeK.........KeK.',
@@ -64,7 +55,6 @@ const CAT = [
 ];
 const FLASK = ['.KKK.', '.KcK.', 'KKcKK', 'KcccK', 'KcdcK', 'KcccK', '.KKK.'];
 
-// the script: marks three dots tall that spell nothing
 const GLY =
 	'111,101,101 101,111,101 101,101,111 11,10,11 111,010,010 101,010,101 101,110,101 1,1,1 11,11,10 111,110,111 011,101,011'
 		.split(' ')
@@ -73,7 +63,6 @@ const GLY =
 function draw(c: Canvas) {
 	const { put, disk, line, dots } = c;
 
-	/** A pattern whose marks are colors or color rules. */
 	const art = (
 		pattern: string[],
 		x: number,
@@ -89,7 +78,6 @@ function draw(c: Canvas) {
 		});
 	};
 
-	/** An outlined shape: its edge in black ink, its inside filled. */
 	const blob = (cells: Point[], fill: Fill) => {
 		const set = new Set(cells.map(([x, y]) => `${x},${y}`));
 		for (const [x, y] of cells) {
@@ -117,7 +105,6 @@ function draw(c: Canvas) {
 			(x, y) => inell(x, y, cx, cy, rx, ry)
 		);
 	const box = (x0: number, y0: number, x1: number, y1: number) => where(x0, y0, x1, y1, () => true);
-	/** A thick stroke from one point to another, `r` dots either side of its middle. */
 	const stroke = (x0: number, y0: number, x1: number, y1: number, r = 1): Point[] => {
 		const out: Point[] = [];
 		const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) || 1;
@@ -132,7 +119,6 @@ function draw(c: Canvas) {
 		for (let i = 1; i < pts.length; i++) line(...pts[i - 1], ...pts[i], col);
 	};
 
-	// coat patterns
 	const dotted = (a: string, b: string) => (x: number, y: number) =>
 		mod(x + 2 * y, 4) === 0 && y % 2 === 0 ? b : a;
 	const striped = (a: string, b: string) => (_x: number, y: number) => (y % 3 === 0 ? b : a);
@@ -141,7 +127,6 @@ function draw(c: Canvas) {
 	const zigzag = (a: string, b: string) => (x: number, y: number) =>
 		mod(y + Math.abs(mod(x, 4) - 2), 3) === 0 ? b : a;
 
-	/** A thin tail from (x, y) going back (away from facing f), curling up at the end. */
 	const tail = (x: number, y: number, f: number, len: number) => {
 		const t: Point[] = [
 			[0, 0],
@@ -154,10 +139,6 @@ function draw(c: Canvas) {
 		path('K', ...t.map(([dx, dy]): Point => [round(x - f * dx), y + dy]));
 	};
 
-	/**
-	 * An upright mouse in a long coat, feet's middle at (x, y), facing f (-1 left).
-	 * Each hand is [forward, up] from the feet's middle; `lean` tips the body forward.
-	 */
 	const mouse = (
 		x: number,
 		y: number,
@@ -181,7 +162,6 @@ function draw(c: Canvas) {
 		art(HEAD, f < 0 ? hx - 6 : hx - 4, y - 19 + (lean ? 1 : 0), { K: 'K', f: 'M', e: ear }, f > 0);
 	};
 
-	/** A little mouse, feet's middle at (x, y); its arms are thin, hands at [forward, up]. */
 	const mini = (
 		x: number,
 		y: number,
@@ -196,7 +176,6 @@ function draw(c: Canvas) {
 		}
 	};
 
-	/** A lubok flower: a stem with leaves and a round head. */
 	const plant = (x: number, y: number, h: number, head: string, eye = 'Y') => {
 		line(x, y, x, y - h, 'G');
 		for (let k = 2; k < h - 1; k += 2) put(x + (k % 4 ? 1 : -1), y - k, 'G');
@@ -204,13 +183,11 @@ function draw(c: Canvas) {
 		dots(head, [x - 1, y - h - 1], [x + 1, y - h - 1], [x, y - h - 2]);
 		put(x, y - h - 1, eye);
 	};
-	/** A little rosette, the kind that fills a print's empty spots. */
 	const rosette = (x: number, y: number, col: string, eye = 'K') => {
 		dots(col, [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]);
 		put(x, y, eye);
 	};
 
-	/** A line of script from x0 to no further than x1, its marks' tops on row y. */
 	const caption = (x0: number, x1: number, y: number, k = 0) => {
 		let x = x0;
 		while (true) {
@@ -222,7 +199,6 @@ function draw(c: Canvas) {
 		}
 	};
 
-	// the ground under each row of figures: tufts of grass over hatched earth
 	for (let row = 0; row < 3; row++) {
 		const y = row * PH + FEET + 1;
 		for (let x = 0; x < COLS * PW; x++) {
@@ -232,19 +208,15 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// ---------- 1. the bagpiper, and a little mouse dancing ----------
 	c.at(0, 0);
 	{
 		const x = 17;
 		const y = FEET;
-		// two drones over his shoulder, tipped in yellow
 		line(x + 2, y - 10, x + 6, y - 20, 'K');
 		line(x + 3, y - 9, x + 9, y - 17, 'K');
 		dots('Y', [x + 6, y - 21], [x + 7, y - 21], [x + 9, y - 18], [x + 10, y - 18]);
 		mouse(x, y, dotted('R', 'Y'), { hands: [[6, -6]] });
-		// the bag under his arm
 		blob(oval(x - 1, y - 8, 3.5, 2.6), dotted('L', 'K'));
-		// the chanter from his mouth down past the bag
 		line(x - 6, y - 13, x - 7, y - 3, 'K');
 		dots('Y', [x - 8, y - 2], [x - 7, y - 2], [x - 6, y - 2]);
 		mini(5, y, checked('G', 'Y'), {
@@ -262,7 +234,6 @@ function draw(c: Canvas) {
 		rosette(26, 7, 'R');
 	}
 
-	// ---------- 2. the drummer ----------
 	c.at(28, 0);
 	{
 		const x = 16;
@@ -274,10 +245,8 @@ function draw(c: Canvas) {
 			],
 			boots: 'R'
 		});
-		// the drum on his belly, its cords in a zigzag, its skin on top
 		blob(box(x - 11, y - 9, x - 2, y - 3), zigzag('R', 'Y'));
 		blob(oval(x - 6.5, y - 9, 5, 1.6), 'W');
-		// sticks raised
 		line(x - 5, y - 12, x - 7, y - 16, 'K');
 		line(x - 3, y - 11, x - 1, y - 16, 'K');
 		dots('Y', [x - 7, y - 17], [x - 1, y - 17]);
@@ -288,7 +257,6 @@ function draw(c: Canvas) {
 		rosette(25, 6, 'Y');
 	}
 
-	// ---------- 3. the fiddler ----------
 	c.at(56, 0);
 	{
 		const x = 18;
@@ -299,7 +267,6 @@ function draw(c: Canvas) {
 				[3, -5]
 			]
 		});
-		// a pear-shaped fiddle held upright, and its bow
 		blob(box(x - 9, y - 15, x - 7, y - 8), 'O');
 		dots('R', [x - 10, y - 14], [x - 6, y - 14], [x - 10, y - 12], [x - 6, y - 12]);
 		blob(oval(x - 8, y - 5, 4, 4), (xx, yy) => (yy === y - 4 ? 'K' : 'Y'));
@@ -313,7 +280,6 @@ function draw(c: Canvas) {
 		rosette(25, 6, 'L');
 	}
 
-	// ---------- 4. the horn, and a little mouse weeping ----------
 	c.at(84, 0);
 	{
 		const x = 17;
@@ -326,11 +292,9 @@ function draw(c: Canvas) {
 			boots: 'K',
 			len: 6
 		});
-		// a long horn from his mouth, up and ahead, banded, with a wide bell
 		blob(stroke(x - 6, y - 13, x - 11, y - 18), (xx, yy) => ((xx + yy) % 2 ? 'Y' : 'O'));
 		blob(oval(x - 12, y - 19, 2.5, 2.5), 'Y');
 		put(x - 12, y - 19, 'K');
-		// she dabs her eye with a red kerchief
 		mini(5, y, striped('L', 'G'), { hands: [[3, -8]], len: 0 });
 		blob(box(1, y - 9, 3, y - 7), 'R');
 		dots('B', [1, y - 6], [2, y - 4], [0, y - 3], [1, y - 1]);
@@ -338,11 +302,9 @@ function draw(c: Canvas) {
 		rosette(23, 5, 'Y');
 	}
 
-	// ---------- 5. the sledge team ----------
 	c.at(0, 28);
 	{
 		const y = FEET;
-		// leaning into a rope that runs back over their shoulders to the sledge
 		mouse(21, y - 1, dotted('G', 'Y'), { hands: [[6, -11]], len: 3, lean: 3 });
 		path('O', [27, y - 6], [22, y - 10], [15, y - 12]);
 		mouse(9, y, striped('L', 'R'), { hands: [[6, -11]], len: 4, lean: 3 });
@@ -352,18 +314,14 @@ function draw(c: Canvas) {
 		rosette(14, 5, 'R');
 	}
 
-	// ---------- 6 and 7. the cat on its sledge ----------
 	c.at(28, 28);
 	{
 		const y = FEET;
-		// the sledge: a runner curling up at the front, a deck of planks on posts
 		line(1, y, 53, y, 'K');
 		path('K', [1, y], [-1, y - 2], [-1, y - 4], [1, y - 6]);
 		blob(box(1, y - 4, 54, y - 2), (x) => (x % 4 ? 'R' : 'Y'));
 		for (let x = 4; x < 54; x += 6) put(x, y - 1, 'K');
-		// the tail, curling up behind
 		blob(stroke(49, y - 8, 53, y - 17, 1), (x, yy) => ((x + yy) % 3 ? 'O' : 'K'));
-		// the body on its back: a spotted yellow belly up, a striped back below
 		blob(oval(30, y - 8, 21, 5.5), (x, yy) =>
 			yy < y - 8
 				? mod(x * 3 + yy, 5) === 0
@@ -373,7 +331,6 @@ function draw(c: Canvas) {
 					? 'K'
 					: 'O'
 		);
-		// four legs in the air, each pair bound at the ankles with red rope
 		for (const x of [19, 41]) {
 			for (const s of [-1, 1]) {
 				blob(stroke(x + s * 5, y - 12, x + s * 2, y - 19), (xx, yy) => (yy % 3 ? 'O' : 'K'));
@@ -385,11 +342,9 @@ function draw(c: Canvas) {
 			}
 			path('R', [x + 3, y - 16], [x + 5, y - 15], [x + 6, y - 13]);
 		}
-		// a tasseled pillow under the head, the head on it
 		blob(box(0, y - 10, 14, y - 4), checked('L', 'Y'));
 		dots('Y', [-1, y - 11], [15, y - 11], [-1, y - 3], [15, y - 3]);
 		art(CAT, -1, y - 22, { K: 'K', O: 'O', e: 'P', Y: 'Y' });
-		// long whiskers
 		path('K', [1, y - 13], [-3, y - 14], [-7, y - 14]);
 		path('K', [1, y - 12], [-3, y - 11], [-7, y - 12]);
 		path('K', [15, y - 13], [19, y - 14], [23, y - 14]);
@@ -399,11 +354,9 @@ function draw(c: Canvas) {
 		caption(47, 54, 5, 5);
 	}
 
-	// ---------- 8. the rider ----------
 	c.at(84, 28);
 	{
 		const y = FEET;
-		// a mouse on all fours, saddled, carrying a little one
 		tail(21, y - 6, -1, 5);
 		blob(oval(13, y - 6, 8, 3.5), 'M');
 		for (const x of [7, 10, 16, 19]) blob(box(x - 1, y - 4, x + 1, y), 'M');
@@ -417,9 +370,7 @@ function draw(c: Canvas) {
 			len: 0,
 			boots: 'R'
 		});
-		// reins to the mount's mouth
 		line(9, y - 14, 4, y - 8, 'R');
-		// waving a green branch
 		line(9, y - 21, 7, y - 24, 'G');
 		dots('G', [6, y - 23], [8, y - 25], [6, y - 25]);
 		caption(1, 26, 0, 7);
@@ -427,7 +378,6 @@ function draw(c: Canvas) {
 		rosette(3, 6, 'R');
 	}
 
-	// ---------- 9. pancakes ----------
 	c.at(0, 56);
 	{
 		const x = 17;
@@ -438,11 +388,9 @@ function draw(c: Canvas) {
 				[4, -8]
 			]
 		});
-		// a stack of pancakes on a dish, a pat of butter on top
 		line(x - 14, y - 8, x - 3, y - 8, 'K');
 		for (let k = 0; k < 4; k++) blob(oval(x - 8.5, y - 10 - k * 2, 5, 1.4), k % 2 ? 'O' : 'Y');
 		dots('R', [x - 9, y - 17], [x - 8, y - 17]);
-		// a pot of kasha set down on the ground
 		blob(
 			where(1, y - 6, 11, y, (xx, yy) => inell(xx, yy, 6, y - 6, 5, 6.5)),
 			(xx, yy) => (mod(xx + yy, 3) ? 'G' : 'Y')
@@ -454,7 +402,6 @@ function draw(c: Canvas) {
 		rosette(25, 6, 'G');
 	}
 
-	// ---------- 10. the fish ----------
 	c.at(28, 56);
 	{
 		const x = 19;
@@ -465,7 +412,6 @@ function draw(c: Canvas) {
 				[3, -7]
 			]
 		});
-		// a big fish in his arms, longer than he is: scaly back, yellow belly, forked tail
 		blob(
 			where(14, y - 14, 19, y - 4, (xx, yy) => Math.abs(yy - (y - 9)) <= (xx - 14) * 0.9 + 1),
 			'G'
@@ -484,12 +430,10 @@ function draw(c: Canvas) {
 		rosette(25, 6, 'R');
 	}
 
-	// ---------- 11. the beer barrel ----------
 	c.at(56, 56);
 	{
 		const y = FEET;
 		mouse(8, y, checked('L', 'G'), { hands: [[4, -9]], len: 0 });
-		// a barrel on a little cart, hooped, with a tap
 		line(12, y - 3, 26, y - 3, 'K');
 		blob(oval(19.5, y - 9, 6.5, 5), (x, yy) =>
 			Math.abs(x - 19.5) === 3.5 ? 'K' : yy % 2 ? 'O' : 'Y'
@@ -501,7 +445,6 @@ function draw(c: Canvas) {
 		rosette(18, 5, 'L');
 	}
 
-	// ---------- 12. pie, and flasks ----------
 	c.at(84, 56);
 	{
 		const x = 17;
@@ -513,13 +456,11 @@ function draw(c: Canvas) {
 			],
 			len: 6
 		});
-		// a domed pie with a lattice crust, on a dish
 		line(x - 14, y - 8, x - 4, y - 8, 'K');
 		blob(
 			where(x - 14, y - 15, x - 4, y - 9, (xx, yy) => inell(xx, yy, x - 9, y - 9, 5, 5.5)),
 			(xx, yy) => (mod(xx + yy, 3) === 0 || mod(xx - yy, 3) === 0 ? 'O' : 'Y')
 		);
-		// flasks at his belt
 		art(FLASK, x - 1, y - 8, { K: 'K', c: 'G', d: 'Y' });
 		art(FLASK, x + 3, y - 7, { K: 'K', c: 'B', d: 'Y' });
 		caption(1, 26, 0, 10);
@@ -529,7 +470,6 @@ function draw(c: Canvas) {
 	}
 	c.at();
 
-	// the color slops a little past the ink, here and there
 	const SLOP = 'RYGLBO';
 	for (let y = 0; y < c.h; y++) {
 		for (let x = 0; x < c.w; x++) {
@@ -553,7 +493,6 @@ export const mice: Mural = {
 	cols: COLS,
 	difficulty: 0.3,
 	panel: [PW, PH],
-	// W paper, K ink, R cinnabar, Y yellow, G green, L lilac, B blue, O ochre, M mouse gray, P pink
 	palette: {
 		W: '#f2e8cc',
 		K: '#211a16',

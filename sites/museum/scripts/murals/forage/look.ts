@@ -1,8 +1,4 @@
-// Preview one Forage mural while drawing it, without writing its pack file:
-//   node scripts/murals/forage/look.ts <file in this folder> <out dir>
-// e.g. `node scripts/murals/forage/look.ts thief.ts /tmp/look`. Saves <prefix>.png
-// (whole) and <prefix>-panels.png (cut apart), and prints each panel's colonies, colors,
-// biggest color and any problem (like two colors too close to tell apart).
+// node scripts/murals/forage/look.ts <file in this folder> <out dir>
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 import { reportForage } from '../../../src/lib/forage/report.ts';

@@ -1,7 +1,3 @@
-/*
- * The server side of a game's pages, the same for every game. Each game makes its
- * own with `gamePages` (src/lib/<game>/pages.server.ts), and its routes call it.
- */
 import { error, type Cookies } from '@sveltejs/kit';
 
 import type { GameInfo } from '../games';
@@ -11,11 +7,9 @@ import type { GameSave } from './save';
 
 interface GameParts<L extends Picture, S> {
 	game: GameInfo;
-	/** Every level, in play order, and the packs they come in. */
 	levels: L[];
 	packs: Pack<L>[];
 	save: GameSave;
-	/** Level `index`'s starting state, as the game's component builds it. */
 	build(level: L, index: number): S;
 }
 
@@ -29,13 +23,8 @@ export function gamePages<L extends Picture, S>({
 	const saveIn = (cookies: Cookies) => save.saveFromCookie(cookies.get(save.cookie));
 
 	return {
-		/** Every level's page, for prerendering. */
 		entries: () => levels.map((lv) => ({ id: lv.id })),
 
-		/**
-		 * `/<game>/<level id>`, with the level's starting state built ahead so the page needn't
-		 * build it. Ids, not places in play, so a link keeps its picture when packs are added.
-		 */
 		level(id: string) {
 			const index = levels.findIndex((lv) => lv.id === id);
 			const level = levels[index];
@@ -48,11 +37,6 @@ export function gamePages<L extends Picture, S>({
 			};
 		},
 
-		/**
-		 * The mural you're working on, from your save, as one picture: or, once it's
-		 * finished, the next one up (the first, before you've played). With its name, its
-		 * panels' layout, and which of them you've finished.
-		 */
 		current(cookies: Cookies) {
 			const saved = saveIn(cookies);
 			let start = 0;
@@ -72,7 +56,6 @@ export function gamePages<L extends Picture, S>({
 			};
 		},
 
-		/** `/<game>`: its murals, with your save so the ✓ marks and the way back are there at once. */
 		home(cookies: Cookies) {
 			return {
 				save: saveIn(cookies),

@@ -14,7 +14,6 @@ import { loadPacks } from './levels.ts';
 const packs = loadPacks<F.Level>('forage');
 const LEVELS = packs.flatMap((p) => p.levels);
 
-/** A hand-made state: art rows, colonies per column (front first), as [color, ants]. */
 function make(art: string[], columns: [number, number][][], slots = 5): F.State {
 	const lv: F.Level = {
 		id: 't',
@@ -31,11 +30,9 @@ function make(art: string[], columns: [number, number][][], slots = 5): F.State 
 	return s;
 }
 
-/** Whether every slot is empty. */
 const slotsFree = (s: F.State) => s.slots.every((e) => !e);
 
 test('only blocks touching the outside are exposed; sealed holes do not count', () => {
-	// A ring of A around a hole, with B in the hole's corner.
 	const s = make(['AAAAA', 'A...A', 'A.B.A', 'A...A', 'AAAAA'], [[[1, 1]]]);
 	assert.equal(F.exposedOf(s, 1).length, 0, 'B sits in a sealed hole');
 	assert.equal(F.exposedOf(s, 0).length, 16, 'the whole ring is on the edge');
@@ -53,7 +50,6 @@ test('ants tunnel: eating a block exposes the one behind it', () => {
 });
 
 test('a waiting colony eats by itself when its color opens up', () => {
-	// B is sealed inside A. Send B first (it waits), then A opens the way.
 	const s = make(['AAA', 'ABA', 'AAA'], [[[1, 1]], [[0, 8]]]);
 	let r = F.pick(s, 0);
 	assert.ok(r.ok && r.parked.length === 1);
@@ -63,7 +59,6 @@ test('a waiting colony eats by itself when its color opens up', () => {
 });
 
 test('every colony out working holds a slot until it has eaten its count', () => {
-	// One slot: B waits in it (it can't reach its color), so A can't go out at all.
 	const s = make(['AAA', 'ABA', 'AAA'], [[[1, 1]], [[0, 8]]], 1);
 	assert.ok(F.send(s, 0).ok);
 	const r = F.send(s, 1);
@@ -114,7 +109,6 @@ test('a locked column opens when its key block touches the outside', () => {
 });
 
 test('ants leave one at a time; covered food is claimed only once it is exposed', () => {
-	// A 3x3 block: the middle (4) is sealed until a food beside it is eaten.
 	const s = make(['AAA', 'AAA', 'AAA'], [[[0, 9]]]);
 	assert.ok(F.send(s, 0).ok);
 	assert.equal(s.walking.length, 1, 'the first ant leaves right away');
@@ -136,7 +130,6 @@ test('ants leave one at a time; covered food is claimed only once it is exposed'
 });
 
 test('linked colonies stay linked in their slots until both are done', () => {
-	// A has 1 food and finishes fast; B has 3, so it is still working when A is done.
 	const s = make(['AB', 'BB'], [[[0, 1]], [[1, 3]]]);
 	s.columns[0][0].link = s.columns[1][0].link = s.columns[0][0].id;
 	const r = F.send(s, 0);
@@ -154,7 +147,6 @@ test('linked colonies stay linked in their slots until both are done', () => {
 });
 
 test('a lock sits in front of the colony it blocks; colonies ahead of it can still go', () => {
-	// Column 0: one free colony, then the lock (its key is the B deep in the middle), then B.
 	const art = ['AAAAA', 'AAAAA', 'AABAA', 'AAAAA', 'AAAAA'];
 	const first: [number, number][] = [
 		[0, 4],
@@ -191,7 +183,6 @@ test('linked colonies go out together, only when both are at the front', () => {
 });
 
 test('linked colonies back to back in one column go out as one stack', () => {
-	// Column 0: two linked A colonies back to back, then a B. Column 1: their third member, behind a B.
 	const s = make(
 		['AAAABB'],
 		[
@@ -251,7 +242,6 @@ test('a linked stack waits while another colony sits between its members, or a l
 		]
 	);
 	t.columns[0][0].link = t.columns[0][1].link = t.columns[0][0].id;
-	// Column 0's lock sits between its two members; its key is the B, still covered.
 	t.locks = [5, -1, -1];
 	t.lockAt = [1, 0, 0];
 	assert.ok(F.hasLock(t, 0));
@@ -259,7 +249,6 @@ test('a linked stack waits while another colony sits between its members, or a l
 	assert.ok(!held.ok && held.reason === 'partner', 'a lock splits the stack');
 });
 
-/** A board from make() with a dispenser in place of the food at `cell`. */
 function withDispenser(s: F.State, cell: number, colors: number[], amounts: number[]): F.State {
 	s.target = s.target.slice();
 	s.target[cell] = F.DISPENSER;
@@ -267,7 +256,6 @@ function withDispenser(s: F.State, cell: number, colors: number[], amounts: numb
 	return s;
 }
 
-/** Tick until an ant gets to its food; what it ate. */
 function nextMeal(s: F.State) {
 	for (let t = 0; t < 50; t++) {
 		const r = F.tick(s);
@@ -277,7 +265,6 @@ function nextMeal(s: F.State) {
 }
 
 test('a dispenser puts eaten food of its color back at once, so nothing behind it is uncovered', () => {
-	// A ring of A around a B; the dispenser takes the bottom right A and holds 3 more A.
 	const s = withDispenser(make(['AAA', 'ABA', 'AAA'], [[[0, 10]], [[1, 1]]]), 8, [0], [3]);
 	assert.equal(F.blocksLeft(s), 7 + 1 + 3, 'the picture, and the 3 still in the dispenser');
 	assert.ok(F.send(s, 0).ok);
@@ -285,7 +272,6 @@ test('a dispenser puts eaten food of its color back at once, so nothing behind i
 	assert.ok(s.alive[first.cell], 'a new A took its place');
 	assert.deepEqual(F.dispensing(s.dispensers![0]), { c: 0, left: 2 });
 	assert.equal(F.exposedOf(s, 1).length, 0, 'the B is still covered');
-	// Then the dispenser runs out and its tile is empty; the rest of the ring goes as usual.
 	for (let t = 0; t < 200 && s.slots.some(Boolean); t++) F.tick(s);
 	for (let t = 0; t < 50 && s.walking.length; t++) F.tick(s);
 	assert.equal(F.dispensing(s.dispensers![0]), null);
@@ -294,7 +280,6 @@ test('a dispenser puts eaten food of its color back at once, so nothing behind i
 });
 
 test("a dispenser changes color after its amount, and when empty it can uncover what's beside it", () => {
-	// The dispenser is the top middle A, over the B: 1 A, then 1 C.
 	const s = withDispenser(
 		make(['AAA', 'ABA', 'ACA'], [[[0, 7]], [[2, 2]], [[1, 1]]]),
 		1,
@@ -315,7 +300,6 @@ test("a dispenser changes color after its amount, and when empty it can uncover 
 });
 
 test('a linked group of three goes out together and holds its slots until all are done', () => {
-	// A ring of A around a C, beside a block of B. Two A colonies: 7 ants, then 1.
 	const s = make(
 		['AAABB', 'ACABB', 'AAABB'],
 		[
@@ -348,7 +332,6 @@ test('a linked group of three goes out together and holds its slots until all ar
 });
 
 test('dig depth: blocks to eat before each cell is exposed', () => {
-	// B sits under one ring of A; C under two.
 	const s = make(['AAAAA', 'ABBBA', 'ABCBA', 'ABBBA', 'AAAAA'], [[[0, 16]]]);
 	const d = F.digDepth(s);
 	assert.equal(d[0], 0, 'the edge is exposed');
@@ -357,7 +340,6 @@ test('dig depth: blocks to eat before each cell is exposed', () => {
 });
 
 test('a patient pick times ants the same way the board does, tick by tick', () => {
-	// pick() skips making the walks the board draws ants along; it must still match send + tick.
 	const lv = packs[0].levels[3];
 	const s0 = F.buildPuzzle(lv, 3);
 	const a = F.clone(s0);
@@ -368,7 +350,6 @@ test('a patient pick times ants the same way the board does, tick by tick', () =
 		const col = legal[Math.floor(rng() * legal.length)];
 		assert.ok(F.pick(a, col).ok);
 		assert.ok(F.send(b, col).ok);
-		// Tick until nothing is walking and every colony out is done or has nothing to eat.
 		while (b.walking.length || b.slots.some((e) => e && e.n > 0 && !F.isWaiting(b, e))) {
 			for (const d of F.tick(b).dispatched) {
 				const path = F.antPath(b, d);
@@ -388,7 +369,6 @@ test('difficulty: teaching levels take one try, the hardest several, the sharpes
 		assert.deepEqual(targetTries(d), { best: 1, typical: 1, worst: 1 }, `difficulty ${d}`);
 	}
 	assert.deepEqual(targetTries(1), { best: 5, typical: 8, worst: 15 });
-	/** The difficulty `part` of the way from teaching to the hardest. */
 	const at = (part: number) => F.TEACH + part * (1 - F.TEACH);
 	const pips = (d: number) => fromTries(targetTries(d).typical);
 	assert.equal(pips(1), 5);
@@ -423,7 +403,6 @@ test('rating and hardness come from the typical learner\u2019s attempts', () => 
 test('passes: losses bunched in a few sends, soon seen, are a crux; spread thin or seen late, not', () => {
 	const at = (n: number, from: number, gap: number) =>
 		Array.from({ length: n }, (_, k) => ({ at: from + (k % 2), gap }));
-	// Two passes: sends 10-11, seen within 3 sends, and 30-31, seen 12 sends later.
 	const e = expression([...at(6, 10, 3), ...at(4, 30, 12)]);
 	assert.deepEqual(
 		e.passes.map((p) => [p.from, p.to, p.share, p.learnable]),
@@ -433,7 +412,6 @@ test('passes: losses bunched in a few sends, soon seen, are a crux; spread thin 
 		]
 	);
 	assert.equal(e.focus, 0.6);
-	// One loss at each of 20 sends: nothing bunches, so nothing to learn.
 	const thin = expression(Array.from({ length: 20 }, (_, k) => ({ at: 5 * k, gap: 2 })));
 	assert.equal(thin.focus, 0);
 	assert.equal(expression([]).focus, 1);
@@ -474,8 +452,6 @@ for (const pack of packs) {
 			const r = F.clone(s);
 			for (const col of s.intended!) assert.ok(F.pick(r, col).ok);
 			assert.ok(F.isWon(r));
-			// Learners take a while on big pictures, so check every tenth tuned level: they
-			// take what forage:tune saved for this deal, and none of them gives up.
 			if (i % 10 === 0 && lv.tries) {
 				const t = triesOf(s);
 				const saved = [t.best, t.typical, t.worst].map((x) => Math.round(x * 10) / 10);
@@ -511,7 +487,6 @@ test('forage level ids are unique, and every level has a difficulty', () => {
 test('the rule-of-thumb player never parks while a send that finishes can go', () => {
 	const lv = packs[1].levels[3];
 	const s0 = F.buildPuzzle(lv, 40);
-	// Replay its choices: whenever one finishes, the one it took did.
 	let s = s0;
 	const g = playAs('clean', s0, 7);
 	assert.ok(g.path.length > 10);
@@ -533,7 +508,6 @@ test('cruxes: a teaching level has none, and the walked line wins', () => {
 	const t = F.clone(s);
 	for (const col of a.line) assert.ok(F.pick(t, col).ok);
 	assert.ok(F.isWon(t));
-	// A search stops on time, with what it found so far.
 	const quick = analyze(F.buildPuzzle(LEVELS.at(-1)!, LEVELS.length - 1), {
 		ms: 300,
 		playouts: 1,
@@ -549,7 +523,6 @@ test("a level's deal string says which column each colony goes to; a bad one is 
 	const placement = F.placementOf(random);
 	const same = F.buildPuzzle({ ...lv, deal: placement.join('') });
 	assert.deepEqual(same.columns, random.columns);
-	// Move the last colony to another column: still a winning deal, now with it there.
 	const moved = placement.slice();
 	const last = moved.length - 1;
 	for (let k = 0; k < plan.tune.columns; k++) {
@@ -565,8 +538,7 @@ test("a level's deal string says which column each colony goes to; a bad one is 
 });
 
 test('tuned levels: each mural is about as hard as the one before or harder', () => {
-	if (LEVELS.some((l) => l.tries === undefined)) return; // not tuned yet
-	// Panels vary within a mural; the murals' averages climb.
+	if (LEVELS.some((l) => l.tries === undefined)) return;
 	const means = packs.map((p) => {
 		const pips = p.levels.map((l) => levelDifficulty(l)!);
 		return pips.reduce((a, b) => a + b) / pips.length;
@@ -591,7 +563,7 @@ test('tuned levels: no level takes the slowest learners past what the hardest as
 });
 
 test('tuned levels: teaching ones have no cruxes, the hardest several rule breaks', () => {
-	if (LEVELS.some((l) => l.tries === undefined)) return; // not tuned yet
+	if (LEVELS.some((l) => l.tries === undefined)) return;
 	const by = (from: number, to: number) =>
 		LEVELS.filter((l) => {
 			const t = F.progress(l.difficulty);
@@ -603,8 +575,6 @@ test('tuned levels: teaching ones have no cruxes, the hardest several rule break
 	const breaks = late.reduce((n, l) => n + (l.breaks ?? 0), 0) / late.length;
 	assert.ok(breaks >= 2, `late levels average ${breaks.toFixed(1)} rule breaks`);
 	const avg = (ls: F.Level[]) => ls.reduce((a, l) => a + levelDifficulty(l)!, 0) / ls.length;
-	// Late levels give up some hardness for difficulty from cruxes (see FOCUS in
-	// scripts/tune-forage.ts), so they average Hard rather than Very hard.
 	assert.ok(avg(teaching) <= 1.2 && avg(late) >= 3.5, `rises from 1 to ${avg(late).toFixed(2)}`);
 	assert.ok(avg(by(0.3, 0.5)) < avg(late) - 0.8, 'the middle is in the middle of the curve');
 });

@@ -1,5 +1,4 @@
-// A Page of Beasts: one illuminated page from a medieval bestiary. Twelve panels of
-// 18 by 16, each a framed miniature over its caption.
+// A Page of Beasts, after a medieval bestiary.
 import { points, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -7,13 +6,11 @@ const PW = 18;
 const PH = 16;
 const COLS = 3;
 
-// letter-like marks, two dots tall, each written top/bottom
 const GLYPHS = '1/1 11/1. 1./11 11/.1 1/1 .1/11 11/11'.split(' ').map((g) => g.split('/'));
 
 function draw(c: Canvas) {
 	const { put, rect, ell, disk, dots } = c;
 
-	// a framed miniature over a caption strip; leaves the clip on the inside of the frame
 	const miniature = (
 		col: number,
 		row: number,
@@ -32,7 +29,6 @@ function draw(c: Canvas) {
 		for (const word of words.split(' ')) {
 			for (const g of word) {
 				const glyph = GLYPHS[+g];
-				// a word is cut off where the strip ends
 				if (x + glyph[0].length > 17) break;
 				c.stamp(glyph, x, 13, { 1: 'K' });
 				x += glyph[0].length + 1;
@@ -49,7 +45,6 @@ function draw(c: Canvas) {
 		}
 	};
 
-	// ---------- 1. the unicorn ----------
 	miniature(0, 0, 'B', 'Y', 'B', '014 20 34');
 	rect(1, 10, 16, 10, 'G');
 	rect(1, 9, 2, 9, 'G');
@@ -70,7 +65,6 @@ function draw(c: Canvas) {
 	put(1, 1, 'B');
 	put(4, 1, 'B');
 
-	// ---------- 2. the griffin ----------
 	miniature(1, 0, 'R', 'Y', 'R', '10 420 5');
 	rect(1, 10, 16, 10, 'G');
 	rect(6, 5, 13, 7, 'Y');
@@ -84,13 +78,11 @@ function draw(c: Canvas) {
 	points('8,11 9,13 10,14 11,14').forEach(([x0, x1], i) => rect(x0, 4 - i, x1, 4 - i, 'P'));
 	dots('Y', [14, 6], [15, 5], [16, 4], [16, 3]);
 
-	// ---------- 3. the whale with a ship on its back ----------
 	miniature(2, 0, 'Y', 'K', 'B', '03 140 2');
 	ell(9, 8, 7, 3, 'S');
 	rect(13, 6, 15, 8, 'S');
 	dots('S', [3, 5], [2, 4], [1, 3], [1, 2], [3, 3], [4, 2]);
 	rect(1, 9, 16, 10, 'B');
-	// wave tips, only where the gold ground still shows
 	for (const x of [1, 2, 5, 6, 9, 10, 13, 14]) {
 		if (c.get(x, 8) === 'Y') put(x, 8, 'B');
 	}
@@ -106,7 +98,6 @@ function draw(c: Canvas) {
 	put(9, 3, 'P');
 	put(10, 3, 'P');
 
-	// ---------- 4. the elephant and castle ----------
 	miniature(0, 1, 'R', 'Y', 'R', '41 023 6');
 	rect(3, 5, 10, 8, 'S');
 	put(3, 5, 'R');
@@ -123,7 +114,6 @@ function draw(c: Canvas) {
 	rect(6, 3, 6, 4, 'K');
 	dots('S', [2, 6], [1, 7]);
 
-	// ---------- 5. the dragon ----------
 	miniature(1, 1, 'Y', 'K', 'R', '22 05 104');
 	rect(5, 6, 11, 8, 'G');
 	legs([6, 10], 9, 10, 'G', 'K');
@@ -136,7 +126,6 @@ function draw(c: Canvas) {
 	dots('G', [4, 8], [3, 9], [2, 9], [1, 8], [1, 7], [1, 6], [2, 5], [3, 5], [4, 6], [3, 7]);
 	rect(6, 8, 10, 8, 'P');
 
-	// ---------- 6. the tiger and the mirror ----------
 	miniature(2, 1, 'B', 'Y', 'R', '041 3 20');
 	rect(2, 5, 9, 7, 'R');
 	legs([2, 4, 7, 9], 8, 10, 'R');
@@ -150,7 +139,6 @@ function draw(c: Canvas) {
 	disk(14.5, 7.5, 2.2, 'Y');
 	rect(14, 7, 15, 8, 'P');
 
-	// ---------- 7. the stag and the snake ----------
 	miniature(0, 2, 'Y', 'K', 'R', '30 412 0');
 	rect(1, 10, 16, 10, 'G');
 	rect(3, 6, 10, 7, 'R');
@@ -165,7 +153,6 @@ function draw(c: Canvas) {
 	dots('K', [12, 3], [13, 2], [13, 1], [14, 2], [15, 2], [15, 1]);
 	dots('G', [15, 5], [15, 6], [16, 7], [15, 8], [14, 9]);
 
-	// ---------- 8. the lion ----------
 	miniature(1, 2, 'B', 'Y', 'R', '11 403 5');
 	rect(6, 5, 13, 7, 'Y');
 	legs([7, 9, 11, 13], 8, 9, 'Y');
@@ -176,7 +163,6 @@ function draw(c: Canvas) {
 	dots('Y', [14, 5], [15, 4], [16, 3], [16, 2]);
 	dots('R', [15, 1], [16, 1]);
 
-	// ---------- 9. the owl mobbed by small birds ----------
 	miniature(2, 2, 'R', 'Y', 'B', '24 001 3');
 	rect(1, 9, 16, 9, 'K');
 	ell(8.5, 5.2, 4, 3.9, 'P');
@@ -191,7 +177,6 @@ function draw(c: Canvas) {
 	for (const [bx, by] of points('1,3 14,2 1,6 14,6'))
 		dots('K', [bx, by], [bx + 1, by + 1], [bx + 2, by]);
 
-	// ---------- 10. the phoenix ----------
 	miniature(0, 3, 'B', 'Y', 'R', '02 51 40');
 	for (let x = 1; x < 17; x++) {
 		const h = [1, 2, 3, 2][(x + 1) % 4];
@@ -209,7 +194,6 @@ function draw(c: Canvas) {
 	}
 	dots('R', [7, 9], [10, 9], [8, 9], [9, 9]);
 
-	// ---------- 11. the pelican ----------
 	miniature(1, 3, 'R', 'Y', 'B', '31 042 1');
 	rect(3, 9, 14, 10, 'Y');
 	dots('Y', [2, 9], [15, 9]);
@@ -223,7 +207,6 @@ function draw(c: Canvas) {
 	rect(10, 6, 13, 6, 'K');
 	put(14, 5, 'K');
 
-	// ---------- 12. the hedgehog with grapes on its spines ----------
 	miniature(2, 3, 'Y', 'K', 'B', '40 13 20');
 	rect(1, 10, 16, 10, 'G');
 	ell(8, 9, 5.5, 3.6, 'K', (_x, y) => y <= 9);
@@ -249,7 +232,6 @@ export const bestiary: Mural = {
 	difficulty: 0.1,
 	cols: COLS,
 	panel: [PW, PH],
-	// P parchment and pale beasts, B blue ground, R vermilion ground, Y gold leaf, K ink, S grey
 	palette: {
 		P: '#f1e3bd',
 		B: '#22408f',

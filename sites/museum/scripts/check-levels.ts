@@ -1,10 +1,4 @@
-// Check every level of every game and print its stats: pnpm -F museum levels [--order] [--measure]
-// Fails when a level's picture has problems (like colors that look alike, from checkPicture,
-// which every game's checks start with), when two levels of a game share an id, when a
-// Mosaic level can't be solved with the standard tray, or when Forage can't build a deal.
-//   --order    also list each game's levels from easiest to hardest, when it rates them
-//   --measure  play each Forage level with every player (minutes) instead of trusting the
-//              win share forage:tune saved
+// pnpm -F museum levels [--order] [--measure]
 import { parseArgs } from 'node:util';
 
 import { rules as forage } from '../src/lib/forage/rules.ts';
@@ -22,7 +16,6 @@ type Line = Row & { pack: string; id: string };
 let total = 0;
 let bad = 0;
 
-/** Print one game's table and problems, and add its levels to the totals. */
 function checkGame<L extends Picture>(rules: Rules<L>) {
 	const game = rules.id;
 	const lines: Line[] = loadPacks<L>(game)

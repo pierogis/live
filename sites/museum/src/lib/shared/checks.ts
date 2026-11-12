@@ -1,21 +1,12 @@
-/*
- * Checks every game's pictures share: is it a well-formed picture with colors that
- * are easy to tell apart. Each game adds its own checks on top (can it be won, how
- * hard is it). Imports use `.ts` so node scripts can load this file directly.
- */
 import type { Picture } from './level.ts';
 import { closePairs, MIN_DELTA } from './palette.ts';
 
 export interface PictureCheck {
 	w: number;
 	h: number;
-	/** Pixels per color key ('.' left out). */
 	counts: Record<string, number>;
-	/** Pixels that aren't empty. */
 	pixels: number;
-	/** Must fix: no game can use the picture like this. */
 	problems: string[];
-	/** Worth a look, but usable. */
 	warnings: string[];
 }
 
@@ -42,7 +33,6 @@ export function checkPicture(lv: Picture): PictureCheck {
 	return { w, h, counts, pixels, problems, warnings };
 }
 
-/** A 0 to 1 share as a whole percent, like "42%". */
 export function pct(x: number): string {
 	return `${Math.round(100 * x)}%`;
 }

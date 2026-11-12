@@ -1,9 +1,3 @@
-/*
- * Pieces every game's engine uses: seeded randomness and reading a picture's
- * letters into colors. No DOM; imports use `.ts` so node tests and scripts can
- * load the engines directly.
- */
-
 export type Rng = () => number;
 
 export interface Color {
@@ -11,7 +5,6 @@ export interface Color {
 	hex: string;
 }
 
-/** A picture as an engine sees it: one color index per pixel (-1 is empty). */
 export interface Art {
 	w: number;
 	h: number;
@@ -19,7 +12,6 @@ export interface Art {
 	colors: Color[];
 }
 
-/** FNV-1a: a level id becomes a stable seed. */
 export function hashStr(s: string): number {
 	let h = 2166136261;
 	for (let i = 0; i < s.length; i++) {
@@ -29,7 +21,6 @@ export function hashStr(s: string): number {
 	return h >>> 0;
 }
 
-/** mulberry32: small, fast, seeded. */
 export function makeRng(seed: number): Rng {
 	let a = seed >>> 0;
 	return function () {
@@ -41,7 +32,6 @@ export function makeRng(seed: number): Rng {
 	};
 }
 
-/** Shuffle `arr` in place (Fisher-Yates) and return it. */
 export function shuffle<T>(arr: T[], rng: Rng): T[] {
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(rng() * (i + 1));
@@ -52,12 +42,10 @@ export function shuffle<T>(arr: T[], rng: Rng): T[] {
 	return arr;
 }
 
-/** One item, uniformly. */
 export function pickOne<T>(arr: readonly T[], rng: Rng): T {
 	return arr[Math.floor(rng() * arr.length)];
 }
 
-/** One item, with odds in proportion to `weight`. */
 export function pickWeighted<T>(items: T[], weight: (t: T) => number, rng: Rng): T {
 	const total = items.reduce((sum, t) => sum + weight(t), 0);
 	let r = rng() * total;
@@ -68,7 +56,6 @@ export function pickWeighted<T>(items: T[], weight: (t: T) => number, rng: Rng):
 	return items[items.length - 1];
 }
 
-/** Read a picture's rows of letters into color indices, in order of first use. */
 export function parseArt(level: {
 	id: string;
 	palette: Record<string, string>;

@@ -1,8 +1,3 @@
-<!--
-	Forage: tap the front colony of a column; its ants eat exposed blocks of their color.
-	The level's life (building, undo, restart, the end panel, saving) is the shared
-	LevelControl; this keeps the picture, the colonies, the clock and the ants.
--->
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Card } from '@pierogis/utensils';
@@ -31,34 +26,15 @@
 
 	const props: LevelProps<Level, State> = $props();
 
-	/** Colonies shown in each lane; a count stands for the rest. */
 	const VISIBLE = 3;
 
-	/**
-	 * One step of time at the usual tempo. Ants walk a tick at a time; each colony sends one
-	 * every E.DISPATCH_EVERY ticks. A level's song plays a little quicker or slower, and the
-	 * ticks keep to its clock (`ctl.clock.ms`), so the game counts the same ticks either way.
-	 */
 	const TICK_MS = 100;
-	/**
-	 * Drawn ants stride on the music's eighth notes (this many of its sixteenths,
-	 * a tick each at its usual pace), and get to their blocks only on the lines of
-	 * the clock's gear, a little after the engine's tick if need be, so every
-	 * arrival sounds on the beat: quarter notes with few ants out, sixteenths with
-	 * a crowd (`Clock.crowd`).
-	 */
 	const BEAT_TICKS = 2;
 
 	let ants: AntLayer | null = null;
-	/** Colors whose food is all gone, and heard so. Only the sound reads it, so it needn't be reactive. */
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	let finished = new Set<number>();
 
-	/**
-	 * Color c's last food may just have gone from sight: sound it once it's gone
-	 * in the engine with no drawn ant still on its way to some (an ant carries its
-	 * food's color, a dispenser's too).
-	 */
 	function checkFinished(c: number) {
 		const s = game;
 		if (!s || finished.has(c)) return;
@@ -68,7 +44,6 @@
 		ctl.finished(hex);
 	}
 
-	/** A drawn ant got to its block (meant to, `at`, on a tick): it goes from sight now, with the tune's next note. */
 	function arrived(hex: string, at: number) {
 		ctl.touch();
 		ctl.music?.note(hex, false, at);
@@ -85,13 +60,8 @@
 			isStuck: E.isStuck,
 			reset: (s) => {
 				ants?.clear();
-				// Colors already done here aren't heard again.
 				finished = new Set(s.colors.map((_, c) => c).filter((c) => !E.foodLeft(s, c)));
 			},
-			// A tick is a sixteenth of the music; ants get to
-			// their blocks on its eighths, each with a tune note or, between them, a quiet one.
-			// Each arrival warms the music, as a move does in Mosaic, so a busy colony swells it.
-			// Its songs may be in 3/4, 5/4 or 7/8, and swing a little: ants then step in the swing.
 			rhythm: {
 				beat: TICK_MS,
 				fill: true,
@@ -116,27 +86,21 @@
 	);
 	const game = $derived(ctl.state);
 
-	/** Brief visual cues for a tap that can't go: a linked group, a locked column (its lane and key), the slots. */
 	const flashGroup = ctl.cue(-1);
 	const flashCol = ctl.cue(-1);
 	const slotsFlash = ctl.cue(false);
 
-	/** How far the front colony lightens toward white on hover; its count's ink is picked again for that shade. */
 	const HOVER_LIGHTEN = 0.22;
 
-	// ---------- what to draw ----------
-	/** The parts of the state the template shows, read through `version` so moves redraw them. */
 	const view = $derived.by(() => {
 		void ctl.version;
 		if (!game) return null;
-		// A block stays in sight until its drawn ant gets there (see AntLayer.bound).
 		const alive = game.alive.slice();
 		for (const cell of ants?.bound ?? []) alive[cell] = true;
 		return {
 			alive,
 			slots: game.slots.slice(),
 			left: E.blocksLeft(game),
-			/** Each dispenser's tile: the color it hands out now and how many more of it. */
 			dispensers: new Map(game.dispensers?.map((d) => [d.cell, E.dispensing(d)]))
 		};
 	});
@@ -147,18 +111,15 @@
 		if (!s) return null;
 		const out = E.outside(s);
 		const keys: Record<number, number> = {};
-		/** Per column: whether its lock is still there. */
 		const locked = s.locks.map((cell, k) => cell >= 0 && E.hasLock(s, k, out));
 		locked.forEach((on, k) => {
 			if (on) keys[s.locks[k]] = k;
 		});
-		// Working colonies with nothing of their color to reach are just waiting.
 		const hungry = s.slots.map((e) => !!e && E.isWaiting(s, e, out));
 		return { out, keys, locked, hungry };
 	});
 
 	type Item = { kind: 'colony'; e: Colony; front: boolean } | { kind: 'lock'; key: number };
-	/** Each column top to bottom, with its lock in front of the colony it blocks. */
 	const columnItems = $derived.by(() => {
 		void ctl.version;
 		if (!game || !board) return [];
@@ -174,10 +135,6 @@
 
 	const difficulty = $derived(ctl.level ? levelDifficulty(ctl.level) : null);
 
-	/**
-	 * Markers, read from the deal so sends, undo and restart never change them:
-	 * each linked group's color, and each lock's color.
-	 */
 	const marks = $derived.by(() => {
 		const deal = ctl.initial;
 		return {
@@ -187,13 +144,11 @@
 	});
 	const linkColor = (e: Colony) => (e.link === undefined ? undefined : marks.link.get(e.link));
 
-	/** Each linked group's rails in the slots and in the lanes, and the groups each lane hides. */
 	const links = $derived.by(() => {
 		void ctl.version;
 		const collect = (
 			put: (add: (e: Colony | null, col: number, depth: number) => void) => void
 		) => {
-			// Built fresh each time and never drawn, so it needn't be reactive.
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			const byGroup = new Map<number, Group>();
 			put((e, col, depth) => {
@@ -219,11 +174,8 @@
 			cols: columnItems.length,
 			rows: VISIBLE,
 			taken: (col, depth) => depth < columnItems[col].length,
-			// Rails keep to the gaps between lanes and the strip above them.
 			channels: true
 		});
-		// Per lane: the linked groups among its colonies out of sight, nearest first.
-		// No rail reaches them, so each gets a ring in its color by the lane's count.
 		const late: Record<number, { g: number; color: string }[]> = {};
 		columnItems.forEach((items, col) => {
 			for (const item of items.slice(VISIBLE)) {
@@ -235,24 +187,17 @@
 		return { slots, lanes, late };
 	});
 
-	/**
-	 * The group whose lane the pointer is over, when that lane's front colony is
-	 * linked: a tap sends the whole group, so every member it can see lightens.
-	 */
 	let hoverGroup = $state<number | undefined>(undefined);
 	function hoverLane(k: number, on: boolean) {
 		const head = columnItems[k]?.[0];
 		hoverGroup = on && head?.kind === 'colony' ? head.e.link : undefined;
 	}
 
-	/** What a screen reader hears for a front colony. */
 	function colonyLabel(e: Colony) {
 		const name = game!.colors[e.c].key;
 		return `${name} colony, ${plural(e.n, 'ant', 'ants')}${e.link !== undefined ? ', linked' : ''}`;
 	}
 
-	// ---------- moves ----------
-	/** When the last tick ran: an ant's block goes on a tick, so its walk is timed to end on one. */
 	let lastTick = 0;
 
 	function send(col: number) {
@@ -274,19 +219,12 @@
 	let stageEl: HTMLElement | undefined = $state();
 
 	let pictureEl: HTMLElement | undefined = $state();
-	/**
-	 * Ants leave their slot and walk the path the engine found: up out of the slot
-	 * into the picture's margin, along it and in through cleared space to the food.
-	 * The engine starts each path at its slot's door on the bottom edge; the walk
-	 * along that edge is cut to start above the slot, where the ant comes out.
-	 */
 	function launch(list: E.Dispatch[]) {
 		const s = game;
 		if (!ants || !stageEl || !pictureEl || !s || ctl.still) return;
 		const box = stageEl.getBoundingClientRect();
 		const first = pictureEl.querySelector<HTMLElement>('.px');
 		if (!first) return;
-		// CSS sizes the picture (see .forage in the styles); read the result.
 		const cellPx = first.offsetWidth;
 		const pitch = cellPx + (parseFloat(getComputedStyle(pictureEl).columnGap) || 0);
 		const r0 = first.getBoundingClientRect();
@@ -307,21 +245,18 @@
 			if (!slot) continue;
 			const sx = slot.left + slot.width / 2 - box.left;
 			const pts = E.antPath(s, d);
-			// Join the path at its bottom-edge point nearest the slot.
 			let j = 0;
 			for (let k = 1; k < pts.length && pts[k].y === s.h; k++) {
 				if (Math.abs(at(pts[k]).x - sx) < Math.abs(at(pts[j]).x - sx)) j = k;
 			}
 			const path = [{ x: sx, y: slot.top - box.top }, { x: sx, y: edgeY }, ...pts.slice(j).map(at)];
 			const size = Math.max(3, Math.round(cellPx * 0.32));
-			// Its block goes on the eta-th tick from the last one (a tap's ants leave between ticks);
-			// the ant gets there on the next eighth, the block in sight till then.
+			// Arrive on the clock's next gear line, so every arrival sounds on the beat.
 			const arrives = ctl.clock.next(lastTick + d.eta * ctl.clock.ms, ctl.clock.gear);
 			ants.run(path, d.cell, arrives, s.colors[d.c].hex, size);
 		}
 	}
 
-	/** One step of time: working colonies eat. Paused while the end panel shows or the picture is done. */
 	function runTick() {
 		const s = game;
 		if (!s || ctl.overlay || ctl.won) return;
@@ -332,31 +267,22 @@
 		}
 		if (r.eaten.length) {
 			ctl.touch();
-			// Drawn ants play the tune as they get to their blocks; with none drawn, the clock does.
 			if (ctl.still) ctl.music?.note(s.colors[r.eaten[0].c].hex);
 			if (r.unlocked.length) {
 				ctl.say(`Column ${r.unlocked.map((k) => k + 1).join(' and ')} opened.`);
 				ctl.music?.chime();
 			}
-			// A color's last food eaten with no drawn ant to show it: heard now.
 			for (const c of new Set(r.eaten.map((e) => e.c))) checkFinished(c);
 			if (r.won) settle();
 		} else {
-			// Nothing eaten: maybe nothing can be, so the stuck panel shows (after a moment).
 			settle();
 		}
 	}
 
-	/**
-	 * The board is still once no drawn ant is on its way to a block: the picture
-	 * is done when the last one gets there (as Mosaic's is once its last dot
-	 * lands), so the win's music comes after the last arrival's.
-	 */
 	function settle() {
 		if (!ants?.bound.size) ctl.settle();
 	}
 
-	/** A tap that can't go: show why with a quick cue, not a message. */
 	function explain(reason: string, col: number) {
 		if (reason === 'locked') {
 			flashCol.show(col);
@@ -372,9 +298,6 @@
 
 	onMount(() => {
 		const unmount = ctl.mount();
-		// A tick each of the clock's sixteenths, each timed from the first at this tempo so they
-		// never drift; a new level's tempo counts from its own first. (The game's own clock:
-		// ants meet the music's beat on arriving.)
 		let start = performance.now();
 		let pace = ctl.clock.ms;
 		let timer = 0;
@@ -384,6 +307,7 @@
 				start = lastTick;
 				pace = ctl.clock.ms;
 			}
+			// Time each tick from the first at this tempo, so ticks never drift.
 			lastTick = start + Math.round((now - start) / pace) * pace;
 			runTick();
 			timer = window.setTimeout(loop, lastTick + pace - performance.now());
@@ -400,7 +324,6 @@
 
 <svelte:document onkeydown={ctl.onKey} />
 
-<!-- Linked groups' rails: bars in the group's color in the gaps between colonies, never across one. -->
 {#snippet railBars(list: { g: number; segs: Seg[] }[])}
 	{#each list as r (r.g)}
 		{#each r.segs as seg, j (j)}
@@ -428,7 +351,6 @@
 			style:--lane-gap="{GAP}px"
 			style:--cols={columnItems.length}
 		>
-			<!-- One card: the picture, and the slots and lanes under it. -->
 			<div class="board snapped">
 				<Card>
 					{#key ctl.key}
@@ -441,7 +363,6 @@
 							{#each game.target as c, i (i)}
 								{@const dispenser = c === E.DISPENSER ? view.dispensers.get(i) : undefined}
 								{#if dispenser && view.alive[i]}
-									<!-- A dispenser: what it hands out now and how many more; never what comes after. -->
 									<div
 										class="px dispenser"
 										style:--c={game.colors[dispenser.c].hex}
@@ -455,7 +376,6 @@
 								{:else if view.alive[i]}
 									<div class="px food" data-i={i} style:--c={game.colors[c].hex}>
 										{#if i in board.keys}
-											<!-- A key: ringed in its lock's color. -->
 											<span
 												class="key"
 												class:flash={flashCol.value === board.keys[i]}
@@ -473,7 +393,6 @@
 						</div>
 					{/key}
 
-					<!-- Under the picture: the working slots, then the colonies' lanes. -->
 					<div class="tab">
 						<div class="slots" class:flash={slotsFlash.value} aria-label="Working slots">
 							{#each view.slots as e, k (k)}
@@ -494,7 +413,6 @@
 													? 'Waiting'
 													: 'Working'}: {colonyLabel(e)}"
 										>
-											<!-- Counts down as its ants leave. -->
 											<span class="count">{done ? '✓' : e.n > 0 ? e.n : ''}</span>
 										</div>
 									{/if}
@@ -502,12 +420,10 @@
 							{/each}
 							{@render railBars(links.slots)}
 						</div>
-						<!-- The end panel takes the lanes' place, so nothing on the page moves. -->
 						<div class="lanes-area">
 							<div class="lanes" class:hidden={!!ctl.overlay}>
 								{#each columnItems as items, k (k)}
 									{@const head = items[0]}
-									<!-- A lane is one button: tapping it sends the colony at its front. -->
 									<button
 										class="lane"
 										class:flash={flashCol.value === k}
@@ -528,7 +444,6 @@
 									>
 										{#each items.slice(0, VISIBLE) as item (item.kind === 'lock' ? 'lock' : item.e.id)}
 											{#if item.kind === 'lock'}
-												<!-- Ringed in its key's color. -->
 												<span
 													class="lock"
 													style:--m={marks.lock[k]}
@@ -601,7 +516,6 @@
 			<div
 				class="ant-layer"
 				{@attach (node) => {
-					// A drawn ant got to its block: it goes from sight now, with the tune's next note.
 					ants = new AntLayer(node, arrived, () => BEAT_TICKS * ctl.clock.ms);
 				}}
 				aria-hidden="true"
@@ -611,18 +525,12 @@
 </div>
 
 <style>
-	/* Forage follows the site's look: flat colors, 2px inset rings, Courier for numbers. */
-	/*
-	 * The picture sizes itself: a food's pitch is as big as fits the row's width
-	 * (container units) and half the small viewport height (steady while a phone's
-	 * address bar comes and goes), with a walking margin of a cell all around.
-	 */
 	.forage {
 		container-type: inline-size;
 		--gap: 2px;
 		--room-w: calc(min(100cqw, 640px) - 40px);
+		/* svh stays steady while a phone's address bar comes and goes. */
 		--room-h: max(50svh, 180px);
-		/* Whole pixels, so every piece of food sits on the pixel grid. */
 		--pitch: round(
 			down,
 			clamp(
@@ -633,22 +541,18 @@
 			1px
 		);
 		--cell: calc(var(--pitch) - var(--gap));
-		/* The picture with its walking ring, (w + 2) cells and (w + 3) gaps, in the card's bevel. */
 		--picture-w: calc((var(--w) + 2) * var(--pitch) + var(--gap) + 2 * var(--border-size));
+		/* size() in marks.ts assumes these two sizes. */
 		--slot-size: 52px;
 		--colony: 36px;
 		--muted: color-mix(in srgb, var(--text-color) 65%, var(--primary-color));
 		--hole: color-mix(in srgb, var(--text-color) 18%, var(--primary-color));
 
-		/*
-		 * The page centers its content, which can land on half a pixel. So the game
-		 * spans the content and centers itself with whole-pixel padding, and its parts
-		 * are centered with whole-pixel margins (--snap-w) rather than by flex.
-		 */
 		box-sizing: border-box;
 		width: 100%;
+		/* The page can center on half a pixel, so the game centers itself with whole-pixel padding. */
 		padding-inline: max(0px, round(down, calc((100% - 720px) / 2), 1px));
-		/* Quick taps are moves, so a double tap shouldn't zoom the page. Pinch still does. */
+		/* Quick taps are moves, so a double tap must not zoom. */
 		touch-action: manipulation;
 		display: flex;
 		flex-direction: column;
@@ -666,28 +570,15 @@
 		stroke-linejoin: round;
 	}
 
-	/*
-	 * The picture and the slots are one card (stage.css), so the ants walk out of
-	 * their slot straight into the picture's margin. The card is as wide as the
-	 * wider of the picture and the slots or lanes.
-	 */
 	.stage {
-		/*
-		 * Slots and lanes share one pitch, so a colony is the same size in both. The
-		 * gaps between them, and the strip between the slots and the lanes, are the
-		 * rails' room (GAP in marks.ts).
-		 */
 		--lane-pitch: calc(var(--slot-size) + var(--lane-gap));
-		/* Room under a lane's three colonies for its count and the rings above it. */
 		--lane-foot: 24px;
 		--pad: calc((var(--slot-size) - var(--colony)) / 2);
 		--slots-w: calc(var(--n) * var(--slot-size) + (var(--n) - 1) * var(--lane-gap));
 		--lanes-w: calc(var(--cols) * var(--slot-size) + (var(--cols) - 1) * var(--lane-gap));
-		/* The tab's side padding (roomier than its 8px top and bottom) and bevel on each side. */
 		--tab-pad: 14px;
 		--tab-edges: calc(2 * (var(--tab-pad) + var(--border-size)));
 		--tab-w: calc(max(var(--slots-w), var(--lanes-w)) + var(--tab-edges));
-		/* The card's width, bevel and all. */
 		--board-w: min(100cqw, max(var(--picture-w), var(--tab-w)));
 		position: relative;
 		align-self: stretch;
@@ -696,7 +587,6 @@
 		align-items: flex-start;
 		margin-top: 4px;
 	}
-	/* Inside the tab, the slots and the lanes are each centered on whole pixels. */
 	.slots,
 	.lanes {
 		position: relative;
@@ -711,7 +601,6 @@
 		display: grid;
 		grid-template-columns: repeat(var(--w), var(--cell));
 		gap: var(--gap);
-		/* Room around the edge for the ants to walk, and any extra width split evenly. */
 		padding: var(--ring);
 		padding-left: calc(
 			var(--ring) + round(down, calc((var(--board-w) - var(--picture-w)) / 2), 1px)
@@ -723,7 +612,6 @@
 		height: var(--cell);
 		position: relative;
 	}
-	/* Each food is its own piece, so you can count what a colony is up against. */
 	.food {
 		background: var(--c);
 		border-radius: 2px;
@@ -733,10 +621,6 @@
 		background: var(--hole);
 		border-radius: 2px;
 	}
-	/*
-	 * A dispenser: its color with a ring in the text color, so it can't pass for
-	 * food, and how many more of that color it holds.
-	 */
 	.dispenser {
 		display: grid;
 		place-items: center;
@@ -751,12 +635,6 @@
 		line-height: 1;
 		color: var(--ink);
 	}
-	/*
-	 * A lock and its key share a marker color, only ever as a ring, never a fill,
-	 * so a marker can't pass for food.
-	 * A key keeps its food's color, ringed in its lock's color with a thin grey edge,
-	 * so it shows on any food.
-	 */
 	.key {
 		position: absolute;
 		inset: -3px;
@@ -785,7 +663,6 @@
 		pointer-events: none;
 		z-index: 20;
 	}
-	/* An ant is a small round dot of its food's color, ringed like the site's other pieces. */
 	.ant-layer :global(.ant) {
 		position: absolute;
 		width: var(--size);
@@ -797,7 +674,6 @@
 		will-change: transform;
 	}
 
-	/* The tab: working slots on top, the colonies' lanes under them. */
 	.tab {
 		display: flex;
 		flex-direction: column;
@@ -825,7 +701,6 @@
 		place-items: center;
 	}
 
-	/* Lanes: the end panel and the lanes share one spot. */
 	.lanes-area {
 		align-self: stretch;
 		display: grid;
@@ -839,10 +714,6 @@
 		grid-template-columns: repeat(var(--cols), var(--slot-size));
 		gap: var(--lane-gap);
 	}
-	/*
-	 * A lane holds its colonies on the slots' pitch, front at the top. It's fixed
-	 * at three colonies tall (plus a count of the rest), so the page never moves.
-	 */
 	.lane {
 		position: relative;
 		z-index: 0;
@@ -861,11 +732,6 @@
 		color: var(--text-color);
 		cursor: pointer;
 	}
-	/*
-	 * The whole lane takes the tap, but only the front colony, what a tap sends,
-	 * shows it: it lightens on hover and presses down when tapped. When it's
-	 * linked, the rest of its group lightens with it (.lit), since they go too.
-	 */
 	.colony.front,
 	.colony.linked {
 		transition: background-color 150ms;
@@ -892,7 +758,6 @@
 			0 0 0 2px var(--accent-color);
 	}
 	.colony {
-		/* Its own ring; a linked colony adds its group's halo outside it. */
 		--ring: var(--inset);
 		position: relative;
 		flex: none;
@@ -909,23 +774,14 @@
 		font-weight: 700;
 		font-size: 15px;
 	}
-	/* The site styles every element's text and font, so the count sets its own. */
 	.count {
 		color: var(--ink);
 		font: inherit;
 	}
-	/*
-	 * The front colony, what a tap sends, is raised like a key: a solid ring and a
-	 * lip along its bottom. The ones behind lie flat in full color.
-	 */
 	.colony.front {
 		--ring: inset 0 0 0 2px var(--text-color), inset 0 -5px 0 rgb(0 0 0 / 0.22);
 		padding-bottom: 3px;
 	}
-	/*
-	 * A linked colony wears its group's color as a 2px halo just outside, with a
-	 * thin gap so it never runs into the colony's own color. Its rails meet the halo.
-	 */
 	.colony.linked {
 		box-shadow:
 			var(--ring),
@@ -937,7 +793,6 @@
 			var(--ring),
 			0 0 0 3px var(--accent-color);
 	}
-	/* A lock sits in the lane in front of the colonies it holds back, ringed in its key's color. */
 	.lock {
 		position: relative;
 		flex: none;
@@ -950,7 +805,6 @@
 		background: var(--primary-color);
 		box-shadow: inset 0 0 0 3px var(--m);
 	}
-	/* A rail: one bar of a linked group's path, over the lanes, in the group's color. */
 	.rail {
 		position: absolute;
 		z-index: 1;
@@ -961,10 +815,6 @@
 	.rail.flash {
 		box-shadow: 0 0 0 2px var(--accent-color);
 	}
-	/*
-	 * How many more wait behind the three shown, along the lane's bottom, with a
-	 * ring above it in the color of each linked group among them, nearest first.
-	 */
 	.more {
 		position: absolute;
 		bottom: 2px;
@@ -979,7 +829,6 @@
 		font-size: 12px;
 		color: var(--muted);
 	}
-	/* The site gives every element its own font and color; the count keeps the lane's. */
 	.left {
 		font: inherit;
 		color: inherit;
@@ -988,14 +837,12 @@
 		display: flex;
 		gap: 2px;
 	}
-	/* Five or more overlap like links of a chain, so they fit a phone's lane. */
 	.late.crowded {
 		gap: 0;
 	}
 	.late.crowded .late-ring + .late-ring {
 		margin-left: -2px;
 	}
-	/* A ring like a linked colony's halo, never a fill, so it can't pass for food. */
 	.late-ring {
 		box-sizing: border-box;
 		width: 8px;
@@ -1007,7 +854,6 @@
 		box-shadow: 0 0 0 2px var(--accent-color);
 	}
 
-	/* The lanes give way to the level end, keeping their room. */
 	.hidden {
 		visibility: hidden;
 	}
@@ -1021,7 +867,6 @@
 		}
 	}
 	@media (max-width: 500px) {
-		/* Phones: the picture takes the full width (the page scrolls if the colonies end up below). */
 		.forage {
 			--gap: 1px;
 			--room-w: calc(100cqw - 8px - 2 * var(--border-size));

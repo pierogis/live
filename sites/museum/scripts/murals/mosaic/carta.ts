@@ -1,12 +1,9 @@
-// Olaus Magnus, Carta Marina (1539): a sea chart of the north, its waters full of
-// monsters and ships, its land full of mountains, towns and kings. 5 by 4 panels.
+// Carta Marina, Olaus Magnus (1539).
 import { inell, int, points, round, SIDES, type Canvas, type Point } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const W = 120;
 const H = 88;
-
-// ---------- where the land is ----------
 
 function inpoly(x: number, y: number, pts: Point[]): boolean {
 	let r = false;
@@ -25,20 +22,18 @@ const SCANDINAVIA = points(
 );
 const SCOTLAND = points('-4,75 5,76 9,80 12,84 12,92 -4,92');
 
-// the spot is nudged by waves first, so the coast comes out ragged
 function land(x: number, y: number): boolean {
 	const xj = x + 1.2 * Math.sin(y * 0.9) + 0.8 * Math.sin(y * 2.3 + 1);
 	const yj = y + 1.1 * Math.sin(x * 0.8) + 0.7 * Math.sin(x * 1.9);
 	return (
 		inpoly(xj, yj, SCANDINAVIA) ||
 		inpoly(xj, yj, SCOTLAND) ||
-		inell(xj, yj, 12.5, 15, 10.6, 5.6) || // Iceland
+		inell(xj, yj, 12.5, 15, 10.6, 5.6) ||
 		inell(xj, yj, 43, 68.5, 3.6, 2.1) ||
 		inell(xj, yj, 19.5, 83.5, 3, 2)
 	);
 }
 
-// the cartouche's writing: blocky marks that look like letters and spell nothing
 const GLYPH = [
 	'0,0 0,1 0,2 1,0',
 	'0,0 1,0 1,1 1,2',
@@ -71,8 +66,6 @@ function draw(c: Canvas) {
 			if (LAND[y][x] && onCoast) c.g[y][x] = 'N';
 		}
 	}
-
-	// ---------- small things ----------
 
 	const person = (x: number, y: number, coat: string) => {
 		put(x, y - 3, 'K');
@@ -139,7 +132,6 @@ function draw(c: Canvas) {
 			rect(x - 2, y - 1, x + 2, y - 1, b);
 		}
 	};
-	// a fat line through the points: a tail, a neck, a claw arm
 	const thick = (pts: Point[], r: number, col: string) => {
 		for (let k = 0; k + 1 < pts.length; k++) {
 			const [x0, y0] = pts[k];
@@ -154,7 +146,6 @@ function draw(c: Canvas) {
 		ell(cx, cy, rx, ry, 'W');
 		ell(cx, cy, rx, ry, 'E', (_x, y) => y > cy + ry * 0.35);
 	};
-	// ink the sea dots that touch white, so a pale beast stands out
 	const outline = (x0: number, y0: number, x1: number, y1: number) => {
 		for (let y = y0; y <= y1; y++) {
 			for (let x = x0; x <= x1; x++) {
@@ -164,7 +155,6 @@ function draw(c: Canvas) {
 		}
 	};
 
-	// ---------- 1. Iceland and its volcanoes ----------
 	for (const [x, h] of points('5,3 12,5 20,3')) {
 		mountain(x, 16, h, false);
 		const t = 16 - h;
@@ -179,7 +169,6 @@ function draw(c: Canvas) {
 	house(7, 20);
 	house(16, 20);
 
-	// ---------- 2. ice floes and the white bear ----------
 	ell(33, 10.5, 8.5, 2.6, 'E');
 	rect(26, 9, 28, 9, 'W');
 	rect(38, 9, 40, 9, 'W');
@@ -198,7 +187,6 @@ function draw(c: Canvas) {
 	outline(27, 1, 41, 8);
 	ship(41, 19, 'R', 'W', 'Y');
 
-	// ---------- 3. the sea unicorn ----------
 	at(0, 2);
 	ell(60, 14, 7, 3, 'W');
 	ell(60, 15.6, 6, 1.5, 'E');
@@ -216,7 +204,6 @@ function draw(c: Canvas) {
 	outline(48, 8, 71, 16);
 	boat(65, 7, 'Y');
 
-	// ---------- 4. the reindeer sled ----------
 	mountain(86, 7, 4);
 	mountain(95, 7, 3);
 	at(0, 2);
@@ -236,7 +223,6 @@ function draw(c: Canvas) {
 	at();
 	boat(74, 8, 'W');
 
-	// ---------- 5. the cartouche and the tents ----------
 	rect(100, 3, 116, 13, 'R');
 	rect(101, 4, 115, 12, 'W');
 	for (const [cx, cy] of points('99,2 116,2 99,13 116,13')) rect(cx, cy, cx + 1, cy + 1, 'Y');
@@ -260,7 +246,6 @@ function draw(c: Canvas) {
 	dots('R', [118, 20]);
 	dots('O', [118, 19]);
 
-	// ---------- 6. the whale taken for an island ----------
 	ell(11, 37, 10, 5, 'K');
 	ell(11, 35.2, 8.5, 2.6, 'E');
 	ell(9, 40.6, 6, 1.2, 'W');
@@ -279,14 +264,11 @@ function draw(c: Canvas) {
 	boat(18, 28, 'O');
 	line(15, 29, 14, 33, 'K');
 	dots('K', [13, 34], [15, 34], [14, 34]);
-	// after the boat, so its crown covers the hull
 	tree(18, 32);
 
-	// ---------- 7. the red serpent around a ship ----------
 	ship(36, 36, 'W', 'B', 'Y');
 	const path = points('25,30 27,34 26,39 29,41 33,40 37,37 41,35 44,31 43,27 40,25 37,25');
 	thick(path, 1.1, 'R');
-	// a gold spot on every third dot along its spine
 	let k = 0;
 	for (let s = 0; s + 1 < path.length; s++) {
 		const [x0, y0] = path[s];
@@ -308,7 +290,6 @@ function draw(c: Canvas) {
 	dots('R', [36, 22], [38, 23], [41, 23], [44, 25], [24, 29], [24, 28], [25, 28]);
 	thick(points('42,42 44,40 46,42'), 0.8, 'R');
 
-	// ---------- 8. the maelstrom ----------
 	const MX = 58;
 	const MY = 33;
 	disk(MX, MY, 10, 'B');
@@ -328,7 +309,6 @@ function draw(c: Canvas) {
 	put(66, 23, 'Y');
 	mountain(70, 28, 3);
 
-	// ---------- 9. the king on his throne ----------
 	for (const [x, h] of points('76,4 86,5 95,3')) mountain(x, 30, h);
 	rect(81, 33, 87, 42, 'N');
 	dots('Y', [81, 32], [87, 32], [81, 31], [87, 31]);
@@ -347,7 +327,6 @@ function draw(c: Canvas) {
 	shield(75, 37, 'R', 'Y');
 	shield(93, 38, 'B', 'Y', true);
 
-	// ---------- 10. skiers and a hunter ----------
 	const skier = (x: number, y: number, coat: string, hat: string) => {
 		put(x, y - 4, hat);
 		put(x, y - 3, 'F');
@@ -360,7 +339,6 @@ function draw(c: Canvas) {
 	line(113, 26, 114, 28, 'K');
 	skier(110, 36, 'B', 'R');
 	line(112, 34, 113, 36, 'K');
-	// a deer
 	rect(112, 40, 116, 41, 'N');
 	dots('N', [112, 42], [116, 42], [113, 42], [115, 42], [117, 39], [117, 40], [118, 39]);
 	dots('K', [117, 38], [116, 37], [118, 37], [118, 36], [115, 36]);
@@ -368,7 +346,6 @@ function draw(c: Canvas) {
 	tree(116, 33);
 	boat(101, 38, 'Y');
 
-	// ---------- 11. the giant lobster ----------
 	ell(8.5, 55, 5.5, 3, 'R');
 	disk(13.5, 55, 2.6, 'R');
 	for (const x of [5, 7, 9, 11]) {
@@ -397,7 +374,6 @@ function draw(c: Canvas) {
 	rect(16, 55, 21, 55, 'K');
 	put(22, 54, 'K');
 
-	// ---------- 12. the pristis and a ship ----------
 	ell(31, 59, 6.5, 4.2, 'K');
 	disk(36, 55.5, 3.6, 'K');
 	ell(31, 61.6, 5, 1.4, 'E');
@@ -411,7 +387,6 @@ function draw(c: Canvas) {
 	thick(points('25,58 25,54 26,51'), 0.8, 'K');
 	dots('K', [25, 49], [27, 49], [24, 50], [28, 50]);
 	spout(33, 45, 51);
-	// the second jet arcs onto the ship
 	for (let i = 0; i < 11; i++) {
 		const t = i / 10;
 		const rise = 6 * Math.sin(t * Math.PI) * 0.9;
@@ -420,7 +395,6 @@ function draw(c: Canvas) {
 	}
 	ship(43, 61, 'Y', 'R', 'B');
 
-	// ---------- 13. the green tusked monster ----------
 	ell(57, 56, 7, 5, 'G');
 	ell(58, 59.6, 5, 1.3, 'L');
 	for (const x of [55, 58, 61]) dots('R', [x, 50], [x + 1, 50], [x, 49]);
@@ -437,7 +411,6 @@ function draw(c: Canvas) {
 	dots('G', ...points('54,62 55,62 60,62 61,62 64,54 64,53 63,52 65,52 64,55'));
 	dots('K', [53, 62], [59, 62]);
 
-	// ---------- 14. the red-roofed town ----------
 	ell(77.5, 48.5, 4.5, 2.4, 'B');
 	dots('W', [77, 48], [78, 48], [78, 47]);
 	rect(77, 57, 92, 59, 'E');
@@ -454,7 +427,6 @@ function draw(c: Canvas) {
 	put(85, 53, 'K');
 	shield(90, 48, 'R', 'W');
 
-	// ---------- 15. a ship in the gulf, and a castle ----------
 	boat(101, 54, 'R', 'Y');
 	rect(110, 54, 117, 57, 'E');
 	tower(109, 57, 5);
@@ -462,11 +434,9 @@ function draw(c: Canvas) {
 	rect(113, 55, 114, 57, 'K');
 	house(112, 53);
 	for (let x = 110; x < 118; x += 2) put(x, 53, 'E');
-	// a seal
 	dots('W', [112, 63], [113, 63], [113, 62]);
 	dots('K', [114, 63]);
 
-	// ---------- 16. the compass rose and Scotland ----------
 	const CX = 15;
 	const CY = 73;
 	disk(CX, CY, 6.3, 'K');
@@ -491,7 +461,6 @@ function draw(c: Canvas) {
 	tower(3, 85, 3);
 	house(7, 86);
 
-	// ---------- 17. barrels for the whale ----------
 	ell(39, 77, 7, 3.6, 'K');
 	ell(38.5, 79.4, 5, 1.2, 'W');
 	rect(32, 77, 35, 78, 'R');
@@ -509,11 +478,9 @@ function draw(c: Canvas) {
 	barrel(29, 79);
 	barrel(27, 81);
 	boat(29, 73, 'O', 'Y');
-	// the map's scale bar
 	for (let i = 0, x = 27; x < 45; i++, x += 3) rect(x, 84, x + 2, 85, i % 2 === 0 ? 'K' : 'W');
 	dots('R', [26, 84], [26, 85], [45, 84], [45, 85], [26, 83], [45, 83]);
 
-	// ---------- 18. the sea owl ----------
 	disk(56, 75, 6, 'N');
 	dots('O', ...points('52,78 54,79 56,78 58,79 60,78 55,80 57,80'));
 	disk(53.5, 73.5, 2.1, 'W');
@@ -527,7 +494,6 @@ function draw(c: Canvas) {
 	dots('O', [49, 75], [49, 76], [50, 77], [54, 82], [58, 82]);
 	dots('K', [53, 82], [57, 82]);
 
-	// ---------- 19. the Danish sound ----------
 	shield(87, 68, 'B', 'Y', true);
 	house(80, 69);
 	house(91, 69);
@@ -536,7 +502,6 @@ function draw(c: Canvas) {
 	ship(88, 81, 'W', 'R', 'Y');
 	for (const x of [58, 64, 79, 95]) house(x, 86);
 
-	// ---------- 20. the Baltic coast ----------
 	ship(103, 77, 'O', 'W', 'B');
 	rect(113, 74, 118, 76, 'E');
 	tower(113, 76, 4);
@@ -545,11 +510,9 @@ function draw(c: Canvas) {
 	shield(115, 83, 'R', 'W');
 	house(100, 86);
 	house(105, 86);
-	// a seal
 	dots('W', [98, 68], [99, 68], [99, 67]);
 	dots('K', [100, 68]);
 
-	// ---------- forests: a tree wherever bare land surrounds a grid spot ----------
 	const bare = (x: number, y: number) => ['C', 'L'].includes(get(x, y));
 	k = 0;
 	for (let y = 4; y < H - 1; y += 5) {
@@ -570,7 +533,6 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// ---------- a border of black and gold dashes ----------
 	const dash = (i: number) => (Math.floor(i / 3) % 2 === 0 ? 'K' : 'Y');
 	for (let i = 0; i < W; i++) dots(dash(i), [i, 0], [i, H - 1]);
 	for (let i = 0; i < H; i++) dots(dash(i), [0, i], [W - 1, i]);
@@ -583,7 +545,6 @@ export const carta: Mural = {
 	notes: 'E',
 	difficulty: 0.35,
 	cols: 5,
-	// S, B, T the sea's three blues; C sand and L meadow; N brown, also the coastline; K ink.
 	palette: {
 		S: '#86c2e6',
 		B: '#2c62b0',

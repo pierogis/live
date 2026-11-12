@@ -1,4 +1,3 @@
-/* Mosaic's line per level in `pnpm -F museum levels`. Pure, with `.ts` imports, for node. */
 import type { Rules } from '../shared/rules.ts';
 import type { Level } from './engine.ts';
 import { reportLevel } from './report.ts';

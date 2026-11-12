@@ -15,7 +15,6 @@ import { loadLevels } from './levels.ts';
 
 const ids = (n: number, prefix = 'level') => Array.from({ length: n }, (_, i) => `${prefix}-${i}`);
 
-/** A stand-in for `document.cookie`: writes set one cookie, reads give them all. */
 function fakeCookies() {
 	const jar = new Map<string, string>();
 	const doc = {
@@ -75,7 +74,6 @@ test('hashes that match no level are skipped', () => {
 	const save = decode(value, ['level-1', 'other']);
 	assert.deepEqual(save.completed, { 'level-1': true });
 	assert.equal(save.level, 0, 'a removed level resumes at the start');
-	// Junk and a stray partial hash are ignored too.
 	assert.deepEqual(decode(`d=${idHash('level-1')}!!!!ab`, ['level-1']).completed, {
 		'level-1': true
 	});
@@ -98,7 +96,6 @@ test('update keeps levels finished in another tab', () => {
 	const tabA = gameSave('test', () => levels);
 	const tabB = gameSave('test', () => levels);
 
-	// Tab A reads its save, then tab B finishes two levels.
 	const stale = tabA.loadSave();
 	tabB.update((s) => {
 		s.completed['level-1'] = true;
@@ -106,7 +103,6 @@ test('update keeps levels finished in another tab', () => {
 		s.level = 3;
 	});
 
-	// Tab A changes a setting by mutating the current save: B's progress stays.
 	tabA.update((s) => {
 		s.options.relaxed = true;
 	});
@@ -115,14 +111,12 @@ test('update keeps levels finished in another tab', () => {
 	assert.equal(now.level, 3);
 	assert.equal(now.options.relaxed, true);
 
-	// Even returning a whole stale save can't un-finish a level.
 	const written = tabA.update(() => ({ ...stale, completed: { 'level-5': true }, level: 5 }));
 	now = tabA.loadSave();
 	assert.deepEqual(now, written);
 	assert.deepEqual(now.completed, { 'level-1': true, 'level-2': true, 'level-5': true });
 	assert.equal(now.level, 5);
 
-	// persist still overwrites, for a deliberate reset.
 	tabA.persist(blank());
 	assert.deepEqual(tabA.loadSave(), blank());
 	assert.ok(jar.has(cookieName('test')));
@@ -159,11 +153,8 @@ test('options read as their defaults until set, and an off option stays off', ()
 	assert.deepEqual(g.loadSave().options, { relaxed: true, hints: false });
 	assert.deepEqual(g.saveFromCookie(value).options, { relaxed: true, hints: false });
 
-	// A cookie from before an option existed reads it as its default.
 	assert.deepEqual(g.saveFromCookie('l=&d=&m=0&o=relaxed').options, { relaxed: true, hints: true });
-	// No options, no `o`.
 	assert.doesNotMatch(encode(blank(), ids(1)), /o=/);
-	// Bad keys are refused when a game declares them, and skipped when read.
 	assert.throws(() => gameSave('bad', () => levels, [{ key: 'a.b', label: '' }]));
 	assert.deepEqual(decode('o=ok.-%21%21.-', ids(1)).options, { ok: true });
 });

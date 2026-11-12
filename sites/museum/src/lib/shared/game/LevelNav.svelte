@@ -1,13 +1,7 @@
-<!--
-	The row under a game's board: the previous and the next picture, with where you are
-	between them. Only a game with more than one level shows it.
--->
 <script lang="ts">
 	interface Props {
-		/** The level being played, from 0. */
 		index: number;
 		count: number;
-		/** Each level's own page; without it, `ongo` moves there in place. */
 		href?: (index: number) => string;
 		ongo: (index: number) => void;
 	}

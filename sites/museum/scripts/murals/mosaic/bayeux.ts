@@ -1,14 +1,10 @@
-/*
- * Bayeux Tapestry (England, about 1070s): the Norman conquest stitched in wool on linen,
- * between two borders of little beasts. 6 x 2 panels (144 x 44); each scene has two halves.
- */
+// Bayeux Tapestry (England, about 1070s).
 import { div, int, points } from '../canvas.ts';
 import type { Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const W = 144;
 
-// the writing over the scenes: blocky marks, three dots tall, that spell nothing
 const GLY =
 	'11,10,11 1,1,1 11,11,10 10,10,11 11,01,01 101,111,101 11,10,10 1,1,1 111,010,010 11,11,11'
 		.split(' ')
@@ -21,8 +17,6 @@ const FISH = ['.##..#', '#####.', '.##..#'];
 function draw(c: Canvas) {
 	const { put, rect, disk, line, dots } = c;
 
-	// ---------- helpers ----------
-	// a standing man, feet on row y: tunic t, legs l, facing f (1 right, -1 left), maybe an arm up
 	const man = (
 		x: number,
 		y: number,
@@ -43,7 +37,6 @@ function draw(c: Canvas) {
 			put(x + 4 * f, y - 7, 'F');
 		}
 	};
-	// a galloping horse facing right, hooves on row y; bl is half its body's length
 	const horse = (x: number, y: number, col: string, bl: number, mane: string) => {
 		const P = (dx: number, dy: number, k = col) => put(x + dx, y - dy, k);
 		for (let dx = -bl; dx <= bl; dx++) for (let dy = 3; dy < 7; dy++) P(dx, dy);
@@ -91,14 +84,12 @@ function draw(c: Canvas) {
 		disk(x + 4.5, y - h, 2, b);
 		dots('R', [x, y - h - 2], [x - 4, y - h], [x + 4, y - h]);
 	};
-	// a line of writing from x0 to no further than x1, starting at mark k
 	const caption = (x0: number, x1: number, y: number, k = 0) => {
 		let x = x0;
 		while (true) {
 			const g = GLY[k % GLY.length];
 			if (x + g[0].length - 1 > x1) break;
 			c.stamp(g, x, y, { 1: 'K' });
-			// a wider gap after every third mark, like the space between words
 			x += g[0].length + (k % 3 === 2 ? 3 : 1);
 			k += 1;
 		}
@@ -120,9 +111,6 @@ function draw(c: Canvas) {
 		}
 	};
 
-	// ---------- the borders ----------
-	// five dots tall, top rule on row y0; every 12 dots a pair of slanted bars, then a beast.
-	// panels in `fishes` get fish for beasts; panels in `empty` are left bare
 	const border = (y0: number, fishes: number[] = [], empty: number[] = []) => {
 		const low = y0 > 0 ? 1 : 0;
 		rect(0, y0, W - 1, y0, 'K');
@@ -145,7 +133,6 @@ function draw(c: Canvas) {
 	};
 	border(0);
 	border(39, [3], [4, 5]);
-	// the fallen lie in the lower border under the battle, among shields and broken spears
 	const fallen = (x: number, y: number, t: string, f = 1) => {
 		put(x, y, 'K');
 		put(x + f, y, 'F');
@@ -164,9 +151,7 @@ function draw(c: Canvas) {
 	line(107, 42, 110, 40, 'K');
 	line(127, 40, 129, 42, 'K');
 
-	// ---------- 1. the king in his palace / riders with hawks and hounds ----------
 	caption(5, 18, 6);
-	// the palace: two towers, a chequered roof on two pillars
 	for (const tx of [0, 21]) {
 		rect(tx, 8, tx + 2, 20, 'N');
 		rect(tx, 7, tx + 2, 7, 'R');
@@ -180,7 +165,6 @@ function draw(c: Canvas) {
 	rect(7, 12, 7, 20, 'T');
 	rect(16, 12, 16, 20, 'T');
 	dots('T', [8, 12], [15, 12], [6, 12], [17, 12], [3, 12], [20, 12]);
-	// the king on his throne, crowned, a sceptre in one hand
 	rect(8, 14, 8, 20, 'Y');
 	rect(15, 14, 15, 20, 'Y');
 	put(8, 13, 'R');
@@ -199,7 +183,6 @@ function draw(c: Canvas) {
 	man(19, 20, 'R', 'T', -1);
 	rect(0, 21, 23, 21, 'K');
 	for (let x = 1; x < 24; x += 3) put(x, 21, 'Y');
-	// lower: a rider with a hawk on his fist
 	ground(0, 23, 38, 'S', 'Y', 2);
 	hill(18.5, 38, 8.5, 6);
 	caption(13, 23, 22, 2);
@@ -217,10 +200,8 @@ function draw(c: Canvas) {
 	dots('K', [2, 24], [3, 23], [4, 24], [5, 23]);
 	dots('N', [3, 24], [4, 23]);
 
-	// ---------- 2. the comet / the feast ----------
 	caption(25, 37, 6, 5);
 	ground(24, 47, 21, 'T', 'S', 1);
-	// the comet, its tail streaming down to the left
 	disk(43, 9, 2.1, 'Y');
 	rect(42, 8, 44, 10, 'R');
 	put(43, 9, 'Y');
@@ -234,7 +215,6 @@ function draw(c: Canvas) {
 	for (let i = 0; i < 4; i++) {
 		man(25 + i * 4, 20, 'RTYN'[i], 'NKRT'[i], 1, { up: true, hair: i % 2 ? 'K' : 'R' });
 	}
-	// the feast hall: roof, side posts and a beam
 	for (let x = 24; x < 48; x++) {
 		put(x, 23, div(x, 2) % 2 ? 'N' : 'R');
 		put(x, 24, div(x, 2) % 2 ? 'R' : 'N');
@@ -243,7 +223,6 @@ function draw(c: Canvas) {
 	rect(24, 25, 25, 37, 'T');
 	rect(46, 25, 47, 37, 'T');
 	rect(24, 25, 47, 25, 'Y');
-	// five diners with drinking horns, behind a table with a striped cloth
 	for (let i = 0; i < 5; i++) {
 		const x = 28 + i * 4;
 		put(x, 27, i % 2 ? 'K' : 'R');
@@ -265,12 +244,10 @@ function draw(c: Canvas) {
 		put(x, 38, div(x, 3) % 2 ? 'N' : 'S');
 	}
 
-	// ---------- 3. felling trees / building ships ----------
 	caption(55, 64, 6, 1);
 	ground(48, 71, 21, 'S', 'T', 1);
 	tree(52, 20, 9);
 	tree(65, 20, 9, 'T', 'S');
-	// a woodman swinging his axe high at the left tree
 	man(57, 20, 'R', 'N', -1, { hair: 'R' });
 	dots('R', [55, 16], [54, 15]);
 	put(53, 14, 'F');
@@ -286,7 +263,6 @@ function draw(c: Canvas) {
 	rect(58, 12, 61, 12, 'R');
 	caption(52, 66, 22, 6);
 	ground(48, 71, 38, 'Y', 'S', 2);
-	// the ship on the stocks: planks narrowing to the keel, gold-tipped stem and stern, props
 	['R', 'Y', 'N', 'T', 'R'].forEach((k, i) => rect(51 + i, 30 + i, 68 - i, 30 + i, k));
 	dots('R', [50, 29], [49, 28], [49, 27], [48, 26], [69, 29], [70, 28], [70, 27], [71, 26]);
 	dots('Y', [48, 25], [49, 25], [71, 25], [70, 25]);
@@ -302,7 +278,6 @@ function draw(c: Canvas) {
 		dots('N', [x + 2, 26], [x + 4, 26]);
 	});
 
-	// ---------- 4. the crossing ----------
 	for (let y = 30; y < 39; y++) {
 		for (let x = 72; x < 96; x++) {
 			const yy = y + Math.sin((x * Math.PI) / 6) * 1.6;
@@ -343,9 +318,7 @@ function draw(c: Canvas) {
 		}
 	});
 
-	// ---------- 5. the charge / the shield wall ----------
 	ground(96, 119, 21, 'Y', 'S', 2);
-	// a knight at the gallop, with shield and lance; bl is half his horse's length
 	const knight = (
 		x: number,
 		bl: number,
@@ -370,7 +343,6 @@ function draw(c: Canvas) {
 	dots('K', [107, 7], [108, 6], [109, 7], [110, 6]);
 	ground(96, 119, 38, 'S', 'T', 2);
 	caption(97, 105, 22);
-	// a horse on its back, legs in the air
 	rect(98, 31, 104, 33, 'T');
 	for (const x of [98, 100, 102, 104]) {
 		const outer = x === 98 || x === 104;
@@ -380,7 +352,6 @@ function draw(c: Canvas) {
 	dots('T', [97, 33], [97, 34], [96, 34], [96, 35], [97, 35], [96, 33]);
 	put(98, 34, 'R');
 	dots('K', [105, 32], [105, 33], [105, 34]);
-	// the shield wall: four men on foot, each with a helmet, a spear and a kite shield
 	for (let i = 0; i < 4; i++) {
 		const x = 108 + i * 3;
 		put(x, 27, 'N');
@@ -395,7 +366,6 @@ function draw(c: Canvas) {
 		dots('K', [x - 1, 33], [x + 1, 33], [x - 1, 34], [x + 1, 34], [x - 1, 35], [x + 1, 35]);
 	}
 
-	// ---------- 6. the castle on its mound / the king is struck ----------
 	for (let y = 11; y < 22; y++) {
 		for (let x = 120; x < 144; x++) {
 			const d = ((x - 132) / 11.5) ** 2 + ((y - 22) / 8.5) ** 2;
@@ -419,7 +389,6 @@ function draw(c: Canvas) {
 		man(x, 35, 'SY'[i], 'N', 1, { hair: 'RK'[i] });
 		dots('N', [x + 2, 29], [x + 3, 30], [x + 3, 31], [x + 2, 32]);
 	});
-	// the king in his gold crown, with the arrow that strikes him
 	man(133, 35, 'T', 'R', -1, { helm: 'Y' });
 	put(133, 27, 'Y');
 	put(132, 28, 'Y');
@@ -428,7 +397,6 @@ function draw(c: Canvas) {
 	put(131, 31, 'T');
 	put(130, 30, 'F');
 	kite(134, 30, 'R', 'Y');
-	// his standard bearer on the hill, holding the red dragon banner
 	man(139, 31, 'N', 'K', -1, { helm: 'K' });
 	rect(142, 22, 142, 32, 'K');
 	dots('R', [138, 22], [139, 22], [140, 22], [141, 22], [139, 23], [141, 23]);
@@ -443,7 +411,6 @@ export const bayeux: Mural = {
 	notes: 'Bb',
 	difficulty: 0.4,
 	cols: 6,
-	// L linen, R terracotta, N dark blue, T blue-green, S sage, Y mustard, K dark brown, F flesh
 	palette: {
 		L: '#f1e6cb',
 		R: '#b8452c',

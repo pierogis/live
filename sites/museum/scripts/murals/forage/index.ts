@@ -1,4 +1,3 @@
-/* Forage's murals. They play in the order they measure (`playOrder`), easiest first. */
 import type { Mural } from '../mural.ts';
 import { apocalypse } from './apocalypse.ts';
 import { bonad } from './bonad.ts';

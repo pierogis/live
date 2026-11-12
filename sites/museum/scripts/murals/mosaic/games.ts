@@ -1,25 +1,18 @@
-/*
- * Pieter Bruegel the Elder, Children's Games (1560): a town square seen from above,
- * packed with children, every group playing a different game. 5 by 4 panels (120 x 88).
- */
+// Children's Games, Pieter Bruegel the Elder (1560).
 import { int, mod, points, round, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const W = 120;
 const H = 88;
 
-// the lower edge of the green in the top left corner, by column
 const edge = (x: number) => 29 - (x / 25) ** 3 * 29 + 1.5 * Math.sin(x * 0.9);
-// the stream's middle row, by column
 const sy = (x: number) => round(9 + 4 * Math.sin(x / 5 + 0.6));
-// the street's left and right edges, by row; it narrows toward the top
 const xl = (y: number) => 104 - (y * 20) / 43;
 const xr = (y: number) => 109 - (y * 10) / 43;
 
 function draw(c: Canvas) {
 	const { put, rect, disk, ell, line, dots, ring } = c;
 
-	// ---------- the square: scalloped bands of two sands, a few gray cobbles ----------
 	for (let y = 0; y < H; y++) {
 		for (let x = 0; x < W; x++) {
 			const yy = y + Math.sin((x * Math.PI) / 9) * 2;
@@ -28,7 +21,6 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// a child about 3 wide and 4 tall, feet at (x, y); '' for no hat or no legs
 	const kid = (
 		x: number,
 		y: number,
@@ -59,7 +51,6 @@ function draw(c: Canvas) {
 		dots('G', [x - 1, y - tall - r], [x, y - tall - r - 1], [x + 2, y - tall - r + 1]);
 	};
 
-	// ---------- top left: the green with its stream ----------
 	for (let x = 0; x < 27; x++) {
 		for (let y = 0; y < H; y++) {
 			if (y < edge(x)) {
@@ -97,7 +88,6 @@ function draw(c: Canvas) {
 	tree(4, 31, 3, 3);
 	dots('D', [10, 25], [11, 25], [11, 24], [15, 22], [16, 22], [16, 21]);
 
-	// ---------- the big building with its arcade ----------
 	const BX0 = 33;
 	const BX1 = 60;
 	rect(BX0 - 1, 2, BX1 + 1, 5, 'E');
@@ -118,7 +108,6 @@ function draw(c: Canvas) {
 		rect(wx, 17, wx + 2, 20, 'K');
 		rect(wx, 21, wx + 2, 21, 'W');
 	}
-	// children at the windows: one trails a streamer, one wears a mask
 	put(46, 9, 'F');
 	dots('R', [45, 10], [46, 10], [47, 10], [46, 11]);
 	line(45, 12, 43, 19, 'W');
@@ -136,7 +125,6 @@ function draw(c: Canvas) {
 		rect(a, 39, b, 40, 'E');
 	}
 	rect(BX0 - 1, 41, BX1 + 1, 41, 'E');
-	// children whipping tops under the arches and beside the building
 	const top = (x: number, y: number) => {
 		rect(x - 1, y - 1, x + 1, y - 1, 'W');
 		put(x, y, 'R');
@@ -154,7 +142,6 @@ function draw(c: Canvas) {
 	top(30, 37);
 	kid(29, 43, 'W', 'R', { dress: true });
 
-	// the tree being climbed: one halfway up the trunk, one waiting, one up in the leaves
 	rect(28, 9, 29, 24, 'K');
 	disk(28.5, 5.5, 4.4, 'D');
 	dots('G', [26, 4], [27, 3], [30, 6], [31, 5], [28, 7]);
@@ -166,7 +153,6 @@ function draw(c: Canvas) {
 	put(27, 5, 'F');
 	dots('B', [26, 6], [27, 6], [28, 6]);
 
-	// ---------- stilts beside the building ----------
 	kid(64, 12, 'R', 'B', { legs: '' });
 	rect(63, 12, 63, 21, 'K');
 	rect(65, 12, 65, 21, 'K');
@@ -178,7 +164,6 @@ function draw(c: Canvas) {
 		rect(x, 0, x, dark ? 3 : 2, dark ? 'D' : 'G');
 	}
 
-	// ---------- the street running to the top right ----------
 	for (let y = 3; y < 47; y++) {
 		let a = round(xl(Math.min(y, 43)));
 		let b = round(xr(Math.min(y, 43)));
@@ -198,7 +183,6 @@ function draw(c: Canvas) {
 		}
 	}
 	dots('W', [111, 0], [112, 0], [113, 0], [112, 1], [117, 1], [118, 1]);
-	// three houses down the left side, seen from the front
 	[...'WNW'].forEach((wall, i) => {
 		const y0 = 1 + 10 * i;
 		const y1 = y0 + 9;
@@ -222,7 +206,6 @@ function draw(c: Canvas) {
 	sideHouse('N', 'K', 4, 12);
 	sideHouse('W', 'R', 13, 22);
 	sideHouse('N', 'K', 23, 32);
-	// follow the leader, up the street, behind a flag
 	kid(105, 8, 'R', 'K');
 	kid(103, 13, 'B', 'W');
 	kid(100, 18, 'W', 'R');
@@ -231,7 +214,6 @@ function draw(c: Canvas) {
 	line(106, 6, 106, 3, 'K');
 	rect(107, 3, 108, 4, 'R');
 
-	// ---------- ring dance ----------
 	for (let i = 0; i < 8; i++) {
 		const a = (2 * Math.PI * i) / 8 + 0.4;
 		const x = round(78 + 5.5 * Math.cos(a));
@@ -240,7 +222,6 @@ function draw(c: Canvas) {
 	}
 	dots('N', [78, 12], [79, 12], [78, 13], [79, 13]);
 
-	// ---------- headstands and tumbling ----------
 	const headstand = (x: number, y: number, col: string) => {
 		put(x, y, 'F');
 		put(x - 1, y, 'K');
@@ -257,7 +238,6 @@ function draw(c: Canvas) {
 	put(14, 34, 'K');
 	kid(21, 34, 'G', 'R', { up: true });
 
-	// ---------- blind man's buff ----------
 	kid(66, 36, 'B');
 	put(66, 33, 'W');
 	put(66, 32, 'W');
@@ -273,7 +253,6 @@ function draw(c: Canvas) {
 	kid(70, 42, 'R', 'B', { up: true });
 	kid(50, 43, 'B', 'W', { dress: true });
 
-	// ---------- tug of war ----------
 	kid(74, 40, 'R', 'K');
 	kid(78, 40, 'W', 'R');
 	kid(82, 40, 'R', 'B');
@@ -291,8 +270,6 @@ function draw(c: Canvas) {
 	put(74, 25, 'W');
 	put(76, 25, 'W');
 
-	// ---------- piggyback fight ----------
-	// one child carrying another, the rider reaching out toward side d
 	const piggy = (x: number, y: number, c1: string, c2: string, d: number) => {
 		kid(x, y, c1);
 		put(x, y - 4, c2);
@@ -307,7 +284,6 @@ function draw(c: Canvas) {
 	piggy(113, 42, 'G', 'W', -1);
 	kid(118, 41, 'R', 'K', { up: true });
 
-	// ---------- fence riders ----------
 	for (const px of [1, 8, 15, 22]) rect(px, 51, px, 60, 'N');
 	rect(0, 54, 23, 54, 'N');
 	rect(0, 57, 23, 57, 'N');
@@ -330,8 +306,6 @@ function draw(c: Canvas) {
 	put(12, 63, 'R');
 	kid(20, 47, 'B', 'R', { dress: true });
 
-	// ---------- wedding procession ----------
-	// two rows of five, walking up to the right; each child: coat, hat, d for a dress
 	const topRow = 'BK WRd RKd WB GRd'.split(' ');
 	const botRow = 'RWd GK KWd BR RWd'.split(' ');
 	for (let i = 0; i < 5; i++) {
@@ -350,8 +324,6 @@ function draw(c: Canvas) {
 	kid(30, 47, 'G', 'W', { up: true });
 	kid(40, 65, 'W', 'B', { dress: true });
 
-	// ---------- leapfrog ----------
-	// a child bent over, hands on knees, head to the right
 	const back = (x: number, y: number, col: string) => {
 		rect(x - 1, y - 2, x + 2, y - 1, col);
 		put(x - 1, y, 'K');
@@ -375,7 +347,6 @@ function draw(c: Canvas) {
 	disk(57, 45, 1.3, 'W');
 	put(57, 45, 'B');
 
-	// ---------- riding the barrel ----------
 	ell(83, 59, 6.5, 4.2, 'N');
 	rect(79, 55, 79, 63, 'K');
 	rect(83, 55, 83, 63, 'K');
@@ -394,7 +365,6 @@ function draw(c: Canvas) {
 	kid(80, 52, 'W', 'R');
 	put(78, 50, 'W');
 
-	// ---------- the long wall down the right side ----------
 	rect(113, 44, 119, 87, 'N');
 	rect(112, 44, 112, 87, 'K');
 	for (const y of [47, 57, 76]) {
@@ -406,7 +376,6 @@ function draw(c: Canvas) {
 	rect(114, 64, 117, 70, 'K');
 	kid(116, 70, 'W', 'R', { legs: 'E' });
 
-	// ---------- running the gauntlet ----------
 	for (let i = 0; i < 4; i++) {
 		const x = 99 + i * 4;
 		put(x, 49, i % 2 ? 'K' : 'R');
@@ -426,7 +395,6 @@ function draw(c: Canvas) {
 	put(102, 56, 'K');
 	put(101, 56, 'K');
 
-	// ---------- the shed and the hobby horse ----------
 	rect(0, 70, 12, 85, 'N');
 	rect(0, 66, 14, 69, 'K');
 	rect(0, 68, 13, 68, 'E');
@@ -443,7 +411,6 @@ function draw(c: Canvas) {
 	kid(17, 73, 'R', 'W', { up: true });
 	line(19, 70, 22, 68, 'K');
 
-	// ---------- hoops ----------
 	ring(36, 76, 3.4, 'K');
 	kid(29, 79, 'R', 'B');
 	line(31, 77, 33, 77, 'N');
@@ -462,7 +429,6 @@ function draw(c: Canvas) {
 	line(41, 70, 43, 70, 'N');
 	put(38, 67, 'R');
 
-	// ---------- whirligigs ----------
 	const wheel = (x: number, y: number, a: string, b: string) => {
 		for (const [dx, dy] of points('-1,0 1,0 0,-1 0,1 -2,0 2,0 0,-2 0,2')) put(x + dx, y + dy, a);
 		dots(b, [x - 1, y - 1], [x + 1, y + 1], [x + 1, y - 1], [x - 1, y + 1]);
@@ -483,7 +449,6 @@ function draw(c: Canvas) {
 	put(64, 69, 'K');
 	kid(51, 70, 'W', 'B', { up: true });
 
-	// ---------- king of the hill ----------
 	ell(83, 87, 10.5, 8.5, 'N');
 	dots('T', [78, 84], [79, 84], [87, 82], [88, 82], [83, 86], [84, 86], [90, 86], [76, 87]);
 	kid(83, 78, 'R', 'W', { up: true });
@@ -496,7 +461,6 @@ function draw(c: Canvas) {
 	kid(75, 72, 'B', 'R');
 	kid(93, 71, 'G', 'W', { dress: true });
 
-	// ---------- marbles ----------
 	ring(104, 81, 3.6, 'K', 0.8);
 	dots('W', [103, 80], [105, 82]);
 	put(105, 80, 'R');
@@ -520,8 +484,6 @@ export const games: Mural = {
 	notes: 'F',
 	difficulty: 0.5,
 	cols: 5,
-	// O and T the square's two sands, E stone, N brick and wood, G and L grass, D dark leaves,
-	// S water and sky, F skin
 	palette: {
 		O: '#d9993a',
 		T: '#f0d596',

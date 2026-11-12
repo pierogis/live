@@ -72,9 +72,7 @@ test('the tune rests now and then, and A comes back changed but recognizable', (
 		const bar = (b: number) =>
 			s.notes.filter((n) => n.bar === b).map((n) => `${n.deg}:${n.len}:${!!n.rest}`);
 		const lens = (b: number) => s.notes.filter((n) => n.bar === b).map((n) => n.len);
-		// A's return opens in its first bar's rhythm...
 		assert.deepEqual(lens(24), lens(0), `seed ${seed}`);
-		// ...and the rest of it isn't a copy.
 		const rest = (from: number) => [1, 2, 3, 4, 5, 6, 7].map((k) => bar(from + k).join()).join('|');
 		if (seed <= 50) assert.notEqual(rest(24), rest(0), `seed ${seed}`);
 	}
@@ -171,7 +169,6 @@ test('songs that share notes and a theme stay on those notes, on one motif', () 
 	const modes = ['major', 'dorian', 'mixolydian', 'lydian', 'minor', 'phrygian'];
 	for (const mode of [...modes, 'pentatonic', 'minor-pentatonic', 'yo', 'in']) {
 		for (let seed = 1; seed <= 40; seed++) {
-			// Not adventurous: those may color outside the key (see below).
 			const spice = seed % 2 ? 'gentle' : 'lively';
 			const s = compose(seed, seed % 3, true, { notes: 'G', theme: 'a-mural', mode, spice });
 			for (const n of s.notes) {

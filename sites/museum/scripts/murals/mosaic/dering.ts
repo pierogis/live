@@ -1,7 +1,4 @@
-/*
- * Dering Roll (England, about 1270): a strip of parchment painted with rows of
- * knights' shields, a name written over each. One shield to a panel.
- */
+// Dering Roll (England, about 1270).
 import type { Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -10,7 +7,6 @@ const PH = 16;
 const COLS = 4;
 const ROWS = 3;
 
-// The shield, 12 wide: each row's left and right edge, outline included.
 const SPAN: [number, number][] = [
 	...Array<[number, number]>(7).fill([0, 11]),
 	[1, 10],
@@ -26,10 +22,8 @@ function inside(u: number, v: number): boolean {
 	return a < u + 1 && u + 1 < b && y < 10;
 }
 
-/** A design: the color of each spot of the 10 by 10 field. */
 type Field = (u: number, v: number) => string;
 
-/** A charge drawn as rows of `X`, in `col` on `bg`, moved right `du` and down `dv`. */
 function bitmap(rows: string[], col: string, bg: string, du = 1, dv = 0): Field {
 	return (u, v) => {
 		const ch = rows[v - dv]?.[u - du];
@@ -118,7 +112,6 @@ const DESIGNS: Field[] = [
 	bitmap(LILIES, 'Y', 'B', 0)
 ];
 
-// The names: marks that look like letters and spell nothing.
 const GLYPH: Record<string, string[]> = {
 	I: ['X', 'X', 'X'],
 	L: ['X.', 'X.', 'XX'],
@@ -160,7 +153,6 @@ function draw(c: Canvas) {
 			x += g[0].length + 1;
 		}
 	};
-	// each panel: a light strip for the name over a tan band with the shield
 	for (let k = 0; k < COLS * ROWS; k++) {
 		const ox = (k % COLS) * PW;
 		const oy = Math.floor(k / COLS) * PH;
@@ -178,7 +170,6 @@ export const dering: Mural = {
 	difficulty: 0.05,
 	cols: COLS,
 	panel: [PW, PH],
-	// L light parchment (also heraldic silver), T worn tan parchment, K ink.
 	palette: {
 		L: '#f0e2c4',
 		T: '#c9a06c',

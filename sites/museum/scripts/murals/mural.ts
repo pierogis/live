@@ -1,36 +1,23 @@
-/* A mural: one big picture, drawn with code, whose panels are the levels of a game's pack. */
 import type { Picture } from '../../src/lib/shared/level.ts';
 import type { SongSettings } from '../../src/lib/shared/sound.ts';
 import { Canvas } from './canvas.ts';
 
-/** A panel: its id's end, its name, its song, and its own difficulty when not the mural's. */
 export type Panel = [slug: string, name: string, song: SongSettings, difficulty?: number];
 
 export interface Mural {
-	/** The pack file's name, without `.json` or the number that sets its place (`fileOf`). */
 	file: string;
 	name: string;
-	/** Starts every panel's id, and is the theme its songs share. */
 	prefix: string;
-	/** The key whose notes every panel's song keeps to. */
 	notes: string;
-	/** Panels to a row; the panel count sets how many rows. */
 	cols: number;
-	/**
-	 * How hard its panels are made, 0 to 1 (see `Pack.difficulty`), unless a panel sets its
-	 * own. Its place in play is measured from what this makes (`playOrder`).
-	 */
 	difficulty?: number;
-	/** A panel's size in dots; 24 by 22 unless given. */
 	panel?: [w: number, h: number];
 	palette: Record<string, string>;
-	/** The letter the canvas starts filled with. */
 	ground: string;
 	panels: Panel[];
 	draw(c: Canvas): void;
 }
 
-/** A panel's size in dots, and how many rows of panels the mural has. */
 export function layout(m: Mural) {
 	const [pw, ph] = m.panel ?? [24, 22];
 	const rows = m.panels.length / m.cols;

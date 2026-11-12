@@ -1,18 +1,10 @@
-/*
- * Every game on the site, in the order the home page lists them. Each game has its
- * own routes, src/routes/<id>/, serving /<id> (its murals) and /<id>/<level id>.
- * They import the game's modules directly, so SvelteKit preloads them
- * with the page. Keep this file free of imports: node scripts and tests read it.
- */
-
+// No imports: node scripts and tests read this file.
 export const GAME_IDS = ['mosaic', 'forage'] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameInfo {
 	id: GameId;
-	/** As shown on the page and in titles. */
 	name: string;
-	/** One line on what you do; the home page's card and the game page's description. */
 	about: string;
 }
 

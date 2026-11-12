@@ -1,18 +1,10 @@
-<!--
-	The bar every game shares: its name, the level's name, difficulty and whether you've
-	finished it, and undo / restart / sound / murals. On a narrow screen the difficulty
-	and the finished mark wrap under the level's name rather than being cut off.
--->
 <script lang="ts">
 	import Pips from './Pips.svelte';
 
 	interface Props {
 		game: string;
-		/** The level's name, like "Bullseye". */
 		label: string;
-		/** The level's difficulty from 1 to 5, when the game has one. */
 		difficulty?: number | null;
-		/** You've finished this level before (or just now). */
 		done?: boolean;
 		canUndo: boolean;
 		muted: boolean;
@@ -124,7 +116,6 @@
 		font-size: 13px;
 		white-space: nowrap;
 	}
-	/* Only a name too long for a line of its own is cut short. */
 	.name {
 		min-width: 0;
 		max-width: 100%;

@@ -1,10 +1,3 @@
-/*
- * `virtual:level-list/<game>`: a game's levels in play order without their pictures,
- * which is all a level page needs to name, save and rate each one. Pages import it
- * instead of every picture, so they download a few kB rather than every level.
- * The order matches levels/index.ts (and levelsFrom): pack files by name, then each
- * pack's levels in turn.
- */
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -15,14 +8,11 @@ import { packLevels, type PackFile } from '../src/lib/shared/levels.ts';
 
 const PREFIX = 'virtual:level-list/';
 const LIB = fileURLToPath(new URL('../src/lib/', import.meta.url));
-/** A level's picture: the fields its list leaves out (see `Listed` in shared/level.ts). */
 const PICTURE = new Set(['palette', 'art']);
 
 export function levelLists(): Plugin {
 	return {
 		name: 'museum-level-lists',
-		// A pack file added or removed changes a game's list too; changes to one already
-		// listed are caught by addWatchFile below.
 		configureServer(server) {
 			const repack = (file: string) => {
 				const game = /\/src\/lib\/([a-z]+)\/levels\/[^/]+\.json$/.exec(file)?.[1];

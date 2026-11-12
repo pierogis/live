@@ -1,7 +1,3 @@
-/*
- * Write a level pack file the way the repo formats it (Prettier, with the repo's
- * config), so a script's save leaves a clean diff.
- */
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 

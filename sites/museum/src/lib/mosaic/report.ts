@@ -1,8 +1,3 @@
-/*
- * One report per level: can it be solved, how hard is it, and what needs fixing.
- * Used by `pnpm -F museum levels` and `pnpm -F museum murals`.
- * Imports use `.ts` so node scripts can load this file directly.
- */
 import {
 	blobSizes,
 	boardGroups,
@@ -28,41 +23,22 @@ export interface LevelReport {
 	colors: number;
 	moves: number;
 	parks: number;
-	/** The most tray the solver's path filled at once. */
 	minTray: number;
-	/** The sizes of the scattered blobs at this point in play, like "10-28". */
 	blobs: string;
-	/** Which shuffle the puzzle kept; -1 when no shuffle fit the standard tray. */
 	shuffle: number;
 	groups: number;
 	biggestGroup: number;
-	/** Starting dot groups that sit on spots of a single color. */
 	cleanGroups: number;
-	/** The quick player's taps (`quickPlay`), on average. */
 	taps: number;
-	/** The groups it looked past before finding one that helped, on average. */
 	glances: number;
-	/** How hard: the quick player's taps and glances. */
 	score: number;
 	ms: number;
-	/** Must fix: the level can't ship like this. */
 	problems: string[];
-	/** Worth a look, but playable. */
 	warnings: string[];
 }
 
-/** The share of open spots, all of tray colors, that has the quick player empty its tray. */
 const WALL = 0.8;
 
-/**
- * Plays the way people do, quickly, not like the solver's best path: fills the tray first,
- * tapping whatever catches the eye (big groups first, lone dots last), which goes home
- * when its color has an open spot and into the tray when not. Once the tray is full, it
- * looks past groups until it finds one that can go home, so needed lone dots cost
- * glances. It empties the tray only at a wall: when nothing on the board can go home, or
- * when nearly all the open spots (`WALL`) are colors in the tray; then it sends home the
- * tray color with the most open spots. Returns its taps and glances.
- */
 export function quickPlay(s0: State, seed: number): { taps: number; glances: number } {
 	const s = clone(s0);
 	const rng = makeRng(seed);
@@ -73,7 +49,6 @@ export function quickPlay(s0: State, seed: number): { taps: number; glances: num
 		const trayed = new Set(s.tray.map((g) => g.c));
 		const opens = open.reduce((a, n) => a + n, 0);
 		const trayOpens = [...trayed].reduce((a, c) => a + open[c], 0);
-		// Noticed in turn, each group about as likely as its size to catch the eye next.
 		const seen = boardGroups(s)
 			.map((g) => ({ g, key: rng() ** (1 / g.cells.length) }))
 			.sort((a, b) => b.key - a.key)
@@ -98,12 +73,10 @@ export function quickPlay(s0: State, seed: number): { taps: number; glances: num
 	return isWon(s) ? { taps, glances } : { taps: Infinity, glances };
 }
 
-/** How hard a mural is, for putting murals in order: its panels' scores (`muralMeasure`). */
 export function muralScore(levels: Level[]): number {
 	return muralMeasure(levels.map((lv) => reportLevel(lv).score));
 }
 
-/** Check a level, as hard as its mural's difficulty makes it. */
 export function reportLevel(lv: Level): LevelReport {
 	const t0 = performance.now();
 	const { w, h, counts, pixels: dots, problems, warnings } = checkPicture(lv);
@@ -130,7 +103,6 @@ export function reportLevel(lv: Level): LevelReport {
 	};
 	if (problems.length) return { ...empty, ms: performance.now() - t0 };
 
-	// The same solve that let the build keep its shuffle, so the report agrees with the game.
 	const { state: s, solution: sol } = buildSolved(lv);
 	const shuffle = s.attempt ?? -1;
 	const minTray = s.minTray ?? 0;

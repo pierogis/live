@@ -1,5 +1,3 @@
-// Mosaic's level set as a whole: levels that fit a phone, with one picture each that
-// no single color swamps, and difficulty that rises through play.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
@@ -12,7 +10,6 @@ const LEVELS = loadLevels();
 test('mosaic has plenty of levels, in packs of a playable size', () => {
 	assert.ok(LEVELS.length >= 150, `${LEVELS.length} levels`);
 	for (const pack of loadPacks()) {
-		// A mural can be as small as six panels.
 		assert.ok(pack.levels.length >= 6 && pack.levels.length <= 24, pack.id);
 		assert.ok(pack.name.trim(), pack.id);
 	}

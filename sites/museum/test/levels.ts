@@ -1,4 +1,3 @@
-// Node-side level loading for tests and scripts (the site uses import.meta.glob instead).
 import { readdirSync, readFileSync } from 'node:fs';
 
 import type { GameId } from '../src/lib/games.ts';
@@ -10,7 +9,6 @@ export interface PackFile<L extends Picture = Level> extends Pack<L> {
 	path: URL;
 }
 
-/** The game's pack files, read the way its levels/index.ts globs them. */
 function read<L extends Picture>(game: GameId) {
 	const dir = new URL(`../src/lib/${game}/levels/`, import.meta.url);
 	const files: PackFiles<L> = {};

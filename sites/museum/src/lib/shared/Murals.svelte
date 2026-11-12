@@ -1,9 +1,3 @@
-<!--
-	A game's home page: its murals, each panel a link to its level, and a way in that
-	resumes where your save is (or starts at the first). The save comes from the server
-	(read from the game's cookie), so your ✓ marks are there at once.
-	The game's options show above the murals as toggles.
--->
 <script lang="ts" generics="L extends Picture">
 	import { Card } from '@pierogis/utensils';
 	import { untrack } from 'svelte';
@@ -15,22 +9,16 @@
 	import type { GameSave, Save } from './save';
 
 	interface Props {
-		/** The game's name, for the title. */
 		game: string;
 		packs: Pack<L>[];
-		/** The game page; each picture links to `${gameHref}/<level id>`. */
 		gameHref: string;
 		save: Save;
-		/** A level's difficulty from 1 to 5, when the game has one. */
 		difficulty?: (level: L) => number | null;
-		/** The game's save functions, when it has options (like Mosaic's relaxed mode) to toggle. */
 		saves?: GameSave;
 	}
 
 	let { game, packs, gameHref, save, difficulty, saves }: Props = $props();
 
-	// Each toggle starts from your saved setting and saves straight to your cookie,
-	// changing only that setting, so progress from another tab stays.
 	const options = $state(untrack(() => ({ ...save.options })));
 
 	function toggle(key: string, on: boolean) {
@@ -40,9 +28,7 @@
 		});
 	}
 
-	/** Whether you've played: then the way in picks up where you were. */
 	const played = $derived(save.level > 0 || Object.keys(save.completed).length > 0);
-	/** The level your save is on, or the first. */
 	const saved = $derived(packs.flatMap((p) => p.levels)[save.level] ?? packs[0].levels[0]);
 
 	const sections = $derived.by(() => {
@@ -81,7 +67,6 @@
 	{#each sections as section (section.name)}
 		{#if section.mural}
 			{@const panel = section.items[0].lv.art}
-			<!-- A mural: its panels side by side as one picture in a card, each a link to its level. -->
 			<h3>
 				{section.name.toLowerCase()} ·
 				{section.items.filter((i) => save.completed[i.lv.id]).length} / {section.items.length}
@@ -155,7 +140,6 @@
 	h2 {
 		font-size: 20px;
 	}
-	/* An option's card hugs its line, at the left. */
 	.option-card {
 		align-self: flex-start;
 	}
@@ -187,10 +171,6 @@
 		grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
 		gap: 10px;
 	}
-	/*
-	 * The card hugs its mural, only as wide as the picture, which sits just inside the
-	 * card's 2px inner ring, rounded to its curve, so the panels never cover the border.
-	 */
 	.frame {
 		align-self: center;
 	}
@@ -198,11 +178,6 @@
 		padding: 2px;
 		height: auto;
 	}
-	/*
-	 * A mural's panels. Each dot is a whole number of pixels (--s): as many as fit the page
-	 * for this mural's width in dots, up to 7. The steps by page width are for browsers
-	 * without round().
-	 */
 	.mural {
 		--s: 3px;
 		border-radius: 4px;
@@ -222,12 +197,12 @@
 			--s: 7px;
 		}
 	}
+	/* The breakpoints above are for browsers without round(). */
 	@supports (width: round(down, 1px, 1px)) {
 		.mural {
 			--s: clamp(2px, round(down, (100cqi - 24px) / (var(--cols) * var(--w)), 1px), 7px);
 		}
 	}
-	/* Arriving at a level's panel (`#<level id>`), it sits a third of the way down, its mural around it. */
 	.panel,
 	.card {
 		scroll-margin-top: 33svh;
@@ -246,7 +221,6 @@
 	.panel:hover canvas {
 		filter: none;
 	}
-	/* Marked inside its own edge, so it never spills onto a neighbor or the card's border. */
 	.panel.current {
 		outline: 3px solid var(--secondary-color);
 		outline-offset: -3px;
@@ -281,7 +255,6 @@
 	canvas {
 		image-rendering: pixelated;
 	}
-	/* Pictures fill their frames, so an unplayed one shows faded rather than as a blank shape. */
 	.thumb.unplayed canvas {
 		filter: grayscale(0.85) opacity(0.55);
 	}

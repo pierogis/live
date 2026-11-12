@@ -1,79 +1,25 @@
-/*
- * A strong Forage player, to measure how hard a deal is the way a careful person
- * finds it. Random play loses by sending colonies that obviously can't eat; a
- * person doesn't, so random win rates make every level look harder than it is.
- *
- * Each turn it tries every column it could send (a patient pick: send, then wait
- * until nothing more eats) and scores where that leaves the board:
- *   - a send that leaves no move at all loses, and when slots run low it looks a
- *     move or two further, so it doesn't walk into a jam it could see coming
- *   - free slots are worth a lot, and more the fewer there are
- *   - so is having a few columns it can send from: it doesn't empty the one
- *     open column while the other fronts are locked or waiting on a partner
- *   - and having a front or two that would finish right away: it sends some
- *     waiting colonies while easy ones are still around to open food for them,
- *     instead of using up the easy ones first
- *   - a colony left waiting costs more the more ants it still has and the deeper
- *     its color's food is buried, so it doesn't send a big colony early while its
- *     color is still mostly sealed off
- *   - a finished colony held in its slot by its linked partner costs a slot
- *   - opening a lock, or digging toward its key, is worth something
- *   - eating is progress
- * Each game weighs these a little differently, the way people do, and picks at
- * random among moves scoring close to the best, so many games give a win share.
- * It sees every colony a person sees. Looking ahead plays sends out, so it can
- * learn a mystery colony's color one send early: a small edge a person lacks.
- * It doesn't back up and retry; the learners in learner.ts do, and the solver in cruxes.ts.
- * Imports use `.ts` so node scripts can load this file directly.
- */
 import { makeRng, pickOne, type Rng } from '../shared/engine.ts';
 import * as F from './engine.ts';
 
-/** How a game went. */
 export interface Game {
 	won: boolean;
-	/** The columns it sent from, in order. */
 	path: number[];
 }
 
-/** What a few free slots are worth: losing the last ones hurts most. */
 const FREE = [0, -30, -12, -4, -1, 0];
-/** Moves that score within this of the best are treated as equally good. */
 const MARGIN = 2;
 
-/**
- * How much a player cares about each thing it scores. People weigh these
- * differently, so each game jitters them a little (see style()).
- */
 export interface Style {
-	/** Times FREE. */
 	free: number;
-	/** Per colony left waiting. */
 	wait: number;
-	/** Per ant a waiting colony still has. */
 	ants: number;
-	/** Per block its color's nearest food is buried under (up to 10). */
 	buried: number;
-	/** Per finished colony held in its slot by its partner. */
 	held: number;
-	/** Per block eaten. */
 	eat: number;
-	/** Per column unlocked. */
 	unlock: number;
-	/** Per column it could send from next (up to 3): keeping options open. */
 	choice: number;
-	/**
-	 * Per column whose front could finish right away (up to 2): an easy send kept
-	 * for later, so it doesn't use them all up and then have only waiting ones left.
-	 */
 	ready: number;
-	/** Per block a lock's key is buried under (up to 20). */
 	key: number;
-	/**
-	 * 0 to 1: how much less a waiting colony costs while slots are free. Some people
-	 * park colonies early, while there's room and food is still opening up; others
-	 * hold them back until they have to.
-	 */
 	early: number;
 }
 
@@ -91,7 +37,6 @@ const STYLE: Style = {
 	early: 0.5
 };
 
-/** This game's weights: each one 0.6 to 1.4 times the usual, and any eagerness to park. */
 export function style(rng: Rng): Style {
 	const s = { ...STYLE };
 	for (const k of Object.keys(s) as (keyof Style)[]) s[k] *= 0.6 + 0.8 * rng();
@@ -103,14 +48,11 @@ function freeSlots(s: F.State): number {
 	return s.slots.filter((e) => !e).length;
 }
 
-/** Whether some sequence of `depth` sends from s doesn't run out of moves first. */
 function survives(s: F.State, depth: number): boolean {
 	if (F.isWon(s)) return true;
 	const legal = F.legalPicks(s);
 	if (!legal.length) return false;
 	if (depth <= 0) return true;
-	// A shortcut: with four slots free and two columns to send from, call the next send
-	// safe. Most sends take one or two slots; only a linked group of three or four could jam.
 	if (freeSlots(s) >= 4 && legal.length >= 2 && depth <= 1) return true;
 	const key = boardKey(s);
 	for (const col of legal) {
@@ -120,25 +62,21 @@ function survives(s: F.State, depth: number): boolean {
 	return false;
 }
 
-/** How good the board looks after a pick that ate `eaten` blocks and opened `unlocked` columns. */
 function score(t: F.State, eaten: number, unlocked: number, w: Style): number {
 	if (F.isWon(t)) return 1e6;
 	const free = freeSlots(t);
 	const legal = F.legalPicks(t);
 	const choices = legal.length;
-	// The fewer slots or columns are left to send from, the further it looks for a jam.
 	const ahead = free <= 1 || choices <= 1 ? 2 : free === 2 ? 1 : 0;
 	if (!survives(t, ahead)) return -1e6;
 	let v =
 		w.free * FREE[free] + w.choice * Math.min(3, choices) + w.eat * eaten + w.unlock * unlocked;
-	// Fronts whose color has as much exposed as they want: about what finishes right away.
 	const food = t.colors.map((_, c) => F.exposedOf(t, c).length);
 	const ready = legal.filter((k) => {
 		const e = t.columns[k][0];
 		return e.n <= food[e.c];
 	}).length;
 	v += w.ready * Math.min(2, ready);
-	// Parking costs less while slots are free, the more eager this player is to park.
 	const parking = 1 - w.early * (free / t.slots.length);
 	for (const e of t.slots) {
 		if (!e) continue;
@@ -154,10 +92,8 @@ function score(t: F.State, eaten: number, unlocked: number, w: Style): number {
 	return v;
 }
 
-/** buriedOf() for each board's digDepth() array. */
 const buriedCache = new WeakMap<Int32Array, Int32Array>();
 
-/** Per color: blocks to eat before it has food exposed. */
 function buriedOf(t: F.State): Int32Array {
 	const depth = F.digDepth(t);
 	const hit = buriedCache.get(depth);
@@ -171,22 +107,15 @@ function buriedOf(t: F.State): Int32Array {
 	return nearest;
 }
 
-/** One send from a board, played out patiently. */
 export interface Choice {
 	col: number;
-	/** The board after sending it. */
 	t: F.State;
-	/** Whether it left a colony waiting. */
 	parked: boolean;
-	/** Blocks eaten and columns opened by the send. */
 	eaten: number;
 	unlocked: number;
 }
 
-/**
- * Every send that can go from s, each played out patiently. The boards it
- * returns are shared (see sendFrom()): read them, or clone before changing one.
- */
+/** The boards it returns are shared with a cache: clone one before changing it. */
 export function options(s: F.State): Choice[] {
 	const out: Choice[] = [];
 	const key = boardKey(s);
@@ -197,48 +126,23 @@ export function options(s: F.State): Choice[] {
 	return out;
 }
 
-/** What a patient send does: the board after it, and what happened on the way. */
 type Sent = Omit<Choice, 'col'>;
 
-/**
- * Sends already played out, by board and column, most recently used last. The
- * players and the solver come back to the same boards again and again (every
- * game starts from the deal, and nearby boards are many sends' look ahead), and
- * playing a send out is most of their work. Kept to the last `remember`.
- */
 const sends = new Map<string, Sent | null>();
 let remember = 1024;
 
-/**
- * How many sends to remember (1024 to start). More helps forage:tune, whose deal
- * search plays many deals that differ by a few colonies; each costs some memory.
- */
 export function rememberSends(n: number) {
 	remember = n;
 	while (sends.size > n) sends.delete(sends.keys().next().value!);
 }
 
-/**
- * Drop every remembered send. A fresh build of a deal is a new picture, so
- * nothing from an earlier one can match it again (a check of a changed picture).
- */
 export function forgetSends() {
 	sends.clear();
 }
 
-/** An id per picture (its target array), so boards of different levels never match. */
 const pictures = new WeakMap<number[], number>();
 let nextPicture = 0;
 
-/**
- * Everything a patient send from s depends on, as text: the picture, the blocks
- * left, every colony waiting or working, and the locks. Null while ants are
- * still walking (a send from there isn't remembered). A working colony's
- * countdown to its next ant is left out: once nothing more eats, the next tick
- * sends an ant whatever it is. A column is a hash of the colonies left in it,
- * so the same board in another deal of the level (the tuner tries many that
- * differ by a few colonies) matches too.
- */
 function boardKey(s: F.State): string | null {
 	if (s.walking.length) return null;
 	let pic = pictures.get(s.target);
@@ -249,14 +153,8 @@ function boardKey(s: F.State): string | null {
 	return `${k}|${s.locks.join(',')}|${s.lockAt.join(',')}#`;
 }
 
-/**
- * Per colony object: a hash of it and every colony behind it in its column. A
- * deal makes its own colonies and play never changes or moves one in a column,
- * so that's fixed once worked out.
- */
 const suffixes = new WeakMap<F.Colony, string>();
 
-/** The colonies in a column, as a hash: worked out once per colony object, from the back. */
 function behind(col: F.Colony[]): string {
 	const hit = suffixes.get(col[0]);
 	if (hit !== undefined) return hit;
@@ -283,7 +181,6 @@ function behind(col: F.Colony[]): string {
 	return key;
 }
 
-/** The send from column `col` of board s (whose boardKey() is `key`): remembered, or played out and remembered. */
 function sendFrom(s: F.State, col: number, key: string | null): Sent | null {
 	const k = key === null ? null : key + col;
 	if (k !== null) {
@@ -311,7 +208,6 @@ function sendFrom(s: F.State, col: number, key: string | null): Sent | null {
 	return sent;
 }
 
-/** The best-looking of `list`, at random among those within MARGIN of it; null if empty. */
 export function best(list: Choice[], rng: Rng, w: Style): Choice | null {
 	if (!list.length) return null;
 	const scored = list.map((o) => ({ o, v: score(o.t, o.eaten, o.unlocked, w) }));
@@ -320,19 +216,8 @@ export function best(list: Choice[], rng: Rng, w: Style): Choice | null {
 	return close[Math.floor(rng() * close.length)].o;
 }
 
-/**
- * How a player picks its sends:
- *   strong: the best-looking send (see score())
- *   clean: the rule of thumb. Any send that finishes without waiting, at random;
- *     only when none would, a strong pick of where to park.
- *   look: the same rule, choosing among the sends that finish with the strong
- *     player's look ahead: a careful person who still never parks by choice.
- *   careless: any send that can go (carelessGame(), but on this board's
- *     choices; the solver uses it for variety)
- */
 export type Player = 'strong' | 'clean' | 'look' | 'careless';
 
-/** Pick a move the way `player` does; null when nothing can go. */
 function choose(s: F.State, rng: Rng, w: Style, player: Player): Choice | null {
 	const all = options(s);
 	if (player === 'careless') return all.length ? all[Math.floor(rng() * all.length)] : null;
@@ -343,10 +228,6 @@ function choose(s: F.State, rng: Rng, w: Style, player: Player): Choice | null {
 	return best(clean, rng, w);
 }
 
-/**
- * Play a whole game as `player`; `seed` sets its style and how it breaks
- * near-ties. `visit` sees each board after a send; returning true stops there.
- */
 export function playAs(
 	player: Player,
 	s0: F.State,
@@ -367,33 +248,25 @@ export function playAs(
 	return { won: F.isWon(s), path };
 }
 
-/** The k-th (1, 2, …) of the strong games measuring a deal; each has its own style. */
 export function strongGame(s: F.State, k: number): Game {
 	return playAs('strong', s, k * 7919 + 17);
 }
 
-/** The k-th (1, 2, …) game of `player` measuring a deal. */
 function gameOf(player: Player, s: F.State, k: number): Game {
 	if (player === 'strong') return strongGame(s, k);
 	return playAs(player, s, k * 6007 + (player === 'clean' ? 3 : 5));
 }
 
-/** Share of games 1 to `games` that `won(k)` says were won, 0 to 1. */
 export function wonShare(games: number, won: (k: number) => boolean): number {
 	let n = 0;
 	for (let k = 1; k <= games; k++) if (won(k)) n++;
 	return n / games;
 }
 
-/** Share of the first `games` games of `player` won, 0 to 1. */
 export function winsOf(player: Player, s: F.State, games: number): number {
 	return wonShare(games, (k) => gameOf(player, s, k).won);
 }
 
-/**
- * One careless game, the way report.ts measures them: any colony that can go,
- * patiently, on the board itself. The columns it sent from if it won, else null.
- */
 export function carelessGame(s0: F.State, seed: number): number[] | null {
 	const s = F.clone(s0);
 	const rng = makeRng(seed);
@@ -408,13 +281,6 @@ export function carelessGame(s0: F.State, seed: number): number[] | null {
 	return path;
 }
 
-/**
- * One game by a hasty player, closer to a person on an easy level than the ones
- * above: it follows the rule of thumb (a send that would finish, at random) but
- * parks any colony when it has to, and it doesn't wait for the board to settle:
- * it sends again `ticks` ticks after each send, while others are still eating
- * (see F.hurry()). With nothing to send it waits. True when it won.
- */
 export function hastyGame(s0: F.State, seed: number, ticks: number): boolean {
 	const s = F.clone(s0);
 	const rng = makeRng(seed);

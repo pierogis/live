@@ -9,7 +9,6 @@ import { fileOf, MURALS, playOrder } from '../scripts/murals/index.ts';
 import { pack } from '../scripts/murals/mural.ts';
 import { loadPacks } from './levels.ts';
 
-/** What a game saves into a panel beyond what its script draws. */
 const SAVED: Record<string, readonly string[]> = { forage: TUNED };
 
 for (const game of GAME_IDS) {
@@ -17,8 +16,6 @@ for (const game of GAME_IDS) {
 
 	test(`every ${game} pack is a mural drawn by a script, in play order`, () => {
 		assert.equal(murals.length, MURALS[game].length);
-		// Mosaic's order is measured, so a mural that now measures harder or easier than
-		// its neighbors needs `pnpm -F museum murals` to move its file.
 		assert.deepEqual(
 			loadPacks(game).map((p) => p.id),
 			murals.map(fileOf)

@@ -1,4 +1,3 @@
-/* Forage's line per level in `pnpm -F museum levels`. Pure, with `.ts` imports, for node. */
 import { pct } from '../shared/checks.ts';
 import type { Rules } from '../shared/rules.ts';
 import { cruxCounts, THOROUGH } from './cruxes.ts';
@@ -9,7 +8,6 @@ import { GAMES, reportForage } from './report.ts';
 export const rules: Rules<Level> = {
 	id: 'forage',
 	row(level, measure) {
-		// Measuring every level takes minutes; by default trust what forage:tune saved.
 		const r = reportForage(level, measure ? GAMES : 0, measure ? THOROUGH : undefined);
 		const wins = measure ? r.difficulty.wins : (level.wins ?? NaN);
 		const a = r.cruxes;

@@ -1,4 +1,3 @@
-/* Every game's murals, and the order each game plays them in. */
 import { readdirSync, readFileSync } from 'node:fs';
 
 import { TUNED, type Level as ForageLevel } from '../../src/lib/forage/engine.ts';
@@ -14,10 +13,6 @@ import { pack, type Mural } from './mural.ts';
 
 export const MURALS: Record<GameId, Mural[]> = { mosaic, forage };
 
-/**
- * A Forage mural's panels as played, with what forage:tune last measured for each panel
- * whose id is still in its pack file.
- */
 function tuned(m: Mural): ForageLevel[] {
 	const dir = new URL('../../src/lib/forage/levels/', import.meta.url);
 	const file = readdirSync(dir).find((f) => f.replace(/^[^-]+-/, '') === `${m.file}.json`);
@@ -29,16 +24,11 @@ function tuned(m: Mural): ForageLevel[] {
 	});
 }
 
-/** How hard each game's murals measure, higher harder: what puts them in order. */
 const MEASURE: Record<GameId, (m: Mural) => number> = {
 	mosaic: (m) => muralScore(packLevels(pack(m)) as MosaicLevel[]),
 	forage: (m) => muralHardness(tuned(m))
 };
 
-/**
- * A game's murals in play order, easiest first, as measured (`MEASURE`): each mural's
- * `difficulty` sets how hard it's made, and a new one goes where its panels put it.
- */
 export function playOrder(game: GameId): Mural[] {
 	const score = new Map(MURALS[game].map((m) => [m, MEASURE[game](m)]));
 	return MURALS[game].toSorted(
@@ -46,6 +36,5 @@ export function playOrder(game: GameId): Mural[] {
 	);
 }
 
-/** The pack file a mural is drawn into, without `.json`: its place in play, then its name. */
 export const fileOf = (m: Mural, place: number) =>
 	`${String(place + 1).padStart(2, '0')}-${m.file}`;

@@ -1,10 +1,4 @@
-// Draws every game's murals (scripts/murals/<game>/) into their pack files.
-//   pnpm -F museum murals [name…] [--look <dir>] [--dry]
-// No names draws them all. `--look` saves images of each, whole and in panels; `--dry`
-// writes no pack file. Prints each panel's stats and how many dots changed. A Forage
-// panel whose picture comes out the same keeps what forage:tune saved for it.
-// Pack files are numbered in play order (`playOrder`, measured): when a game's order
-// changes, any mural's file is renamed to its new place, drawn or not.
+// pnpm -F museum murals [name…] [--look <dir>] [--dry]
 import {
 	existsSync,
 	mkdirSync,
@@ -27,14 +21,11 @@ import { layout, pack, paint } from './murals/mural.ts';
 import { image } from './murals/png.ts';
 import { writePack } from './write-pack.ts';
 
-/** What each game says about a panel, and what a redraw keeps. */
 const GAMES: Record<
 	GameId,
 	{
 		report(lv: Picture): { note: string; problems: string[] };
-		/** No color may cover more than half a panel. */
 		half: boolean;
-		/** Fields a panel keeps from its pack file while its picture stays the same. */
 		keep: readonly string[];
 	}
 > = {

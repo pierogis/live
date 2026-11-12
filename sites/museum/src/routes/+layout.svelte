@@ -6,7 +6,6 @@
 
 	let { children } = $props();
 
-	// No trailing slash, so the home page is the bare origin.
 	let canonical = $derived(`https://museum.pierogis.live${page.url.pathname.replace(/\/$/, '')}`);
 </script>
 
@@ -16,7 +15,6 @@
 		<meta name="robots" content="noindex" />
 	{/if}
 </svelte:head>
-<!-- No canonical link on an error page: it isn't a page of the site. -->
 {#if !page.error}
 	<SEO title={page.data.title} description={page.data.description} {canonical} type="website" />
 {/if}

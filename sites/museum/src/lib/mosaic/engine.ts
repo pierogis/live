@@ -1,23 +1,7 @@
 /*
- * Mosaic game engine: pure logic, no DOM. Imports use `.ts` so it runs in the
- * browser, in node scripts and in node tests.
- *
- * The picture has two layers:
- *   - the bottom layer is the finished picture (target[i] = color the spot needs)
- *   - the top layer covers every spot with a dot (top[i]); the dots are the same
- *     colors as the picture, shuffled around
- *
- * A move is two taps: pick up a touching group of same-color dots (or all tray
- * dots of one color), then pick where they go: the tray, or an open spot of
- * their color. (In the game every move is one tap: a group goes to its color's
- * nearest open spot, or into the tray when none is open, and a tray dot sends its
- * color home.) Lifting dots uncovers
- * the spots under them. As many dots move as there is room for, closest to the dot
- * you picked up first, into the open spots closest to the one you tapped: its open
- * area first, then the other open spots of that color, nearest area first. When there's room for more
- * dots than you picked up, more of that color come too, from the board only
- * (the tray's stay put), nearest group first. Diagonal spots count as
- * touching.
+ * One tap sends a touching group (diagonals count) to its color's nearest open spot, or to
+ * the tray when none is open. A move fills what fits, nearest the tap first, and with room
+ * to spare pulls in more board dots of that color, never the tray's.
  */
 
 import {
@@ -33,7 +17,6 @@ import {
 } from '../shared/engine.ts';
 import type { Picture } from '../shared/level.ts';
 
-/** A level as stored: rows of color letters, '.' for an empty pixel. */
 export type Level = Picture;
 
 export interface Gem {
@@ -44,30 +27,18 @@ export interface Gem {
 export interface State {
 	w: number;
 	h: number;
-	/** Color index each spot needs; -1 is an empty pixel, not part of the picture. */
 	target: number[];
 	colors: Color[];
-	/** The dot covering each spot, or null once uncovered. */
 	top: (Gem | null)[];
-	/** Whether each spot has its matching dot. */
 	filled: boolean[];
 	tray: Gem[];
 	trayCap: number;
-	/** The level's own tray (`trayFor`), before the bigger-tray option doubles it. */
 	trayBase?: number;
 	moves: number;
-	/** The most tray the solver's path needed. */
 	minTray?: number;
-	/** Which shuffle was kept; -1 when the tray had to grow. */
 	attempt?: number;
 }
 
-/**
- * What the player is holding.
- *   { from: 'board', cell }          the touching group around `cell`
- *   { from: 'board', cell, cells }   exactly these dots ("in hand"), even if they no longer touch
- *   { from: 'tray', color }          every tray dot of that color
- */
 export type Sel =
 	{ from: 'board'; cell: number; cells?: number[] } | { from: 'tray'; color: number };
 
@@ -84,11 +55,8 @@ export interface Action {
 export interface Flight {
 	id: number;
 	c: number;
-	/** Board spot the dot lands on. */
 	cell?: number;
-	/** Board spot the dot left. */
 	from?: number;
-	/** Its place in the move: dots onto spots go in this order, nearest the tap first. */
 	order?: number;
 }
 
@@ -99,9 +67,7 @@ export type MoveResult =
 			toBoard: Required<Flight>[];
 			toTray: (Flight & { from: number })[];
 			fromTray: (Flight & { cell: number })[];
-			/** How many dots didn't fit and stayed where they were. */
 			left: number;
-			/** The leftover board dot closest to the one picked up, or -1. */
 			leftCell: number;
 			leftCells?: number[];
 	  };
@@ -117,7 +83,6 @@ export interface Solution {
 	peak: number;
 }
 
-/** The 8 spots around `i`, corners included: diagonal spots count as touching. */
 function neighbors(w: number, h: number, i: number): number[] {
 	const x = i % w;
 	const y = Math.floor(i / w);
@@ -133,19 +98,6 @@ function neighbors(w: number, h: number, i: number): number[] {
 	return out;
 }
 
-/**
- * Build the top layer as random blobs of color:
- *   1. grow blobs of `blobMin`..`blobMax` dots from random seed spots. Each blob is a
- *      color that still has dots left, and keeps to the area of same-colored spots it
- *      started in, so lifting it opens one clean patch. A new blob beside a blob in the
- *      next area takes that blob's color as often as `join` (0 to 1) says, so the two
- *      touch and lift as one group; otherwise it takes a color no blob beside it has, and
- *      stays apart. A busy picture's small areas leave many small groups and lone dots
- *      when blobs stay apart; joined, they come out in fewer, bigger groups.
- *   2. swap dots so as few as possible sit on a spot of their own color
- * Every color ends up with exactly as many dots as the picture has spots for it.
- * Returns the dot color for each spot (-1 for empty pixels).
- */
 function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng: Rng): number[] {
 	const { w, h, target } = art;
 	const cells: number[] = [];
@@ -159,16 +111,13 @@ function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng:
 	let next = 0;
 	const blobOf = new Int32Array(target.length);
 	let blobId = 0;
-	/** Does spot i touch (corners count) a dot of color c from a blob other than `self`? */
 	const touchesColor = (i: number, c: number, self: number) =>
 		neighbors(w, h, i).some((j) => colorsAt[j] === c && blobOf[j] !== self);
 
-	/** Any color but `avoid`, weighted by dots left; `avoid` when no other has any. */
 	const pickColor = (avoid: number) => {
 		const others = left.map((_, c) => c).filter((c) => c !== avoid && left[c] > 0);
 		return others.length ? pickWeighted(others, (c) => left[c], rng) : avoid;
 	};
-	/** The 4 spots beside `i` (no corners), in `neighbors` order. */
 	const square4 = (i: number) =>
 		neighbors(w, h, i).filter((j) => j % w === i % w || Math.floor(j / w) === Math.floor(i / w));
 
@@ -177,9 +126,6 @@ function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng:
 		if (next >= order.length) break;
 		const seed = order[next];
 		blobId += 1;
-		// Pick a color for the new blob, never the color its spots need, weighted by dots
-		// left: as often as `join` says, one already beside it, to join that blob; else one
-		// not beside it, to stay apart.
 		const home = target[seed];
 		const beside: number[] = [];
 		const apart: number[] = [];
@@ -210,7 +156,6 @@ function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng:
 			frontier[k] = frontier[frontier.length - 1];
 			frontier.pop();
 			if (colorsAt[j] !== null) continue;
-			// A blob that stays apart doesn't grow into touching another of its color.
 			if (!joins && touchesColor(j, c, blobId)) continue;
 			colorsAt[j] = c;
 			blobOf[j] = blobId;
@@ -221,8 +166,6 @@ function scramble(art: Art, blobMin: number, blobMax: number, join: number, rng:
 	}
 
 	const out = colorsAt as number[];
-	// Fix dots that sit on their own color, when a swap fixes it without breaking another.
-	// Swap with a nearby dot first so the blobs keep their shape.
 	for (let pass = 0; pass < 3; pass++) {
 		for (const a of shuffle(cells.slice(), rng)) {
 			if (out[a] !== target[a]) continue;
@@ -257,7 +200,6 @@ export function isWon(s: State): boolean {
 	return true;
 }
 
-/** The touching same-color dots that include spot `cell`. */
 export function groupAt(s: State, cell: number): Group | null {
 	const start = s.top[cell];
 	if (!start) return null;
@@ -278,7 +220,6 @@ export function groupAt(s: State, cell: number): Group | null {
 	return { color, cells, gems: cells.map((i) => s.top[i]!) };
 }
 
-/** Uncovered spots of the same color touching `cell`, nearest first. */
 export function openRegion(s: State, cell: number): number[] {
 	const color = s.target[cell];
 	const isOpen = (i: number) => s.target[i] === color && !s.top[i] && !s.filled[i];
@@ -296,12 +237,10 @@ export function openRegion(s: State, cell: number): number[] {
 }
 
 export interface Held {
-	/** Board spot, or -1 for a tray dot. */
 	cell: number;
 	gem: Gem;
 }
 
-/** The dots a selection refers to, or null when it no longer points at any. */
 export function selectionDots(s: State, sel: Sel | null): Held[] | null {
 	if (!sel) return null;
 	if (sel.from === 'board') {
@@ -319,7 +258,6 @@ export function selectionDots(s: State, sel: Sel | null): Held[] | null {
 	return dots.length ? dots : null;
 }
 
-/** Whether every spot of `color` has its dot. */
 export function colorDone(s: State, color: number): boolean {
 	for (let i = 0; i < s.target.length; i++) {
 		if (s.target[i] === color && !s.filled[i]) return false;
@@ -335,7 +273,6 @@ export function openCount(s: State, color: number): number {
 	return n;
 }
 
-/** The open spot of `color` nearest `cell`, or -1. */
 export function nearestOpen(s: State, color: number, cell: number): number {
 	const x = cell % s.w;
 	const y = Math.floor(cell / s.w);
@@ -349,10 +286,6 @@ export function nearestOpen(s: State, color: number, cell: number): number {
 	return best;
 }
 
-/**
- * What a tap on board dot `cell` does in the game: its group goes home to the nearest open
- * spot of its color (and on to the color's others), or, with none open, into the tray.
- */
 export function tapMove(s: State, cell: number): { sel: Sel; dst: Dst } {
 	const spot = nearestOpen(s, s.top[cell]!.c, cell);
 	return {
@@ -361,12 +294,6 @@ export function tapMove(s: State, cell: number): { sel: Sel; dst: Dst } {
 	};
 }
 
-/**
- * Where dots dropped on open spot `cell` go, in order: its open area, nearest
- * first, then the other open spots of its color, area by area, the nearest
- * area first and each from its spot nearest `cell`. (So with only tiny islands
- * left, one drop can still fill several.)
- */
 export function dropSpots(s: State, cell: number): number[] {
 	const out = openRegion(s, cell);
 	if (!out.length) return out;
@@ -390,11 +317,6 @@ export function dropSpots(s: State, cell: number): number[] {
 	return out;
 }
 
-/**
- * Up to `want` more dots of `color` from the board, besides `held`, for a
- * move with room to spare: group by group, the group nearest `near` first and
- * each from its dot nearest `near`. The tray's never come.
- */
 function gather(s: State, color: number, held: Held[], want: number, near: number): Held[] {
 	const out: Held[] = [];
 	const taken = new Set(held.map((d) => d.gem.id));
@@ -418,7 +340,6 @@ function gather(s: State, color: number, held: Held[], want: number, near: numbe
 	return out;
 }
 
-/** How many dots sending board selection `sel` to the tray would park there. */
 export function parkCount(s: State, sel: Sel | null): number {
 	const dots = selectionDots(s, sel);
 	if (!dots || sel?.from !== 'board') return 0;
@@ -429,7 +350,6 @@ export function parkCount(s: State, sel: Sel | null): number {
 	return Math.min(free, all);
 }
 
-/** How many dots dropping selection `sel` on open spot `cell` would place. */
 export function dropCount(s: State, sel: Sel, cell: number): number {
 	const dots = selectionDots(s, sel);
 	if (!dots) return 0;
@@ -442,7 +362,6 @@ export function dropCount(s: State, sel: Sel, cell: number): number {
 	return Math.min(spots, all);
 }
 
-/** Cells of a group ordered by how close they are (along the group) to `center`. */
 function outward(s: State, cells: number[], center: number): number[] {
 	const inGroup = new Set(cells);
 	const seen = new Set([center]);
@@ -455,7 +374,6 @@ function outward(s: State, cells: number[], center: number): number[] {
 			}
 		}
 	}
-	// Pieces that no longer touch the center (after a split) come last, nearest first.
 	const far = cells.filter((i) => !seen.has(i));
 	const d2 = (i: number) =>
 		Math.pow((i % s.w) - (center % s.w), 2) +
@@ -464,7 +382,6 @@ function outward(s: State, cells: number[], center: number): number[] {
 	return queue.concat(far);
 }
 
-/** Put a dot in the tray next to the others of its color, so the tray stays grouped. */
 function trayInsert(s: State, gem: Gem) {
 	let at = -1;
 	for (let k = s.tray.length - 1; k >= 0; k--) {
@@ -477,16 +394,6 @@ function trayInsert(s: State, gem: Gem) {
 	else s.tray.splice(at + 1, 0, gem);
 }
 
-/**
- * Move selected dots to a destination. Mutates s on success.
- * Fills as much as it can, centered on what you tapped:
- *   - the dots that move are the ones closest to the dot you picked up
- *   - the spots they fill are the ones closest to the spot you tapped,
- *     within its touching group of open spots of that color, then on to the
- *     color's other open spots (see `dropSpots`)
- *   - with room to spare, more dots of that color come too (see `gather`)
- * Dots that don't fit stay where they were.
- */
 export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 	let dots = selectionDots(s, sel);
 	if (!dots) return { ok: false, reason: 'empty' };
@@ -496,7 +403,6 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 	const toTray: (Flight & { from: number })[] = [];
 	const fromTray: (Flight & { cell: number })[] = [];
 
-	// Board dots leave starting from the one you picked up.
 	if (sel.from === 'board') {
 		const byCell = new Map(dots.map((d) => [d.cell, d]));
 		dots = outward(
@@ -553,7 +459,6 @@ export function move(s: State, sel: Sel, dst: Dst): MoveResult {
 	return { ok: true, toBoard, toTray, fromTray, left, leftCell, leftCells };
 }
 
-/** True when the tray is full and no dot has an open spot of its color. */
 export function isStuck(s: State): boolean {
 	if (isWon(s)) return false;
 	if (s.tray.length < s.trayCap && s.top.some(Boolean)) return false;
@@ -565,11 +470,6 @@ export function isStuck(s: State): boolean {
 	return true;
 }
 
-/**
- * Flood-fill every region of cells that pass `inSet`, joining touching cells (corners
- * count) where `same` says they belong together. Regions come in order of their first
- * cell, which is their first entry; the rest of each region's cells follow in no set order.
- */
 function floodAll(
 	w: number,
 	h: number,
@@ -608,7 +508,6 @@ function floodAll(
 	return out;
 }
 
-/** Distinct board groups. */
 export function boardGroups(s: State): Group[] {
 	const top = s.top;
 	return floodAll(
@@ -620,7 +519,6 @@ export function boardGroups(s: State): Group[] {
 	).map((cells) => ({ color: top[cells[0]]!.c, cells, gems: cells.map((i) => top[i]!) }));
 }
 
-/** Distinct open regions. */
 function openRegions(s: State): { cell: number; color: number; size: number }[] {
 	const { target, top, filled } = s;
 	return floodAll(
@@ -632,10 +530,6 @@ function openRegions(s: State): { cell: number; color: number; size: number }[] 
 	).map((cells) => ({ cell: cells[0], color: target[cells[0]], size: cells.length }));
 }
 
-/**
- * Candidate legal actions in a sensible order:
- * place tray dots, then place board groups, then park a group in the tray.
- */
 export function actions(s: State): Action[] {
 	const out: Action[] = [];
 	const regions = openRegions(s);
@@ -671,10 +565,7 @@ export function actions(s: State): Action[] {
 	return out;
 }
 
-/**
- * `actions(s)[0]`, without listing the rest: the move greedy play makes. Parking is only
- * scored when nothing can be placed.
- */
+/** Must match `actions(s)[0]`. */
 export function bestAction(s: State): Action | null {
 	const regions = openRegions(s);
 	const inTray = trayCounts(s);
@@ -720,7 +611,6 @@ function byColor(s: State, groups: Group[]): Group[][] {
 	return out;
 }
 
-/** Parking: score each group by how many dots could be placed right after it lifts. */
 function parkings(s: State, groups: Group[], inTray: number[]): Action[] {
 	const free = s.trayCap - s.tray.length;
 	const open: number[] = new Array(s.colors.length).fill(0);
@@ -763,11 +653,6 @@ function parkings(s: State, groups: Group[], inTray: number[]): Action[] {
 	return parks;
 }
 
-/**
- * Greedy play, then randomized greedy. Returns the path and the most tray it
- * used, or null. `cap` overrides the tray size (Infinity measures how much tray
- * a path needs).
- */
 export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | null {
 	const rng = makeRng(seed || 1);
 	const limit = s0.target.length * 6;
@@ -795,78 +680,45 @@ export function solve(s0: State, tries = 1, seed = 1, cap?: number): Solution | 
 	return null;
 }
 
-/** About how many of a picture's dots each tray slot is for: a bigger picture gets more room. */
 const DOTS_PER_SLOT = 14;
-/**
- * How much tighter the tray gets with difficulty, as a share of its room: the lever, apart
- * from the picture's size (0.15 is 15% less room at difficulty 1).
- */
 const TRAY_SQUEEZE = 0.15;
 
-/** A difficulty kept to 0 to 1. */
 const depth = (difficulty = 0) => Math.min(1, Math.max(0, difficulty));
 
-/**
- * The tray for a picture of `dots` dots at `difficulty` (its mural's): room in proportion
- * to the picture, so a bigger one isn't harder for its size alone, tightened a little with
- * difficulty (`TRAY_SQUEEZE`). Each level is built and proven with its own tray.
- */
 export function trayFor(dots: number, difficulty: number): number {
 	return Math.max(8, Math.round((dots / DOTS_PER_SLOT) * (1 - TRAY_SQUEEZE * depth(difficulty))));
 }
 
-/** The bigger tray (the `relaxed` option): twice the level's own. Changes nothing else. */
 export function relax(s: State): State {
 	s.trayCap = Math.max(s.trayCap, 2 * (s.trayBase ?? s.trayCap));
 	return s;
 }
 
 export interface BuildOptions {
-	/** The bigger tray: twice the standard. */
 	relaxed?: boolean;
 }
 
-/** A built puzzle and the solver path that proved it can be finished. */
 export interface Built {
 	state: State;
 	solution: Solution;
 }
 
-/**
- * How big the scattered blobs of dots are at `difficulty` (its mural's): from 10 to 28 dots
- * at 0, which often fit a small tray whole, to 16 to 48 at 1, which rarely fit one.
- */
 export function blobSizes(difficulty: number): { min: number; max: number } {
 	const t = depth(difficulty);
 	return { min: Math.round(10 + 6 * t), max: Math.round(28 + 20 * t) };
 }
 
-/**
- * How often a scattered blob joins a same-colored one in the next area at `difficulty`
- * (see `scramble`): always at 0, so even a busy picture scrambles into fewer, bigger
- * groups with few lone dots; never at 1, so its small areas leave many to hunt for.
- */
 export function joinFor(difficulty: number): number {
 	return 1 - depth(difficulty);
 }
 
-/**
- * Same level always gives the same puzzle, wherever it sits in play: its mural's
- * difficulty (`Level.difficulty`) sets how hard. (`index` is the game interface's; unused.)
- * Tries a few shuffles and keeps the first one the solver can finish with the
- * level's own tray (`trayFor`), so every level is solvable with the tray you get.
- */
 export function buildPuzzle(level: Level, index: number, opts: BuildOptions = {}): State {
 	const { state } = buildSolved(level);
 	if (opts.relaxed) relax(state);
 	return state;
 }
 
-/**
- * The puzzle as proven, with the level's own tray, plus the solution that let it keep
- * its shuffle. Drops gather by the room left in the tray, so the solution replays only
- * with the tray it was found with.
- */
+/** The solution replays only with the tray it was found with: drops gather by tray room. */
 export function buildSolved(level: Level): Built {
 	const art = parseArt(level);
 	const base = hashStr(level.id);
@@ -900,7 +752,6 @@ export function buildSolved(level: Level): Built {
 			return { state: s, solution: sol };
 		}
 	}
-	// Fallback (not expected): grow the tray to whatever the first shuffle needs.
 	const s = make(0);
 	const sol = solve(s, 1, 1, Infinity)!;
 	s.minTray = sol.peak;
@@ -909,19 +760,14 @@ export function buildSolved(level: Level): Built {
 	return { state: s, solution: sol };
 }
 
-/** The board as laid out on screen, in pixels from the first cell's top-left corner. */
 export interface TapGrid {
 	w: number;
 	h: number;
-	/** A cell's width and height. */
 	cell: number;
-	/** From one cell to the next: a cell plus the gap. */
 	step: number;
-	/** How far from a cell's center a tap still reaches it: about a fingertip. */
 	reach: number;
 }
 
-/** The cell passing `ok` whose center is nearest (x, y), within `reach`. */
 function nearestTap(
 	g: TapGrid,
 	x: number,
@@ -947,16 +793,6 @@ function nearestTap(
 	return best < 0 ? null : { cell: best, d: bestD };
 }
 
-/**
- * Which cell a tap at (x, y) means (forgiving taps), or -1 when nothing useful is in reach.
- * Useful cells are dots, and, with dots in hand, open spots of their color (`isDrop`;
- * null when nothing is in hand).
- * A direct hit on an open spot wins. A direct hit on a dot takes, of the dots whose
- * centers are within `near` of the tap, the one in the biggest group (`size`), the
- * nearest of those: a tap by a group's edge rarely means the small group beside the
- * big one. Otherwise the nearest useful cell wins; with dots in hand an open spot gets
- * a little preference over a dot beside it.
- */
 export function tapCell(
 	g: TapGrid,
 	x: number,

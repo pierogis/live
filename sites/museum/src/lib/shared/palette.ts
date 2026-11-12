@@ -1,9 +1,3 @@
-/*
- * Color checks for level palettes. No imports, so node scripts can use it too.
- * Colors in one picture must be easy to tell apart: CIE76 delta E in Lab.
- */
-
-/** Pairs closer than this look alike next to each other. */
 export const MIN_DELTA = 28;
 
 export type Lab = [number, number, number];
@@ -46,7 +40,6 @@ export interface ClosePair {
 	delta: number;
 }
 
-/** Color keys in `palette` that look too alike. Only keys in `used` count, when given. */
 export function closePairs(
 	palette: Record<string, string>,
 	used?: Iterable<string>,

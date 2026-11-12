@@ -1,10 +1,7 @@
-/* Dots flying between the board and the tray, as sprites (see shared/game/sprites.ts). */
 import { canAnimate, Sprites } from '../shared/game/sprites';
 
-/** About how long a dot takes to fly, in milliseconds. */
 export const FLIGHT = 420;
 
-/** Where each dot is on screen right now, by dot id. */
 export function snapshotRects(roots: (HTMLElement | undefined)[]): Map<number, DOMRect> {
 	const map = new Map<number, DOMRect>();
 	for (const root of roots) {
@@ -16,12 +13,6 @@ export function snapshotRects(roots: (HTMLElement | undefined)[]): Map<number, D
 }
 
 export class Flights extends Sprites {
-	/**
-	 * Fly a dot of color `hex` from `from` to `target` over `duration` ms (about
-	 * FLIGHT), then call `onLand` with when it was meant to land. Lands right
-	 * away when there's nothing to animate or motion is reduced. `onSettle` runs
-	 * once the last flight in the air has landed.
-	 */
 	launch(opts: {
 		layer: HTMLElement | undefined;
 		hex: string;
@@ -47,7 +38,6 @@ export class Flights extends Sprites {
 
 		const dx = to.left + to.width / 2 - (from.left + from.width / 2);
 		const dy = to.top + to.height / 2 - (from.top + from.height / 2);
-		// The dot slides straight over and shrinks or grows to fit where it lands.
 		const scale = (to.width * 0.8) / from.width;
 		const anim = this.animate(
 			flight,

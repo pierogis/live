@@ -1,4 +1,3 @@
-/* A tiny PNG writer (RGB, no dependencies), for looking at a mural while drawing it. */
 import { deflateSync } from 'node:zlib';
 
 import { hexToRgb } from '../../src/lib/shared/palette.ts';
@@ -37,7 +36,6 @@ function png(w: number, h: number, rgb: Buffer): Buffer {
 	]);
 }
 
-/** A picture as an image, `px` pixels a dot, with a `gap` between panels when given a panel size. */
 export function image(
 	rows: string[],
 	palette: Record<string, string>,

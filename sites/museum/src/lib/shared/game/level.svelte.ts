@@ -1,19 +1,3 @@
-/*
- * A level's life, the same for every game: building it (on the server too, so a
- * level page arrives drawn), moving to another level, undo and restart, noticing
- * a win or a dead end, the end panel, saving, sound and the shared keys.
- *
- * A level in progress lives only in memory, so it's also kept in the tab's
- * session storage when the page is hidden or left, and picked up again when the
- * same level's page loads in the same tab. That way a page the browser reloads
- * (a phone that dropped a backgrounded tab, or the dev server reconnecting)
- * comes back where you were.
- *
- * A game makes one `LevelControl` while its component starts, passing its props
- * and a few hooks (`LevelGame`), and keeps only its own board, UI and animations.
- * Engines change their state in place, so the game calls `touch()` after each
- * change; everything derived from the state reads `version` to redraw.
- */
 import { untrack } from 'svelte';
 import { goto } from '$app/navigation';
 
@@ -23,105 +7,60 @@ import type { GameSave, Save } from '../save';
 import { music, type Clock, type Music, type Rhythm } from '../sound';
 import { Cue } from './cue.svelte';
 
-/**
- * The props every game component takes; the controller reads them through a getter.
- * Each level has its own page, which builds it ahead; moving to another level goes there.
- */
 export interface LevelProps<L extends Picture, S> {
-	/** Every level in play order, without its picture: enough to name and save each one. */
 	levels: Listed<L>[];
-	/** The page's level. */
 	start: number;
-	/** The `start` level's starting state, built ahead (at prerender). */
 	initial: S;
 	levelHref: (index: number) => string;
-	/** Where the page of all the murals lives; omit to hide the link. */
 	muralsHref?: string;
 }
 
-/** What a game tells the controller about itself. */
 export interface LevelGame<S> {
-	/** The game's save: its cookie store, option defaults and options. */
 	save: GameSave;
 	clone(s: S): S;
 	isWon(s: S): boolean;
-	/** No way left to win from here. */
 	isStuck(s: S): boolean;
-	/**
-	 * Fit a just-built state to the player's options, in place (Mosaic's relaxed
-	 * tray). Also runs once the save loads in the browser, on a state built
-	 * without it, so it must give the same result either way.
-	 */
+	/** Also runs on a state built without the saved options, so must give the same result. */
 	applyOptions?(s: S, options: Record<string, boolean>): void;
-	/**
-	 * `state` was replaced: a new level, an undo or a restart. Drop the game's
-	 * own passing state, like a selection or animations in flight. Runs while the
-	 * controller is being made too, so use `state` rather than the controller.
-	 */
 	reset?(state: S, why: 'level' | 'undo' | 'restart'): void;
-	/**
-	 * The game's own keys, after typing in a field and modified keys are left
-	 * alone. `key` is lower case. Return true when the key was used.
-	 */
 	key?(e: KeyboardEvent, key: string): boolean | void;
-	/** Read out to screen readers on a win, like "Picture complete." */
 	wonStatus: string;
-	/** How long the finished picture shows before the end panel; 900ms by default. */
 	winDelay?: number;
-	/** How long to wait before showing that the game is stuck; at once by default. */
 	stuckDelay?: number;
-	/** Undo steps kept; 500 by default. */
 	maxHistory?: number;
-	/** How its landings come, for the music: its sixteenth note, and whether the ones between tune notes play. */
 	rhythm: Rhythm;
 }
 
 export class LevelControl<L extends Picture, S extends { moves: number }> {
-	/** Progress as last read or written; a fresh save until the component mounts. */
 	save: Save = $state.raw({ level: 0, completed: {}, muted: false, options: {} });
-	/** The level being played, from 0. */
 	index = $state(0);
-	/** Bumps on each new level, so `{#key}` rebuilds the board rather than reusing it. */
 	key = $state(0);
-	/** The game as it is now. The engine changes it in place; see `touch`. */
 	state: S | null = $state.raw(null);
-	/** The level as it started, for restart. */
 	initial: S | null = $state.raw(null);
-	/** Bumps on every change to `state`. */
 	version = $state(0);
-	/** The end panel: a finished or a stuck level. */
 	overlay: 'win' | 'stuck' | null = $state(null);
-	/** Finished; the end panel follows after a moment. */
 	won = $state(false);
-	/** Read out to screen readers only; the game shows what happens instead of narrating it. */
 	status = $state('');
-	/** The options the current level was built with. */
 	options: Record<string, boolean> = $state.raw({});
 
 	level: Listed<L> = $derived.by(() => this.#props().levels[this.index]);
-	/** The level's name, like "Bullseye". */
 	label = $derived.by(() => this.level?.name ?? '');
-	/** You've finished this level, before or just now. */
 	done = $derived.by(() => !!this.level && !!this.save.completed[this.level.id]);
 	canUndo = $derived.by(() => {
 		void this.version;
 		return this.#history.length > 0;
 	});
-	/** The level after this one, wrapping around to the first. */
 	nextIndex = $derived.by(() => (this.index + 1) % this.#props().levels.length);
-	/** The other panels of this level's mural; empty when it isn't a panel. */
 	#panels = $derived.by(() => {
 		const panel = this.level?.panel;
 		if (!panel) return [];
 		const first = this.index - (panel.n - 1);
 		return this.#props().levels.slice(first, first + panel.of);
 	});
-	/** Every panel of this level's mural is complete. */
 	muralDone = $derived.by(
 		() => this.#panels.length > 0 && this.#panels.every((l) => this.save.completed[l.id])
 	);
 
-	/** The end panel's line for a win, `done` being the game's word: a mural's panel says which, or that the mural is finished. */
 	wonText(done: string): string {
 		const { name, panel } = this.level;
 		if (!panel) return `${name} ${done}.`;
@@ -131,28 +70,19 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 
 	#game: LevelGame<S>;
 	#props: () => LevelProps<L, S>;
-	/** A plain array: every change to it comes with a `version` bump. */
 	#history: S[] = [];
 	#stuckSeen = false;
-	// Never drawn, so it needn't be reactive.
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	#timers = new Set<ReturnType<typeof setTimeout>>();
 	#cues: Cue<unknown>[] = [];
 	#motion: MediaQueryList | null = null;
-	/** Mounted: the level in progress is kept through a reload. */
 	#keeping = false;
 
-	/**
-	 * Call while the component starts. `props` gives the component's props object
-	 * (`() => props`), which the controller reads as it changes.
-	 */
 	constructor(game: LevelGame<S>, props: () => LevelProps<L, S>) {
 		this.#game = game;
 		this.#props = props;
 		this.save = game.save.blank();
-		// The page's own level, built right away (on the server too).
 		untrack(() => this.#build(this.#clamp(props().start)));
-		// Moving between level pages reuses the component with a new `start`.
 		$effect(() => {
 			const next = props().start;
 			untrack(() => {
@@ -161,11 +91,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		});
 	}
 
-	/**
-	 * Call from `onMount`: reads the save, fits the page's level (built already) to
-	 * the saved options and remembers it, then picks up a game kept through a reload
-	 * and keeps the game whenever the page is hidden. Returns the cleanup.
-	 */
 	mount(): () => void {
 		this.#motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		this.save = this.#game.save.store.load();
@@ -192,7 +117,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		return () => {
 			document.removeEventListener('visibilitychange', onHide);
 			window.removeEventListener('pagehide', keep);
-			// Gone to another page in the site: what was kept is stale now.
 			this.#keeping = false;
 			this.#forget();
 			this.destroy();
@@ -204,12 +128,10 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		for (const cue of this.#cues) cue.stop();
 	}
 
-	/** Whether the player asked for less motion. */
 	get still(): boolean {
 		return !!this.#motion?.matches;
 	}
 
-	/** Call after the engine changes `state`, so what reads it redraws. */
 	touch() {
 		this.version++;
 	}
@@ -218,32 +140,25 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.status = msg;
 	}
 
-	/** The level's music, or null while the sound is off: `ctl.music?.note(hex)`. */
 	get music(): Music | null {
 		return this.save.muted ? null : music;
 	}
 
-	/** The level's beat, sound or not: land things on it so the music keeps time. */
 	get clock(): Clock {
 		return music.clock;
 	}
 
-	/** Color `hex` was just finished: its sound, unless that finished the picture (the win has its own). */
 	finished(hex: string) {
 		if (this.state && !this.#game.isWon(this.state)) this.music?.done(hex);
 	}
 
-	/** A cue that's turned off when the game goes away. */
 	cue<T>(off: T, ms?: number): Cue<T> {
 		const cue = new Cue(off, ms);
 		this.#cues.push(cue);
 		return cue;
 	}
 
-	// ---------- levels ----------
-	/** Start level `i` here and remember it. */
 	start(i: number) {
-		// Another level: the one kept from before is stale.
 		if (this.#keeping) this.#forget();
 		this.#build(i);
 		this.#write((s) => {
@@ -251,7 +166,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		});
 	}
 
-	/** Another level: its own page. */
 	go = (i: number) => goto(this.#props().levelHref(i));
 
 	next = () => this.go(this.nextIndex);
@@ -260,7 +174,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		return this.#props().levelHref(this.nextIndex);
 	}
 
-	/** LevelNav's props: `<LevelNav {...ctl.nav} />`. */
 	get nav() {
 		return {
 			index: this.index,
@@ -270,10 +183,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		};
 	}
 
-	/**
-	 * Set up level i. No saving and no page access, so it also runs on the server.
-	 * The `start` level comes from the `initial` prop when there is one.
-	 */
 	#build(i: number) {
 		const g = this.#game;
 		const s = this.#starting(i);
@@ -295,7 +204,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.say(`${this.level.name}.`);
 	}
 
-	/** Level i's starting state: its page's own, built ahead. */
 	#starting(i: number): S {
 		const props = this.#props();
 		if (i !== props.start) throw new Error(`level ${i + 1} is built on its own page`);
@@ -306,18 +214,14 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		return Math.min(Math.max(0, i), this.#props().levels.length - 1);
 	}
 
-	// ---------- moves ----------
-	/** Call with a copy of the state from before a move that went through, so it can be undone. */
 	record(before: S) {
 		this.#history.push(before);
 		if (this.#history.length > (this.#game.maxHistory ?? 500)) this.#history.shift();
 		this.#stuckSeen = false;
-		// Quick moves swell the music, and (for a paced game) shift its gear, sound or not.
 		if (this.#game.rhythm.paced) this.clock.paced(performance.now());
 		this.music?.move();
 	}
 
-	/** Call when the board is still: wins, or shows the stuck panel when no way is left. */
 	settle() {
 		const s = this.state;
 		const g = this.#game;
@@ -340,7 +244,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		const next = this.nextIndex;
 		this.#write((s) => {
 			s.completed[id] = true;
-			// The win that finishes a mural leads back to the murals, so the game moves on by itself.
 			if (panels.length && panels.every((l) => s.completed[l.id])) s.level = next;
 		});
 		this.won = true;
@@ -364,7 +267,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.say('Undone.');
 	};
 
-	/** Back to the level's start; undo brings the game back. `fromEnd` is the end panel's button. */
 	restart = (fromEnd = false) => {
 		const { state, initial } = this;
 		if (!state || !initial || (this.overlay && !fromEnd)) return;
@@ -389,7 +291,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		else music.chime();
 	};
 
-	/** For `<svelte:document onkeydown>`: Z undoes, R restarts, then the game's own keys. */
 	onKey = (e: KeyboardEvent) => {
 		if ((e.target as Element).closest?.('input, textarea, select')) return;
 		const key = e.key.toLowerCase();
@@ -405,8 +306,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		else if (key === 'r') this.restart();
 	};
 
-	// ---------- the shared pieces ----------
-	/** GameBar's props: `<GameBar {...ctl.bar} game=… />`. */
 	get bar() {
 		return {
 			label: this.label,
@@ -420,16 +319,11 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		};
 	}
 
-	/**
-	 * The murals page, at this level's panel (`#<level id>`), so leaving a level for it
-	 * lands where you were rather than at the top.
-	 */
 	get #murals(): string | undefined {
 		const href = this.#props().muralsHref;
 		return href && this.level ? `${href}#${this.level.id}` : href;
 	}
 
-	/** LevelEnd's props, while `overlay` is set: `<LevelEnd {...ctl.end} text=… />`. */
 	get end() {
 		return {
 			state: this.overlay === 'win' ? ('won' as const) : ('stuck' as const),
@@ -442,20 +336,14 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		};
 	}
 
-	// ---------- a level in progress, through a reload ----------
 	get #sessionKey() {
 		return `${this.#game.save.cookie}-playing`;
 	}
 
-	/** What the level started as, so a kept game is only picked up on the same deal. */
 	#deal(): number {
 		return hashStr(JSON.stringify(this.initial));
 	}
 
-	/**
-	 * Keep the level in progress in session storage. Runs when the page is hidden or
-	 * left, which comes before any reload, so what's kept is always the latest.
-	 */
 	#keep() {
 		const { state, level } = this;
 		if (!state || !level || this.won || state.moves === 0) {
@@ -467,7 +355,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 			try {
 				sessionStorage.setItem(this.#sessionKey, JSON.stringify(kept));
 			} catch {
-				// Too big for the storage: keep the game without its undo steps.
 				sessionStorage.setItem(this.#sessionKey, JSON.stringify({ ...kept, history: [] }));
 			}
 		} catch {
@@ -483,7 +370,6 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		}
 	}
 
-	/** Pick up the level as it was kept, once: only on the page load right after. */
 	#resume() {
 		let kept: { id: string; deal: number; state: S; history: S[] } | null = null;
 		try {
@@ -504,13 +390,10 @@ export class LevelControl<L extends Picture, S extends { moves: number }> {
 		this.settle();
 	}
 
-	// ---------- saving and timers ----------
-	/** Change the save through the store, which keeps progress made in another tab. */
 	#write(fn: (s: Save) => void) {
 		this.save = this.#game.save.store.update(fn);
 	}
 
-	/** Run `fn` after `ms` (now, for 0), unless the level changes first. */
 	#later(ms: number, fn: () => void) {
 		if (ms <= 0) {
 			fn();

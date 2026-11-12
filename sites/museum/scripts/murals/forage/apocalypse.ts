@@ -1,10 +1,4 @@
-// Apocalypse Tapestry at Angers, France (woven 1377–1382): the Book of Revelation as a
-// long run of scenes, each on a ground of madder red or indigo, turn and turn about, sown
-// with leafy sprigs, flowers and butterflies. St John watches from his Gothic pavilion; the
-// four horsemen ride; angels sound their trumpets; locusts with human faces swarm from the
-// pit; the woman clothed with the sun stands on the moon; Michael fights the seven-headed
-// dragon; the beast rises from the sea; the whore of Babylon rides her beast; Babylon falls;
-// the New Jerusalem shines. Two rows of six scenes, 32 by 32 each.
+// Apocalypse Tapestry (Angers, France, woven 1377–1382).
 import { Canvas, SIDES, mod, points } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -14,14 +8,12 @@ const COLS = 6;
 const KEYS = 'RBKWYOPNGSLA';
 const ID: Record<string, string> = Object.fromEntries([...KEYS].map((k) => [k, k]));
 
-/** Each scene's ground: red and blue like a checkerboard. */
 const back = (k: number) => (((k % COLS) + Math.floor(k / COLS)) % 2 ? 'B' : 'R');
 
 const hash = (x: number, y: number) => (((x * 73856093) ^ (y * 19349663)) >>> 0) % 1000;
 
 type Paint = (s: Canvas) => void;
 
-/** A figure drawn on its own little canvas, then ringed with a dark outline. */
 function sprite(w: number, h: number, fn: Paint, after?: Paint, edge = 'K'): string[] {
 	const s = new Canvas(w, h, '.');
 	fn(s);
@@ -38,11 +30,9 @@ function sprite(w: number, h: number, fn: Paint, after?: Paint, edge = 'K'): str
 	return s.rows();
 }
 
-/** A hand-drawn pattern, outlined. */
 const outlined = (p: string[], key: Record<string, string>, after?: Paint, edge = 'K') =>
 	sprite(p[0].length + 2, p.length + 2, (s) => s.stamp(p, 1, 1, { ...ID, ...key }), after, edge);
 
-// a prancing horse facing right: c coat, m mane and tail, t saddle cloth, k eye
 const HORSE = [
 	'...............cc.....',
 	'..............cccc....',
@@ -61,7 +51,6 @@ const HORSE = [
 	'...c..c....c...cc.....',
 	'..cc..cc...cc...c.....'
 ];
-// a rider seated facing right: h hair, r robe, k eye; the last rows hang over the horse
 const RIDER = [
 	'.hhh..',
 	'hhWW..',
@@ -75,10 +64,7 @@ const RIDER = [
 	'.rrrrr',
 	'...r.r'
 ];
-// one of the beasts' seven heads, facing right: crowned, jaws open
 const HEAD7 = ['.Y.Y..', '.YYY..', 'ccccc.', 'cckccc', 'cc.tt.'];
-// a locust: a golden horse in armour with wings, a scorpion's tail, and a crowned
-// human face with a woman's hair and lion's teeth
 const LOCUST = [
 	'..............Y.Y.Y...',
 	'..aa..........YYYYY...',
@@ -96,7 +82,6 @@ const LOCUST = [
 	'...c..c.....c..c......',
 	'..cc..cc...cc..cc.....'
 ];
-// the mouth of hell: a monster's head, jaws open, fire in its throat
 const HELL = [
 	'..nnnn......',
 	'.nYnnnn.....',
@@ -109,7 +94,6 @@ const HELL = [
 	'nnnnnnnnnnnn',
 	'.nnnnnnnnn..'
 ];
-// the twelve foundations of the holy city, each a different stone
 const JEWELS = 'OLWSPYBO';
 
 interface Who {
@@ -118,16 +102,13 @@ interface Who {
 	hair?: string;
 	halo?: boolean;
 	crown?: boolean;
-	/** Body length below the neck. */
 	h?: number;
-	/** Hem half-width. */
 	hem?: number;
 	wings?: [string, string];
 	extra?: Paint;
 	after?: Paint;
 }
 
-/** A standing Gothic figure facing right: small head, long robe with folds. Head at (7, 4). */
 const person = (o: Who) =>
 	sprite(
 		16,
@@ -136,7 +117,6 @@ const person = (o: Who) =>
 			const h = o.h ?? 17;
 			const hem = o.hem ?? 4;
 			if (o.wings) {
-				// a long wing rising behind the shoulders, feathers in bands
 				const [a, b] = o.wings;
 				s.oval(3.5, 8, 6.5, 2.2, -1.2, a);
 				for (let y = 0; y < 20; y++)
@@ -171,7 +151,6 @@ function draw(c: Canvas) {
 		c.clip(-wide, 0, PW - 1 + wide, PH - 1);
 	};
 
-	// ---------- every scene: its ground, and a meadow along the bottom ----------
 	for (let k = 0; k < 12; k++) {
 		panel(k);
 		rect(0, 0, PW - 1, PH - 1, back(k));
@@ -185,14 +164,12 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// little meadow flowers along the bottom of each scene
 	const meadow = (cols: string) => {
 		for (let x = 1; x < PW; x += 3) {
 			const y = 29 + (hash(x, 3) % 3);
 			if ('GS'.includes(get(x, y))) put(x, y, cols[hash(x, y) % cols.length]);
 		}
 	};
-	// rolling water: crests of cream over pale and dark blue
 	const waves = (y0: number, x0 = 0, x1 = PW - 1) => {
 		for (let y = y0; y < PH; y++) {
 			for (let x = x0; x <= x1; x++) {
@@ -201,7 +178,6 @@ function draw(c: Canvas) {
 			}
 		}
 	};
-	/** Paint in scene coordinates on a layer of its own, then ring it with an outline. */
 	const layer = (fn: Paint, after?: Paint, edge = 'K') => {
 		const shift = (f: Paint) => (s: Canvas) => {
 			s.at(20, 4);
@@ -210,7 +186,6 @@ function draw(c: Canvas) {
 		};
 		S(sprite(PW + 40, PH + 8, shift(fn), after && shift(after), edge), -20, -4);
 	};
-	/** A horse with its rider; (x, y) is the horse's top left. */
 	const mount = (
 		x: number,
 		y: number,
@@ -242,7 +217,6 @@ function draw(c: Canvas) {
 			y
 		);
 	};
-	/** Seven necks from one chest, a crowned head on each; heads are given by their middles. */
 	const hydra = (
 		bx: number,
 		by: number,
@@ -264,15 +238,12 @@ function draw(c: Canvas) {
 				s.disk(x, y, 0.8, skin);
 			}
 		};
-		// the necks bare, then each head outlined, far ones first
 		layer((s) => heads.forEach(([cx, cy]) => neck(s, cx, cy)), undefined, '');
 		for (const [cx, cy] of heads.sort((p, q) => q[2] - p[2]))
 			layer((s) => s.stamp(HEAD7, cx - 3, cy - 2, { ...ID, c: skin, k: 'K', t: tongue }, left));
 	};
 
-	// ---------- 1. St John in his pavilion with his book, an angel appears to him ----------
 	panel(0);
-	// slate roof in checks, gold crockets and finial
 	for (let y = 1; y <= 8; y++) {
 		const hw = Math.round((y - 1) * 0.9);
 		for (let x = 7 - hw; x <= 7 + hw; x++) {
@@ -284,15 +255,12 @@ function draw(c: Canvas) {
 	dots('Y', [7, 0]);
 	rect(0, 9, 14, 9, 'Y');
 	dots('K', [1, 9], [4, 9], [7, 9], [10, 9], [13, 9]);
-	// inside: a blue wall with a gold lattice
 	rect(1, 10, 13, 25, 'B');
 	for (let y = 10; y <= 25; y++)
 		for (let x = 2; x <= 12; x++) if (mod(x + y, 4) === 0 && mod(x - y, 4) === 0) put(x, y, 'Y');
-	// slim columns and a pointed arch
 	for (const x of [0, 14]) line(x, 10, x, 25, 'K');
 	for (const x of [1, 13]) line(x, 10, x, 25, 'W');
 	for (let x = 2; x <= 12; x++) put(x, 10 + Math.round(((x - 7) / 5) ** 2 * 3), 'W');
-	// John on his bench, a book open on his knees
 	S(
 		sprite(16, 22, (s) => {
 			s.disk(7, 4, 3.4, 'Y');
@@ -305,7 +273,6 @@ function draw(c: Canvas) {
 			for (let y = 15; y <= 19; y++) s.rect(9, y, 12, y, 'W');
 			for (let y = 10; y <= 19; y++) if (y % 3 === 0) s.put(10, y, 'A');
 			s.dots('A', [6, 10], [8, 11], [6, 12]);
-			// the open book held up
 			s.rect(10, 9, 13, 11, 'R');
 			s.dots('W', [10, 10], [11, 10], [12, 10], [13, 10]);
 			s.put(9, 11, 'W');
@@ -313,12 +280,10 @@ function draw(c: Canvas) {
 		-1,
 		9
 	);
-	// bench and floor
 	rect(1, 23, 8, 25, 'N');
 	for (let x = 1; x <= 8; x += 2) put(x, 24, 'Y');
 	rect(0, 26, 15, 27, 'A');
 	for (let x = 0; x <= 15; x += 3) put(x, 27, 'K');
-	// the angel on a cloud, pointing John to the vision
 	S(
 		person({
 			robe: 'W',
@@ -336,17 +301,14 @@ function draw(c: Canvas) {
 		4,
 		true
 	);
-	// the cloud
 	for (let x = 16; x <= 31; x++) {
 		const top = 21 + (mod(x, 4) === 1 || mod(x, 4) === 2 ? 0 : 1);
 		for (let y = top; y <= 24; y++) put(x, y, y === top ? 'W' : mod(x + y, 3) ? 'L' : 'W');
 	}
 	meadow('WYP');
 
-	// ---------- 2. the white horse and the red: a crowned archer, a swordsman ----------
 	panel(1);
 	mount(-4, 2, 'WYR', 'R', 'Y', { crown: true });
-	// his bow raised, an arrow on the string
 	for (let k = 0; k <= 8; k++) {
 		const t = k / 8;
 		put(6 + t * 5 + Math.sin(t * Math.PI) * 1.6, 1 + t * 5 - Math.sin(t * Math.PI) * 2, 'N');
@@ -355,27 +317,22 @@ function draw(c: Canvas) {
 	line(6, 6, 12, 0, 'Y');
 	put(13, 0, 'A');
 	mount(10, 14, 'RKY', 'Y', 'K');
-	// the great sword held high
 	line(22, 19, 28, 13, 'A');
 	line(22, 18, 27, 13, 'W');
 	dots('Y', [21, 18], [22, 20], [20, 19]);
 	meadow('WYP');
 
-	// ---------- 3. the black horse and the pale: scales, and Death ----------
 	panel(2);
 	mount(-4, 1, 'KAG', 'G', 'N', { edge: 'A' });
-	// the scales, held up
 	line(9, 0, 9, 5, 'Y');
 	line(6, 1, 12, 1, 'Y');
 	dots('W', [5, 2], [6, 2], [7, 2], [11, 2], [12, 2], [13, 2]);
 	mount(10, 14, 'SAN', 'A', 'W', { skull: true });
-	// Death's spear, hell gaping at his heels
 	line(22, 21, 29, 14, 'N');
 	dots('W', [30, 13], [29, 13], [30, 14]);
 	S(outlined(HELL, { n: 'N' }), -1, 19);
 	meadow('WYO');
 
-	// ---------- 4. three angels sound their trumpets; hail and fire fall ----------
 	panel(3);
 	for (const [x, y, robe, fold] of [
 		[1, 3, 'W', 'A'],
@@ -395,7 +352,6 @@ function draw(c: Canvas) {
 			x - 4,
 			y
 		);
-		// a long gold trumpet raised to the lips
 		line(x + 5, y + 4, x + 10, y - 1, 'Y');
 		dots('Y', [x + 10, y - 2], [x + 11, y - 1], [x + 11, y - 2]);
 	}
@@ -409,9 +365,7 @@ function draw(c: Canvas) {
 		dots(hash(x, y) % 2 ? 'O' : 'W', [x, y]);
 	meadow('WYO');
 
-	// ---------- 5. locusts with human faces come up from the pit ----------
 	panel(4);
-	// the pit, a stone well, smoke rising out of it
 	ring(4, 25, 3.5, 'A', 1.1);
 	disk(4, 25, 2.4, 'K');
 	for (let y = 0; y < 21; y++) {
@@ -425,7 +379,6 @@ function draw(c: Canvas) {
 	S(locust, 7, 14, false, { N: 'O' });
 	meadow('WYS');
 
-	// ---------- 6. the woman clothed with the sun, the moon under her feet ----------
 	panel(5);
 	for (let k = 0; k < 20; k++) {
 		const a = (k / 20) * Math.PI * 2;
@@ -454,12 +407,10 @@ function draw(c: Canvas) {
 		9,
 		3
 	);
-	// twelve stars round her head
 	for (let k = 0; k < 12; k++) {
 		const a = Math.PI * 0.85 + (k / 11) * Math.PI * 1.3;
 		put(16 + Math.cos(a) * 5.5, 7.5 + Math.sin(a) * 5, 'W');
 	}
-	// the moon, a crescent under her feet
 	for (let x = 9; x <= 23; x++) {
 		const d = Math.abs(x - 16) / 7;
 		const y0 = 26 - Math.round((1 - d * d) * 2);
@@ -468,11 +419,9 @@ function draw(c: Canvas) {
 	}
 	meadow('WYP');
 
-	// ---------- 7 and 8. the great red dragon, Michael and his angels ----------
 	panel(6, 4);
 	layer(
 		(s) => {
-			// bat wings raised from the back
 			for (let y = 2; y < 18; y++) {
 				for (let x = 1; x < 17; x++) {
 					const top = 3 + Math.abs(Math.sin((x / 16) * Math.PI * 2.5)) * 3;
@@ -480,14 +429,11 @@ function draw(c: Canvas) {
 				}
 			}
 			s.ell(10, 20, 8, 4.5, 'R');
-			// tail curling back
 			for (let k = 0; k <= 14; k++) s.disk(3 - k * 0.25, 21 + Math.sin(k / 2.4) * 3, 0.9, 'R');
-			// legs with claws
 			s.rect(5, 23, 6, 27, 'R');
 			s.rect(13, 23, 14, 27, 'R');
 		},
 		(s) => {
-			// ribs in the wings, scales and a gold belly
 			for (const [x, y] of [
 				[2, 4],
 				[7, 3],
@@ -504,14 +450,12 @@ function draw(c: Canvas) {
 		}
 	);
 	hydra(14, 18, '22,3 22,10 22,17 29,1 29,7 29,13 29,20', 'R', 'O');
-	// the stars his tail drew down
 	dots('W', [2, 1], [7, 0], [1, 6], [24, 25], [29, 26]);
 	dots('Y', [5, 2], [11, 1], [20, 24]);
 	panel(6);
 	meadow('WYP');
 
 	panel(7, 6);
-	// Michael in mail, a shield with a cross, his lance in a dragon's mouth
 	S(
 		person({
 			robe: 'A',
@@ -533,7 +477,6 @@ function draw(c: Canvas) {
 		true
 	);
 	line(19, 12, -3, 5, 'N');
-	// one of his angels below, sword raised against the heads
 	S(
 		person({
 			robe: 'L',
@@ -554,23 +497,19 @@ function draw(c: Canvas) {
 	panel(7);
 	meadow('WYO');
 
-	// ---------- 9. the beast rises from the sea ----------
 	panel(8);
 	waves(19);
 	layer(
 		(s) => {
 			s.ell(22, 15, 9, 5, 'Y');
 			s.disk(15, 14, 3.5, 'Y');
-			// a bear's front paws reaching out of the waves
 			s.line(14, 17, 10, 20, 'N');
 			s.line(14, 18, 10, 21, 'N');
 			s.line(18, 19, 16, 22, 'N');
 			s.line(19, 19, 17, 22, 'N');
-			// tail
 			s.line(30, 13, 31, 9, 'Y');
 		},
 		(s) => {
-			// leopard spots
 			for (let y = 10; y < 22; y++)
 				for (let x = 12; x < 32; x++)
 					if (s.get(x, y) === 'Y' && mod(x + (y % 4 === 1 ? 2 : 0), 4) === 0 && y % 2)
@@ -579,11 +518,9 @@ function draw(c: Canvas) {
 		}
 	);
 	hydra(14, 13, '3,2 10,1 17,3 3,9 10,8 3,16 9,15', 'Y', 'R', true);
-	// the sea washes over its belly
 	waves(21, 18, 31);
 	dots('A', [3, 27], [4, 26], [5, 27], [24, 29], [25, 28], [26, 29]);
 
-	// ---------- 10. the whore of Babylon on the scarlet beast ----------
 	panel(9);
 	waves(26);
 	layer(
@@ -594,14 +531,12 @@ function draw(c: Canvas) {
 			s.line(29, 18, 31, 23, 'O');
 		},
 		(s) => {
-			// the names of blasphemy written all over it
 			for (let y = 15; y < 24; y++)
 				for (let x = 13; x < 31; x++)
 					if (s.get(x, y) === 'O' && mod(x * 2 + y, 5) === 0) s.put(x, y, 'K');
 		}
 	);
 	hydra(13, 17, '3,3 10,2 3,10 10,9 3,17 9,16 16,7', 'O', 'W', true);
-	// she sits in purple and scarlet, crowned, raising a golden cup
 	S(
 		person({
 			robe: 'P',
@@ -620,17 +555,13 @@ function draw(c: Canvas) {
 		1
 	);
 
-	// ---------- 11. Babylon is fallen ----------
 	panel(10);
-	/** Stone in courses, mortar dark. */
 	const stone = (x: number, y: number) =>
 		y % 3 === 2 || mod(x + (Math.floor(y / 3) % 2) * 3, 6) === 0 ? 'K' : 'A';
-	/** A stone tower, w wide, from row `top` down to row `bottom`; `tilt` leans it as it falls. */
 	const tower = (x: number, top: number, w: number, tilt: number, roof: string, bottom = 26) => {
 		const h = bottom - top;
 		const p = sprite(w + 2, h + 2, (s) => {
 			const mid = (w + 1) / 2;
-			// a tall pointed roof with a gold knob
 			for (let y = 1; y < 8; y++) {
 				const hw = (y - 1) * ((w + 1) / 14);
 				for (let xx = 1; xx <= w; xx++)
@@ -640,7 +571,6 @@ function draw(c: Canvas) {
 			s.put(Math.round(mid), 0, 'Y');
 			for (let y = 8; y <= h; y++)
 				for (let xx = 1; xx <= w; xx++) s.put(xx, y, y % 3 === 2 ? 'K' : 'A');
-			// burning windows
 			for (let wy = 10; wy + 2 <= h; wy += 6) {
 				s.rect(Math.round(mid) - 1, wy, Math.round(mid), wy + 2, 'O');
 				s.put(Math.round(mid) - 1, wy, 'Y');
@@ -655,14 +585,12 @@ function draw(c: Canvas) {
 	};
 	tower(-1, 4, 7, 0, 'R');
 	tower(23, 7, 7, 0, 'L');
-	// the middle tower breaks: its stump stands, its top topples away
 	for (let y = 15; y <= 22; y++) {
 		const jag = y === 15 ? [10, 12, 15] : y === 16 ? [10, 15] : [];
 		for (let x = 9; x <= 17; x++)
 			put(x, y, x === 9 || x === 17 ? 'K' : jag.includes(x) ? back(10) : stone(x, y));
 	}
 	tower(10, 0, 7, 0.55, 'R', 12);
-	// the city wall, its gate, flames along the top
 	for (let y = 22; y <= 27; y++)
 		for (let x = 0; x < PW; x++) {
 			if (y === 22 && x % 2) continue;
@@ -675,18 +603,14 @@ function draw(c: Canvas) {
 		dots('O', [x, y], [x + 1, y], [x, y - 1]);
 		dots('Y', [x + 1, y - 1], [x, y - 2]);
 	}
-	// stones tumbling from the falling tower
 	for (const [x, y] of points('20,15 19,19 9,12 23,18')) {
 		rect(x, y, x + 1, y + 1, 'A');
 		put(x + 1, y + 1, 'K');
 	}
-	// unclean birds flying off
 	for (const [x, y] of points('27,1 15,2 2,0')) dots('K', [x, y], [x + 1, y + 1], [x + 2, y]);
 	meadow('AO');
 
-	// ---------- 12. the New Jerusalem ----------
 	panel(11);
-	// golden walls on courses of jewels, pearl gates
 	for (let y = 13; y <= 26; y++)
 		for (let x = 11; x <= 31; x++) {
 			if (y >= 23) put(x, y, mod(x + y, 2) ? JEWELS[mod(x + y * 3, JEWELS.length)] : 'Y');
@@ -700,7 +624,6 @@ function draw(c: Canvas) {
 		put(gx, 16, 'W');
 		put(gx, 21, 'Y');
 	}
-	// towers with blue roofs
 	for (const [tx, ty] of points('13,6 21,4 29,6')) {
 		rect(tx - 2, ty + 3, tx + 2, 12, 'Y');
 		for (let y = ty + 4; y <= 12; y++) put(tx, y, y % 2 ? 'K' : 'Y');
@@ -708,13 +631,11 @@ function draw(c: Canvas) {
 		rect(tx - 3, ty + 3, tx + 3, ty + 3, 'L');
 		put(tx, ty - 2, 'Y');
 	}
-	// the river of life flows out under the gate
 	for (let y = 27; y < PH; y++)
 		for (let x = 15; x <= 19; x++) {
 			const xx = x + (y % 2);
 			put(xx, y, mod(xx + y, 3) ? 'L' : 'W');
 		}
-	// the angel with the golden reed, showing John the city
 	S(
 		person({ robe: 'W', fold: 'L', hair: 'Y', halo: true, wings: ['L', 'W'], h: 16, hem: 4 }),
 		-4,
@@ -724,7 +645,6 @@ function draw(c: Canvas) {
 	put(6, 14, 'W');
 	meadow('WYO');
 
-	// ---------- sprigs, flowers and butterflies in the empty ground ----------
 	const SPRIGS = [
 		['.a.', 'aba', '.a.'],
 		['a.a', '.a.', '.c.'],
@@ -760,8 +680,6 @@ export const apocalypse: Mural = {
 	cols: COLS,
 	difficulty: 0.85,
 	panel: [PW, PH],
-	// R madder red, B indigo, K dark brown, W cream, Y gold, O orange, P rose, N brown,
-	// G olive green, S sage, L pale blue, A gray
 	palette: {
 		R: '#9a3030',
 		B: '#2c4370',

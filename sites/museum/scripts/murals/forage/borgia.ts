@@ -1,20 +1,12 @@
-// Codex Borgia (central Mexico, before 1500): a screenfold book of the ritual calendar,
-// painted on deerskin coated with white plaster. Everything is ringed in heavy black and
-// filled with flat color, and red frame bands cut the pages into sections. Across the top
-// the feathered serpent faces Tezcatlipoca, and Tlaloc brings the rain; below, a jaguar
-// walks to a temple and the sun drinks a quail's blood; at the bottom the death god and the
-// earth crocodile wait by a river poured from the water goddess's skirt, beside a skull
-// rack. Down the right, day signs in boxes keep the count in dots. 4 by 3 panels of 34 by 32.
+// Codex Borgia (central Mexico, before 1500).
 import { points, SIDES, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const PW = 34;
 const PH = 32;
 
-/** Letters in a pattern paint their own color; '.' paints nothing. */
 const SELF = Object.fromEntries([...'WKRYOTGBSDAPLM'].map((k) => [k, k]));
 
-// ---------- day signs, 9 by 8, each in its own box ----------
 const CROCODILE = [
 	'...KKKKK.',
 	'..KGTGTGK',
@@ -136,8 +128,6 @@ const FLINT = [
 	'.KK......'
 ];
 
-// ---------- gods and beasts ----------
-/** The feathered serpent's head, facing right: a crest of plumes, jaws open, a forked tongue. */
 const SERPENT_HEAD = [
 	'...KK.KK.KK........',
 	'..KGTKGTKRYK.......',
@@ -157,7 +147,6 @@ const SERPENT_HEAD = [
 	'.KKYYYYYYYYYK......',
 	'...KKKKKKKKK.......'
 ];
-/** Tezcatlipoca, facing left: face in yellow and black bands, a mirror at his temple. */
 const TEZ = [
 	'.....KKKKKKKKKK.........',
 	'....KRWRWRWRWRK.........',
@@ -186,7 +175,6 @@ const TEZ = [
 	'....KDDDDDDK............',
 	'....KKKKKKKK............'
 ];
-/** Tlaloc kneeling, facing left: a goggle ring round his eye, a curled lip, fangs. */
 const TLALOC = [
 	'.....KKKKKKKKKK.......',
 	'....KWGWGWGWGWGK......',
@@ -215,7 +203,6 @@ const TLALOC = [
 	'.....KBBBBBBBBDDDK....',
 	'.....KKKKKKKKKKKKK....'
 ];
-/** The jaguar's head, facing right, roaring. */
 const JAG_HEAD = [
 	'.KK...KK....',
 	'KRYK.KRYK...',
@@ -230,7 +217,6 @@ const JAG_HEAD = [
 	'.KYYYKWKWKK.',
 	'..KKKKKKKK..'
 ];
-/** A priest in a red cloak, facing right, with a bag of incense. */
 const PRIEST = [
 	'.KKK..',
 	'KKKKK.',
@@ -242,7 +228,6 @@ const PRIEST = [
 	'.KSKS.',
 	'.KDKD.'
 ];
-/** The sun's face. */
 const SUN_FACE = [
 	'..KKKKK..',
 	'.KOOOOOK.',
@@ -254,7 +239,6 @@ const SUN_FACE = [
 	'.KOOOOOK.',
 	'..KKKKK..'
 ];
-/** Mictlantecuhtli crouching, facing right: a skull in curly black hair full of star eyes. */
 const MICTLAN = [
 	'.KKK..KK.KK.KK..............',
 	'KWRWKKKKKKKKKKKKK...........',
@@ -280,7 +264,6 @@ const MICTLAN = [
 	'.KWWK...KK....KWWK..........',
 	'KKKK..........KKKK..........'
 ];
-/** The earth crocodile's head, facing left: an upper jaw only, full of teeth. */
 const CROC_HEAD = [
 	'......KKKKKKK',
 	'....KKGGTGGGG',
@@ -292,7 +275,6 @@ const CROC_HEAD = [
 	'.KWKWKWKWKKGG',
 	'..K.K.K.K.KRR'
 ];
-/** Chalchiuhtlicue seated, facing left: a jade skirt the river pours from. */
 const WATER_GODDESS = [
 	'....KK.KK.KK.KK.......',
 	'...KWWKTTKWWKTTK......',
@@ -318,7 +300,6 @@ const WATER_GODDESS = [
 	'...KWWWKWWWKWWWKWWK...',
 	'...KKKKKKKKKKKKKKK....'
 ];
-/** A conch shell, pink inside. */
 const CONCH = [
 	'..KKK..',
 	'.KWWWK.',
@@ -329,7 +310,6 @@ const CONCH = [
 	'..KWWK.',
 	'...KK..'
 ];
-/** A water jar with a jade band. */
 const JAR = [
 	'.KKKKK.',
 	'.KWWWK.',
@@ -341,7 +321,6 @@ const JAR = [
 	'..KKK..'
 ];
 const SKULL = ['.KKKKK.', 'KWWWWWK', 'KKKWKKK', 'KKKWKKK', 'KWWKWWK', '.KWKWK.', '..KKK..'];
-/** A vulture, facing left. */
 const VULTURE = [
 	'..KKK.....',
 	'.KROK.....',
@@ -358,7 +337,6 @@ function draw(c: Canvas) {
 	const { put, rect, disk, line, dots, stamp, leaf } = c;
 	const art = (p: string[], x: number, y: number, flip = false) => stamp(p, x, y, SELF, flip);
 
-	/** Paint inside a panel, in its own dots. */
 	const panel = (col: number, row: number) => {
 		c.at(col * PW, row * PH);
 		c.clip(0, 0, PW - 1, PH - 1);
@@ -368,11 +346,9 @@ function draw(c: Canvas) {
 		c.clip();
 	};
 
-	/** Run `fn`, then ring what it painted in black: outside it on the plaster, on its own edge elsewhere. */
 	const ink = (fn: () => void) => {
 		const g = c.g;
 		const before = g.map((r) => r.slice());
-		// paint onto blanks, so what fn painted shows even where it matches what was there
 		for (const r of g) r.fill('_');
 		fn();
 		const mask = g.map((r) => r.map((k) => k !== '_'));
@@ -396,7 +372,6 @@ function draw(c: Canvas) {
 		for (const [x, y] of todo) g[y][x] = 'K';
 	};
 
-	/** A thick stroke along a path of points: `paint` picks each dot's color from how far along it is and which side. */
 	const tube = (
 		keys: [number, number][],
 		r: (i: number, n: number) => number,
@@ -433,8 +408,6 @@ function draw(c: Canvas) {
 		return path;
 	};
 
-	// ---------- 1. the feathered serpent ----------
-	// its body coils down from the head and runs off into the next panel
 	free();
 	let spine: [number, number][] = [];
 	ink(() => {
@@ -451,11 +424,9 @@ function draw(c: Canvas) {
 				[42, 25]
 			],
 			(i, n) => 2.6 - Math.max(0, i - n + 18) * 0.1,
-			// a yellow belly in red-edged plates, a back of green feathers with turquoise eyes
 			(i, side, d) => (side > 0.8 ? (i % 4 === 0 ? 'R' : 'Y') : i % 3 === 0 && d > 1.2 ? 'T' : 'G')
 		);
 	});
-	// quetzal plumes along its back
 	for (let i = 4; i < spine.length - 6; i += 6) {
 		const [bx, by] = spine[i];
 		const [nx, ny] = spine[i + 1];
@@ -464,7 +435,6 @@ function draw(c: Canvas) {
 			leaf(bx + Math.cos(a) * 3, by + Math.sin(a) * 3, a, 4, i % 12 ? 'G' : 'R', i % 12 ? 'T' : 'Y')
 		);
 	}
-	// the rattle and a plume at the tail's end
 	ink(() => {
 		dots('Y', [43, 25], [44, 24], [45, 24]);
 		dots('R', [44, 25], [45, 25]);
@@ -472,7 +442,6 @@ function draw(c: Canvas) {
 	ink(() => leaf(45, 23, -1.9, 5, 'G', 'T'));
 	panel(0, 0);
 	art(SERPENT_HEAD, 11, 3);
-	// jade beads and stars in the air
 	for (const [x, y, k] of [
 		[5, 6, 'G'],
 		[29, 21, 'Y'],
@@ -483,14 +452,11 @@ function draw(c: Canvas) {
 	] as const)
 		ink(() => put(x, y, k));
 
-	// ---------- 2. Tezcatlipoca, the smoking mirror ----------
 	panel(1, 0);
-	// two darts behind his shield
 	for (const d of [0, 3]) {
 		line(14 + d, 25, 5 + d, 7, 'D');
 		ink(() => dots('R', [5 + d, 6], [4 + d, 5]));
 	}
-	// a fan of feathers behind his head, green and turquoise, rimmed in yellow
 	const feather = (x: number, y: number) => Math.floor(Math.atan2(y - 9, x - 23) * 2.2 + 9) % 2;
 	ink(() => {
 		disk(23, 9, 7, 'Y', (x) => x >= 21);
@@ -499,13 +465,11 @@ function draw(c: Canvas) {
 		disk(23, 9, 2.5, 'R', (x) => x >= 21);
 	});
 	art(TEZ, 9, 4);
-	// a round shield in his front hand
 	ink(() => {
 		disk(8, 19, 3.6, 'W');
 		disk(8, 19, 1.7, 'T');
 		put(8, 19, 'R');
 	});
-	// the smoking mirror in place of his foot, smoke curling up
 	ink(() => {
 		disk(28, 28, 1.8, 'B');
 		put(28, 28, 'W');
@@ -515,9 +479,7 @@ function draw(c: Canvas) {
 		dots('Y', [31, 21], [28, 23]);
 	});
 
-	// ---------- 3. Tlaloc, the rain ----------
 	panel(2, 0);
-	// plumes of white and green, a pleated paper fan behind his neck
 	ink(() => {
 		for (const [a, k] of [
 			[-1.9, 'W'],
@@ -531,7 +493,6 @@ function draw(c: Canvas) {
 		for (let y = 12; y < 20; y++) for (let x = 22; x < 27; x++) put(x, y, x % 2 ? 'W' : 'R');
 	});
 	art(TLALOC, 6, 4);
-	// a lightning serpent held up in his front hand
 	ink(() => {
 		for (let y = 7; y < 28; y++) {
 			const x = 2 + Math.abs((y % 6) - 3);
@@ -541,7 +502,6 @@ function draw(c: Canvas) {
 		rect(2, 4, 4, 6, 'R');
 	});
 	put(3, 5, 'W');
-	// a jar in his back hand, pouring
 	ink(() => {
 		disk(27, 23, 2.5, 'O');
 		line(25, 23, 29, 23, 'W');
@@ -550,7 +510,6 @@ function draw(c: Canvas) {
 		for (let y = 26; y < 30; y++) put(29, y, 'L');
 		dots('L', [30, 24], [30, 25]);
 	});
-	// rain: drops in rows on the open plaster
 	for (let x = 0; x < PW; x++) {
 		for (let y = 3; y < 30; y++) {
 			const k = x % 4 === 1 && y % 4 < 2 ? 'B' : x % 4 === 3 && (y + 2) % 4 < 2 ? 'L' : '';
@@ -560,7 +519,6 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// ---------- 4. and 8. the day signs ----------
 	const signs = [
 		[CROCODILE, 1],
 		[WIND, 2],
@@ -587,30 +545,25 @@ function draw(c: Canvas) {
 			rect(x0 + 1, y0 + 1, x0 + 13, y1 - 1, 'W');
 			const [sign, n] = signs[r * 2 + k];
 			art(sign, x0 + 1, y0 + 1);
-			// its count in dots, one color to a box
 			for (let i = 0; i < n; i++)
 				put(x0 + 11 + (i % 2) * 2, y0 + 1 + Math.floor(i / 2) * 2, DOT[(3 * r + k) % 4]);
 		}
 	}
 
-	// ---------- 5. the jaguar ----------
 	panel(0, 1);
 	ink(() => {
 		c.ell(16, 14, 10, 5, 'Y');
-		// tail curling up behind
 		for (let k = 0; k < 14; k++) {
 			const a = (k / 14) * Math.PI * 1.4;
 			disk(6 - Math.sin(a) * 2.5, 13 - k * 0.65, 1, 'Y');
 		}
 	});
-	// four legs, each with claws
 	for (const x of [8, 13, 20, 25]) {
 		ink(() => {
 			rect(x, 18, x + 2, 25, 'Y');
 			dots('W', [x - 1, 26], [x + 1, 26], [x + 3, 26]);
 		});
 	}
-	// rosettes: black rings round an orange heart
 	for (let y = 10; y < 25; y += 4) {
 		for (let x = 7 + (y % 8 === 2 ? 2 : 0); x < 28; x += 4) {
 			const ring: [number, number][] = [
@@ -625,7 +578,6 @@ function draw(c: Canvas) {
 		}
 	}
 	art(JAG_HEAD, 22, 4);
-	// stars in the night above
 	for (const [x, y] of [
 		[13, 4],
 		[18, 6],
@@ -635,7 +587,6 @@ function draw(c: Canvas) {
 		put(x, y, 'R');
 	}
 
-	// ---------- 6. the temple ----------
 	panel(1, 1);
 	ink(() => {
 		for (let t = 0; t < 4; t++)
@@ -643,7 +594,6 @@ function draw(c: Canvas) {
 		rect(14, 18, 21, 28, 'W');
 	});
 	for (let y = 19; y < 29; y += 2) line(14, y, 21, y, 'K');
-	// the shrine: red walls, a dark door hung with a feather curtain, a thatched roof
 	ink(() => {
 		rect(10, 10, 25, 18, 'R');
 		rect(14, 12, 21, 18, 'K');
@@ -653,18 +603,15 @@ function draw(c: Canvas) {
 	for (let x = 10; x < 26; x += 2) dots('K', [x, 7], [x + 1, 8]);
 	for (let x = 15; x < 21; x++) put(x, 12, x % 2 ? 'G' : 'T');
 	for (let y = 12; y < 18; y += 4) dots('W', [11, y], [24, y]);
-	// a priest with incense on the steps, braziers burning
 	art(PRIEST, 1, 16);
 	for (const x of [5, 29]) {
 		ink(() => rect(x - 1, 23, x + 1, 24, 'D'));
 		ink(() => dots('O', [x, 22], [x - 1, 21], [x + 1, 21]));
 		put(x, 21, 'R');
 	}
-	// smoke curling from the shrine
 	ink(() => dots('A', [28, 10], [29, 9], [29, 8], [28, 7], [28, 6], [29, 5], [30, 4]));
 	ink(() => dots('A', [6, 10], [5, 9], [5, 8], [6, 7], [6, 6], [5, 5], [4, 4]));
 
-	// ---------- 7. the sun drinks a stream of blood ----------
 	panel(2, 1);
 	ink(() => {
 		for (let k = 0; k < 16; k++) {
@@ -679,7 +626,6 @@ function draw(c: Canvas) {
 		put(18 + Math.cos(a) * 7.6, 13 + Math.sin(a) * 7.6, 'G');
 	}
 	art(SUN_FACE, 14, 9);
-	// a headless quail at the bottom: its blood streams up into the sun
 	ink(() => {
 		tube(
 			[
@@ -697,7 +643,6 @@ function draw(c: Canvas) {
 		dots('W', [4, 27], [6, 26], [2, 27]);
 		dots('O', [3, 29], [6, 29]);
 	});
-	// flowers scattered on the ground
 	for (const [x, y] of [
 		[22, 27],
 		[27, 25],
@@ -708,7 +653,6 @@ function draw(c: Canvas) {
 		ink(() => put(x, y + 2, 'G'));
 	}
 
-	// ---------- 10. the earth crocodile, half in the water ----------
 	panel(1, 2);
 	ink(() => {
 		tube(
@@ -720,24 +664,19 @@ function draw(c: Canvas) {
 				[28, 5]
 			],
 			(i, n) => 4 - (i / n) * 3,
-			// turquoise scales on green, a yellow belly
 			(i, side, d) => (side > 2 ? 'Y' : (i + Math.round(d)) % 3 === 0 ? 'T' : 'G')
 		);
-		// legs reaching down into the stream
 		for (const x of [15, 23]) rect(x, 17, x + 2, 21, 'G');
 	});
-	// spines down its back
 	for (let x = 13; x < 27; x += 3)
 		ink(() => put(x, Math.round(10 + Math.abs(x - 20) * 0.1) - (x > 24 ? 2 : 0), 'R'));
 	art(CROC_HEAD, 2, 8);
 
-	// ---------- the river, from the water goddess along the bottom ----------
 	free();
 	const top = (x: number) =>
 		x < 34 ? 90 : x < 40 ? 90 - (x - 34) : x < 62 ? 84 : x < 70 ? 84 + (x - 62) / 2 : 88;
 	ink(() => {
 		for (let x = 3; x < 92; x++) {
-			// blue water in pale wave lines with crests, a few turquoise eddies
 			for (let y = Math.round(top(x)); y < 93; y++) {
 				const r = (92 - y) % 3;
 				const wave = r === 1 || (r === 2 && (x + y) % 8 === 0);
@@ -745,7 +684,6 @@ function draw(c: Canvas) {
 			}
 		}
 	});
-	// shells and jade beads ride its edge; fish swim in it
 	for (let x = 6; x < 86; x += 6) {
 		const y = Math.round(top(x)) - 2;
 		if (x > 64 && x < 70) continue;
@@ -760,9 +698,7 @@ function draw(c: Canvas) {
 		put(x, y, 'K');
 	}
 
-	// ---------- 9. the death god ----------
 	panel(0, 2);
-	// a mass of curly black hair full of star eyes, then the skull and bones
 	disk(7, 8, 5, 'K');
 	disk(5, 14, 3.5, 'K');
 	for (const [x, y] of points('5,5 8,3 3,9 6,12 4,16')) {
@@ -770,7 +706,6 @@ function draw(c: Canvas) {
 		put(x + 1, y, 'R');
 	}
 	art(MICTLAN, 5, 2);
-	// his owl, perched and watching
 	ink(() => {
 		c.ell(29, 6, 2.6, 3.5, 'D');
 		disk(28, 5, 0.8, 'Y');
@@ -781,25 +716,19 @@ function draw(c: Canvas) {
 	for (const [x, y] of points('28,8 30,9')) put(x, y, 'W');
 	ink(() => dots('O', [28, 10], [30, 10]));
 
-	// ---------- 11. the water goddess ----------
 	panel(2, 2);
-	// her throne, in jaguar skin
 	ink(() => {
 		rect(19, 12, 23, 24, 'Y');
 		rect(14, 20, 23, 24, 'Y');
 	});
 	dots('O', [21, 14], [20, 17], [22, 20], [19, 23]);
 	art(WATER_GODDESS, 4, 2);
-	// a pink conch shell, her trumpet, and a jar of water with a jade band
 	art(CONCH, 26, 10);
 	art(JAR, 25, 20);
 
-	// ---------- 12. the skull rack ----------
 	panel(3, 2);
-	// a red platform with white steps
 	ink(() => rect(0, 25, 30, 28, 'R'));
 	for (let x = 2; x < 30; x += 3) dots('W', [x, 27], [x + 1, 27]);
-	// orange posts and poles strung with skulls, blood dripping below
 	ink(() => {
 		rect(2, 11, 3, 24, 'O');
 		rect(27, 11, 28, 24, 'O');
@@ -809,9 +738,7 @@ function draw(c: Canvas) {
 	});
 	for (const y of [12, 18]) for (let k = 0; k < 3; k++) art(SKULL, 4 + k * 8, y);
 	ink(() => dots('R', [7, 24], [15, 24], [23, 24]));
-	// a vulture perched on top
 	art(VULTURE, 12, 1);
-	// ---------- red frame bands ----------
 	free();
 	const band = (x0: number, y0: number, x1: number, y1: number, across: boolean) => {
 		rect(x0, y0, x1, y1, 'K');
@@ -821,9 +748,7 @@ function draw(c: Canvas) {
 	band(0, 30, 101, 33, true);
 	band(0, 62, 135, 65, true);
 	band(100, 0, 103, 63, false);
-	// the river runs under this one
 	band(66, 64, 69, 85, false);
-	// the page's own edge
 	rect(0, 0, 135, 2, 'K');
 	rect(0, 93, 135, 95, 'K');
 	rect(0, 0, 2, 95, 'K');
@@ -842,8 +767,6 @@ export const borgia: Mural = {
 	cols: 4,
 	difficulty: 0.95,
 	panel: [PW, PH],
-	// W plaster, K black, R red, Y yellow, O orange, T turquoise, G jade green, B blue,
-	// L pale blue, S skin, D dark brown, A gray, P pink, M purple
 	palette: {
 		W: '#efe6cf',
 		K: '#1b1714',

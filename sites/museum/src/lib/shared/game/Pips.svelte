@@ -1,13 +1,7 @@
-<!--
-	A level's difficulty from 1 to 5 as filled and empty dots. With `label`, the
-	difficulty's name follows them (the game bar); without, the name is a tooltip.
-	The dots are drawn in CSS, since fonts give ● and ○ different sizes.
--->
 <script lang="ts">
 	import { LABELS } from '../difficulty';
 
 	interface Props {
-		/** 1 (easy) to 5 (very hard). */
 		difficulty: number;
 		label?: boolean;
 	}
@@ -37,7 +31,6 @@
 		gap: 3px;
 		color: var(--accent-color);
 	}
-	/* Whole pixels, so every dot is the same round shape. */
 	.pip {
 		box-sizing: border-box;
 		width: 8px;

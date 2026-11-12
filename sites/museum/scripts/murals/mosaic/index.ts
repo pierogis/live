@@ -1,4 +1,3 @@
-/* Mosaic's murals. They play in the order they measure, easiest first (`playOrder`). */
 import { babel } from './babel.ts';
 import { bayeux } from './bayeux.ts';
 import { bestiary } from './bestiary.ts';

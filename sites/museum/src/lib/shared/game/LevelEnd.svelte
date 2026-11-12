@@ -1,18 +1,10 @@
-<!--
-	How a level ended, shown in place, not as a pop-up: a cleared picture offers the
-	next one, or the murals page when it finished a mural; a stuck game offers undo or
-	starting over.
--->
 <script lang="ts">
 	interface Props {
 		state: 'won' | 'stuck';
-		/** A short line, like "Heart cleared." */
 		text: string;
-		/** The next level's page; without one, `onnext` moves on in place. */
 		nextHref?: string;
 		onnext?: () => void;
 		muralsHref?: string;
-		/** This win finished a mural, so the way on is back to the murals. */
 		finished?: boolean;
 		onundo: () => void;
 		onrestart: () => void;
@@ -45,7 +37,6 @@
 </div>
 
 <style>
-	/* Drawn inside another piece (like a game's tray), so it has no frame of its own. */
 	.end {
 		width: 100%;
 		align-self: center;

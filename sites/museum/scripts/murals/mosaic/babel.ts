@@ -1,20 +1,16 @@
-// Tower of Babel, after Bruegel (1563): a huge round tower, still being built, rising
-// through the clouds over a town and a harbour. Twenty panels of 24 by 22.
+// Tower of Babel, after Bruegel (1563).
 import { div, int, mod, points, round, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const W = 120;
 const H = 88;
-const HOR = 31; // the row where the sky meets the land
+const HOR = 31;
 
-// the tower: storey height, each storey's half width from the bottom up, the row it stands on
 const TH = 9;
 const HW = [41, 36, 31, 26, 21.5, 17, 13];
 const BASE = 78;
-// it leans a little: its middle at a given row
 const cxat = (y: number) => 62 - (BASE - y) * 0.065;
 
-// where the water starts on a row
 const coast = (y: number) => 90 + 9 * Math.sin((y - 30) / 11) + (y - 30) * 0.05;
 
 type Triple = [number, number, number];
@@ -22,7 +18,6 @@ type Triple = [number, number, number];
 function draw(c: Canvas) {
 	const { put, rect, disk, line, dots, get } = c;
 
-	// ---------- sky: banded clouds ----------
 	for (let y = 0; y < HOR; y++) {
 		for (let x = 0; x < W; x++) {
 			const yy = y + Math.abs(Math.sin(((x + 3) * Math.PI) / 10)) * 2.6 + Math.sin(x / 17) * 1.5;
@@ -30,7 +25,6 @@ function draw(c: Canvas) {
 			c.g[y][x] = k < 4.5 ? 'S' : k < 7.5 ? 'W' : 'N';
 		}
 	}
-	// big cumulus heaps so each sky panel has its own shape
 	const cumulus = (x: number, y: number, s: number) => {
 		for (const [dx, dy, r] of points<Triple>('-5,0,3 -1,-2,4 4,-1,3.4 8,0.5,2.4'))
 			disk(x + dx * s, y + dy * s, r * s, 'W');
@@ -40,7 +34,6 @@ function draw(c: Canvas) {
 	cumulus(86, 18, 0.8);
 	cumulus(84, 25, 0.7);
 	cumulus(27, 27, 0.6);
-	// the grey storm heap, top right, with white tops
 	for (const [dx, dy, r] of points<Triple>('-6,1,3 -1,-1,4.6 5,0,3.6 10,2,2.4'))
 		disk(104 + dx, 10 + dy, r, 'N');
 	for (const [dx, dy, r] of points<Triple>('-6,0,1.8 -2,-3,2.4 4,-2,2'))
@@ -65,7 +58,6 @@ function draw(c: Canvas) {
 		disk(x, y - 1 - r, r, 'D');
 	};
 
-	// ---------- land (left) and sea (right) ----------
 	for (let y = HOR; y < H; y++) {
 		for (let x = 0; x < W; x++) {
 			const yy = y + Math.sin((x * Math.PI) / 9) * 1.6;
@@ -74,7 +66,6 @@ function draw(c: Canvas) {
 			if ((x + div(y, 3) * 5) % 9 === 0 && y % 3 === 0) c.g[y][x] = 'D';
 		}
 	}
-	// distant hills on the horizon
 	for (let x = 0; x < 60; x++) {
 		const h = Math.max(
 			3.5 - Math.abs(x - 7) * 0.5,
@@ -85,7 +76,6 @@ function draw(c: Canvas) {
 		for (let y = int(HOR - h); y <= HOR; y++) put(x, y, 'N');
 	}
 	rect(0, HOR + 1, 59, HOR + 1, 'D');
-	// the sea, with a strip of sand along the shore
 	for (let y = HOR - 1; y < H; y++) {
 		for (let x = 0; x < W; x++) {
 			if (x >= coast(y)) {
@@ -96,7 +86,6 @@ function draw(c: Canvas) {
 			}
 		}
 	}
-	// far shore on the right
 	for (let x = 96; x < 120; x++) {
 		const h = Math.max(2.5 - Math.abs(x - 104) * 0.4, 3.5 - Math.abs(x - 115) * 0.5, 0);
 		for (let y = int(HOR - 1 - h); y < HOR; y++) put(x, y, 'N');
@@ -106,13 +95,11 @@ function draw(c: Canvas) {
 		const xr = 13 + 7 * Math.sin((y - 30) / 6) - (y - 30) * 0.12;
 		rect(int(xr), y, int(xr) + 1 + div(y - 30, 14), y, 'B');
 	}
-	// the city: red roofs to the horizon
 	let k = 0;
 	for (let y = HOR + 4; y < 66; y += 5) {
 		for (let x = 0; x < 36; x += 5) {
 			k += 1;
 			const yy = y + (k % 2);
-			// build only on open grass, clear of the river and of what is already there
 			let open = x + 4 < 12 + (80 - yy) * 0.5;
 			for (let a = x - 1; open && a < x + 5; a++) {
 				for (let b = yy - 3; open && b < yy + 1; b++) open = 'GLD'.includes(get(a, b));
@@ -123,7 +110,6 @@ function draw(c: Canvas) {
 			}
 		}
 	}
-	// the church, the town wall with two gate towers, the windmill
 	rect(21, 37, 23, 41, 'W');
 	rect(21, 35, 23, 36, 'N');
 	rect(22, 31, 22, 34, 'N');
@@ -144,18 +130,14 @@ function draw(c: Canvas) {
 	line(0, 42, 7, 49, 'K');
 	line(7, 42, 0, 49, 'K');
 
-	// ---------- the tower ----------
-	// one storey, its bottom middle on row `yb`; `raw` is bare brick, `last` runs down to the ground
 	const tier = (i: number, hw: number, yb: number, h = TH, raw = false, last = false) => {
 		const cx = cxat(yb);
 		for (let x = int(cx - hw) - 1; x < int(cx + hw) + 2; x++) {
 			const u = (x - cx) / hw;
 			if (Math.abs(u) > 1) continue;
-			// the storey is round, so its edges sit higher than its middle
 			const bow = 3 * Math.sqrt(1 - u * u) - 3;
 			const ybot = yb + bow - u * 1.6;
 			const ytop = ybot - h;
-			// the distance round the wall, and where that falls in the 6-wide arch pattern
 			const s = Math.asin(u) * hw + i * 2.5;
 			const kk = mod(s, 6);
 			const lit = u < 0.22;
@@ -174,18 +156,15 @@ function draw(c: Canvas) {
 				if (r === 0) col = lit && !red ? 'W' : 'N';
 				else if (kk < 1.2) col = butt;
 				else if (i % 2 === 0) {
-					// even storeys: one tall arch with a narrow top
 					if (r >= 3 && r <= 7 && kk >= 2 && kk < 5.2 && !(r === 3 && (kk < 3 || kk >= 4.2))) {
 						col = 'K';
 					} else if (r === 8 && kk >= 2 && kk < 5.2 && !last) col = butt;
 				} else {
-					// odd storeys: a small window over a shorter arch
 					if ((r === 2 || r === 3) && kk >= 2.4 && kk < 4.6) col = 'K';
 					else if (r >= 5 && r <= 8 && kk >= 2 && kk < 5.2 && !(r === 5 && (kk < 3 || kk >= 4.2))) {
 						col = lit || red ? 'K' : 'M';
 					}
 				}
-				// the footing under the bottom storey: a ledge, small doors, a plinth
 				if (last && r > 9) {
 					if (r === 10) col = lit ? 'W' : 'N';
 					else if (kk < 1.2) col = butt;
@@ -193,7 +172,6 @@ function draw(c: Canvas) {
 					else if (r === 16) col = butt;
 					else col = wall;
 				}
-				// a darker edge down each side, to make the tower look round
 				if (u < -0.94 && 'CW'.includes(col)) col = 'O';
 				if (u > 0.94 && 'OC'.includes(col)) col = 'M';
 				put(x, y, col);
@@ -201,7 +179,6 @@ function draw(c: Canvas) {
 		}
 	};
 	tier(7, 9.5, BASE - 7 * TH, 8, true);
-	// cloud and sky showing through its ragged, unfinished top
 	for (let x = 48; x < 68; x++) {
 		const t = 1 + ((x * 7) % 4);
 		const cx = cxat(10);
@@ -209,7 +186,6 @@ function draw(c: Canvas) {
 			for (let y = 6; y < 6 + t; y++) put(x, y + int(Math.abs(x - cx) * 0.25), y < 8 ? 'W' : 'S');
 		}
 	}
-	// the seven storeys, the top one first so each lower one overlaps it
 	for (let i = 6; i >= 0; i--) tier(i, HW[i], BASE - i * TH, TH, false, i === 0);
 	for (let x = 18; x < 100; x++) {
 		for (let y = 83; y < H; y++) {
@@ -217,7 +193,6 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// the big gate at the foot
 	const gx = int(cxat(80)) - 6;
 	rect(gx - 4, 73, gx + 4, 82, 'M');
 	rect(gx - 3, 74, gx + 3, 82, 'K');
@@ -225,7 +200,6 @@ function draw(c: Canvas) {
 	rect(gx - 1, 73, gx + 1, 73, 'K');
 	rect(gx - 1, 79, gx + 1, 82, 'N');
 	put(gx, 78, 'C');
-	// the road along the tower's foot, with ox carts of stone
 	for (let x = 40; x < 97; x++) {
 		if ('GL'.includes(get(x, 85))) put(x, 85, 'C');
 		if ('GL'.includes(get(x, 86)) && div(x, 7) % 2) put(x, 86, 'C');
@@ -238,7 +212,6 @@ function draw(c: Canvas) {
 		rect(x - 3, 85, x - 2, 85, 'M');
 		put(x - 3, 84, 'M');
 	}
-	// rock that the tower grows out of, lower left
 	for (let x = 18; x < 44; x++) {
 		const h = 13 - Math.abs(x - 30) * 0.75 + ((x * 5) % 3);
 		const top = int(88 - h);
@@ -247,7 +220,6 @@ function draw(c: Canvas) {
 		}
 	}
 
-	// cranes, scaffolding and ladders
 	const crane = (x: number, y: number, d: number, arm: number, wheel = true) => {
 		rect(x, y - 7, x, y, 'K');
 		line(x, y - 7, x + d * arm, y - 10, 'K');
@@ -273,7 +245,6 @@ function draw(c: Canvas) {
 			put(x + 1, y, y % 2 ? 'W' : 'K');
 		}
 	}
-	// workers on the ramps
 	HW.forEach((hw, i) => {
 		const yb = BASE - i * TH;
 		const cx = cxat(yb);
@@ -289,7 +260,6 @@ function draw(c: Canvas) {
 		});
 	});
 
-	// the cloud drifting across the upper tier
 	for (const [cx, cy, r] of points<Triple>(
 		'37,28.5,2.2 42,27,3.2 48,26,3.6 54,27,3 60,26.5,3.4 66,27.5,2.6 71,28.5,2'
 	))
@@ -303,7 +273,6 @@ function draw(c: Canvas) {
 	for (let i = 0; i < 5; i++) bird(78 + i * 4, 6 + Math.abs(i - 2) * 3);
 	for (const [x, y] of points('114,19 100,20 117,3')) bird(x, y);
 
-	// ---------- harbour on the right ----------
 	const ship = (x: number, y: number, s: number, hull = 'M', sail = 'W') => {
 		rect(x - 3 * s, y, x + 3 * s, y, hull);
 		rect(x - 2 * s, y + 1, x + 2 * s, y + 1, hull);
@@ -311,7 +280,6 @@ function draw(c: Canvas) {
 		put(x + 3 * s + 1, y - 1, hull);
 		rect(x, y - 5 * s - 1, x, y - 1, 'K');
 		rect(x - 2 * s, y - 4 * s - 1, x + 2 * s, y - 2, sail);
-		// on a big ship the mast shows in front of the sail
 		if (s > 1) rect(x, y - 5 * s - 1, x, y - 1, 'K');
 		put(x + 1, y - 5 * s - 2, 'R');
 		put(x, y - 5 * s - 2, 'K');
@@ -339,7 +307,6 @@ function draw(c: Canvas) {
 	raft(114, 85);
 	boat(104, 71);
 	boat(117, 68, 'M');
-	// a lighthouse island and jetty
 	rect(113, 46, 119, 47, 'N');
 	rect(116, 41, 117, 45, 'W');
 	rect(116, 43, 117, 43, 'R');
@@ -347,7 +314,6 @@ function draw(c: Canvas) {
 	rect(112, 48, 119, 48, 'C');
 	rect(96, 66, 104, 66, 'M');
 	dots('K', [98, 67], [102, 67], [98, 65], [102, 65]);
-	// trees, sheds and the quay on the shore
 	for (const [x, y] of points('88,40 92,44 86,47 95,52 93,58')) tree(x, y, 1.8);
 	house(89, 53, 3);
 	house(94, 63, 3, 'C', 'M');
@@ -359,7 +325,6 @@ function draw(c: Canvas) {
 	rect(76, 85, 80, 87, 'N');
 	rect(76, 84, 80, 84, 'W');
 
-	// ---------- foreground hill, bottom left: the king's visit ----------
 	for (let x = 0; x < 30; x++) {
 		const top = 66 + (x * x) / 50 + Math.sin(x / 2);
 		for (let y = int(top); y < 88; y++) {
@@ -372,7 +337,6 @@ function draw(c: Canvas) {
 		rect(x, y, x + w - 1, y + 1, 'N');
 		rect(x, y - 1, x + w - 1, y - 1, 'W');
 	}
-	// a standing figure in a hat, with a spear on side `spear` (0 for none)
 	const fig = (x: number, y: number, body: string, hat: string, spear = 0) => {
 		rect(x - 1, y - 5, x + 1, y - 1, body);
 		put(x - 1, y, 'K');
@@ -386,7 +350,6 @@ function draw(c: Canvas) {
 	};
 	fig(1, 81, 'M', 'K');
 	fig(14, 80, 'B', 'N', 1);
-	// the king in his red cloak, with crown and sceptre
 	rect(5, 73, 9, 80, 'R');
 	rect(4, 78, 10, 80, 'R');
 	rect(6, 73, 8, 73, 'W');
@@ -414,8 +377,6 @@ export const babel: Mural = {
 	notes: 'B',
 	difficulty: 0.3,
 	cols: 5,
-	// S sky, W white, B sea blue, G grass, L light grass, D dark green, C cream stone,
-	// O ochre stone, R red brick, M dark red-brown, K near black, N grey
 	palette: {
 		S: '#86c2e6',
 		W: '#f7f4ec',

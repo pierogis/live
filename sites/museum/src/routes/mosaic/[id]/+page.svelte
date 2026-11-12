@@ -5,7 +5,6 @@
 	let { data } = $props();
 </script>
 
-<!-- Moving to another level keeps this component and hands it the new level's `start` and `initial`. -->
 <Mosaic
 	levels={LIST}
 	start={data.index}

@@ -1,8 +1,4 @@
-// William Morris, Strawberry Thief (1883): a printed cotton from Merton Abbey, Surrey.
-// On a deep indigo ground, curling stems and leaves mirror each other round the middle;
-// song thrushes face each other in pairs over the strawberries they steal, among a red
-// tulip, a yellow carnation, a daisy, snake's head lilies and little white strawberry
-// flowers. 4 by 3 panels: strawberry plants in two corners, six thrushes, four flowers.
+// Strawberry Thief, William Morris (Merton Abbey, Surrey, 1883).
 import { around, mod, round, type Canvas, type Point } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -12,10 +8,6 @@ const COLS = 4;
 const W = PW * COLS;
 const H = PH * 3;
 
-// The thrushes, all drawn beak to the right: K outline, T brown back, Y wing feathers,
-// W cream breast, s its dark speckles, e eye ring, k eye.
-
-/** Leaning forward on a stem. */
 const PERCH = [
 	'...........KKKK....',
 	'..........KTTTTK...',
@@ -34,7 +26,6 @@ const PERCH = [
 	'.........K..K......'
 ];
 
-/** Both wings thrown up. */
 const WINGS = [
 	'.KK...................',
 	'KYTK....KK............',
@@ -55,7 +46,6 @@ const WINGS = [
 	'.........K..K.........'
 ];
 
-/** Sitting fluffed up and round. */
 const ROUND = [
 	'......KKKKK.....',
 	'.....KTTTTTK....',
@@ -73,7 +63,6 @@ const ROUND = [
 	'........K..K....'
 ];
 
-/** Tail up, head down at the berries. */
 const PECK = [
 	'KKK.................',
 	'KTTKK...............',
@@ -93,7 +82,6 @@ const PECK = [
 	'..............K.....'
 ];
 
-/** Upright, singing with its beak open. */
 const SING = [
 	'.........KKKK.....',
 	'........KTTTTKKKK.',
@@ -115,7 +103,6 @@ const SING = [
 	'KKK...............'
 ];
 
-/** Standing tall on its legs, tail cocked. */
 const HOP = [
 	'..........KKKK.....',
 	'.........KTTTTK....',
@@ -136,7 +123,6 @@ const HOP = [
 
 const BIRD = { K: 'K', T: 'T', W: 'W', s: 'K', k: 'K', e: 'W', Y: 'Y' };
 
-/** The red tulip: red petals with yellow veins round a yellow middle petal. */
 const TULIP = [
 	'........K........',
 	'...K...KYK...K...',
@@ -156,7 +142,6 @@ const TULIP = [
 	'.......KGK.......'
 ];
 
-/** The yellow carnation: toothed petals streaked white, on a striped green cup. */
 const CARNATION = [
 	'..R.R...R...R.R..',
 	'.RYRYR.RYR.RYRYR.',
@@ -173,7 +158,6 @@ const CARNATION = [
 	'.......KGK.......'
 ];
 
-/** A snake's head lily: a checked bell hanging from its stalk. */
 const BELL = [
 	'...L...',
 	'..KLK..',
@@ -186,14 +170,12 @@ const BELL = [
 	'.WKWKW.'
 ];
 
-/** Hand-made noise, the same every time. */
 const hash = (x: number, y: number) => {
 	let h = (x * 374761393 + y * 668265263) | 0;
 	h = Math.imul(h ^ (h >>> 13), 1274126177);
 	return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 };
 
-/** Points along a smooth curve through `pts`. */
 function curve(pts: Point[], step = 0.05): Point[] {
 	const out: Point[] = [];
 	for (let i = 0; i < pts.length - 1; i++) {
@@ -213,7 +195,6 @@ function curve(pts: Point[], step = 0.05): Point[] {
 	return out;
 }
 
-/** The stems that hold the design together, left half; the right half mirrors them. */
 const LOBES: Point[][] = [
 	[
 		[55, -2],
@@ -247,7 +228,6 @@ const LOBES: Point[][] = [
 	]
 ];
 
-/** Leaf schemes: edge and middle. */
 const LEAVES = [
 	['L', 'G'],
 	['W', 'B'],
@@ -258,7 +238,6 @@ const LEAVES = [
 function draw(c: Canvas) {
 	const { put, get, dots, stamp, line, disk } = c;
 
-	/** A stem: a solid line of dots, no gaps at its corners. */
 	const stem = (pts: Point[], col = 'L') => {
 		let last: Point | null = null;
 		for (const [fx, fy] of curve(pts)) {
@@ -269,12 +248,10 @@ function draw(c: Canvas) {
 			last = [x, y];
 		}
 	};
-	/** A pointed leaf from (x, y) toward angle `a`: an edge round a middle, a vein. */
 	const bigLeaf = (x: number, y: number, a: number, len: number, w = 2, scheme = 0) => {
 		const [edge, fill] = LEAVES[scheme % LEAVES.length];
 		const ca = Math.cos(a);
 		const sa = Math.sin(a);
-		// pointed at both ends, widest a third of the way out
 		const inside = (px: number, py: number) => {
 			const u = (px - x) * ca + (py - y) * sa;
 			const v = -(px - x) * sa + (py - y) * ca;
@@ -296,7 +273,6 @@ function draw(c: Canvas) {
 		}
 		for (let t = 0.1; t <= 0.75; t += 0.08) put(x + ca * len * t, y + sa * len * t, edge);
 	};
-	/** A curl of stem ending in a spiral. */
 	const curl = (x: number, y: number, r: number, from: number, dir = 1, col = 'L') => {
 		let last: Point | null = null;
 		for (let t = 0; t < 1.6 * Math.PI; t += 0.08) {
@@ -308,31 +284,25 @@ function draw(c: Canvas) {
 			last = [px, py];
 		}
 	};
-	/** A strawberry hanging from (x, y): green cap, red body, yellow seeds. */
 	const berry = (x: number, y: number, big = true, red = 'R') => {
 		const key = { G: 'G', L: 'L', R: red, Y: red === 'R' ? 'Y' : 'G' };
 		if (big) stamp(['.GLG.', 'RRYRR', 'RYRYR', '.RRR.', '..R..'], x - 2, y, key);
 		else stamp(['.G.', 'RRR', 'RYR', '.R.'], x - 1, y, key);
 	};
-	/** A little white strawberry flower. */
 	const blossom = (x: number, y: number) => {
 		stamp(['.W.', 'WYW', 'W.W'], x - 1, y - 1, { W: 'W', Y: 'Y' });
 	};
-	/** A big strawberry flower: five white petals round a yellow heart. */
 	const flower = (x: number, y: number) => {
 		for (const [px, py] of around(5, 1.6, x, y, -Math.PI / 2)) {
 			disk(px, py, 0.8, 'W');
 		}
 		put(x, y, 'Y');
 	};
-	/** A strawberry leaf: three leaflets. */
 	const trefoil = (x: number, y: number, a: number, scheme = 0) => {
 		for (const d of [-0.9, 0, 0.9]) bigLeaf(x, y, a + d, d ? 6 : 7, 2.2, scheme);
 	};
 
-	// ---------- the stems: two lobes each side, mirrored round the middle ----------
 	const mirror = (pts: Point[]): Point[] => pts.map(([x, y]) => [W - 1 - x, y]);
-	// leaves along the stems, alternating sides, both halves alike in shape
 	LOBES.forEach((l, i) => {
 		const pts = curve(l, 0.01);
 		let run = 4;
@@ -355,7 +325,6 @@ function draw(c: Canvas) {
 		stem(l);
 		stem(mirror(l));
 	}
-	// curls where the lobes meet
 	for (const [x, y, r, f, d] of [
 		[18, 18, 3, 0, 1],
 		[18, 63, 3, 0, -1],
@@ -366,7 +335,6 @@ function draw(c: Canvas) {
 		curl(W - 1 - x, y, r, Math.PI - f, -d);
 	}
 
-	// ---------- between each pair of thrushes: the strawberries they're after ----------
 	for (const [top, bottom] of [
 		[9, 25],
 		[60, 77]
@@ -387,7 +355,6 @@ function draw(c: Canvas) {
 		blossom(55, top - 1);
 	}
 
-	// ---------- 1. ripe berries: a strawberry plant ----------
 	c.at(0, 0);
 	stem([
 		[1, 25],
@@ -423,7 +390,6 @@ function draw(c: Canvas) {
 	])
 		blossom(x, y);
 
-	// ---------- 2. the berry thief, a strawberry in its beak ----------
 	c.at(PW, 0);
 	stem([
 		[0, 22],
@@ -437,7 +403,6 @@ function draw(c: Canvas) {
 	bigLeaf(8, 20, 1.9, 5, 1.8, 0);
 	berry(17, 22, false);
 
-	// ---------- 3. wings up, coming down to its mate ----------
 	c.at(PW * 2, 0);
 	stamp(WINGS, 4, 3, BIRD, true);
 	stem([
@@ -447,7 +412,6 @@ function draw(c: Canvas) {
 		[27, 18]
 	]);
 
-	// ---------- 4. the daisy ----------
 	c.at(PW * 3, 0);
 	const daisy = (cx: number, cy: number, r: number) => {
 		for (let y = Math.floor(cy - r - 1); y <= cy + r + 1; y++) {
@@ -455,7 +419,6 @@ function draw(c: Canvas) {
 				const d = Math.hypot(x - cx, y - cy);
 				const a = Math.atan2(y - cy, x - cx);
 				const petal = mod(a / ((2 * Math.PI) / 11), 1);
-				// petals with round tips
 				const edge = r - 1.6 * (1 - Math.sin(petal * Math.PI));
 				if (d > edge + 0.5) continue;
 				if (d > edge - 0.5 || (petal < 0.14 && d > r * 0.35)) put(x, y, 'K');
@@ -474,7 +437,6 @@ function draw(c: Canvas) {
 	bigLeaf(13, 23, 0.3, 7, 2, 2);
 	bigLeaf(13, 22, 3.1, 6, 1.8, 1);
 
-	// ---------- 5. a thrush resting, fluffed up ----------
 	c.at(0, PH);
 	stem([
 		[0, 19],
@@ -486,13 +448,11 @@ function draw(c: Canvas) {
 	berry(4, 20, false);
 	berry(22, 19);
 
-	// ---------- 6. the red tulip ----------
 	c.at(PW, PH);
 	stamp(TULIP, 6, 2, { K: 'K', R: 'R', Y: 'Y', W: 'W', G: 'G' });
 	bigLeaf(14, 18, 2.5, 8, 2, 0);
 	bigLeaf(15, 18, 0.5, 8, 2, 1);
 
-	// ---------- 7. snake's head lilies hanging from an arching stalk ----------
 	c.at(PW * 2, PH);
 	bigLeaf(2, 25, -1.0, 10, 2.6, 0);
 	bigLeaf(26, 25, -2.1, 9, 2.4, 2);
@@ -513,7 +473,6 @@ function draw(c: Canvas) {
 		stamp(BELL, sx - 3, sy, { L: 'L', K: 'K', B: 'B', W: 'W' });
 	}
 
-	// ---------- 8. pecking at the berries ----------
 	c.at(PW * 3, PH);
 	stem([
 		[0, 18],
@@ -529,7 +488,6 @@ function draw(c: Canvas) {
 	])
 		berry(x, y);
 
-	// ---------- 9. the yellow carnation ----------
 	c.at(0, PH * 2);
 	stamp(CARNATION, 5, 3, { R: 'R', Y: 'Y', W: 'W', K: 'K', G: 'G', L: 'L' });
 	stem([
@@ -540,7 +498,6 @@ function draw(c: Canvas) {
 	bigLeaf(13, 19, 2.9, 9, 2, 0);
 	bigLeaf(13, 20, 0.1, 9, 2, 3);
 
-	// ---------- 10 / 11. a pair at the bottom: one sings, one hops ----------
 	c.at(PW, PH * 2);
 	stamp(SING, 7, 3, BIRD);
 	stem([
@@ -559,7 +516,6 @@ function draw(c: Canvas) {
 		[27, 20]
 	]);
 
-	// ---------- 12. blossoms: a strawberry plant in flower ----------
 	c.at(PW * 3, PH * 2);
 	stem([
 		[26, 25],
@@ -597,7 +553,6 @@ function draw(c: Canvas) {
 	blossom(26, 15);
 	c.at();
 
-	// ---------- sprigs wherever the ground is still open ----------
 	const open = (x: number, y: number, r: number) => {
 		for (let dy = -r; dy <= r; dy++)
 			for (let dx = -r; dx <= r; dx++) if (get(x + dx, y + dy) !== 'I') return false;
@@ -608,7 +563,6 @@ function draw(c: Canvas) {
 			if (!open(x, y, 3)) continue;
 			const h = hash(x * 3, y + 11);
 			if (h < 0.3) {
-				// a pair of leaves on a twig
 				line(x, y + 3, x, y - 1, 'L');
 				bigLeaf(x, y + 1, -0.6 - Math.PI * (h < 0.15 ? 1 : 0), 4, 1.3, 0);
 				bigLeaf(x, y, -2.5 + Math.PI * (h < 0.15 ? 1 : 0), 4, 1.3, 2);
@@ -632,7 +586,6 @@ function draw(c: Canvas) {
 			else dots('L', [x - 1, y], [x, y], [x + 1, y - 1]);
 		}
 	}
-	// ---------- the indigo ground, scattered with white and pale blue specks ----------
 	for (let y = 0; y < H; y++) {
 		for (let x = 0; x < W; x++) {
 			const h = hash(x, y);
@@ -651,7 +604,6 @@ export const thief: Mural = {
 	cols: COLS,
 	difficulty: 0.15,
 	panel: [PW, PH],
-	// I indigo, B pale blue, W cream, G green, L light green, R red, Y yellow, T thrush brown, K dark
 	palette: {
 		I: '#1d2a5c',
 		B: '#6d93cf',

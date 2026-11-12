@@ -1,5 +1,4 @@
-// Hall of the Bulls (Lascaux cave, France, about 17,000 years ago): animals in
-// charcoal and ochre on a cave wall. Eight panels of 18 by 16.
+// Hall of the Bulls (Lascaux cave, France, about 17,000 years ago).
 import { inell, int, points, SIDES, type Canvas, type Point } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
@@ -10,7 +9,6 @@ const ROWS = 2;
 const W = PW * COLS;
 const H = PH * ROWS;
 
-// a flat shape built from ovals and boxes, painted in one go so it can have an outline
 class Shape {
 	mask = new Map<string, Point>();
 
@@ -30,7 +28,6 @@ class Shape {
 		for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.add(x, y);
 	}
 
-	// `f` is 1 to face right, -1 to face left; rim dots take the `edge` color if given
 	paint(c: Canvas, ox: number, oy: number, f: number, fill: string, edge = fill) {
 		for (const [x, y] of this.mask.values()) {
 			const inner = SIDES.every(([dx, dy]) => this.mask.has(`${x + dx},${y + dy}`));
@@ -42,21 +39,17 @@ class Shape {
 function draw(c: Canvas) {
 	const { put, rect } = c;
 
-	// single dots placed like a shape: at (ox, oy), facing `f`
 	const marks = (ox: number, oy: number, f: number, col: string, list: string) => {
 		for (const [x, y] of points(list)) put(ox + f * x, oy + y, col);
 	};
 
-	// ---------- the wall ----------
 	for (let x = 0; x < W; x++) {
-		// the pale stone ends lower at the sides and higher in the middle, in small steps
 		const arch = x < 14 ? 8 : x < 20 ? 6 : x < 52 ? 4 : x < 58 ? 6 : 8;
 		const top = arch + (Math.floor(x / 5) % 2 ? 1 : 0);
 		const floor = 26 - (Math.floor((x + 3) / 9) % 2 ? 1 : 0);
 		for (let y = 0; y < H; y++) put(x, y, y < top ? 'L' : y < floor ? 'T' : 'D');
 	}
 
-	// ---------- the animals ----------
 	const bull = (ox: number, oy: number, f: number) => {
 		const s = new Shape();
 		s.ell(-1, 0, 5.5, 3.2);
@@ -101,20 +94,17 @@ function draw(c: Canvas) {
 		s.rect(2, 2, 3, 4);
 		s.paint(c, ox, oy, 1, 'Y');
 		marks(ox, oy, 1, 'K', '-3,5 -2,5 2,5 3,5 7,-4 -5,-1 -5,-2');
-		// two antler beams: one at x 3 leaning back, one at x 5 leaning forward
 		for (const [ax, d] of points('3,-1 5,1')) {
 			for (const [k, y] of points('0,-6 0,-7 1,-8 1,-9 1,-10 2,-8 3,-9 3,-10 0,-9 0,-10'))
 				put(ox + ax + k * d, oy + y, 'K');
 		}
 	};
 
-	// head and shoulders coming in from the right edge
 	const blackBull = (ox: number, oy: number) => {
 		const s = new Shape();
 		s.ell(13, 2, 7.5, 5.6);
 		s.rect(4, -2, 9, 3);
 		s.ell(3, 0, 3.4, 2.4);
-		// stays in the top row
 		for (const [key, [, y]] of s.mask) if (oy + y >= PH) s.mask.delete(key);
 		s.paint(c, ox, oy, 1, 'K');
 		marks(ox, oy, 1, 'K', '3,-3 2,-4 1,-5 1,-6 2,-7 6,-3 6,-4 5,-5 5,-6 6,-7');
@@ -128,21 +118,18 @@ function draw(c: Canvas) {
 		put(ox + 6, oy, 'R');
 	};
 
-	// top row, one panel each; two red marks by the stag's antlers
 	stag(7, 10);
 	for (let i = 0; i < 2; i++) rect(1 + i * 3, 2, 2 + i * 3, 3, 'R');
 	bull(25, 8, 1);
 	bull(46, 8, -1);
 	blackBull(57, 9);
 
-	// bottom row
 	cow(8, 21);
 	horse(22, 22);
 	horse(31, 20);
 	horse(40, 20);
 	horse(49, 22, 'Y');
 	hand(58, 21);
-	// ochre marks on the floor and three black dots climbing
 	for (let i = 0; i < 5; i++) rect(56 + i * 3, 29, 57 + i * 3, 30, 'Y');
 	for (let i = 0; i < 3; i++) rect(66 + i * 2, 23 - i * 3, 67 + i * 2, 24 - i * 3, 'K');
 }
@@ -155,7 +142,6 @@ export const lascaux: Mural = {
 	difficulty: 0,
 	cols: COLS,
 	panel: [PW, PH],
-	// L pale stone, T tan stone, D dark rock floor, K charcoal, R red ochre, Y yellow ochre
 	palette: {
 		L: '#f0e2c4',
 		T: '#c9a06c',

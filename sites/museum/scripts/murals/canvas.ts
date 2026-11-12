@@ -1,8 +1,5 @@
-/* The grid a mural is painted on: one letter per dot. Later paint covers earlier paint. */
-
 export const int = Math.trunc;
 
-/** Rounds a half to the even number. */
 export function round(x: number): number {
 	const f = Math.floor(x);
 	const d = x - f;
@@ -10,24 +7,20 @@ export function round(x: number): number {
 	return f % 2 === 0 ? f : f + 1;
 }
 
-/** Never negative: `mod(-1, 4)` is 3. */
 export const mod = (a: number, b: number) => ((a % b) + b) % b;
 
 export const div = (a: number, b: number) => Math.floor(a / b);
 
 export type Point = [x: number, y: number];
 
-/** Points written short: `points('5,3 12,5 20,3')`. Longer tuples work too: `points<[x, y, r]>`. */
 export const points = <P extends number[] = Point>(list: string): P[] =>
 	list
 		.trim()
 		.split(/\s+/)
 		.map((p) => p.split(',').map(Number) as P);
 
-/** The four dots next to a dot, as steps. */
 export const SIDES = points('1,0 -1,0 0,1 0,-1');
 
-/** A pattern turned a quarter turn clockwise. */
 export const turn = (p: string[]) =>
 	[...p[0]].map((_, i) =>
 		p
@@ -36,14 +29,12 @@ export const turn = (p: string[]) =>
 			.join('')
 	);
 
-/** `n` points evenly round a circle, starting at angle `from`: [x, y, angle]. */
 export const around = (n: number, r: number, cx: number, cy: number, from = 0) =>
 	Array.from({ length: n }, (_, k) => {
 		const a = from + (k * 2 * Math.PI) / n;
 		return [cx + r * Math.cos(a), cy + r * Math.sin(a), a] as const;
 	});
 
-/** Whether (x, y) is inside the oval centered on (cx, cy). */
 export const inell = (x: number, y: number, cx: number, cy: number, rx: number, ry: number) =>
 	((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
 
@@ -52,7 +43,6 @@ type Where = (x: number, y: number) => boolean;
 export class Canvas {
 	readonly w: number;
 	readonly h: number;
-	/** Rows of dots. Writing to it directly skips `at` and `clip`. */
 	readonly g: string[][];
 	#ox = 0;
 	#oy = 0;
@@ -64,13 +54,11 @@ export class Canvas {
 		this.g = Array.from({ length: h }, () => Array<string>(w).fill(ground));
 	}
 
-	/** Shift everything painted from here on. */
 	at = (ox = 0, oy = 0) => {
 		this.#ox = ox;
 		this.#oy = oy;
 	};
 
-	/** Keep paint inside a box, corners included, that moves with `at`. No box: anywhere. */
 	clip = (...box: [x0: number, y0: number, x1: number, y1: number] | []) => {
 		this.#clip = box.length ? box : null;
 	};
@@ -85,7 +73,6 @@ export class Canvas {
 		if (x >= 0 && x < this.w && y >= 0 && y < this.h) this.g[y][x] = c;
 	};
 
-	/** '' off the canvas. */
 	get = (x: number, y: number): string => {
 		x += this.#ox;
 		y += this.#oy;
@@ -96,7 +83,6 @@ export class Canvas {
 		for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) this.put(x, y, c);
 	};
 
-	/** `where` keeps part of it. */
 	ell = (cx: number, cy: number, rx: number, ry: number, c: string, where?: Where) => {
 		for (let y = int(cy - ry) - 1; y < int(cy + ry) + 2; y++) {
 			for (let x = int(cx - rx) - 1; x < int(cx + rx) + 2; x++) {
@@ -105,7 +91,6 @@ export class Canvas {
 		}
 	};
 
-	/** An oval turned `a` radians. */
 	oval = (cx: number, cy: number, rx: number, ry: number, a: number, c: string) => {
 		const ca = Math.cos(a);
 		const sa = Math.sin(a);
@@ -119,7 +104,6 @@ export class Canvas {
 		}
 	};
 
-	/** A pointed leaf from (x, y) toward angle `a`, `len` long; `vein` marks its middle. */
 	leaf = (x: number, y: number, a: number, len: number, c: string, vein = '') => {
 		this.oval(x + (Math.cos(a) * len) / 2, y + (Math.sin(a) * len) / 2, len / 2 + 0.3, 1.2, a, c);
 		if (vein) this.put(x + Math.cos(a) * len * 0.5, y + Math.sin(a) * len * 0.5, vein);
@@ -148,7 +132,6 @@ export class Canvas {
 		for (const [x, y] of points) this.put(x, y, c);
 	};
 
-	/** Rows of marks; `key` gives each mark's color, other marks paint nothing. */
 	stamp = (pattern: string[], x: number, y: number, key: Record<string, string>, flip = false) => {
 		pattern.forEach((line, r) => {
 			const row = flip ? [...line].reverse() : [...line];

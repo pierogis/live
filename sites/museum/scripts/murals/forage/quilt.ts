@@ -1,13 +1,10 @@
-// Baltimore Album Quilt (Maryland, 1840s): appliqué blocks in turkey red and green on
-// cream, each sewn by a different hand: wreaths, baskets, birds, an eagle, a ship. The
-// cream is quilted in a diagonal grid. Twelve blocks of 26 by 26, each framed in green.
+// Baltimore Album Quilt (Maryland, 1840s).
 import { around as ring, turn, type Canvas } from '../canvas.ts';
 import type { Mural } from '../mural.ts';
 
 const PW = 26;
 const PH = 26;
 const COLS = 4;
-/** A block's middle. */
 const MID = 12.5;
 
 const HEART = [
@@ -44,17 +41,14 @@ const BIRD = ['..rr....', '.rrrr...', 'rkrrrr..', 'yrrrrrrr', '.rrrrrrr', '..rrr
 
 function draw(c: Canvas) {
 	const { put, rect, disk, ell, line, dots, stamp, leaf } = c;
-	/** Points round a block's middle (or a given one). */
 	const around = (n: number, r: number, from = 0, cx = MID, cy = MID) => ring(n, r, cx, cy, from);
 
-	/** A round rose: red, a pink heart, a yellow eye. */
 	const rose = (x: number, y: number, r = 2.4) => {
 		disk(x, y, r, 'R');
 		disk(x, y, r * 0.5, 'P');
 		put(Math.round(x), Math.round(y), 'Y');
 	};
 
-	// every block: a green frame with red corners, the cream quilted in a diagonal grid
 	const block = (col: number, row: number) => {
 		c.at(col * PW, row * PH);
 		c.clip(0, 0, PW - 1, PH - 1);
@@ -67,7 +61,6 @@ function draw(c: Canvas) {
 		dots('R', [0, 0], [PW - 1, 0], [0, PH - 1], [PW - 1, PH - 1]);
 	};
 
-	// ---------- 1. a wreath of roses ----------
 	block(0, 0);
 	c.ring(MID, MID, 7.5, 'G', 0.8);
 	for (const [x, y, a] of around(8, 7.5, Math.PI / 8)) {
@@ -77,9 +70,7 @@ function draw(c: Canvas) {
 	for (const [x, y] of around(4, 7.5)) rose(x, y);
 	rose(MID, MID, 2.2);
 
-	// ---------- 2. four hearts and four tulips ----------
 	block(1, 0);
-	// tips to the middle
 	let heart = HEART;
 	for (const [dx, dy] of [
 		[8, 2],
@@ -90,14 +81,12 @@ function draw(c: Canvas) {
 		stamp(heart, dx, dy, { '#': 'R' });
 		heart = turn(heart);
 	}
-	// a tulip in each corner, on a stem from the middle
 	for (const [x, y, a] of around(4, 9.5, Math.PI / 4)) {
 		line(MID + Math.cos(a) * 4, MID + Math.sin(a) * 4, x, y, 'G');
 		disk(x + Math.cos(a) * 0.8, y + Math.sin(a) * 0.8, 1.7, 'Y');
 		put(x + Math.cos(a) * 1.5, y + Math.sin(a) * 1.5, 'R');
 	}
 
-	// ---------- 3. a red bird on a cherry branch ----------
 	block(2, 0);
 	line(3, 21, 22, 6, 'K');
 	line(3, 22, 22, 7, 'K');
@@ -111,7 +100,6 @@ function draw(c: Canvas) {
 		[16, 12, 1.9]
 	] as const)
 		leaf(x, y, a, 4, 'G', 'L');
-	// cherries hang in pairs on fine stems
 	for (const [x, y] of [
 		[5, 22],
 		[11, 18],
@@ -124,10 +112,8 @@ function draw(c: Canvas) {
 	}
 	stamp(BIRD, 9, 5, { r: 'R', k: 'K', y: 'Y' });
 
-	// ---------- 4. a pineapple ----------
 	block(3, 0);
 	ell(MID, 15, 6, 7.5, 'Y');
-	// its scales: a brown diamond grid, an orange eye in some
 	for (let y = 8; y <= 22; y++) {
 		for (let x = 6; x <= 19; x++) {
 			if (c.get(x, y) !== 'Y') continue;
@@ -139,9 +125,7 @@ function draw(c: Canvas) {
 	leaf(MID, 6, -1.57, 3.5, 'G');
 	line(9, 23, 16, 23, 'G');
 
-	// ---------- 5. a basket of flowers ----------
 	block(0, 1);
-	// woven: rows of blue and cream, shifted each row
 	for (let y = 15; y <= 22; y++) {
 		const half = 7 - (y - 15) * 0.4;
 		for (let x = Math.round(MID - half); x <= Math.round(MID + half); x++) {
@@ -168,7 +152,6 @@ function draw(c: Canvas) {
 	] as const)
 		leaf(x, y, a, 3.5, 'G', 'L');
 
-	// ---------- 6. a lyre with a wreath ----------
 	block(1, 1);
 	for (const s of [-1, 1]) {
 		for (let y = 8; y <= 21; y++) {
@@ -180,7 +163,6 @@ function draw(c: Canvas) {
 	rect(7, 21, 18, 22, 'Y');
 	rect(8, 9, 17, 9, 'K');
 	for (const x of [10, 12, 13, 15]) line(x, 10, x, 20, 'K');
-	// a ribbon bow on top, laurel round it
 	dots('R', [11, 7], [14, 7], [10, 6], [15, 6], [12, 7], [13, 7]);
 	dots('R', [11, 8], [14, 8]);
 	for (const [x, y, a] of around(9, 9.5, Math.PI * 0.6)) {
@@ -189,16 +171,13 @@ function draw(c: Canvas) {
 	}
 	dots('R', [4, 18], [21, 18], [3, 13], [22, 13]);
 
-	// ---------- 7. a cornucopia ----------
 	block(2, 1);
-	// the horn curls from its tip at the bottom right up to a wide mouth at the left
 	for (let k = 0; k <= 30; k++) {
 		const t = k / 30;
 		const x = 21 - t * 11;
 		const y = 21 - t * 7 - Math.sin(t * Math.PI) * 3;
 		disk(x, y, 0.6 + t * 3.6, Math.floor(k / 5) % 2 ? 'K' : 'Y');
 	}
-	// spilling out of the mouth: an apple, a pear, grapes, cherries
 	disk(7, 9, 2.6, 'R');
 	put(7, 6, 'K');
 	leaf(7, 6, -0.6, 3, 'G');
@@ -221,7 +200,6 @@ function draw(c: Canvas) {
 	leaf(2, 9, -1.2, 3.5, 'G', 'L');
 	dots('P', [9, 12], [10, 13]);
 
-	// ---------- 8. an urn of flowers ----------
 	block(3, 1);
 	ell(MID, 18, 4.5, 3.5, 'B');
 	rect(9, 14, 16, 15, 'B');
@@ -244,12 +222,9 @@ function draw(c: Canvas) {
 		leaf(x, y, a, 3.5, 'G', 'L');
 	dots('P', [9, 12], [16, 12], [5, 10], [20, 10]);
 
-	// ---------- 9. an eagle with a shield ----------
 	block(0, 2);
-	// a dark edge round the white head, so it shows on the cream
 	disk(12.5, 6, 2.6, 'K');
 	stamp(EAGLE, 2, 2, { K: 'K', Y: 'Y', y: 'Y', W: 'W', B: 'B', R: 'R' });
-	// olive branch and arrows in the talons
 	line(3, 22, 10, 19, 'G');
 	leaf(5, 21, -2, 2.5, 'L');
 	leaf(7, 20, -1.9, 2.5, 'L');
@@ -258,7 +233,6 @@ function draw(c: Canvas) {
 	line(15, 20, 21, 23, 'K');
 	dots('R', [22, 21], [21, 22], [21, 24]);
 
-	// ---------- 10. a ship ----------
 	block(1, 2);
 	for (let y = 19; y <= 23; y++)
 		for (let x = 2; x <= 23; x++) put(x, y, (x + (y % 3) * 2) % 6 < 2 && y > 19 ? 'W' : 'B');
@@ -280,7 +254,6 @@ function draw(c: Canvas) {
 	dots('R', [13, 2], [14, 2], [15, 3], [14, 3]);
 	dots('R', [3, 15], [22, 15]);
 
-	// ---------- 11. a brick church ----------
 	block(2, 2);
 	rect(6, 11, 19, 22, 'R');
 	for (let y = 12; y <= 22; y += 2) for (let x = 6 + (y % 4) / 2; x <= 19; x += 4) put(x, y, 'K');
@@ -296,7 +269,6 @@ function draw(c: Canvas) {
 		dots('L', [x - 1, 12], [x + 1, 14]);
 	}
 
-	// ---------- 12. a grape wreath with two birds ----------
 	block(3, 2);
 	c.ring(MID, 13, 8, 'K', 0.7);
 	for (const [x, y, a] of around(6, 8, Math.PI / 6, MID, 13)) {
@@ -313,7 +285,6 @@ function draw(c: Canvas) {
 			put(Math.round(x + ox) + dx, Math.round(y + oy) + dy, (dx + dy) % 2 ? 'P' : 'B');
 	}
 	for (const [x, y, a] of around(6, 8, 0, MID, 13)) leaf(x, y, a + Math.PI / 2, 3, 'G', 'L');
-	// two lovebirds face each other inside it
 	stamp(BIRD, 4, 10, { r: 'R', k: 'K', y: 'Y' }, true);
 	stamp(BIRD, 14, 10, { r: 'R', k: 'K', y: 'Y' });
 	c.at();
@@ -326,10 +297,8 @@ export const quilt: Mural = {
 	prefix: 'album-quilt',
 	notes: 'F',
 	cols: COLS,
-	// The first five teach the game, a step each (see TEACH in engine.ts).
 	difficulty: 0.05,
 	panel: [PW, PH],
-	// W cream, Q quilting, G green, L light green, R turkey red, P pink, Y yellow, B blue, K brown
 	palette: {
 		W: '#f3ead3',
 		Q: '#bfa06a',
