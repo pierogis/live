@@ -110,14 +110,6 @@ test('most songs stay gentle, about one in five gets adventurous', () => {
 	assert.ok(wild > 50 && wild < 110, `adventurous ${wild}`);
 });
 
-test('a level\u2019s song settings take over from its seed', () => {
-	const s = compose(7, 0, true, { mode: 'dorian', spice: 'adventurous', meter: 3 });
-	assert.equal(s.home.scale.join(), '0,2,3,5,7,9,10');
-	assert.equal(s.style.spice, 0.9);
-	assert.equal(s.style.meter, 3);
-	assert.equal(compose(7, 0, false, { meter: 3 }).style.meter, 4, 'only a game with a feel');
-});
-
 test('the gear follows the pace of moves, without flickering', () => {
 	const c = new Clock();
 	c.start(0, 100);

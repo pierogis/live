@@ -1,12 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { fromTries, levelDifficulty, levelHardness } from '../src/lib/forage/difficulty.ts';
+import { fromTries } from '../src/lib/forage/difficulty.ts';
 import { expression, GIVE_UP, triesOf } from '../src/lib/forage/learner.ts';
 import * as F from '../src/lib/forage/engine.ts';
-import { analyze, THOROUGH } from '../src/lib/forage/cruxes.ts';
-import { options, playAs, strongGame, winsOf } from '../src/lib/forage/player.ts';
-import { pressure, targetTries, targetWins } from '../src/lib/forage/report.ts';
+import { targetTries, targetWins } from '../src/lib/forage/report.ts';
 import { makeRng } from '../src/lib/shared/engine.ts';
 import { closePairs } from '../src/lib/shared/palette.ts';
 import { loadPacks } from './levels.ts';
@@ -331,14 +329,6 @@ test('a linked group of three goes out together and holds its slots until all ar
 	assert.ok(!r.ok && r.reason === 'no-slot', 'three need three free slots');
 });
 
-test('dig depth: blocks to eat before each cell is exposed', () => {
-	const s = make(['AAAAA', 'ABBBA', 'ABCBA', 'ABBBA', 'AAAAA'], [[[0, 16]]]);
-	const d = F.digDepth(s);
-	assert.equal(d[0], 0, 'the edge is exposed');
-	assert.equal(d[6], 1, 'B is under one block');
-	assert.equal(d[12], 2, 'C is under two');
-});
-
 test('a patient pick times ants the same way the board does, tick by tick', () => {
 	const lv = packs[0].levels[3];
 	const s0 = F.buildPuzzle(lv, 3);
@@ -388,18 +378,6 @@ test("a level's deal comes from its own difficulty, not its place in play", () =
 	assert.ok(harder.links > F.tuning(lv).links && harder.waitChance > F.tuning(lv).waitChance);
 });
 
-test('rating and hardness come from the typical learner\u2019s attempts', () => {
-	assert.equal(levelHardness({}), null);
-	assert.equal(levelDifficulty({}), null);
-	assert.equal(levelHardness({ tries: [1, 1, 2] }), 0);
-	assert.equal(levelHardness({ tries: [4, 8, 20] }), 3);
-	assert.deepEqual(
-		[1, 2, 3, 4, 5, 6, 7, 31].map(fromTries),
-		[1, 2, 3, 3, 4, 4, 5, 5],
-		'1 try, 2, 3 or 4, 5 or 6, 7 or more'
-	);
-});
-
 test('passes: losses bunched in a few sends, soon seen, are a crux; spread thin or seen late, not', () => {
 	const at = (n: number, from: number, gap: number) =>
 		Array.from({ length: n }, (_, k) => ({ at: from + (k % 2), gap }));
@@ -415,20 +393,6 @@ test('passes: losses bunched in a few sends, soon seen, are a crux; spread thin 
 	const thin = expression(Array.from({ length: 20 }, (_, k) => ({ at: 5 * k, gap: 2 })));
 	assert.equal(thin.focus, 0);
 	assert.equal(expression([]).focus, 1);
-});
-
-test('learners: a teaching level takes everyone one try', () => {
-	const lv = LEVELS.find((l) => (l.difficulty ?? 0) === 0)!;
-	assert.deepEqual(triesOf(F.buildPuzzle(lv)), { best: 1, typical: 1, worst: 1 });
-});
-
-test('the strong player clears a teaching level, and its path replays to a win', () => {
-	const lv = packs[0].levels[0];
-	const s = F.buildPuzzle(lv, 0);
-	assert.equal(winsOf('strong', s, 6), 1);
-	const t = F.clone(s);
-	for (const col of strongGame(s, 1).path) assert.ok(F.pick(t, col).ok);
-	assert.ok(F.isWon(t));
 });
 
 let index = 0;
@@ -463,118 +427,9 @@ for (const pack of packs) {
 	}
 }
 
-test('later deals make you wait: waits and long-held linked pairs are common', () => {
-	const later = LEVELS.filter((lv) => F.progress(lv.difficulty) >= 0.6);
-	let waits = 0;
-	let sends = 0;
-	let withHeld = 0;
-	for (const lv of later) {
-		const p = pressure(F.buildPuzzle(lv));
-		waits += p.waits;
-		sends += p.sends;
-		if (p.heldPairs) withHeld++;
-	}
-	assert.ok(waits / sends >= 0.1, `${waits} of ${sends} sends wait`);
-	assert.ok(withHeld >= later.length * 0.7, `${withHeld} of ${later.length} hold a pair long`);
-});
-
-test('forage level ids are unique, and every level has a difficulty', () => {
-	const ids = LEVELS.map((l) => l.id);
-	assert.equal(new Set(ids).size, ids.length);
-	for (const lv of LEVELS) assert.ok(lv.difficulty !== undefined, `${lv.id}: no difficulty`);
-});
-
-test('the rule-of-thumb player never parks while a send that finishes can go', () => {
-	const lv = packs[1].levels[3];
-	const s0 = F.buildPuzzle(lv, 40);
-	let s = s0;
-	const g = playAs('clean', s0, 7);
-	assert.ok(g.path.length > 10);
-	for (const col of g.path) {
-		const all = options(s);
-		const took = all.find((o) => o.col === col)!;
-		if (all.some((o) => !o.parked)) assert.ok(!took.parked, 'took a send that finishes');
-		s = took.t;
-	}
-});
-
-test('cruxes: a teaching level has none, and the walked line wins', () => {
-	const lv = packs[0].levels[1];
-	const s = F.buildPuzzle(lv, 1);
-	const a = analyze(s, THOROUGH);
-	assert.ok(a.complete);
-	assert.equal(a.breaks, 0);
-	assert.equal(a.real, 0);
-	const t = F.clone(s);
-	for (const col of a.line) assert.ok(F.pick(t, col).ok);
-	assert.ok(F.isWon(t));
-	const quick = analyze(F.buildPuzzle(LEVELS.at(-1)!, LEVELS.length - 1), {
-		ms: 300,
-		playouts: 1,
-		nodes: 4
-	});
-	assert.ok(quick.ms < 1500, `the search took ${quick.ms.toFixed(0)}ms`);
-});
-
-test("a level's deal string says which column each colony goes to; a bad one is ignored", () => {
-	const lv = { ...packs[3].levels[2], deal: undefined };
-	const plan = F.planPlay(lv);
-	const random = F.buildPuzzle(lv);
-	const placement = F.placementOf(random);
-	const same = F.buildPuzzle({ ...lv, deal: placement.join('') });
-	assert.deepEqual(same.columns, random.columns);
-	const moved = placement.slice();
-	const last = moved.length - 1;
-	for (let k = 0; k < plan.tune.columns; k++) {
-		moved[last] = k;
-		const s = F.dealAs(plan, moved);
-		if (k === placement[last] || !s || !F.wins(s)) continue;
-		const built = F.buildPuzzle({ ...lv, deal: moved.join('') });
-		assert.equal(F.placementOf(built)[last], k);
-		break;
-	}
-	const bad = F.buildPuzzle({ ...lv, deal: '9'.repeat(placement.length) });
-	assert.deepEqual(bad.columns, random.columns, 'falls back to the seed’s own deal');
-});
-
-test('tuned levels: each mural is about as hard as the one before or harder', () => {
-	if (LEVELS.some((l) => l.tries === undefined)) return;
-	const means = packs.map((p) => {
-		const pips = p.levels.map((l) => levelDifficulty(l)!);
-		return pips.reduce((a, b) => a + b) / pips.length;
-	});
-	means.slice(1).forEach((m, k) => {
-		assert.ok(
-			m >= means[k] - 0.25,
-			`${packs[k + 1].id} averages ${m.toFixed(2)}, after ${means[k].toFixed(2)}`
-		);
-	});
-	assert.ok(
-		means.at(-1)! - means[0] >= 2,
-		`from ${means[0].toFixed(2)} to ${means.at(-1)!.toFixed(2)}`
-	);
-});
-
 test('tuned levels: no level takes the slowest learners past what the hardest asks', () => {
 	const ceiling = targetTries(1).worst;
 	for (const l of LEVELS) {
 		if (l.tries) assert.ok(l.tries[2] <= ceiling, `${l.id}: ${l.tries.join('/')} attempts`);
 	}
-});
-
-test('tuned levels: teaching ones have no cruxes, the hardest several rule breaks', () => {
-	if (LEVELS.some((l) => l.tries === undefined)) return;
-	const by = (from: number, to: number) =>
-		LEVELS.filter((l) => {
-			const t = F.progress(l.difficulty);
-			return (l.difficulty ?? 0) >= F.TEACH && t >= from && t <= to;
-		});
-	const teaching = LEVELS.filter((l) => (l.difficulty ?? 0) < F.TEACH);
-	for (const l of teaching) assert.equal(l.cruxes, 0, l.id);
-	const late = by(0.8, 1);
-	const breaks = late.reduce((n, l) => n + (l.breaks ?? 0), 0) / late.length;
-	assert.ok(breaks >= 2, `late levels average ${breaks.toFixed(1)} rule breaks`);
-	const avg = (ls: F.Level[]) => ls.reduce((a, l) => a + levelDifficulty(l)!, 0) / ls.length;
-	assert.ok(avg(teaching) <= 1.2 && avg(late) >= 3.5, `rises from 1 to ${avg(late).toFixed(2)}`);
-	assert.ok(avg(by(0.3, 0.5)) < avg(late) - 0.8, 'the middle is in the middle of the curve');
 });

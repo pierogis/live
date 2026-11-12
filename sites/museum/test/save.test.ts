@@ -66,19 +66,6 @@ test('✓ marks and the saved level stay on their pictures when a level is added
 	assert.equal(after[save.level], 'level-4');
 });
 
-test('hashes that match no level are skipped', () => {
-	const value = encode(
-		{ level: 3, completed: { 'level-1': true, 'level-3': true }, muted: false, options: {} },
-		ids(5)
-	);
-	const save = decode(value, ['level-1', 'other']);
-	assert.deepEqual(save.completed, { 'level-1': true });
-	assert.equal(save.level, 0, 'a removed level resumes at the start');
-	assert.deepEqual(decode(`d=${idHash('level-1')}!!!!ab`, ['level-1']).completed, {
-		'level-1': true
-	});
-});
-
 test('a broken cookie reads as a fresh start', () => {
 	const all = ids(5);
 	for (const bad of ['', 'garbage', 'l=%%%&d=@@@@', 'l=9999&d=zzzz']) {

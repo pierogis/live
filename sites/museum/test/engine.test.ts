@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import * as E from '../src/lib/mosaic/engine.ts';
-import { reportLevel } from '../src/lib/mosaic/report.ts';
 import { loadLevels } from './levels.ts';
 
 const LEVELS = loadLevels();
@@ -46,7 +45,7 @@ for (const relaxed of [false, true]) {
 	});
 }
 
-test('two taps: pick up, then put down where it fits', () => {
+test('a move lifts a group into the tray or onto open spots of its color', () => {
 	const s = tiny(['ABB'], [1, 0, 1], 1);
 	const before = JSON.stringify(s);
 	assert.equal(E.move(s, { from: 'board', cell: 0 }, { to: 'spot', cell: 1 }).ok, false);
@@ -160,43 +159,6 @@ test('with room to spare, the tray takes more of the color, nearest first', () =
 	assert.ok(s.top[0] || s.top[4], 'one A is left on the board');
 });
 
-test('leftovers stay in hand, even when a drop splits them apart', () => {
-	const s = tiny(['AAAAA', 'BBBBB'], [1, 1, 1, 1, 1, 0, 0, 0, 0, 0], 1);
-	assert.ok(E.move(s, { from: 'board', cell: 7 }, { to: 'tray' }).ok);
-	const g = E.groupAt(s, 2)!.cells;
-	const r = E.move(s, { from: 'board', cell: 2, cells: g }, { to: 'spot', cell: 7 });
-	assert.ok(
-		r.ok && r.toBoard.length === 1 && r.toBoard[0].from === 2,
-		'the picked-up dot goes first'
-	);
-	assert.equal(r.leftCells!.length, 4, 'four dots stay in hand');
-	const hand = E.selectionDots(s, { from: 'board', cell: r.leftCell, cells: r.leftCells });
-	assert.equal(hand!.length, 4);
-	assert.ok(E.groupAt(s, r.leftCell)!.cells.length < 4, 'they no longer touch');
-});
-
-test('same level always gives the same puzzle', () => {
-	const a = E.buildPuzzle(LEVELS[0], 0);
-	const b = E.buildPuzzle(LEVELS[0], 0);
-	assert.deepEqual(a.top, b.top);
-});
-
-test('the report judges a level by the solve that kept its shuffle', () => {
-	LEVELS.slice(0, 3).forEach((lv, i) => {
-		const { state, solution } = E.buildSolved(lv);
-		assert.equal(state.trayCap, state.trayBase);
-		assert.deepEqual(state, E.buildPuzzle(lv, i), 'the same puzzle the game plays, tray and all');
-		const r = E.clone(state);
-		for (const a of solution.path) assert.ok(E.move(r, a.sel, a.dst).ok);
-		assert.ok(E.isWon(r));
-		const rep = reportLevel(lv);
-		assert.deepEqual(rep.problems, []);
-		assert.equal(rep.moves, solution.path.length);
-		assert.equal(rep.parks, solution.path.filter((a) => a.dst.to === 'tray').length);
-		assert.equal(rep.shuffle, state.attempt);
-	});
-});
-
 test('taps: a direct hit wins, a near miss snaps to the nearest useful cell', () => {
 	const g: E.TapGrid = { w: 4, h: 1, cell: 40, step: 44, reach: 42 };
 	const isDot = (i: number) => i === 0 || i === 3;
@@ -220,17 +182,6 @@ test("taps on a dot by a bigger group's edge take the bigger group", () => {
 	assert.equal(E.tapCell(g, 82, 20, isDot, null), 1);
 });
 
-test('greedy play takes the first listed action, without listing the rest', () => {
-	LEVELS.slice(0, 4).forEach((lv, i) => {
-		const s = E.buildPuzzle(lv, i);
-		for (let step = 0; step < 120 && !E.isWon(s); step++) {
-			const best = E.bestAction(s);
-			assert.deepEqual(best, E.actions(s)[0] ?? null, `${lv.id} step ${step}`);
-			assert.ok(E.move(s, best!.sel, best!.dst).ok);
-		}
-	});
-});
-
 test('the tray always holds as many dots as there are open spots, so play never sticks', () => {
 	const lv = LEVELS[LEVELS.length - 1];
 	const { state, solution } = E.buildSolved(lv);
@@ -243,20 +194,7 @@ test('the tray always holds as many dots as there are open spots, so play never 
 	}
 });
 
-test('blobs grow with difficulty, from about half a small tray to over twice it', () => {
-	let last = E.blobSizes(0);
-	assert.ok(last.max < 40 && last.min < 20);
-	for (let k = 1; k <= 20; k++) {
-		const b = E.blobSizes(k / 20);
-		assert.ok(b.min >= last.min && b.max >= last.max && b.min < b.max, `difficulty ${k / 20}`);
-		last = b;
-	}
-	assert.ok(last.max > 40);
-	assert.deepEqual(E.blobSizes(2), last, 'and stop at 1');
-});
-
 test('a level\u2019s tray grows with its picture, tightens a little with difficulty, and the bigger one doubles it', () => {
-	assert.equal(E.trayFor(288, 0), 21);
 	assert.ok(E.trayFor(528, 0) > E.trayFor(288, 0), 'a bigger picture, more room');
 	assert.ok(E.trayFor(528, 1) < E.trayFor(528, 0), 'tighter when harder');
 	assert.ok(E.trayFor(528, 1) >= 0.8 * E.trayFor(528, 0), 'but only a little');

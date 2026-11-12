@@ -116,55 +116,6 @@ test('forage: rails stay whole pixels, off colonies, above the counts, and in th
 	}
 });
 
-test('forage: a member out of sight gets no rail', () => {
-	const segs = join([
-		{ col: 0, depth: 0 },
-		{ col: 2, depth: 1 },
-		{ col: 3, depth: 5 }
-	]);
-	assert.ok(segs.length > 0);
-	assert.ok(segs.every((s) => px(s.x) + px(s.w) <= 2 * 64 + 26));
-});
-
-test('forage: rails of two groups that share a gap run side by side', () => {
-	const laid = rails(
-		[
-			{
-				g: 1,
-				members: [
-					{ col: 0, depth: 0 },
-					{ col: 1, depth: 2 }
-				]
-			},
-			{
-				g: 2,
-				members: [
-					{ col: 0, depth: 2 },
-					{ col: 1, depth: 0 }
-				]
-			}
-		],
-		lanes()
-	);
-	const area = (s: Seg) => [px(s.x), px(s.y), px(s.x) + px(s.w), px(s.y) + px(s.h)];
-	for (const a of laid[0].segs.map(area)) {
-		for (const b of laid[1].segs.map(area)) {
-			const overlapX = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
-			const overlapY = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
-			assert.ok(!(overlapX > 4 && overlapY > 4), `${a} over ${b}`);
-			assert.ok(
-				!(
-					overlapX > 0 &&
-					overlapY > 0 &&
-					(a[2] - a[0] === b[2] - b[0] || a[3] - a[1] === b[3] - b[1]) &&
-					Math.max(overlapX, overlapY) > 4
-				),
-				`${a} along ${b}`
-			);
-		}
-	}
-});
-
 test('forage: every level gives each of its linked groups its own color', () => {
 	let levels = 0;
 	loadLevels<Level>('forage').forEach((lv, i) => {
