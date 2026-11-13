@@ -736,15 +736,21 @@
 	.colony.linked {
 		transition: background-color 150ms;
 	}
-	.lane:not(:disabled):hover .colony.front,
 	.lane:focus-visible .colony.front,
 	.colony.lit {
 		background: var(--c-hover, color-mix(in srgb, var(--c), white 22%));
 	}
-	.lane:not(:disabled):hover .colony.front .count,
 	.lane:focus-visible .colony.front .count,
 	.colony.lit .count {
 		color: var(--ink-hover, var(--ink));
+	}
+	@media (hover: hover) {
+		.lane:not(:disabled):hover .colony.front {
+			background: var(--c-hover, color-mix(in srgb, var(--c), white 22%));
+		}
+		.lane:not(:disabled):hover .colony.front .count {
+			color: var(--ink-hover, var(--ink));
+		}
 	}
 	.lane:not(:disabled):active .colony.front {
 		transform: translate(0, 1px);
