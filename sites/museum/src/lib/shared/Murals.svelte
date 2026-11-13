@@ -200,7 +200,8 @@
 	/* The breakpoints above are for browsers without round(). */
 	@supports (width: round(down, 1px, 1px)) {
 		.mural {
-			--s: clamp(2px, round(down, (100cqi - 24px) / (var(--cols) * var(--w)), 1px), 7px);
+			--fit: calc((100cqi - 24px - (var(--cols) - 1) * 2px) / (var(--cols) * var(--w)));
+			--s: min(clamp(2px, round(down, var(--fit), 1px), 7px), var(--fit));
 		}
 	}
 	.panel,
